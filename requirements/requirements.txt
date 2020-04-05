@@ -1,2 +1,3 @@
 mlflow>=1.0.0, <2.0.0
-kedro>=0.15.8 # actually, the first version with pluggy hooks (not released yet, develop branch)
+git+https://github.com/quantumblacklabs/kedro.git@develop # currently, the first version with pluggy hooks (not released yet, develop branch)
+pathlib>=1.0.0

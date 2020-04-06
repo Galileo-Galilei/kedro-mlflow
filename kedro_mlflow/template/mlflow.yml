@@ -1,0 +1,27 @@
+# GLOBAL CONFIGURATION -------------------
+
+# `mlflow_tracking_uri` is the path where the runs will be recorded.
+# For more informations, see https://www.mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
+# kedro-mlflow accepts relative path from the project root.
+# For instance, default `mlruns` will create a mlruns folder
+# at the root of the project
+mlflow_tracking_uri: mlruns  
+
+
+# EXPERIMENT-RELATED PARAMETERS ----------
+
+# `name` is the name of the experiment (~subfolder) 
+# where the runs are recorded. Change the name to
+# switch between different experiments
+experiment:
+  name: {{ python_package }}  
+  create: True  # if the specified `name` does not exists, should it be created?
+
+
+# RUN-RELATED PARAMETERS -----------------
+
+# `nested`: should we allowed nested runs?
+# If set to False, you won't be able to launch
+# sub-runs inside your nodes
+run:
+  nested: True  

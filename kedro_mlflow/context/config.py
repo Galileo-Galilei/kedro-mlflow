@@ -9,13 +9,11 @@ LOGGER = logging.getLogger(__name__)
 
 
 class KedroMlflowConfig:
-    EXPERIMENT_OPTS = {
-        "name": "Default",
-        "create": True
-    }
-    RUN_OPTS = {
-        "nested": True
-    }
+
+    EXPERIMENT_OPTS = {"name": "Default",
+                       "create": True}
+
+    RUN_OPTS = {"nested": True}
 
     def __init__(self,
                  project_path: Union[str, pathlib.Path],
@@ -35,7 +33,7 @@ class KedroMlflowConfig:
         self.mlflow_client = None  # the client to interact with the mlflow database
         self.experiment = None  # the mlflow experiment object to interact directly with it
 
-        # laod attributes with the from_dict method
+        # load attributes with the from_dict method
         # which is the method which will almost always be used
         # for loading the configuration
         configuration = dict(mlflow_tracking_uri=mlflow_tracking_uri,

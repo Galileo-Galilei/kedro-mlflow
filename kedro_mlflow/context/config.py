@@ -1,23 +1,25 @@
 from typing import Union, Dict, Any
 import pathlib
 import kedro_mlflow.utils as utils
-from kedro.context.context import _is_relative_path  # this function is only in the develop branch
+# this function is only in the develop branch
+from kedro.context.context import _is_relative_path
 import mlflow
 import logging
 
 LOGGER = logging.getLogger(__name__)
+
 
 class KedroMlflowConfig:
 
     EXPERIMENT_OPTS = {"name": "Default",
                        "create": True}
 
-    RUN_OPTS = {"nested": True}
+    RUN_OPTS = {"id": None,
+                "name": None,
+                "nested": True}
 
-    
     UI_OPTS = {"port": None,
                "host": None}
-
 
     def __init__(self,
                  project_path: Union[str, pathlib.Path],
@@ -44,9 +46,9 @@ class KedroMlflowConfig:
         # which is the method which will almost always be used
         # for loading the configuration
         configuration = dict(mlflow_tracking_uri=mlflow_tracking_uri,
-                             experiment_opts=experiment_opts,
-                             run_opts=run_opts,
-                             ui_opts=ui_opts)
+                             experiment=experiment_opts,
+                             run=run_opts,
+                             ui=ui_opts)
         self.from_dict(configuration)
 
     def from_dict(self,
@@ -77,17 +79,19 @@ class KedroMlflowConfig:
             }
 
         """
+
         mlflow_tracking_uri = configuration.get("mlflow_tracking_uri")
-        experiment_opts = configuration.get("experiment_opts")
-        run_opts = configuration.get("run_opts")
-        ui_opts = configuration.get("ui_opts")
+        experiment_opts = configuration.get("experiment")
+        run_opts = configuration.get("run")
+        ui_opts = configuration.get("ui")
+
         self.mlflow_tracking_uri = self._validate_uri(uri=mlflow_tracking_uri)
         self.experiment_opts = _validate_opts(opts=experiment_opts,
                                               default=self.EXPERIMENT_OPTS)
         self.run_opts = _validate_opts(opts=run_opts,
                                        default=self.RUN_OPTS)
         self.ui_opts = _validate_opts(opts=ui_opts,
-                                       default=self.UI_OPTS)
+                                      default=self.UI_OPTS)
 
         # instantiate mlflow objects to interact with the database
         # the client must not be create dbefore carefully checking the uri,
@@ -141,7 +145,7 @@ class KedroMlflowConfig:
             if self.experiment is None:
                 # case 1 : the experiment does not exist, it must be created manually
                 experiment_id = self.mlflow_client.create_experiment(
-                    name=self.experiment_opts["create"])
+                    name=self.experiment_opts["name"])
                 self.experiment = self.mlflow_client.get_experiment(
                     experiment_id=experiment_id)
             elif self.experiment.lifecycle_stage == "deleted":
@@ -199,9 +203,9 @@ def _validate_opts(opts: Dict[str, Any],
             Possible keys are :\n- {keys}""".format(k=k,
                                                     keys="\n- ".join(default_copy.keys)))
 
-    opts_copy.update(default_copy)
+    default_copy.update(opts_copy)
 
-    return opts_copy
+    return default_copy
 
 
 class KedroMlflowConfigError(Exception):

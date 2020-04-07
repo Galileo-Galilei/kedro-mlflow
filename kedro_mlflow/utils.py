@@ -64,3 +64,33 @@ def _already_updated(project_path: Union[str, pathlib.Path, None] = None) -> boo
     if (project_path / "conf" / "base" / "mlflow.yml").is_file():
         flag = True
     return flag
+
+def generate_kedro_command(tags,
+                           node_names,
+                           from_nodes,
+                           to_nodes,
+                           from_inputs,
+                           load_versions,
+                           pipeline_name):
+    cdm_list = ["kedro","run"]
+    SEP = " "
+    if len(from_inputs) > 0:
+        cdm_list.append("--from-inputs" + SEP  + ",".join(from_inputs))
+    if len(from_nodes)>0:
+        cdm_list.append("--from-nodes" + SEP  + ",".join(from_nodes))
+    if len(to_nodes)>0:
+        cdm_list.append("--to-nodes" + SEP  + ",".join(to_nodes))
+    if len(node_names)>0:
+        cdm_list.append("--node" + SEP  + ",".join(node_names))
+    if len(node_names)>0:
+        cdm_list.append("--node" + SEP  + ",".join(node_names))
+    if len(tags)>0:
+        # "tag" is the name of the command, "tags" the value in run_params
+        cdm_list.append("--tag" + SEP + ",".join(tags))
+    if len(load_versions)>0:
+        # "load_version" is the name of the command, "load_versions" the value in run_params
+        formatted_versions= ["k:v".format(k=k, v=v) for k, v in load_versions.items()]
+        cdm_list.append("--load-version" + SEP + ",".join(formatted_versions))
+    
+    kedro_cmd = " ".join(cdm_list)
+    return kedro_cmd

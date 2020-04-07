@@ -64,17 +64,3 @@ def flatten_dict(d, recursive: bool = True, sep="."):
     items = [item for k, v in d.items() for item in expand(k, v)]
 
     return dict(items)
-
-
-if __name__=="__main__":
-    inputs={
-        "a":1,
-        "params:b":2,
-        "parameters":3,
-        "parameters_3":4,
-        "params":4,
-        "params:dict_param": dict(a=1,b=2, c=dict(c=3,d=4, e=dict(f=6,g=7)))
-    }
-
-    flatten_dict(inputs, recursive=True, sep=".")
-    flatten_dict(inputs, recursive=False, sep=".")

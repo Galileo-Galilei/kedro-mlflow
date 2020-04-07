@@ -27,7 +27,7 @@ def mlflow_commands():
 
 
 @click.command()
-@click.option("--force", "-f", help= "Update the template without any checks. The modifications you made in 'run.py' will be lost.")
+@click.option("--force", "-f", default=True, help= "Update the template without any checks. The modifications you made in 'run.py' will be lost.")
 def template(force):
     """Updates the template of a kedro project. 
     Running this command is mandatory to use kedro-mlflow.  
@@ -61,6 +61,7 @@ def template(force):
     # if yes, replace the script by the template silently
     # if no, raise a warning and send a message to INSERT_DOC_URL
     flag_erase_runpy = force 
+    runpy_project_path = project_path / "src" / (pathlib.Path(project_globals["context_path"]).parent.as_posix() + ".py") 
     if not force: 
         kedro_path = pathlib.Path(KEDRO_PATH).parent
         runpy_template_path = (
@@ -72,7 +73,6 @@ def template(force):
                                                             kedro_version=project_globals["kedro_version"]
                                                             )
         
-        runpy_project_path = project_path / "src" / (pathlib.Path(project_globals["context_path"]).parent.as_posix() + ".py") 
         with open(runpy_project_path, mode="r") as file_handler:
             kedro_runpy_project = file_handler.read()
 

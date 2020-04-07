@@ -1,7 +1,7 @@
 from typing import Union, Dict, Any
 import pathlib
 import kedro_mlflow.utils as utils
-# from kedro.context.context import _is_relative_path  # this function is only in the develop branch
+from kedro.context.context import _is_relative_path  # this function is only in the develop branch
 import mlflow
 import logging
 
@@ -163,7 +163,7 @@ class KedroMlflowConfig:
         # if no tracking uri is provided, we register the runs locally at the root of the project
         uri = "mlruns" if uri is None else uri
 
-        if utils._is_relative_path(uri):
+        if _is_relative_path(uri):
             absolute_uri = self.project_path / uri
             valid_uri = absolute_uri.resolve().as_uri()
 

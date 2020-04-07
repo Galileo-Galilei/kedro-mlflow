@@ -2,6 +2,7 @@ import os
 import click
 import pathlib
 import subprocess
+from kedro_mlflow.context import get_mlflow_conf
 import kedro_mlflow.utils as utils
 import kedro_mlflow.cli.cli_utils as cli_utils
 from kedro.cli import get_project_context
@@ -27,8 +28,9 @@ def mlflow_commands():
 
 
 @click.command()
-@click.option("--force", "-f", default=True, help= "Update the template without any checks. The modifications you made in 'run.py' will be lost.")
-def template(force):
+@click.option("--force", "-f", is_flag=True, default=False, help="Update the template without any checks. The modifications you made in 'run.py' will be lost.")
+@click.option("--silent", "-s", is_flag=True, default=False, help="Should message be logged when files are modified?")
+def template(force, silent):
     """Updates the template of a kedro project. 
     Running this command is mandatory to use kedro-mlflow.  
     2 actions are performed : 
@@ -41,6 +43,7 @@ def template(force):
          If you do not want to erase "run.py", insert the hooks manually 
 
     """
+
     # get constants
     project_path = pathlib.Path().cwd()
     if not utils._is_kedro_project(project_path):
@@ -56,32 +59,34 @@ def template(force):
                                    is_cookiecutter=False,
                                    dst=project_path / "conf" / "base" / mlflow_yml,
                                    python_package=project_globals["python_package"])
-
+    if not silent:
+        click.secho(click.style("'conf/base/mlflow.yml' sucessfully updated.", fg="green"))
     # make a check whether the project run.py is strictly identical to the template
     # if yes, replace the script by the template silently
     # if no, raise a warning and send a message to INSERT_DOC_URL
-    flag_erase_runpy = force 
-    runpy_project_path = project_path / "src" / (pathlib.Path(project_globals["context_path"]).parent.as_posix() + ".py") 
-    if not force: 
+    flag_erase_runpy = force
+    runpy_project_path = project_path / "src" / \
+        (pathlib.Path(project_globals["context_path"]).parent.as_posix() + ".py")
+    if not force:
         kedro_path = pathlib.Path(KEDRO_PATH).parent
         runpy_template_path = (
             kedro_path / r"template\{{ cookiecutter.repo_name }}\src\{{ cookiecutter.python_package }}\run.py")
         kedro_runpy_template = cli_utils.render_jinja_template(src=runpy_template_path,
-                                                            is_cookiecutter=True,
-                                                            python_package=project_globals["python_package"],
-                                                            project_name=project_globals["project_name"],
-                                                            kedro_version=project_globals["kedro_version"]
-                                                            )
-        
+                                                               is_cookiecutter=True,
+                                                               python_package=project_globals["python_package"],
+                                                               project_name=project_globals["project_name"],
+                                                               kedro_version=project_globals["kedro_version"]
+                                                               )
+
         with open(runpy_project_path, mode="r") as file_handler:
             kedro_runpy_project = file_handler.read()
 
-        # strip() is necessary because cookiecutter render python files 
+        # strip() is necessary because cookiecutter render python files
         # with an extra line jump "\n" (to match autopep8 convention)
-        if kedro_runpy_project.strip()==kedro_runpy_template:
-            flag_erase_runpy=True
+        if kedro_runpy_project.strip() == kedro_runpy_template:
+            flag_erase_runpy = True
 
-    if flag_erase_runpy:    
+    if flag_erase_runpy:
         os.remove(runpy_project_path)
         cli_utils.write_jinja_template(src=template_folder_path / "run.py",
                                        dst=runpy_project_path,
@@ -90,35 +95,42 @@ def template(force):
                                        project_name=project_globals["project_name"],
                                        kedro_version=project_globals["kedro_version"]
                                        )
-
+        if not silent:
+            click.secho(click.style("'run.py' sucessfully updated", fg="green"))
     else:
         click.secho(click.style("You have modified your 'run.py' since project creation.\n" +
-                                "In order to use kedro-mlflow, you must either:\n" + 
+                                "In order to use kedro-mlflow, you must either:\n" +
                                 "    -  set up your run.py with the following instructions :\n" +
                                 "INSERT_DOC_URL\n" +
                                 "    - call the following command:\n" +
                                 "$ kedro mlflow template --force",
                                 fg="yellow"))
 
+
 @click.command()
-def ui():
+@click.option("--project-path", "-p", required=False, help= "The environment within conf folder we want to retrieve.")
+@click.option("--env", "-e", required=False, default="local", help= "The environment within conf folder we want to retrieve.")
+def ui(project_path, env):
     """Opens the mlflow user interface with the 
         project-specific settings of mlflow.yml. This interface 
         enables to browse and compares runs. 
 
     """
-    cwd = pathlib.Path().cwd().as_posix()
-    if not utils._is_kedro_project(cwd):
+    if project_path is None:
+        project_path = pathlib.Path().cwd().as_posix()
+    else:
+        project_path = pathlib.Path(project_path)
+    if not utils._is_kedro_project(project_path):
         raise KedroMlflowCliError(
-            "This command can only be called from the root of a kedro project.")
+            "'project_path' must be the root of a kedro project.")
 
     # the context must contains the self.mlflow attribues with mlflow configuration
-    project_context = load_context(project_path=cwd) 
+    mlflow_conf = get_mlflow_conf(project_path=project_path, env=env)
 
     # call mlflow ui with specific options
     # TODO : add more options for ui
     subprocess.call(["mlflow", "ui", "--backend-store-uri",
-                     project_context.mlflow.mlflow_tracking_uri])
+                     mlflow_conf.mlflow_tracking_uri])
 
 
 @click.command()

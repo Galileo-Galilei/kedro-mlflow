@@ -1,12 +1,11 @@
 from typing import Union, Dict, Any
 import pathlib
 import kedro_mlflow.utils as utils
-import kedro.context.context as kedro_context
+# from kedro.context.context import _is_relative_path  # this function is only in the develop branch
 import mlflow
 import logging
 
 LOGGER = logging.getLogger(__name__)
-
 
 class KedroMlflowConfig:
 
@@ -15,11 +14,18 @@ class KedroMlflowConfig:
 
     RUN_OPTS = {"nested": True}
 
+    
+    UI_OPTS = {"port": None,
+               "host": None}
+
+
     def __init__(self,
                  project_path: Union[str, pathlib.Path],
                  mlflow_tracking_uri: str = "mlruns",
                  experiment_opts: Union[Dict[str, Any], None] = None,
-                 run_opts: Union[Dict[str, Any], None] = None):
+                 run_opts: Union[Dict[str, Any], None] = None,
+                 ui_opts: Union[Dict[str, Any], None] = None,
+                 ):
 
         # declare attributes in __init__.py to avoid pylint complaining
         if not utils._is_kedro_project(project_path):
@@ -30,6 +36,7 @@ class KedroMlflowConfig:
         self.mlflow_tracking_uri = "mlruns"
         self.experiment_opts = None
         self.run_opts = None
+        self.ui_opts = None
         self.mlflow_client = None  # the client to interact with the mlflow database
         self.experiment = None  # the mlflow experiment object to interact directly with it
 
@@ -38,7 +45,8 @@ class KedroMlflowConfig:
         # for loading the configuration
         configuration = dict(mlflow_tracking_uri=mlflow_tracking_uri,
                              experiment_opts=experiment_opts,
-                             run_opts=run_opts)
+                             run_opts=run_opts,
+                             ui_opts=ui_opts)
         self.from_dict(configuration)
 
     def from_dict(self,
@@ -60,6 +68,11 @@ class KedroMlflowConfig:
                 run_opts:
                     {
                         nested {bool}: should we allow nested run within the context?
+                    },
+                ui_opts:
+                    {
+                        port {int} : the port where the ui must be served
+                        host {str} : the host for the ui
                     }
             }
 
@@ -67,11 +80,14 @@ class KedroMlflowConfig:
         mlflow_tracking_uri = configuration.get("mlflow_tracking_uri")
         experiment_opts = configuration.get("experiment_opts")
         run_opts = configuration.get("run_opts")
+        ui_opts = configuration.get("ui_opts")
         self.mlflow_tracking_uri = self._validate_uri(uri=mlflow_tracking_uri)
         self.experiment_opts = _validate_opts(opts=experiment_opts,
                                               default=self.EXPERIMENT_OPTS)
         self.run_opts = _validate_opts(opts=run_opts,
                                        default=self.RUN_OPTS)
+        self.ui_opts = _validate_opts(opts=ui_opts,
+                                       default=self.UI_OPTS)
 
         # instantiate mlflow objects to interact with the database
         # the client must not be create dbefore carefully checking the uri,
@@ -102,7 +118,8 @@ class KedroMlflowConfig:
             "project_path": self.project_path,
             "mlflow_tracking_uri": self.mlflow_tracking_uri,
             "experiments_opts": self.experiment_opts,
-            "run_opts": self.run_opts
+            "run_opts": self.run_opts,
+            "ui_opts": self.ui_opts,
         }
         return info
 
@@ -146,7 +163,7 @@ class KedroMlflowConfig:
         # if no tracking uri is provided, we register the runs locally at the root of the project
         uri = "mlruns" if uri is None else uri
 
-        if kedro_context._is_relative_path(uri):
+        if utils._is_relative_path(uri):
             absolute_uri = self.project_path / uri
             valid_uri = absolute_uri.resolve().as_uri()
 

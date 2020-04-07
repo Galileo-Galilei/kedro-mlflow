@@ -5,6 +5,7 @@ import yaml
 import re
 from kedro.context import load_context
 from kedro import __version__ as KEDRO_VERSION
+from urllib.parse import urlparse
 
 KEDRO_YML = ".kedro.yml"
 
@@ -25,7 +26,7 @@ def _get_project_globals(project_path: Union[str, pathlib.Path, None] = None) ->
 
     # for the project name, we have to load the context : it is the only place where it is recorded
     project_context = load_context(project_path)
-    project_name = project_context.name
+    project_name = project_context.project_name
 
     kedro_yml = _read_kedro_yml(project_path)
     python_package = re.search(pattern=r"^(\w+)(?=\.)",

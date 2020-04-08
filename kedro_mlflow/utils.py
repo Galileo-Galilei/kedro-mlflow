@@ -1,4 +1,4 @@
-from typing import Union, Dict
+from typing import Union, Dict, List
 import pathlib
 import os
 import yaml
@@ -6,6 +6,7 @@ import re
 from kedro.context import load_context
 from kedro import __version__ as KEDRO_VERSION
 from urllib.parse import urlparse
+from pkg_resources import working_set
 
 KEDRO_YML = ".kedro.yml"
 
@@ -65,7 +66,7 @@ def _already_updated(project_path: Union[str, pathlib.Path, None] = None) -> boo
         flag = True
     return flag
 
-def generate_kedro_command(tags,
+def _generate_kedro_command(tags,
                            node_names,
                            from_nodes,
                            to_nodes,
@@ -94,3 +95,13 @@ def generate_kedro_command(tags,
     
     kedro_cmd = " ".join(cdm_list)
     return kedro_cmd
+
+def _get_package_requirements(package_name: str) -> List[str]:
+    package = working_set.by_key[package_name]
+    requirements = [str(r) for r in package.requires()]
+    return requirements
+
+def _parse_requirements(path, encoding="utf-8"):
+    with open(path, mode="r", encoding=encoding) as file_handler:
+        requirements = [x.strip() for x in file_handler if x.strip() and not x.startswith("-r")]
+    return requirements

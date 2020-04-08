@@ -14,14 +14,14 @@ with open((HERE / NAME / "__init__.py").as_posix(), encoding="utf-8") as file_ha
 
     VERSION = result.group(1)
 
-def _get_requirements(path, encoding="utf-8"):
+def _parse_requirements(path, encoding="utf-8"):
     with open(path, mode="r", encoding=encoding) as file_handler:
         requirements = [x.strip() for x in file_handler if x.strip() and not x.startswith("-r")]
     return requirements
 
 # get the dependencies and installs
-base_requirements= _get_requirements("requirements/requirements.txt")
-test_requirements= _get_requirements("requirements/test_requirements.txt")
+base_requirements= _parse_requirements("requirements/requirements.txt")
+test_requirements= _parse_requirements("requirements/test_requirements.txt")
 
 
 # Get the long description from the README file

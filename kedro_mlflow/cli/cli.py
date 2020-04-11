@@ -1,16 +1,20 @@
 import os
 import click
-import pathlib
+from pathlib import Path
 import subprocess
 from kedro_mlflow.context import get_mlflow_conf
-import kedro_mlflow.utils as utils
-import kedro_mlflow.cli.cli_utils as cli_utils
 from kedro.cli import get_project_context
 from kedro.context import load_context
 from kedro import __file__ as KEDRO_PATH
-# from importlib import reload
-# reload(utils)
-# reload(cli_utils)
+from kedro_mlflow.utils import (
+    _get_project_globals,
+    _is_kedro_project,
+    _already_updated
+)
+from kedro_mlflow.cli.cli_utils import(
+    render_jinja_template,
+    write_jinja_template 
+)
 
 
 @click.group(name="Mlflow")
@@ -45,17 +49,18 @@ def template(force, silent):
     """
 
     # get constants
-    project_path = pathlib.Path().cwd()
-    if not utils._is_kedro_project(project_path):
+    project_path = Path().cwd()
+    if not _is_kedro_project(project_path):
         raise KedroMlflowCliError(
             "This command can only be called from the root of a kedro project.")
-    project_globals = utils._get_project_globals(project_path)
-    template_folder_path = pathlib.Path(__file__).parent.parent / "template"
+    project_globals = _get_project_globals(project_path)
+    template_folder_path = Path(__file__).parent.parent \
+        / "template" / "project"
 
     # mlflow.yml is just a static file,
     # but the name of the experiment is set to be the same as the project
     mlflow_yml = "mlflow.yml"
-    cli_utils.write_jinja_template(src=template_folder_path / mlflow_yml,
+    write_jinja_template(src=template_folder_path / mlflow_yml,
                                    is_cookiecutter=False,
                                    dst=project_path / "conf" / "base" / mlflow_yml,
                                    python_package=project_globals["python_package"])
@@ -66,12 +71,12 @@ def template(force, silent):
     # if no, raise a warning and send a message to INSERT_DOC_URL
     flag_erase_runpy = force
     runpy_project_path = project_path / "src" / \
-        (pathlib.Path(project_globals["context_path"]).parent.as_posix() + ".py")
+        (Path(project_globals["context_path"]).parent.as_posix() + ".py")
     if not force:
-        kedro_path = pathlib.Path(KEDRO_PATH).parent
+        kedro_path = Path(KEDRO_PATH).parent
         runpy_template_path = (
             kedro_path / r"template\{{ cookiecutter.repo_name }}\src\{{ cookiecutter.python_package }}\run.py")
-        kedro_runpy_template = cli_utils.render_jinja_template(src=runpy_template_path,
+        kedro_runpy_template = render_jinja_template(src=runpy_template_path,
                                                                is_cookiecutter=True,
                                                                python_package=project_globals["python_package"],
                                                                project_name=project_globals["project_name"],
@@ -88,7 +93,7 @@ def template(force, silent):
 
     if flag_erase_runpy:
         os.remove(runpy_project_path)
-        cli_utils.write_jinja_template(src=template_folder_path / "run.py",
+        write_jinja_template(src=template_folder_path / "run.py",
                                        dst=runpy_project_path,
                                        is_cookiecutter=True,
                                        python_package=project_globals["python_package"],
@@ -117,10 +122,10 @@ def ui(project_path, env):
 
     """
     if project_path is None:
-        project_path = pathlib.Path().cwd().as_posix()
+        project_path = Path().cwd().as_posix()
     else:
-        project_path = pathlib.Path(project_path)
-    if not utils._is_kedro_project(project_path):
+        project_path = Path(project_path)
+    if not _is_kedro_project(project_path):
         raise KedroMlflowCliError(
             "'project_path' must be the root of a kedro project.")
 
@@ -163,9 +168,9 @@ class KedroMlflowCliError(Exception):
 
 # logic to deal with the import of the different commands
 # we want to give restrictive access depending on conditions
-if utils._is_kedro_project():
+if _is_kedro_project():
     mlflow_commands.add_command(template)
-    if utils._already_updated():
+    if _already_updated():
         mlflow_commands.add_command(ui)
         mlflow_commands.add_command(run)
     else:

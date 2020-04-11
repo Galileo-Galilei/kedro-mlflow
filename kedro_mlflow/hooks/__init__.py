@@ -1,2 +1,2 @@
-from .node_specs import MlflowNodeHook
-from .pipeline_specs import MlflowPipelineHook
+from .node_hook import MlflowNodeHook
+from .pipeline_hook import MlflowPipelineHook

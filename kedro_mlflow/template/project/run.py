@@ -33,7 +33,7 @@ from typing import Dict
 from kedro.context import KedroContext, load_context
 from kedro.pipeline import Pipeline
 
-from kedro_mlflow.hooks import MlflowNodeSpecs, MlflowPipelineSpecs
+from kedro_mlflow.hooks import MlflowNodeHook, MlflowPipelineHook
 
 from {{ cookiecutter.python_package }}.pipeline import create_pipelines
 

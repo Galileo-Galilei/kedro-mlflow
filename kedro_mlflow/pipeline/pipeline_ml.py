@@ -20,7 +20,7 @@ class PipelineML(Pipeline):
      are the outpust of the "training" pipeline, except for one of them (the data to predict).
 
      This class enables to "link" a training pipeline and an inference pipeline in order to package them
-     in mlflow easily. The goal is to call the ``MLflowPipelineSpec`` hook after a PipelineMl is called
+     in mlflow easily. The goal is to call the ``MLflowPipelineHook`` hook after a PipelineMl is called
      in order to trigger mlflow packaging.
 
 

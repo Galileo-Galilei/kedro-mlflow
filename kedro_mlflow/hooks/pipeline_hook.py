@@ -1,5 +1,7 @@
 import mlflow
 import re
+import sys
+import yaml
 from typing import Union, Dict, Any
 from pathlib import Path
 
@@ -11,7 +13,8 @@ from kedro.versioning.journal import _git_sha
 
 from kedro_mlflow.context import get_mlflow_conf
 from kedro_mlflow.utils import (_get_package_requirements,
-                                _get_project_globals)
+                                _get_project_globals, 
+                                _parse_requirements)
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import PipelineML
 
@@ -114,7 +117,7 @@ class MlflowPipelineHook:
                          if name != pipeline.model_input_name}
             mlflow.pyfunc.log_model(artifact_path=self.model_name,
                                     python_model=KedroPipelineModel(pipeline_ml=pipeline,
-                                                                    catalog=sub_catalog),
+                                                                    catalog=pipeline_catalog),
                                     artifacts=artifacts,
                                      conda_env=self.conda_env)
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
@@ -161,7 +164,7 @@ def _format_conda_env(conda_env: Union[str, Path, Dict[str, Any]] = None) -> Dic
             your current python_version and these dependencies is returned
             - a path to an "environment.yml" : data is loaded and used as they are
             - a Dict : used as the environment
-            - None (default: {None}) : try to infer the dependencies base on current package name
+            - None (default: {None})
 
     Returns:
         Dict[str, Any] -- [description]
@@ -169,22 +172,24 @@ def _format_conda_env(conda_env: Union[str, Path, Dict[str, Any]] = None) -> Dic
     python_version = ".".join([str(sys.version_info.major), str(sys.version_info.minor), str(sys.version_info.micro)])
     if isinstance(conda_env, str):
         conda_env = Path(conda_env)
+    
     if isinstance(conda_env, Path):
         if conda_env.suffix in (".yml", ".yaml"):
             with open(conda_env, mode="r") as file_handler:
                 conda_env = yaml.safe_load(file_handler)
         elif conda_env.suffix in (".txt"):
-            with open(conda_env, mode="r") as file_handler:
-                dependencies = _parse_requirements(file_handler)
             conda_env = {"python": python_version,
-                         "dependencies": dependencies}
+                         "dependencies":  _parse_requirements(conda_env)}
+    elif conda_env is None:
+            conda_env = {"python": python_version}
     else:
-        project_globals = _get_project_globals(Path().cwd())
-        try:
-            conda_env = {"python": python_version,
-                         "dependencies": _get_project_globals(project_globals["python_package"])}
-        except:
-            conda_env = {"python": python_version,
-                         "dependencies": [project_globals["python_package"]]}
+        raise ValueError("""Invalid conda_env. It can be either : 
+            - a Dict : used as the environment without control
+            - None (default: {None}) : Only the python vresion will be stored.
+            - a path to a "requirements.txt": In this case
+            the packages are parsed and a conda env with
+            your current python_version and these dependencies is returned
+            - a path to an "environment.yml" : data is loaded and used as they are
+            """)
 
     return conda_env

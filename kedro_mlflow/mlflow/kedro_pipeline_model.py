@@ -1,49 +1,38 @@
 from typing import Callable, Any, Dict, Union
+from copy import deepcopy
 from mlflow.pyfunc import PythonModel
-from kedro.io import DataCatalog
+from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.runner import SequentialRunner
+from kedro.io import DataCatalog
+from kedro_mlflow.pipeline import PipelineML
 
 
 class KedroPipelineModel(PythonModel):
     def __init__(self,
-                 training: Pipeline,
-                 inference: Pipeline,
-                 input_formatter: Callable = None,
-                 formatter_kwargs: Dict[str, Any] = None,
-                 instance_name: Union[str, None] = None):
+                 pipeline_ml: PipelineML,
+                 catalog: DataCatalog):
 
-        free_inputs_set = set(inference.inputs) - set(training.outputs)
-        if len(free_inputs_set) == 1:
-            free_input = list(free_inputs_set)[0]
-        else:
-            raise KedroPipelineModelInputsError("""
-        The following inputs are free for the inference pipeline:
-            - {inputs}. 
-        Only one free input is allowed. 
-        Please make sure that 'inference' pipeline inputs are 'training' pipeline outputs,
-        except one.""".format("\n     - ".join(free_inputs_set)))
-
-        self.catalog = DataCatalog()
-        self.training = training
-        self.inference = inference
-        self.input_formatter = input_formatter
-        self.formatter_kwargs = formatter_kwargs
-        self.instance_name = instance_name or free_input
+        self.pipeline_ml = pipeline_ml
+        self.initial_catalog = pipeline_ml.extract_pipeline_catalog(catalog)
+        self.loaded_catalog = DataCatalog()
 
     def load_context(self, context):
-        self.catalog.add_feed_dict(context.artifacts)
+        self.loaded_catalog = deepcopy(self.initial_catalog)
+        for name, uri in context.artifacts.items():
+            if name == self.pipeline_ml.model_input_name:
+                self.loaded_catalog._data_sets[name] = MemoryDataSet()
+            else:
+                self.loaded_catalog._data_sets[name]._filepath = uri
 
     def predict(self, context, model_input):
-        input_data = self.input_formatter(data=model_input,
-                                          **self.formatter_kwargs)
-        self.catalog.add_feed_dict({self.instance_name: input_data})
+        # TODO : checkout out how to pass extra args in predict
+        # for instance, to enable parallelization
+
+        self.loaded_catalog.add(data_set_name=self.pipeline_ml.input_name,
+                                data_set=MemoryDataSet(model_input),
+                                replace=True)
         runner = SequentialRunner()
-        run_outputs = runner.run(pipeline=self.inference,
-                                 catalog=self.catalog)
+        run_outputs = runner.run(pipeline=self.pipeline_ml.inference,
+                                 catalog=self.loaded_catalog)
         return run_outputs
-
-
-class KedroPipelineModelInputsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid
-    """

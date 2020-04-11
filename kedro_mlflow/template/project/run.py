@@ -45,9 +45,11 @@ class ProjectContext(KedroContext):
 
     project_name = "{{ cookiecutter.project_name }}"
     project_version = "{{ cookiecutter.kedro_version }}"
-    hooks = (MlflowNodeHook(flatten_dict_params=False),
-             MlflowPipelineHook(model_name="{{cookiecutter.python_package}}",
-                                 conda_env="requirements.txt"))
+    hooks = (
+        MlflowNodeHook(flatten_dict_params=False),
+        MlflowPipelineHook(model_name="{{cookiecutter.python_package}}",
+                           conda_env="src/requirements.txt")
+    )
 
     def _get_pipelines(self) -> Dict[str, Pipeline]:
         return create_pipelines()

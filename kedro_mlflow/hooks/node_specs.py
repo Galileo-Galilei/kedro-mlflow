@@ -7,7 +7,7 @@ from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
-class MlflowNodeSpecs:
+class MlflowNodeHook:
 
     def __init__(self,
                  flatten_dict_params: bool = False,

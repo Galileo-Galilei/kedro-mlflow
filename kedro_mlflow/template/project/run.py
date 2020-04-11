@@ -33,18 +33,23 @@ from typing import Dict
 from kedro.context import KedroContext, load_context
 from kedro.pipeline import Pipeline
 
-from kedro_mlflow.context import KedroMlflowContext
+from kedro_mlflow.hooks import MlflowNodeHook, MlflowPipelineHook
 
 from {{ cookiecutter.python_package }}.pipeline import create_pipelines
 
 
-class ProjectContext(KedroMlflowContext):
+class ProjectContext(KedroContext):
     """Users can override the remaining methods from the parent class here,
     or create new ones (e.g. as required by plugins)
     """
 
     project_name = "{{ cookiecutter.project_name }}"
     project_version = "{{ cookiecutter.kedro_version }}"
+    hooks = (
+        MlflowNodeHook(flatten_dict_params=False),
+        MlflowPipelineHook(model_name="{{cookiecutter.python_package}}",
+                           conda_env="src/requirements.txt")
+    )
 
     def _get_pipelines(self) -> Dict[str, Pipeline]:
         return create_pipelines()

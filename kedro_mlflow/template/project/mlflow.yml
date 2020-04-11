@@ -10,8 +10,8 @@ mlflow_tracking_uri: mlruns
 
 # EXPERIMENT-RELATED PARAMETERS ----------
 
-# `name` is the name of the experiment (~subfolder) 
-# where the runs are recorded. Change the name to
+# `name` is the name of the experiment (~subfolder 
+# where the runs are recorded). Change the name to
 # switch between different experiments
 experiment:
   name: {{ python_package }}  
@@ -20,8 +20,7 @@ experiment:
 
 # RUN-RELATED PARAMETERS -----------------
 
-# `nested`: should we allowed nested runs?
-# If set to False, you won't be able to launch
-# sub-runs inside your nodes
 run:
-  nested: True  
+  id:  # if `id` is None, a new run will be created 
+  name:  # if `name` is None, pipeline name will be used for the run name 
+  nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes

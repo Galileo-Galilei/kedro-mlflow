@@ -29,7 +29,7 @@ class KedroPipelineModel(PythonModel):
         # TODO : checkout out how to pass extra args in predict
         # for instance, to enable parallelization
 
-        self.loaded_catalog.add(data_set_name=self.pipeline_ml.input_name,
+        self.loaded_catalog.add(data_set_name=self.pipeline_ml.model_input_name,
                                 data_set=MemoryDataSet(model_input),
                                 replace=True)
         runner = SequentialRunner()

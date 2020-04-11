@@ -1,5 +1,6 @@
 from typing import Iterable, Union, Callable, Any, Dict
 
+from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 from pathlib import Path
@@ -28,52 +29,76 @@ class PipelineML(Pipeline):
     """
 
     def __init__(
-        self,
-        nodes: Iterable[Union[Node, "Pipeline"]],
-        *args,
-        inference: Pipeline,
-        conda_env: Union[str, None, Path],
-        tags: Union[str, Iterable[str]] = None):
-    
-        super.__init__(nodes, *args, tags=tags)
+            self,
+            nodes: Iterable[Union[Node, "Pipeline"]],
+            *args,
+            tags: Union[str, Iterable[str]] = None,
+            inference: Pipeline):
+
+        super().__init__(nodes, *args, tags=tags)
+
         self.inference = inference
-        self.conda_env = self._format_conda_env(conda_env)
 
-    def _format_conda_env(self, conda_env=None) -> Dict[str, Any]:
-        """Best effort to get dependecies of the project.
+        free_input = self._check_degrees_of_freedom()
+        self._check_model_input_name(free_input)
+        self.model_input_name = free_input
 
-        Keyword Arguments:
-            conda_env {[type]} -- It can be either :
-                - a path to a "requirements.txt": In this case
-                the packages are parsed and a conda env with
-                your current python_version and these dependencies is returned
-                - a path to an "environment.yml" : data is loaded and used as they are
-                - a Dict : used as the environment
-                - None (default: {None}) : try to infer the dependencies base on current package name
+    def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
+        sub_catalog = DataCatalog()
+        for data_set_name in self.inference.inputs():
+            if data_set_name == self.model_input_name:
+                # there is no obligation that this dataset is persisted
+                # thus it is allowed to be an empty memory dataset
+                data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
+                sub_catalog.add(data_set_name=data_set_name,
+                                data_set=MemoryDataSet())
+            else:
+                try:
+                    data_set = catalog._data_sets[data_set_name]
+                    if isinstance(data_set, MemoryDataSet):
+                        raise KedroMlflowPipelineMLDatasetsError("""
+                                The datasets of the training pipeline must be persisted locally
+                                to be used by the inference pipeline. You must enforce them as 
+                                non 'MemoryDataSet' in the 'catalog.yml'. 
+                                Dataset '{data_set_name}' is not persisted currently.
+                                """.format(data_set_name=data_set_name))
+                    sub_catalog.add(data_set_name=data_set_name,
+                                    data_set=data_set)
+                except KeyError:
+                    raise KedroMlflowPipelineMLDatasetsError("""
+                                The provided catalog must contains '{data_set_name}' data_set
+                                since it is an input for inference pipeline.
+                                """.format(data_set_name=data_set_name))
 
-        Returns:
-            Dict[str, Any] -- [description]
-        """
-        if isinstance(conda_env, str):
-            conda_env = pathlib.Path(conda_env)
-        if isinstance(conda_env, pathlib.Path):
-            if conda_env.suffix in (".yml", ".yaml"):
-                with open(conda_env, mode="r") as file_handler:
-                    conda_env = yaml.safe_load(conda_env)
-            elif conda_env.suffix in (".txt"):
-                with open(conda_env, mode="r") as file_handler:
-                    dependencies = _parse_requirements(conda_env)
-                conda_env = {"python": sys.version,
-                             "dependencies": dependencies}
+        return sub_catalog
+
+
+    def _check_degrees_of_freedom(self) -> str:
+        #check 1 : verify there is only one free
+        free_inputs_set = set(self.inference.inputs()) - set(self.outputs())
+        if len(free_inputs_set) == 1:
+            free_input = list(free_inputs_set)[0]
         else:
-            try:
-                conda_env = {"python": sys.version,
-                             "dependencies": _get_project_globals(project_globals["python_package"])}
-            except:
-                conda_env = {"python": sys.version,
-                             "dependencies": [project_globals["python_package"]]}
+            raise KedroMlflowPipelineMLInputsError("""
+        The following inputs are free for the inference pipeline:
+        - {inputs}. 
+        Only one free input is allowed. 
+        Please make sure that 'inference' pipeline inputs are 'training' pipeline outputs,
+        except one.""".format(inputs="\n     - ".join(free_inputs_set)))
+        return free_input
 
-        return conda_env
+    def _check_model_input_name(self, model_input_name: str) -> str:
+        flag = (model_input_name is None) or \
+            (model_input_name in self.inference.inputs())
+        if not flag:
+            raise KedroMlflowPipelineMLInputsError(
+                "model_input_name='{name}' must be in inference.inputs()".format(name=model_input_name))
+
+        return flag
+
+    def _turn_pipeline_to_ml(self, pipeline):
+        return PipelineML(nodes=pipeline.nodes,
+                          inference=self.inference)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":
         pipeline = super().only_nodes_with_inputs(*inputs)
@@ -111,6 +136,12 @@ class PipelineML(Pipeline):
         pipeline = super().tag(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def _turn_pipeline_to_ml(self, pipeline):
-        return PipelineML(nodes=pipeline.nodes,
-                        inference=self.inference)
+
+class KedroMlflowPipelineMLInputsError(Exception):
+    """Error raised when the inputs of KedroPipelineMoel are invalid
+    """
+
+
+class KedroMlflowPipelineMLDatasetsError(Exception):
+    """Error raised when the inputs of KedroPipelineMoel are invalid
+    """

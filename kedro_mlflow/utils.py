@@ -1,5 +1,5 @@
 from typing import Union, Dict, List
-import pathlib
+from pathlib import Path
 import os
 import yaml
 import re
@@ -11,7 +11,7 @@ from pkg_resources import working_set
 KEDRO_YML = ".kedro.yml"
 
 
-def _is_kedro_project(project_path: Union[str, pathlib.Path, None] = None) -> bool:
+def _is_kedro_project(project_path: Union[str, Path, None] = None) -> bool:
     """Best effort to check if the function is called
      inside a kedro project.
     
@@ -23,7 +23,7 @@ def _is_kedro_project(project_path: Union[str, pathlib.Path, None] = None) -> bo
     return flag
 
 
-def _get_project_globals(project_path: Union[str, pathlib.Path, None] = None) -> Dict[str, str]:
+def _get_project_globals(project_path: Union[str, Path, None] = None) -> Dict[str, str]:
 
     # for the project name, we have to load the context : it is the only place where it is recorded
     project_context = load_context(project_path)
@@ -40,7 +40,7 @@ def _get_project_globals(project_path: Union[str, pathlib.Path, None] = None) ->
                 )
 
 
-def _read_kedro_yml(project_path: Union[str, pathlib.Path, None] = None) -> Dict[str, str]:
+def _read_kedro_yml(project_path: Union[str, Path, None] = None) -> Dict[str, str]:
     project_path = _validate_project_path(project_path)
     kedro_yml_path = project_path / KEDRO_YML
 
@@ -50,15 +50,15 @@ def _read_kedro_yml(project_path: Union[str, pathlib.Path, None] = None) -> Dict
     return kedro_yml
 
 
-def _validate_project_path(project_path: Union[str, pathlib.Path, None] = None) -> pathlib.Path:
+def _validate_project_path(project_path: Union[str, Path, None] = None) -> Path:
     if project_path is None:
-        project_path = pathlib.Path.cwd()
+        project_path = Path.cwd()
     else:
-        project_path = pathlib.Path(project_path)
+        project_path = Path(project_path)
     return project_path
 
 
-def _already_updated(project_path: Union[str, pathlib.Path, None] = None) -> bool:
+def _already_updated(project_path: Union[str, Path, None] = None) -> bool:
     project_path = _validate_project_path(project_path)
     flag = False
     # TODO : add a better check ...
@@ -66,35 +66,6 @@ def _already_updated(project_path: Union[str, pathlib.Path, None] = None) -> boo
         flag = True
     return flag
 
-def _generate_kedro_command(tags,
-                           node_names,
-                           from_nodes,
-                           to_nodes,
-                           from_inputs,
-                           load_versions,
-                           pipeline_name):
-    cdm_list = ["kedro","run"]
-    SEP = " "
-    if len(from_inputs) > 0:
-        cdm_list.append("--from-inputs" + SEP  + ",".join(from_inputs))
-    if len(from_nodes)>0:
-        cdm_list.append("--from-nodes" + SEP  + ",".join(from_nodes))
-    if len(to_nodes)>0:
-        cdm_list.append("--to-nodes" + SEP  + ",".join(to_nodes))
-    if len(node_names)>0:
-        cdm_list.append("--node" + SEP  + ",".join(node_names))
-    if len(node_names)>0:
-        cdm_list.append("--node" + SEP  + ",".join(node_names))
-    if len(tags)>0:
-        # "tag" is the name of the command, "tags" the value in run_params
-        cdm_list.append("--tag" + SEP + ",".join(tags))
-    if len(load_versions)>0:
-        # "load_version" is the name of the command, "load_versions" the value in run_params
-        formatted_versions= ["k:v".format(k=k, v=v) for k, v in load_versions.items()]
-        cdm_list.append("--load-version" + SEP + ",".join(formatted_versions))
-    
-    kedro_cmd = " ".join(cdm_list)
-    return kedro_cmd
 
 def _get_package_requirements(package_name: str) -> List[str]:
     package = working_set.by_key[package_name]

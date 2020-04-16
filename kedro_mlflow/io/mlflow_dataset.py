@@ -46,6 +46,11 @@ class MlflowDataSet(AbstractVersionedDataSet):
                         mlflow.start_run(current_run_id)
                 else:
                     mlflow.log_artifact(self._filepath, self.artifact_path)
+        
+        # rename the class
+        MlflowDataSetChildren.__name__="Mlflow{parent_name}".format(parent_name = data_set.__name__)
+        MlflowDataSetChildren.__qualname__="{parent_name}.Mlflow{parent_name}".format(parent_name = data_set.__name__)
+
         mlflow_dataset_instance = MlflowDataSetChildren(run_id=run_id,
                                                         artifact_path=artifact_path)
         return mlflow_dataset_instance

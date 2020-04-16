@@ -86,7 +86,8 @@ or with the python API:
 ```
 from kedro_mlflow.io import MlflowDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
-csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet, "filepath": r"/path/to/a/local/destination/file.csv")
+csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet, 
+                                      "filepath": r"/path/to/a/local/destination/file.csv"})
 ```
 ### New ``Pipeline``
 ``PipelineML`` is a new class which inherits from 

@@ -42,7 +42,7 @@ def test_mlflow_data_set_save_with_run_id(tmp_path, tracking_uri, dummy_df1):
         mlflow.log_param("fake", 2)
         run_id = mlflow.active_run().info.run_id
 
-    # then same scneario but precise the run_id where data is saved
+    # then same scenario but precise the run_id where data is saved
     mlflow_csv_dataset = MlflowDataSet(data_set=dict(type=CSVDataSet,
                                                      filepath=(tmp_path / "df1.csv").as_posix()),
                                        run_id=run_id)

@@ -110,8 +110,7 @@ The current version of ``kedro-mlflow`` provides the following items:
     - replace the ``src/PYTHON_PACKAGE/run.py`` file by an updated version of the template. If your template has been modified since project creation, a warning wil be raised. You can either run ``kedro mlflow init --force`` to ignore this warning (but this will erase your ``run.py``) or [set hooks manually](#new-hooks).
 2. ``kedro mlflow ui``: this command opens the mlflow UI (basically launches the ``mlflow ui`` command with the configuration of your ``mlflow.yml`` file)
 ### New ``DataSet``:
-``MlflowDataSet`` is a wrapper for any ``AbstractDataSet`` wich logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the
-YAML API:
+``MlflowDataSet`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
 ```
 my_dataset_to_version:
     type: kedro_mlflow.io.MlflowDataSet

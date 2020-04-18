@@ -64,7 +64,7 @@ If you do not have a kedro project yet, you can create it with ``kedro new`` com
 For this tutorial and if you do not have a real-world project, I strongly suggest that you accept to include the proposed example to make a demo of this plugin out of the box. 
 
 ### Step 2 : update the template
-Position yourself with at the root (i.e; the folder with the ``.kedro.yml`` file)
+Position yourself with at the root (i.e. the folder with the ``.kedro.yml`` file)
 ```
 $ cd path/to/your/project
 ```

@@ -90,7 +90,7 @@ Run the following command :
 ```
 $ kedro mlflow ui
 ``` 
-and opens your browser to [localhost:5000](localhost:5000). You will reach the mlflow ui. 
+and opens your browser to [http://localhost:5000](http://localhost:5000). You will reach the mlflow ui. 
 
 Click on your project name, and then last run recorded, and enjoy what is logged!
 

@@ -11,7 +11,7 @@ The release history is available [here](CHANGELOG.md).
 - better integration to [Mlflow Projects](https://www.mlflow.org/docs/latest/projects.html) 
 - better integration to [Mlflow Model Registry](https://www.mlflow.org/docs/latest/model-registry.html) 
 - better CLI experience and bug fixes
-- ability to retrieve parameters / re-run a former run for rerpoducibility / collaboration
+- ability to retrieve parameters / re-run a former run for reproducibility / collaboration
 
 # Getting started
 
@@ -37,7 +37,7 @@ pip install kedro[pandas]
 ```
 else check the documentation and install the dependencies you need.
 ### Check the installation
-Type  ``kedro info`` in a command line to check the installation. If it has succeeded, you should see the following ascii art:
+Type  ``kedro info`` in a terminal to check the installation. If it has succeeded, you should see the following ascii art:
 ```
  _            _
 | | _____  __| |_ __ ___
@@ -140,6 +140,7 @@ from kedro_mlflow.io import MlflowDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
 csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet, 
                                       "filepath": r"/path/to/a/local/destination/file.csv"})
+csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
 ```
 
 ### New ``Hooks``
@@ -147,10 +148,10 @@ This package provides 2 new hooks:
 1. The ``MlflowPipelineHook`` :
     1.  manages mlflow settings at the beginning and the end of the run (run start / end). 
     2. log useful informations for reproducibility as ``mlflow tags`` (including kedro ``Journal`` information and the commands used to launch the run.)
-    3. register the pipeline as a valid ``mlflow model`` if it is a ``PipelineML`` instance
+    3. register the pipeline as a valid ``mlflow model`` if [it is a ``PipelineML`` instance](#new-pipeline)
 1. The ``MlflowNodeHook`` :
     1. must be used with the ``MlflowPipelineHook``
-    2. autolog nodes parameters each time the pipeline is run with ``kedro run`` (or programatically).
+    2. autolog nodes parameters each time the pipeline is run (with ``kedro run`` or programatically).
 
 **These hooks need to be registered in the the ``run.py`` file**. You can either :
 - [register them manually](https://kedro.readthedocs.io/en/latest/04_user_guide/15_hooks.html#registering-your-hook-implementations-with-kedro). Your run.py should look like the following code snippet :
@@ -196,9 +197,9 @@ def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
     }
 
 ```
-Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you run.py), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
+Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
 
-*Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, yuo can use the follwing code snippet.* 
+*Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:* 
 ```
 from pathlib import Path
 from kedro.context import load_context

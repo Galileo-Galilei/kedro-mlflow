@@ -34,7 +34,7 @@ def mlflow_commands():
 @click.command()
 @click.option("--force", "-f", is_flag=True, default=False, help="Update the template without any checks. The modifications you made in 'run.py' will be lost.")
 @click.option("--silent", "-s", is_flag=True, default=False, help="Should message be logged when files are modified?")
-def template(force, silent):
+def init(force, silent):
     """Updates the template of a kedro project. 
     Running this command is mandatory to use kedro-mlflow.  
     2 actions are performed : 
@@ -45,7 +45,6 @@ def template(force, silent):
          to the ProjectContext. This will erase your current "run.py"
          script and all your modifications will be lost.
          If you do not want to erase "run.py", insert the hooks manually 
-
     """
 
     # get constants
@@ -108,7 +107,7 @@ def template(force, silent):
                                 "    -  set up your run.py with the following instructions :\n" +
                                 "INSERT_DOC_URL\n" +
                                 "    - call the following command:\n" +
-                                "$ kedro mlflow template --force",
+                                "$ kedro mlflow init --force",
                                 fg="yellow"))
 
 
@@ -157,7 +156,7 @@ def run():
 def new():
     """Create a new kedro project with updated template.
     """
-    pass
+    click.secho("Not implemented yet")
 
 
 class KedroMlflowCliError(Exception):
@@ -169,7 +168,7 @@ class KedroMlflowCliError(Exception):
 # logic to deal with the import of the different commands
 # we want to give restrictive access depending on conditions
 if _is_kedro_project():
-    mlflow_commands.add_command(template)
+    mlflow_commands.add_command(init)
     if _already_updated():
         mlflow_commands.add_command(ui)
         mlflow_commands.add_command(run)
@@ -177,7 +176,7 @@ if _is_kedro_project():
         click.secho(click.style("You have not updated your template yet. "
                                 "This is mandatory to use 'kedro-mlflow' plugin.\n" +
                                 "Please run the following command before you can access to other commands :\n" +
-                                '$ kedro mlflow template',
+                                '$ kedro mlflow init',
                                 fg="yellow"))
 else:
     mlflow_commands.add_command(new)

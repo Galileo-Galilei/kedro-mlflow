@@ -39,6 +39,7 @@ setup(
     url="https://github.com/Galileo-Galilei/kedro-mlflow",
     python_requires=">=3.6, <3.9",
     packages=find_packages(exclude=["docs*", "tests*"]),
+    setup_requires=['setuptools_scm'],
     include_package_data=True,
     tests_require=test_requirements,
     install_requires=base_requirements,

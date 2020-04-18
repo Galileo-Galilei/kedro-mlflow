@@ -40,7 +40,7 @@ setup(
     python_requires=">=3.6, <3.9",
     packages=find_packages(exclude=["docs*", "tests*"]),
     package_data={'': ['kedro_mlflow/template/**']},
-    include_package_data=True,
+    include_package_data=False, # strange bug?
     tests_require=test_requirements,
     install_requires=base_requirements,
     author="Galileo-Galilei",

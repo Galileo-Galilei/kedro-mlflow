@@ -1,0 +1,30 @@
+exclude: ^kedro_mlflow/template/project/run.py$
+repos:
+    - repo: https://github.com/psf/black
+      rev: 19.10b0
+      hooks:
+          - id: black
+            language_version: python3.7
+    - repo: https://github.com/asottile/seed-isort-config
+      rev: v2.1.1
+      hooks:
+          - id: seed-isort-config
+            args: [--exclude=kedro_mlflow/template/project/run.py]
+    - repo: https://github.com/timothycrosley/isort
+      rev: e762d48fce82492b9c092653fc2f5cbf00197dcc
+      hooks:
+          - id: isort
+    - repo: https://gitlab.com/pycqa/flake8
+      rev: 3.7.9
+      hooks:
+          - id: flake8
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.5.0
+      hooks:
+          - id: check-merge-conflict
+          - id: debug-statements
+          - id: end-of-file-fixer
+          - id: mixed-line-ending
+            args: [--fix=lf]
+          - id: trailing-whitespace
+            args: [--markdown-linebreak-ext=md]

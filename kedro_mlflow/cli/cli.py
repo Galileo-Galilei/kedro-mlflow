@@ -87,9 +87,12 @@ def init(force, silent):
     )
     if not force:
         kedro_path = Path(KEDRO_PATH).parent
-        runpy_template_path = (
-            kedro_path
-            / r"template\{{ cookiecutter.repo_name }}\src\{{ cookiecutter.python_package }}\run.py"
+        runpy_template_path = kedro_path / os.path.join(
+            "template",
+            "{{ cookiecutter.repo_name }}",
+            "src",
+            "{{ cookiecutter.python_package }}",
+            "run.py",
         )
         kedro_runpy_template = render_jinja_template(
             src=runpy_template_path,

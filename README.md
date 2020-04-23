@@ -8,14 +8,14 @@ The release history is available [here](CHANGELOG.md).
 
 **Coming soon:**
 - enhanced documentation, especially with detailed tutorials for ``PipelineML`` class and advanced versioning parametrisation
-- better integration to [Mlflow Projects](https://www.mlflow.org/docs/latest/projects.html) 
-- better integration to [Mlflow Model Registry](https://www.mlflow.org/docs/latest/model-registry.html) 
+- better integration to [Mlflow Projects](https://www.mlflow.org/docs/latest/projects.html)
+- better integration to [Mlflow Model Registry](https://www.mlflow.org/docs/latest/model-registry.html)
 - better CLI experience and bug fixes
 - ability to retrieve parameters / re-run a former run for reproducibility / collaboration
 
 # Getting started
 
-## Installation 
+## Installation
 ### Pre-requisites
 I strongly recommend to use ``conda`` (a package manager) to create an environment in order to avoid version conflicts between packages. This is specially important because **this package uses the ``develop`` version of kedro** which is very likely not the default one you use in your projects.
 
@@ -61,14 +61,14 @@ That's it! You are now ready to go!
 ### Step 1 : Create a kedro project
 If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
 
-For this tutorial and if you do not have a real-world project, I strongly suggest that you accept to include the proposed example to make a demo of this plugin out of the box. 
+For this tutorial and if you do not have a real-world project, I strongly suggest that you accept to include the proposed example to make a demo of this plugin out of the box.
 
 ### Step 2 : update the template
 Position yourself with at the root (i.e. the folder with the ``.kedro.yml`` file)
 ```
 $ cd path/to/your/project
 ```
-Run the init command : 
+Run the init command :
 ```
 $ kedro mlflow init
 ```
@@ -81,7 +81,7 @@ $ kedro mlflow init --force
 to override your ``run.py`` (be cautious if you do this in an existing project !).
 
 ### Run the project
-You can now run 
+You can now run
 ```
 $ kedro run
 ```
@@ -89,8 +89,8 @@ $ kedro run
 Run the following command :
 ```
 $ kedro mlflow ui
-``` 
-and opens your browser to [http://localhost:5000](http://localhost:5000). You will reach the mlflow ui. 
+```
+and opens your browser to [http://localhost:5000](http://localhost:5000). You will reach the mlflow ui.
 
 Click on your project name, and then last run recorded, and enjoy what is logged!
 
@@ -98,7 +98,7 @@ Click on your project name, and then last run recorded, and enjoy what is logged
 - You want to log additional metrics to the run? -> [See ``mlflow.log_metric`` and add it to your functions](https://www.mlflow.org/docs/latest/python_api/mlflow.html#mlflow.log_metric) !
 - You want to log nice dataviz of your pipeline that you register with ``MatplotlibWriter``? -> [Try ``MlflowDataSet`` to log any local files (.png, .pkl, .csv...) *automagically*](#new-dataset)!
 - You want to create easily an API to share your awesome model to anyone? -> [See if ``pipeline_ml`` can fit your needs](#new-pipeline)
-- You want to do something that is not straigthforward with current implementation? Open an issue, and let's see what happens! 
+- You want to do something that is not straigthforward with current implementation? Open an issue, and let's see what happens!
 # Tutorial
 TO BE DONE... It will contain [more explanations and examples of the ``pipeline_ml`` function](#new-pipeline).
 
@@ -137,7 +137,7 @@ or with the python API:
 ```
 from kedro_mlflow.io import MlflowDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
-csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet, 
+csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet,
                                       "filepath": r"/path/to/a/local/destination/file.csv"})
 csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
 ```
@@ -145,7 +145,7 @@ csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
 ### New ``Hooks``
 This package provides 2 new hooks:
 1. The ``MlflowPipelineHook`` :
-    1.  manages mlflow settings at the beginning and the end of the run (run start / end). 
+    1.  manages mlflow settings at the beginning and the end of the run (run start / end).
     2. log useful informations for reproducibility as ``mlflow tags`` (including kedro ``Journal`` information and the commands used to launch the run.)
     3. register the pipeline as a valid ``mlflow model`` if [it is a ``PipelineML`` instance](#new-pipeline)
 1. The ``MlflowNodeHook`` :
@@ -154,7 +154,7 @@ This package provides 2 new hooks:
 
 **These hooks need to be registered in the the ``run.py`` file**. You can either :
 - [register them manually](https://kedro.readthedocs.io/en/latest/04_user_guide/15_hooks.html#registering-your-hook-implementations-with-kedro). Your run.py should look like the following code snippet :
-``` 
+```
 from kedro_mlflow.hooks import MlflowNodeHook, MlflowPipelineHook
 from pk.pipeline import create_pipelines
 
@@ -176,7 +176,7 @@ class ProjectContext(KedroContext):
 ### New ``Pipeline``
 ``PipelineML`` is a new class which extends ``Pipeline`` and enable to bind two pipelines (one of training, one of inference) together. This class comes with a ``KedroPipelineModel`` class for logging it in mlflow. A pipeline logged as a mlflow model can be served using ``mlflow models serve`` and ``mlflow models predict`` command.  
 
-The ``PipelineML`` class is not intended to be used directly. A ``pipeline_ml`` factory is provided for user friendly interface. 
+The ``PipelineML`` class is not intended to be used directly. A ``pipeline_ml`` factory is provided for user friendly interface.
 
 Example within kedro template:
 ```
@@ -191,14 +191,14 @@ def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
 
     return {
         "ds": data_science_pipeline,
-        "training": training_pipeline, 
+        "training": training_pipeline,
         "__default__": data_engineering_pipeline + data_science_pipeline,
     }
 
 ```
 Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
 
-*Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:* 
+*Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:*
 ```
 from pathlib import Path
 from kedro.context import load_context
@@ -208,7 +208,7 @@ from kedro_mlflow.mlflow import KedroPipelineModel
 catalog = load_context(".").io
 
 # artifacts are all the inputs of the inference pipelines that are persisted in the catalog
-pipeline_catalog = pipeline_training.extract_pipeline_catalog(catalog) 
+pipeline_catalog = pipeline_training.extract_pipeline_catalog(catalog)
 artifacts = {name: Path(dataset._filepath).resolve().as_uri()
                 for name, dataset in pipeline_catalog._data_sets.items()
                 if name != pipeline_training.model_input_name}
@@ -220,6 +220,3 @@ mlflow.pyfunc.log_model(artifact_path="model",
                         artifacts=artifacts,
                             conda_env={"python": "3.7.0"})
 ```
-
-
-

@@ -1,9 +1,9 @@
-from typing import Iterable, Union, Callable, Any, Dict
+from pathlib import Path
+from typing import Any, Callable, Dict, Iterable, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
-from pathlib import Path
 
 
 class PipelineML(Pipeline):
@@ -29,11 +29,12 @@ class PipelineML(Pipeline):
     """
 
     def __init__(
-            self,
-            nodes: Iterable[Union[Node, "Pipeline"]],
-            *args,
-            tags: Union[str, Iterable[str]] = None,
-            inference: Pipeline):
+        self,
+        nodes: Iterable[Union[Node, "Pipeline"]],
+        *args,
+        tags: Union[str, Iterable[str]] = None,
+        inference: Pipeline
+    ):
 
         super().__init__(nodes, *args, tags=tags)
 
@@ -50,55 +51,67 @@ class PipelineML(Pipeline):
                 # there is no obligation that this dataset is persisted
                 # thus it is allowed to be an empty memory dataset
                 data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
-                sub_catalog.add(data_set_name=data_set_name,
-                                data_set=MemoryDataSet())
+                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataSet())
             else:
                 try:
                     data_set = catalog._data_sets[data_set_name]
                     if isinstance(data_set, MemoryDataSet):
-                        raise KedroMlflowPipelineMLDatasetsError("""
+                        raise KedroMlflowPipelineMLDatasetsError(
+                            """
                                 The datasets of the training pipeline must be persisted locally
-                                to be used by the inference pipeline. You must enforce them as 
-                                non 'MemoryDataSet' in the 'catalog.yml'. 
+                                to be used by the inference pipeline. You must enforce them as
+                                non 'MemoryDataSet' in the 'catalog.yml'.
                                 Dataset '{data_set_name}' is not persisted currently.
-                                """.format(data_set_name=data_set_name))
-                    sub_catalog.add(data_set_name=data_set_name,
-                                    data_set=data_set)
+                                """.format(
+                                data_set_name=data_set_name
+                            )
+                        )
+                    sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
                 except KeyError:
-                    raise KedroMlflowPipelineMLDatasetsError("""
+                    raise KedroMlflowPipelineMLDatasetsError(
+                        """
                                 The provided catalog must contains '{data_set_name}' data_set
                                 since it is an input for inference pipeline.
-                                """.format(data_set_name=data_set_name))
+                                """.format(
+                            data_set_name=data_set_name
+                        )
+                    )
 
         return sub_catalog
 
-
     def _check_degrees_of_freedom(self) -> str:
-        #check 1 : verify there is only one free
+        # check 1 : verify there is only one free
         free_inputs_set = set(self.inference.inputs()) - set(self.outputs())
         if len(free_inputs_set) == 1:
             free_input = list(free_inputs_set)[0]
         else:
-            raise KedroMlflowPipelineMLInputsError("""
+            raise KedroMlflowPipelineMLInputsError(
+                """
         The following inputs are free for the inference pipeline:
-        - {inputs}. 
-        Only one free input is allowed. 
+        - {inputs}.
+        Only one free input is allowed.
         Please make sure that 'inference' pipeline inputs are 'training' pipeline outputs,
-        except one.""".format(inputs="\n     - ".join(free_inputs_set)))
+        except one.""".format(
+                    inputs="\n     - ".join(free_inputs_set)
+                )
+            )
         return free_input
 
     def _check_model_input_name(self, model_input_name: str) -> str:
-        flag = (model_input_name is None) or \
-            (model_input_name in self.inference.inputs())
+        flag = (model_input_name is None) or (
+            model_input_name in self.inference.inputs()
+        )
         if not flag:
             raise KedroMlflowPipelineMLInputsError(
-                "model_input_name='{name}' must be in inference.inputs()".format(name=model_input_name))
+                "model_input_name='{name}' must be in inference.inputs()".format(
+                    name=model_input_name
+                )
+            )
 
         return flag
 
     def _turn_pipeline_to_ml(self, pipeline):
-        return PipelineML(nodes=pipeline.nodes,
-                          inference=self.inference)
+        return PipelineML(nodes=pipeline.nodes, inference=self.inference)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":
         pipeline = super().only_nodes_with_inputs(*inputs)

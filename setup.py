@@ -1,5 +1,6 @@
-import re
 import pathlib
+import re
+
 from setuptools import find_packages, setup
 
 NAME = "kedro_mlflow"
@@ -14,14 +15,18 @@ with open((HERE / NAME / "__init__.py").as_posix(), encoding="utf-8") as file_ha
 
     VERSION = result.group(1)
 
+
 def _parse_requirements(path, encoding="utf-8"):
     with open(path, mode="r", encoding=encoding) as file_handler:
-        requirements = [x.strip() for x in file_handler if x.strip() and not x.startswith("-r")]
+        requirements = [
+            x.strip() for x in file_handler if x.strip() and not x.startswith("-r")
+        ]
     return requirements
 
+
 # get the dependencies and installs
-base_requirements= _parse_requirements("requirements/requirements.txt")
-test_requirements= _parse_requirements("requirements/test_requirements.txt")
+base_requirements = _parse_requirements("requirements/requirements.txt")
+test_requirements = _parse_requirements("requirements/test_requirements.txt")
 
 
 # Get the long description from the README file
@@ -39,15 +44,15 @@ setup(
     url="https://github.com/Galileo-Galilei/kedro-mlflow",
     python_requires=">=3.6, <3.9",
     packages=find_packages(exclude=["docs*", "tests*"]),
-    setup_requires=['setuptools_scm'],
+    setup_requires=["setuptools_scm"],
     include_package_data=True,
     tests_require=test_requirements,
     install_requires=base_requirements,
     author="Galileo-Galilei",
     entry_points={
         "kedro.project_commands": ["kedro_mlflow =  kedro_mlflow.cli.cli:commands"],
-        "kedro.global_commands": ["kedro_mlflow =  kedro_mlflow.cli.cli:commands"]
-        },
+        "kedro.global_commands": ["kedro_mlflow =  kedro_mlflow.cli.cli:commands"],
+    },
     zip_safe=False,
     keywords="kedro plugin, mlflow, model versioning, model packaging, pipelines, machine learning, data pipelines, data science, data engineering",
     classifiers=[

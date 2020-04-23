@@ -1,1 +1,1 @@
-from .kedro_pipeline_model import KedroPipelineModel 
+from .kedro_pipeline_model import KedroPipelineModel

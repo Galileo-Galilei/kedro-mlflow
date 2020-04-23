@@ -1,11 +1,12 @@
-from typing import Union, Dict, List
-from pathlib import Path
 import os
-import yaml
 import re
-from kedro.context import load_context
-from kedro import __version__ as KEDRO_VERSION
+from pathlib import Path
+from typing import Dict, List, Union
 from urllib.parse import urlparse
+
+import yaml
+from kedro import __version__ as KEDRO_VERSION
+from kedro.context import load_context
 from pkg_resources import working_set
 
 KEDRO_YML = ".kedro.yml"
@@ -14,9 +15,9 @@ KEDRO_YML = ".kedro.yml"
 def _is_kedro_project(project_path: Union[str, Path, None] = None) -> bool:
     """Best effort to check if the function is called
      inside a kedro project.
-    
+
     Returns:
-        bool -- True if the working directory is the root of a kedro project 
+        bool -- True if the working directory is the root of a kedro project
     """
     project_path = _validate_project_path(project_path)
     flag = (project_path / KEDRO_YML).is_file()
@@ -30,14 +31,16 @@ def _get_project_globals(project_path: Union[str, Path, None] = None) -> Dict[st
     project_name = project_context.project_name
 
     kedro_yml = _read_kedro_yml(project_path)
-    python_package = re.search(pattern=r"^(\w+)(?=\.)",
-                               string=kedro_yml["context_path"]).group(1)
+    python_package = re.search(
+        pattern=r"^(\w+)(?=\.)", string=kedro_yml["context_path"]
+    ).group(1)
     context_path = kedro_yml["context_path"].replace(".", "/")
-    return dict(context_path=context_path,
-                project_name=project_name,
-                python_package=python_package,
-                kedro_version=KEDRO_VERSION
-                )
+    return dict(
+        context_path=context_path,
+        project_name=project_name,
+        python_package=python_package,
+        kedro_version=KEDRO_VERSION,
+    )
 
 
 def _read_kedro_yml(project_path: Union[str, Path, None] = None) -> Dict[str, str]:
@@ -72,7 +75,10 @@ def _get_package_requirements(package_name: str) -> List[str]:
     requirements = [str(r) for r in package.requires()]
     return requirements
 
+
 def _parse_requirements(path, encoding="utf-8"):
     with open(path, mode="r", encoding=encoding) as file_handler:
-        requirements = [x.strip() for x in file_handler if x.strip() and not x.startswith("-r")]
+        requirements = [
+            x.strip() for x in file_handler if x.strip() and not x.startswith("-r")
+        ]
     return requirements

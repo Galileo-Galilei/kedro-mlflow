@@ -34,8 +34,7 @@ from kedro.context import KedroContext, load_context
 from kedro.pipeline import Pipeline
 
 from kedro_mlflow.hooks import MlflowNodeHook, MlflowPipelineHook
-
-from {{ cookiecutter.python_package }}.pipeline import create_pipelines
+from {{cookiecutter.python_package}}.pipeline import create_pipelines
 
 
 class ProjectContext(KedroContext):
@@ -47,8 +46,10 @@ class ProjectContext(KedroContext):
     project_version = "{{ cookiecutter.kedro_version }}"
     hooks = (
         MlflowNodeHook(flatten_dict_params=False),
-        MlflowPipelineHook(model_name="{{cookiecutter.python_package}}",
-                           conda_env="src/requirements.txt")
+        MlflowPipelineHook(
+            model_name="{{cookiecutter.python_package}}",
+            conda_env="src/requirements.txt"
+        )
     )
 
     def _get_pipelines(self) -> Dict[str, Pipeline]:

@@ -1,5 +1,4 @@
-from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Union
+from typing import Callable, Iterable, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline

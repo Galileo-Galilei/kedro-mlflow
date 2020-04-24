@@ -1,11 +1,9 @@
-import sys
 from pathlib import Path
 from typing import Any, Dict, Union
 
-import yaml
 from kedro.pipeline import Pipeline
 
-from kedro_mlflow.pipeline import PipelineML
+from .pipeline_ml import PipelineML
 
 
 def pipeline_ml(

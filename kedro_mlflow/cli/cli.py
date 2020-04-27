@@ -4,8 +4,6 @@ from pathlib import Path
 
 import click
 from kedro import __file__ as KEDRO_PATH
-from kedro.cli import get_project_context
-from kedro.context import load_context
 
 from kedro_mlflow.cli.cli_utils import render_jinja_template, write_jinja_template
 from kedro_mlflow.context import get_mlflow_conf
@@ -87,12 +85,9 @@ def init(force, silent):
     )
     if not force:
         kedro_path = Path(KEDRO_PATH).parent
-        runpy_template_path = kedro_path / os.path.join(
-            "template",
-            "{{ cookiecutter.repo_name }}",
-            "src",
-            "{{ cookiecutter.python_package }}",
-            "run.py",
+        runpy_template_path = (
+            kedro_path
+            / "template/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/run.py"
         )
         kedro_runpy_template = render_jinja_template(
             src=runpy_template_path,

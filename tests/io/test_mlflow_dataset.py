@@ -1,5 +1,3 @@
-import glob
-
 import mlflow
 import pandas as pd
 import pytest

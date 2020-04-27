@@ -1,10 +1,8 @@
-import re
 from typing import Any, Dict
 
 import mlflow
 from kedro.hooks import hook_impl
 from kedro.io import DataCatalog
-from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
 

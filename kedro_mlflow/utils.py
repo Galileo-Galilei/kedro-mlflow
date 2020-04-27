@@ -1,8 +1,6 @@
-import os
 import re
 from pathlib import Path
 from typing import Dict, List, Union
-from urllib.parse import urlparse
 
 import yaml
 from kedro import __version__ as KEDRO_VERSION

@@ -1,8 +1,6 @@
 from copy import deepcopy
-from typing import Any, Callable, Dict, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
-from kedro.pipeline import Pipeline
 from kedro.runner import SequentialRunner
 from mlflow.pyfunc import PythonModel
 

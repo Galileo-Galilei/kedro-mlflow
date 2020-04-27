@@ -1,4 +1,3 @@
-import re
 import sys
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -8,17 +7,12 @@ import yaml
 from kedro.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
-from kedro.pipeline.node import Node
 from kedro.versioning.journal import _git_sha
 
 from kedro_mlflow.context import get_mlflow_conf
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import PipelineML
-from kedro_mlflow.utils import (
-    _get_package_requirements,
-    _get_project_globals,
-    _parse_requirements,
-)
+from kedro_mlflow.utils import _parse_requirements
 
 
 class MlflowPipelineHook:

@@ -209,7 +209,7 @@ def _validate_opts(opts: Dict[str, Any], default: Dict[str, Any]) -> Dict:
             raise KedroMlflowConfigError(
                 """Provided option '{k}' is not valid.
             Possible keys are :\n- {keys}""".format(
-                    k=k, keys="\n- ".join(default_copy.keys()))
+                    k=k, keys="\n- ".join(default_copy.keys())
                 )
             )
 

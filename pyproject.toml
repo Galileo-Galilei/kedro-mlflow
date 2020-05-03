@@ -1,0 +1,2 @@
+[tool.black]
+exclude="kedro_mlflow/template/project/run.py"

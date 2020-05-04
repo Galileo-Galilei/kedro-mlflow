@@ -1,7 +1,12 @@
+from pathlib import Path
+
 import mlflow
 import pandas as pd
 import pytest
 from kedro.extras.datasets.pandas import CSVDataSet
+from kedro.extras.datasets.pickle import PickleDataSet
+from mlflow.tracking import MlflowClient
+from pytest_lazyfixture import lazy_fixture
 
 from kedro_mlflow.io import MlflowDataSet
 
@@ -12,7 +17,7 @@ def tracking_uri(tmp_path):
 
 
 @pytest.fixture
-def dummy_df1():
+def df1():
     return pd.DataFrame({"col1": [1, 2, 3], "col2": [4, 5, 6]})
 
 
@@ -21,41 +26,91 @@ def dummy_df2():
     return pd.DataFrame({"col3": [7, 8, 9], "col4": ["a", "b", "c"]})
 
 
-def test_mlflow_csv_data_set_save(tmp_path, tracking_uri, dummy_df1):
+@pytest.mark.parametrize(
+    "dataset,extension,data,artifact_path",
+    [
+        (CSVDataSet, ".csv", lazy_fixture("df1"), None),
+        ("pandas.CSVDataSet", ".csv", lazy_fixture("df1"), None),
+        (PickleDataSet, ".pkl", lazy_fixture("df1"), None),
+        ("pickle.PickleDataSet", ".pkl", lazy_fixture("df1"), None),
+        (CSVDataSet, ".csv", lazy_fixture("df1"), "artifact_dir"),
+        ("pandas.CSVDataSet", ".csv", lazy_fixture("df1"), "artifact_dir"),
+        (PickleDataSet, ".pkl", lazy_fixture("df1"), "artifact_dir"),
+        ("pickle.PickleDataSet", ".pkl", lazy_fixture("df1"), "artifact_dir",),
+    ],
+)
+def test_mlflow_csv_data_set_save_reload(
+    tmp_path, tracking_uri, dataset, extension, data, artifact_path
+):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+    filepath = (tmp_path / "data").with_suffix(extension)
+
     mlflow_csv_dataset = MlflowDataSet(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix())
+        artifact_path=artifact_path,
+        data_set=dict(type=CSVDataSet, filepath=filepath.as_posix()),
     )
+
     with mlflow.start_run():
-        mlflow_csv_dataset.save(dummy_df1)
+        mlflow_csv_dataset.save(data)
         run_id = mlflow.active_run().info.run_id
 
     # the artifact must be properly uploaded to "mlruns" and reloadable
-    assert (tracking_uri / "0" / run_id / "artifacts" / "df1.csv").is_file()
-    assert dummy_df1.equals(mlflow_csv_dataset.load())
+    run_artifacts = [
+        fileinfo.path
+        for fileinfo in mlflow_client.list_artifacts(run_id=run_id, path=artifact_path)
+    ]
+    remote_path = (
+        filepath.name
+        if artifact_path is None
+        else (Path(artifact_path) / filepath.name).as_posix()
+    )
+    assert remote_path in run_artifacts
+    assert data.equals(mlflow_csv_dataset.load())
 
 
-def test_mlflow_data_set_save_with_run_id(tmp_path, tracking_uri, dummy_df1):
+@pytest.mark.parametrize(
+    "exists_active_run", [(False), (True)],
+)
+def test_mlflow_data_set_save_with_run_id(
+    tmp_path, tracking_uri, df1, exists_active_run
+):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
-
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+    nb_runs = 0
     # create a first run and get its id
     with mlflow.start_run():
         mlflow.log_param("fake", 2)
         run_id = mlflow.active_run().info.run_id
+        nb_runs += 1
 
-    # then same scenario but precise the run_id where data is saved
+    # check behaviour when logging with an already opened run
+    if exists_active_run:
+        mlflow.start_run()
+        active_run_id = mlflow.active_run().info.run_id
+        nb_runs += 1
+
+    # then same scenario but the run_id where data is saved is specified
     mlflow_csv_dataset = MlflowDataSet(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
         run_id=run_id,
     )
-    mlflow_csv_dataset.save(dummy_df1)
-    tracked_runs = [f.stem for f in (tracking_uri / "0").glob("*") if f.is_dir()]
+    mlflow_csv_dataset.save(df1)
+
     # same tests as previously, bu no new experiments must have been created
-    assert len(tracked_runs) == 1
-    assert (tracking_uri / "0" / run_id / "artifacts" / "df1.csv").is_file()
-    assert dummy_df1.equals(mlflow_csv_dataset.load())
+    runs_list = mlflow_client.list_run_infos(experiment_id="0")
+    run_artifacts = [
+        fileinfo.path for fileinfo in mlflow_client.list_artifacts(run_id=run_id)
+    ]
 
+    assert len(runs_list) == nb_runs  # no new run must have been created when saving
+    assert (
+        mlflow.active_run().info.run_id == active_run_id
+        if mlflow.active_run()
+        else True
+    )  # if a run was opened before saving, it must be reopened
+    assert "df1.csv" in run_artifacts  # the file must exists
+    assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
 
-# use pytest.fixture.parametrize to test if it works with
-# - type="pandas.CSVDataSet" (a string) -> because it is necessary for loading from catalog
-# - experiment name = None or a string
+    if exists_active_run:
+        mlflow.end_run()

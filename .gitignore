@@ -133,3 +133,5 @@ dmypy.json
 
 # mlflow
 mlruns/
+
+debug/

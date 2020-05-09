@@ -195,12 +195,15 @@ def test_filtering_generate_invalid_pipeline_ml(
     node_names,
     from_inputs,
 ):
-    """When a PipelineML is filtered it must keepp one degree of freedom.
+    """When a PipelineML is filtered it must keep one degree of freedom.
     If by chance a new pipeline with one degree of freedom
     but not the same than previously is generated, it should be catched.
     """
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
-    with pytest.raises(KedroMlflowPipelineMLInputsError) as execinfo:
+    with pytest.raises(
+        KedroMlflowPipelineMLInputsError,
+        match="(?:Only one free input is allowed|the only unconstrained input is)",
+    ):
         dummy_context._filter_pipeline(
             pipeline=pipeline_ml_with_tag,
             tags=tags,
@@ -209,10 +212,6 @@ def test_filtering_generate_invalid_pipeline_ml(
             node_names=node_names,
             from_inputs=from_inputs,
         )
-    assert (
-        "Only one free input is allowed" in execinfo.value.args[0]
-        or "the only unconstrained input is" in execinfo.value.args[0]
-    )
 
 
 # add a test to check number of inputs of dummy_context._filter_pipeline
@@ -222,3 +221,73 @@ def test_filtering_generate_invalid_pipeline_ml(
 #     pass
 
 # filtering that remove the degree of freedom constraints should fail
+def test_catalog_extraction(pipeline_ml_with_tag):
+    catalog = DataCatalog(
+        {
+            "raw_data": MemoryDataSet(),
+            "data": MemoryDataSet(),
+            "model": CSVDataSet("fake/path/to/file.csv"),
+        }
+    )
+    filtered_catalog = pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+    assert set(filtered_catalog.list()) == {"model", "data"}
+
+
+def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
+    catalog = DataCatalog({"raw_data": MemoryDataSet(), "data": MemoryDataSet()})
+    with pytest.raises(
+        KedroMlflowPipelineMLDatasetsError,
+        match="since it is an input for inference pipeline",
+    ):
+        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+
+
+def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
+    catalog = DataCatalog(
+        {"raw_data": MemoryDataSet(), "data": MemoryDataSet(), "model": MemoryDataSet()}
+    )
+    with pytest.raises(
+        KedroMlflowPipelineMLDatasetsError,
+        match="The datasets of the training pipeline must be persisted locally",
+    ):
+        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+
+
+def test_too_many_free_inputs():
+    with pytest.raises(
+        KedroMlflowPipelineMLInputsError, match="Only one free input is allowed."
+    ):
+        pipeline_ml(
+            training=Pipeline(
+                [
+                    node(
+                        func=preprocess_fun,
+                        inputs="raw_data",
+                        outputs="neither_data_nor_model",
+                    )
+                ]
+            ),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+        )
+
+
+def test_tagging(pipeline_ml_with_tag):
+    new_pl = pipeline_ml_with_tag.tag(["hello"])
+    assert all(["hello" in node.tags for node in new_pl.nodes])
+
+
+def test_decorate(pipeline_ml_with_tag):
+    def fake_dec(x):
+        return x
+
+    new_pl = pipeline_ml_with_tag.decorate(fake_dec)
+    assert all([fake_dec in node._decorators for node in new_pl.nodes])

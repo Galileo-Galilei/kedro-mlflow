@@ -1,4 +1,4 @@
 """kedro-mlflow context imports
 """
 
-from .mlflow_context import KedroMlflowContext, get_mlflow_conf
+from .mlflow_context import get_mlflow_conf

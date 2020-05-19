@@ -196,6 +196,8 @@ def _format_conda_env(
             }
     elif conda_env is None:
         conda_env = {"python": python_version}
+    elif isinstance(conda_env, dict):
+        return conda_env
     else:
         raise ValueError(
             """Invalid conda_env. It can be either :

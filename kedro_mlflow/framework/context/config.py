@@ -5,7 +5,7 @@ from typing import Any, Dict, Union
 import mlflow
 
 # this function is only in the develop branch
-from kedro.context.context import _is_relative_path
+from kedro.framework.context.context import _is_relative_path
 
 from kedro_mlflow import utils as utils
 

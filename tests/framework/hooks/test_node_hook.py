@@ -3,8 +3,8 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import node
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.hooks import MlflowNodeHook
-from kedro_mlflow.hooks.node_hook import flatten_dict
+from kedro_mlflow.framework.hooks import MlflowNodeHook
+from kedro_mlflow.framework.hooks.node_hook import flatten_dict
 
 
 def test_flatten_dict_non_nested():

@@ -5,8 +5,11 @@ from pathlib import Path
 import click
 from kedro import __file__ as KEDRO_PATH
 
-from kedro_mlflow.cli.cli_utils import render_jinja_template, write_jinja_template
-from kedro_mlflow.context import get_mlflow_conf
+from kedro_mlflow.framework.cli.cli_utils import (
+    render_jinja_template,
+    write_jinja_template,
+)
+from kedro_mlflow.framework.context import get_mlflow_conf
 from kedro_mlflow.utils import _already_updated, _get_project_globals, _is_kedro_project
 
 

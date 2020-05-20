@@ -50,8 +50,12 @@ setup(
     install_requires=base_requirements,
     author="Galileo-Galilei",
     entry_points={
-        "kedro.project_commands": ["kedro_mlflow =  kedro_mlflow.cli.cli:commands"],
-        "kedro.global_commands": ["kedro_mlflow =  kedro_mlflow.cli.cli:commands"],
+        "kedro.project_commands": [
+            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
+        ],
+        "kedro.global_commands": [
+            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
+        ],
     },
     zip_safe=False,
     keywords="kedro plugin, mlflow, model versioning, model packaging, pipelines, machine learning, data pipelines, data science, data engineering",

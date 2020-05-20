@@ -155,7 +155,7 @@ This package provides 2 new hooks:
 **These hooks need to be registered in the the ``run.py`` file**. You can either :
 - [register them manually](https://kedro.readthedocs.io/en/latest/04_user_guide/15_hooks.html#registering-your-hook-implementations-with-kedro). Your run.py should look like the following code snippet :
 ```
-from kedro_mlflow.hooks import MlflowNodeHook, MlflowPipelineHook
+from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
 from pk.pipeline import create_pipelines
 
 class ProjectContext(KedroContext):
@@ -201,7 +201,7 @@ Now each time you will run ``kedro run --pipeline=training`` (provided you regis
 *Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:*
 ```
 from pathlib import Path
-from kedro.context import load_context
+from kedro.framework.context import load_context
 from kedro_mlflow.mlflow import KedroPipelineModel
 
 # pipeline_training is your PipelineML object, created as previsously

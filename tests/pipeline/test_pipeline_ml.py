@@ -5,7 +5,9 @@ from typing import Dict
 import pytest
 import yaml
 from kedro import __version__ as KEDRO_VERSION
-from kedro.context import KedroContext
+from kedro.extras.datasets.pandas import CSVDataSet
+from kedro.framework.context import KedroContext
+from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
 from kedro_mlflow.pipeline import KedroMlflowPipelineMLInputsError, PipelineML

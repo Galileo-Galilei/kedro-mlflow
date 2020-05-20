@@ -2,7 +2,7 @@ from pathlib import Path
 
 from kedro.config import ConfigLoader
 
-from kedro_mlflow.context.config import KedroMlflowConfig
+from kedro_mlflow.framework.context.config import KedroMlflowConfig
 
 
 # this could be a read-only property in the context

@@ -14,12 +14,12 @@ class PipelineML(Pipeline):
     ``pipeline_ml`` FUNCTION FOR MODULAR PIPELINE WHICH IS MORE FLEXIBLE AND USER FRIENDLY.
     SEE INSERT_DOC_URL
     A ``PipelineML`` is a kedro ``Pipeline`` which we assume is a "training" (in the machine learning way)
-    pipeline. Basically, training is a higher order function (it generates another function). It implies that:
+    pipeline. Basically, "training" is a higher order function (it generates another function). It implies that:
     -  the outputs of this pipeline are considered as "fitted models", i.e. inputs
-    of another inference pipeline (it is very likely that tere are several outputs because we any object
-    that depends on the train data (e.g encoders, binarizers, vectorizer, machine learning models...)
+    of another inference pipeline (it is very likely that there are several outputs because we need to store any
+    object that depends on the train data (e.g encoders, binarizers, vectorizer, machine learning models...)
     - These outputs will feed another "inference" pipeline (to be used for prediction purpose) whose inputs
-     are the outpust of the "training" pipeline, except for one of them (the data to predict).
+     are the outputs of the "training" pipeline, except for one of them (the new data to predict).
 
      This class enables to "link" a training pipeline and an inference pipeline in order to package them
      in mlflow easily. The goal is to call the ``MLflowPipelineHook`` hook after a PipelineMl is called

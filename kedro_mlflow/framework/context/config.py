@@ -1,5 +1,5 @@
 import logging
-import pathlib
+from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
@@ -22,7 +22,7 @@ class KedroMlflowConfig:
 
     def __init__(
         self,
-        project_path: Union[str, pathlib.Path],
+        project_path: Union[str, Path],
         mlflow_tracking_uri: str = "mlruns",
         experiment_opts: Union[Dict[str, Any], None] = None,
         run_opts: Union[Dict[str, Any], None] = None,
@@ -33,12 +33,10 @@ class KedroMlflowConfig:
         if not utils._is_kedro_project(project_path):
             raise KedroMlflowConfigError(
                 (
-                    "'project_path' = '{projet_path}' is not a valid path to a kedro project".format(
-                        project_path=project_path
-                    )
+                    f"'project_path' = '{project_path}' is not a valid path to a kedro project"
                 )
             )
-        self.project_path = pathlib.Path(project_path)
+        self.project_path = Path(project_path)
         # TODO we may add mlflow_registry_uri future release
         self.mlflow_tracking_uri = "mlruns"
         self.experiment_opts = None
@@ -127,7 +125,6 @@ class KedroMlflowConfig:
             }
         """
         info = {
-            "project_path": self.project_path,
             "mlflow_tracking_uri": self.mlflow_tracking_uri,
             "experiments_opts": self.experiment_opts,
             "run_opts": self.run_opts,
@@ -173,11 +170,9 @@ class KedroMlflowConfig:
         """
 
         # if no tracking uri is provided, we register the runs locally at the root of the project
-        uri = "mlruns" if uri is None else uri
-
-        if _is_relative_path(uri):
-            absolute_uri = self.project_path / uri
-            valid_uri = absolute_uri.resolve().as_uri()
+        uri = uri or "mlruns"
+        absolute_uri = self.project_path / uri if _is_relative_path(uri) else Path(uri)
+        valid_uri = absolute_uri.resolve().as_uri()
 
         return valid_uri
 

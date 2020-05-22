@@ -58,9 +58,9 @@ def test_kedro_mlflow_config_init(tmp_path):
     )
 
 
-def test_kedro_mlflow_config_new_experiment_does_not_exists(tmp_path):
+def test_kedro_mlflow_config_new_experiment_does_not_exists(mocker, tmp_path):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
-    (tmp_path / ".kedro.yml").write_text(yaml.dump(dict(context_path="fake/path")))
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
     config = KedroMlflowConfig(
         project_path=tmp_path,
@@ -72,7 +72,7 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(tmp_path):
 
 def test_kedro_mlflow_config_experiment_exists(mocker, tmp_path):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
-    mocker.patch("kedro_mlflow.utils._is_kedro_project", lambda x: True)
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
     # create an experiment with the same name
     mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
@@ -106,7 +106,15 @@ def test_kedro_mlflow_config_experiment_was_deleted(mocker, tmp_path):
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
-def test_kedro_mlflow_config_validate_uri_local(mocker, tmp_path):
+@pytest.mark.parametrize(
+    "uri",
+    [
+        (r"mlruns"),  # relative
+        (r"C:\fake\path\mlruns"),  # absolute
+        (r"file:///C:/fake/path/mlruns"),  # local uri
+    ],
+)
+def test_kedro_mlflow_config_validate_uri_local(mocker, tmp_path, uri):
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
     mocker.patch("mlflow.tracking.MlflowClient", return_value=None)
     mocker.patch(
@@ -115,7 +123,19 @@ def test_kedro_mlflow_config_validate_uri_local(mocker, tmp_path):
     )
 
     config = KedroMlflowConfig(project_path=tmp_path)
-    assert config._validate_uri(uri="mlruns").startswith(r"file:///")  # relative
-    assert config._validate_uri(uri=(tmp_path / "mlruns").as_posix()).startswith(
-        r"file:///"
-    )  # absolute
+    assert config._validate_uri(uri=uri).startswith(r"file:///")  # relative
+
+
+def test_from_dict_to_dict_idempotent(mocker, tmp_path):
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    mocker.patch("mlflow.tracking.MlflowClient", return_value=None)
+    mocker.patch(
+        "kedro_mlflow.framework.context.config.KedroMlflowConfig._get_or_create_experiment",
+        return_value=None,
+    )
+
+    config = KedroMlflowConfig(project_path=tmp_path)
+    original_config_dict = config.to_dict()
+    # modify config
+    config.from_dict(original_config_dict)
+    assert config.to_dict() == original_config_dict

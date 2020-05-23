@@ -12,6 +12,8 @@ from kedro_mlflow.framework.cli.cli_utils import (
 from kedro_mlflow.framework.context import get_mlflow_conf
 from kedro_mlflow.utils import _already_updated, _get_project_globals, _is_kedro_project
 
+TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
+
 
 @click.group(name="Mlflow")
 def commands():
@@ -62,13 +64,12 @@ def init(force, silent):
             "This command can only be called from the root of a kedro project."
         )
     project_globals = _get_project_globals(project_path)
-    template_folder_path = Path(__file__).parent.parent / "template" / "project"
 
     # mlflow.yml is just a static file,
     # but the name of the experiment is set to be the same as the project
     mlflow_yml = "mlflow.yml"
     write_jinja_template(
-        src=template_folder_path / mlflow_yml,
+        src=TEMPLATE_FOLDER_PATH / mlflow_yml,
         is_cookiecutter=False,
         dst=project_path / "conf" / "base" / mlflow_yml,
         python_package=project_globals["python_package"],
@@ -90,7 +91,12 @@ def init(force, silent):
         kedro_path = Path(KEDRO_PATH).parent
         runpy_template_path = (
             kedro_path
-            / "template/{{ cookiecutter.repo_name }}/src/{{ cookiecutter.python_package }}/run.py"
+            / "templates"
+            / "project"
+            / "{{ cookiecutter.repo_name }}"
+            / "src"
+            / "{{ cookiecutter.python_package }}"
+            / "run.py"
         )
         kedro_runpy_template = render_jinja_template(
             src=runpy_template_path,
@@ -103,15 +109,14 @@ def init(force, silent):
         with open(runpy_project_path, mode="r") as file_handler:
             kedro_runpy_project = file_handler.read()
 
-        # strip() is necessary because cookiecutter render python files
-        # with an extra line jump "\n" (to match autopep8 convention)
-        if kedro_runpy_project.strip() == kedro_runpy_template:
+        # beware : black formatting could change slightly this test which is very strict
+        if kedro_runpy_project == kedro_runpy_template:
             flag_erase_runpy = True
 
     if flag_erase_runpy:
         os.remove(runpy_project_path)
         write_jinja_template(
-            src=template_folder_path / "run.py",
+            src=TEMPLATE_FOLDER_PATH / "run.py",
             dst=runpy_project_path,
             is_cookiecutter=True,
             python_package=project_globals["python_package"],

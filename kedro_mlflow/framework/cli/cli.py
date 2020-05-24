@@ -15,17 +15,55 @@ from kedro_mlflow.utils import _already_updated, _get_project_globals, _is_kedro
 TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
 
 
+class KedroClickGroup(click.Group):
+    def reset_commands(self):
+        self.commands = {}
+        self.warning_msg = None
+        # add commands on the fly based on conditions
+        if _is_kedro_project():
+            self.add_command(init)
+            if _already_updated():
+                self.add_command(ui)
+                # self.add_command(run) # TODO : IMPLEMENT THIS FUNCTION
+            else:
+                # single line jump "\n" is not rendered in help?
+                self.warning_msg = click.style(
+                    "\n\nYou have not updated your template yet. "
+                    "This is mandatory to use 'kedro-mlflow' plugin."
+                    + "Please run the following command before you can access to other commands :\n\n"
+                    + "$ kedro mlflow init",
+                    fg="yellow",
+                )
+        else:
+            self.add_command(new)
+
+    def list_commands(self, ctx):
+        self.reset_commands()
+        return sorted(self.commands)
+
+    def get_command(self, ctx, cmd_name):
+        self.reset_commands()
+        if ctx.invoked_subcommand != "init":
+            click.secho(self.warning_msg)
+        return self.commands.get(cmd_name)
+
+
 @click.group(name="Mlflow")
 def commands():
     """Kedro plugin for interactions with mlflow.
     """
-    pass
+    pass  # pragma: no cover
 
 
-@commands.group(name="mlflow")
+@commands.command(name="mlflow", cls=KedroClickGroup)
 def mlflow_commands():
     """Use mlflow-specific commands inside kedro project.
     """
+    # beware : this group must be defined at the end of the script
+    # i.e. AFTER the commands creation
+    # else the commands will not be discovered while loading
+    # entry_points from kedro
+    #
     pass
 
 
@@ -59,11 +97,7 @@ def init(force, silent):
 
     # get constants
     project_path = Path().cwd()
-    if not _is_kedro_project(project_path):
-        raise KedroMlflowCliError(
-            "This command can only be called from the root of a kedro project."
-        )
-    project_globals = _get_project_globals(project_path)
+    project_globals = _get_project_globals()
 
     # mlflow.yml is just a static file,
     # but the name of the experiment is set to be the same as the project
@@ -76,7 +110,7 @@ def init(force, silent):
     )
     if not silent:
         click.secho(
-            click.style("'conf/base/mlflow.yml' sucessfully updated.", fg="green")
+            click.style("'conf/base/mlflow.yml' successfully updated.", fg="green")
         )
     # make a check whether the project run.py is strictly identical to the template
     # if yes, replace the script by the template silently
@@ -124,7 +158,7 @@ def init(force, silent):
             kedro_version=project_globals["kedro_version"],
         )
         if not silent:
-            click.secho(click.style("'run.py' sucessfully updated", fg="green"))
+            click.secho(click.style("'run.py' successfully updated", fg="green"))
     else:
         click.secho(
             click.style(
@@ -159,12 +193,6 @@ def ui(project_path, env):
         enables to browse and compares runs.
 
     """
-    if project_path is None:
-        project_path = Path().cwd().as_posix()
-    else:
-        project_path = Path(project_path)
-    if not _is_kedro_project(project_path):
-        raise KedroMlflowCliError("'project_path' must be the root of a kedro project.")
 
     # the context must contains the self.mlflow attribues with mlflow configuration
     mlflow_conf = get_mlflow_conf(project_path=project_path, env=env)
@@ -188,14 +216,14 @@ def run():
     # TODO retrieve parameters
     # TODO perform checks on data
     # TODO launch run
-    pass
+    raise NotImplementedError  # pragma: no cover
 
 
 @click.command()
 def new():
     """Create a new kedro project with updated template.
     """
-    click.secho("Not implemented yet")
+    raise NotImplementedError  # pragma: no cover
 
 
 class KedroMlflowCliError(Exception):
@@ -203,24 +231,3 @@ class KedroMlflowCliError(Exception):
     """
 
     pass
-
-
-# logic to deal with the import of the different commands
-# we want to give restrictive access depending on conditions
-if _is_kedro_project():
-    mlflow_commands.add_command(init)
-    if _already_updated():
-        mlflow_commands.add_command(ui)
-        mlflow_commands.add_command(run)
-    else:
-        click.secho(
-            click.style(
-                "You have not updated your template yet. "
-                "This is mandatory to use 'kedro-mlflow' plugin.\n"
-                + "Please run the following command before you can access to other commands :\n"
-                + "$ kedro mlflow init",
-                fg="yellow",
-            )
-        )
-else:
-    mlflow_commands.add_command(new)

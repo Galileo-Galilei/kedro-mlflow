@@ -1,6 +1,6 @@
 from kedro.pipeline import Pipeline
 
-from .pipeline_ml import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
 def pipeline_ml(

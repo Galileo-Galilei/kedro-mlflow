@@ -1,11 +1,10 @@
 import re
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, Union
 
 import yaml
 from kedro import __version__ as KEDRO_VERSION
 from kedro.framework.context import load_context
-from pkg_resources import working_set
 
 KEDRO_YML = ".kedro.yml"
 
@@ -68,12 +67,6 @@ def _already_updated(project_path: Union[str, Path, None] = None) -> bool:
     if (project_path / "conf" / "base" / "mlflow.yml").is_file():
         flag = True
     return flag
-
-
-def _get_package_requirements(package_name: str) -> List[str]:
-    package = working_set.by_key[package_name]
-    requirements = [str(r) for r in package.requires()]
-    return requirements
 
 
 def _parse_requirements(path, encoding="utf-8"):

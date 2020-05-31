@@ -11,7 +11,7 @@ from kedro.versioning.journal import _git_sha
 
 from kedro_mlflow.framework.context import get_mlflow_conf
 from kedro_mlflow.mlflow import KedroPipelineModel
-from kedro_mlflow.pipeline import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
 
 
@@ -53,7 +53,7 @@ class MlflowPipelineHook:
         mlflow_conf = get_mlflow_conf(
             project_path=run_params["project_path"], env=run_params["env"]
         )
-
+        mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
         # TODO : if the pipeline fails, we need to be able to end stop the mlflow run
         # cannot figure out how to do this within hooks
         run_name = (
@@ -114,11 +114,7 @@ class MlflowPipelineHook:
 
         if isinstance(pipeline, PipelineML):
             pipeline_catalog = pipeline.extract_pipeline_catalog(catalog)
-            artifacts = {
-                name: Path(dataset._filepath).resolve().as_uri()
-                for name, dataset in pipeline_catalog._data_sets.items()
-                if name != pipeline.model_input_name
-            }
+            artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
             mlflow.pyfunc.log_model(
                 artifact_path=self.model_name,
                 python_model=KedroPipelineModel(

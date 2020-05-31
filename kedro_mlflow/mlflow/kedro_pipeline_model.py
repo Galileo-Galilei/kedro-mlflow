@@ -4,7 +4,7 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.runner import SequentialRunner
 from mlflow.pyfunc import PythonModel
 
-from kedro_mlflow.pipeline import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
 class KedroPipelineModel(PythonModel):

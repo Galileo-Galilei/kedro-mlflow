@@ -131,7 +131,7 @@ def _generate_kedro_command(
     tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_name
 ):
     cmd_list = ["kedro", "run"]
-    SEP = " "
+    SEP = "="
     if len(from_inputs) > 0:
         cmd_list.append("--from-inputs" + SEP + ",".join(from_inputs))
     if len(from_nodes) > 0:

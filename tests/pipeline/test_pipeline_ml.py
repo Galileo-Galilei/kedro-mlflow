@@ -5,18 +5,19 @@ from kedro.framework.context import KedroContext
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
-from kedro_mlflow.pipeline import KedroMlflowPipelineMLInputsError, PipelineML
-
-
-def _write_yaml(filepath: Path, config: Dict):
-    filepath.parent.mkdir(parents=True, exist_ok=True)
-    yaml_str = yaml.dump(config)
+from kedro_mlflow.pipeline import (
+    KedroMlflowPipelineMLDatasetsError,
+    KedroMlflowPipelineMLInputsError,
+    pipeline_ml,
+)
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
 def preprocess_fun(data):
     return data
 
 
+def train_fun(data):
     return 2
 
 
@@ -27,7 +28,7 @@ def predict_fun(model, data):
 @pytest.fixture
 def pipeline_with_tag():
 
-    return Pipeline(
+    pipeline_with_tag = Pipeline(
         [
             node(
                 func=preprocess_fun,
@@ -38,18 +39,19 @@ def pipeline_with_tag():
             node(func=train_fun, inputs="data", outputs="model", tags=["training"]),
         ]
     )
+    return pipeline_with_tag
 
 
 @pytest.fixture
 def pipeline_ml_with_tag(pipeline_with_tag):
-    training_pipeline = PipelineML(
-        nodes=deepcopy(pipeline_with_tag.nodes),
+    pipeline_ml_with_tag = pipeline_ml(
+        training=pipeline_with_tag,
         inference=Pipeline(
             [node(func=predict_fun, inputs=["model", "data"], outputs="predictions")]
         ),
         input_name="data",
     )
-    return training_pipeline
+    return pipeline_ml_with_tag
 
 
 @pytest.fixture

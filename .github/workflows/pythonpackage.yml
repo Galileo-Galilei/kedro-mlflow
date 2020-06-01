@@ -37,4 +37,5 @@ jobs:
     - name: Test with pytest
       run: |
         pip install -r requirements/test_requirements.txt
+        pip install -e .  # required for some tests which launches commands via subprocess
         pytest

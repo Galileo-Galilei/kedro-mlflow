@@ -9,7 +9,7 @@ from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.versioning.journal import _git_sha
 
-from kedro_mlflow.framework.context import get_mlflow_conf
+from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
@@ -50,7 +50,7 @@ class MlflowPipelineHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        mlflow_conf = get_mlflow_conf(
+        mlflow_conf = get_mlflow_config(
             project_path=run_params["project_path"], env=run_params["env"]
         )
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)

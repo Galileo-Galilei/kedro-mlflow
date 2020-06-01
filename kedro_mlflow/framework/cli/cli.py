@@ -9,7 +9,7 @@ from kedro_mlflow.framework.cli.cli_utils import (
     render_jinja_template,
     write_jinja_template,
 )
-from kedro_mlflow.framework.context import get_mlflow_conf
+from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.utils import _already_updated, _get_project_globals, _is_kedro_project
 
 TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
@@ -195,7 +195,7 @@ def ui(project_path, env):
     """
 
     # the context must contains the self.mlflow attribues with mlflow configuration
-    mlflow_conf = get_mlflow_conf(project_path=project_path, env=env)
+    mlflow_conf = get_mlflow_config(project_path=project_path, env=env)
 
     # call mlflow ui with specific options
     # TODO : add more options for ui

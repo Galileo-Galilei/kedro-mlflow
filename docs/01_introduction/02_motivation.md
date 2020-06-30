@@ -30,8 +30,10 @@ The approach has the advantage of being very straightforward and "mlflow complia
 |Set up configuration         |``mlflow.yml``          |``MlflowPipelineHook``|
 |Logging parameters           |``run.py``              |``MlflowNodeHook``    |
 |Logging artifacts            |``catalog.yml``         |``MlflowDataSet``     |
+|Logging models               |NA                      |NA                    |
+|Logging metrics              |NA                      |NA                    |
 |Logging Pipeline as model    |``pipeline.py``         |``KedroPipelineModel`` and ``pipeline_ml``|
 
-In the current version (``kedro_mlflow=0.2.0``), kedro-mlflow do not provide interface to log metrics, set tags or log models outside a Kedro ``Pipeline``. These decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. after a node run).
+In the current version (``kedro_mlflow=0.2.0``), kedro-mlflow do not provide interface to log metrics, set tags or log models outside a Kedro ``Pipeline``. These decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 
 _**Note:** the version ``0.2.0`` does not need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files._

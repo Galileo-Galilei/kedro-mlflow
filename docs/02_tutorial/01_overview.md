@@ -1,0 +1,19 @@
+# Scope of the tutorial
+This tutorial adresses the following items:
+1. How to include ``kedro-mlflow`` capabilities in a Kedro project:
+    1. [create a new kedro project](./02_setup.md) with updated template
+    2. [update an existing kedro project](./02_setup.md)
+2. [Configure mlflow](./03_configuration.md) inside a Kedro project
+3. Version and track objects during execution with mlflow:
+    1. [Open mlflow ui](./04_mlflow_ui.md) with project configuration
+    4. [Version parameters](./03_parameters_tracking.md) inside a Kedro project
+    5. [Version data](./05_artifacts_tracking.md) inside a Kedro project
+    6. **(COMING in 0.3.0)** [Version machine learning models](./05_artifacts_tracking.md) inside a Kedro project
+    6. **(COMING in 0.3.0)** [Version metrics](./05_artifacts_tracking.md) inside a Kedro project
+
+This is a step by step tutorial and it is recommended to read the different chapters above order, but not mandatory.
+
+# Out of scope of the tutorial
+Some advanced capabilities are adressed in the [advanced use section](../03_advanced_use/01_pipeline_serving.md):
+- saving a kedro pipeline as a mlflow model and serve it
+- **(COMING in 0.3.0)** launching a Kedro project directly with mlflow trhough the ``MLProject`` file.

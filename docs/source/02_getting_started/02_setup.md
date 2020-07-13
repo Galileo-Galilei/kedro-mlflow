@@ -55,7 +55,7 @@ kedro mlflow init --force
 ```
 **USE AT YOUR OWN RISK: This will erase definitely all the modifications you made to your own ``run.py`` with no possible recovery.** In consequence, this is not the recommended way to setup the project if you have a custom ``run.py``. The best way to continue the setup is to [set up the hooks manually](#manual-update).
 
-### Manual update
+## Manual update
 
 The ``MlflowPipelineHook`` and ``MlflowNodeHook`` hooks need to be registered in the the ``run.py`` file. The kedro documenation explain sinde tail [how to register a hook](https://kedro.readthedocs.io/en/latest/04_user_guide/15_hooks.html#registering-your-hook-implementations-with-kedro).
 

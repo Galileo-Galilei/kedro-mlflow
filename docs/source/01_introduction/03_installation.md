@@ -5,25 +5,25 @@ I strongly recommend to use ``conda`` (a package manager) to create an environme
 I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/stable/02_getting_started/01_prerequisites.html) to set up your Kedro project.
 
 ## Installation guide
-The plugin is compatble with ``kedro>=0.16.0``. Since Kedro tries to enforce backward compatibility, it will very likely remain compatible with further versions.
+The plugin is compatible with ``kedro>=0.16.0``. Since Kedro tries to enforce backward compatibility, it will very likely remain compatible with further versions.
 
 First, install Kedro from PyPI and ensure you have a ``0.16.0`` version:
-```shell
+```bash
 pip install --upgrade "kedro>=0.16.0,<0.17.0"
 ```
 
 Second, and since the ``kedro-mlflow`` plugin is not on ``PyPi`` yet, you must install it from sources:
-```shell
+```bash
 pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git
 ```
 
 You may want to install the develop branch which has unreleased features:
-```shell
+```bash
 pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git@develop
 ```
 ## Check the installation
 Type  ``kedro info`` in a terminal to check the installation. If it has succeeded, you should see the following ascii art:
-```shell
+```bash
  _            _
 | | _____  __| |_ __ ___
 | |/ / _ \/ _` | '__/ _ \
@@ -45,7 +45,7 @@ That's it! You are now ready to go!
 ## Available commands
 With the ``kedro mlflow -h`` command outside of a kedro project, you now see the following output:
 
-```shell
+```bash
 Usage: kedro mlflow [OPTIONS] COMMAND [ARGS]...
 
   Use mlflow-specific commands inside kedro project.

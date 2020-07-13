@@ -1,10 +1,11 @@
-# What is ``Kedro``?
+# Introduction ohe
+## What is ``Kedro``?
 
 ``Kedro`` is a python package which facilitates the prototyping of data pipelines. It aims at implementing software engineering best practices (separation between I/O and compute, abstraction, templating...). It is specifically useful for machine learning projects since it provides within the same interface both interactive objects for the exploration phase and *Command Line Interface* (CLI) and configuration files for the production phase. This makes the transition from exploration to production as smooth as possible.
 
 For more details, see [Kedro's official documentation](https://kedro.readthedocs.io/en/stable/01_introduction/01_introduction.html).
 
-# What is ``Mlflow``?
+## What is ``Mlflow``?
 
 ``Mlflow`` is a library which helps managing the lifecycle of machine learning models. Mlflow provides 4 modules:
 - ``Mlflow Tracking``: This modules focuses on experiment versioning. The goal is to store all the objects needed to reproduce any code execution. This includes code through version control, but also parameters and artifacts (i.e objects fitted on data like encoders, binarizers...). These elements vary wildly during machine learning experimentation phase. ``Mlflow`` also enable to track metrics to evaluate runs, and provides a *User Interface* (UI) to browse the different runs and compare them.
@@ -14,7 +15,7 @@ For more details, see [Kedro's official documentation](https://kedro.readthedocs
 
 For more details, see [Mlflow's official documentation](https://www.mlflow.org/docs/latest/index.html).
 
-# A brief comparison between ``Kedro`` and ``Mlflow``
+## A brief comparison between ``Kedro`` and ``Mlflow``
 
 While ``Kedro`` and ``Mlflow`` do not compete in the same field, they provide some overlapping functionalities. ``Mlflow`` is specifically dedicated to machine learning and its lifecycle management, while ``Kedro`` focusing on data pipeline development. Below chart compare the different functionalities:
 
@@ -32,16 +33,16 @@ While ``Kedro`` and ``Mlflow`` do not compete in the same field, they provide so
 
 We can draw the following conclusions from the chart, discussed hereafter.
 
-#### Configuration and prototyping: Kedro 1 - 0 Mlflow
+### Configuration and prototyping: Kedro 1 - 0 Mlflow
 ``Mlflow`` and ``Kedro`` are essentially overlapping on the way they offer a dedicated configuration files for running the pipeline from CLI. However:  
 - ``Mlflow`` provides a single configuration file (the ``MLProject``) where all elements are declared (data, parameters and pipelines). Its goal is mainly to enable CLI execution of the project, but it is not very flexible. In my opinion, this file is **production oriented** and is not really intended to use for exploration.
-- ``Kedro`` offers a bunch of files (``catalog.yml``, ``parameters.yml``, ``pipeline.py``) and their associated abstraction (``AbstractDataSet``, ``DataCatalog``, ``Pipeline`` and ``node`` objects). ``Kedro`` is much more opinionated: each object has a dedicated place (and only one!) in the template. This makes the framework both **exploration and production oriented**. The downside is that it could make the learning curve a bit sharper since a newcomer has to learn all ``Kedro`` specifications.
+- ``Kedro`` offers a bunch of files (``catalog.yml``, ``parameters.yml``, ``pipeline.py``) and their associated abstraction (``AbstractDataSet``, ``DataCatalog``, ``Pipeline`` and ``node`` objects). ``Kedro`` is much more opinionated: each object has a dedicated place (and only one!) in the template. This makes the framework both **exploration and production oriented**. The downside is that it could make the learning curve a bit sharper since a newcomer has to learn all ``Kedro`` specifications. It also provides a ``kedro-viz`` plugin to visualize the DAG interactively, which is particularly handy in medium-to-big projects.
 
 
 |**``Kedro`` is a clear winner here, since it provides more functionnalities than ``Mlflow``. It handles very well _by design_ the exploration phase of data science projects when Mlflow is less flexible.**|
 |:-|
 
-#### Versioning: Kedro 1 - 1 Mlflow
+### Versioning: Kedro 1 - 1 Mlflow
 The ``Kedro`` [``Journal`` aims at reproducibility](https://kedro.readthedocs.io/en/stable/04_user_guide/13_journal.html), but is not focused on machine learning. The Journal keeps track of two elements:
 -  the CLI arguments , including *on the fly* parameters. This makes the command used to run the pipeline fully reproducible.
 - the ``AbstractVersionedDataSet`` for which versioning is activated. It consists in copying the data whom ``versioned`` argument is ``True`` when the ``save`` method of the ``AbstractVersionedDataSet`` is called.
@@ -58,7 +59,7 @@ On the other hand, ``Mlflow``:
 |**``Mlflow`` is a clear winner here, because _UI_ and _run querying_ are must-have for machine learning projects. It is more mature than ``Kedro`` for versioning and more focused on machine learning.**|
 |:-|
 
-#### Model packaging and service: Kedro 1 - 2 Mlflow
+### Model packaging and service: Kedro 1 - 2 Mlflow
 ``Kedro`` offers a way to package the code to make the pipelines callable, but does not manage specifically machine learning models.
 
 ``Mlflow`` offers a way to store machine learning models with a given "flavor", which is the minimal amount of information necessary to use the model for prediction:
@@ -72,6 +73,6 @@ When a stored model meets these requirements, ``Mlflow`` provides built-in tools
 |**``Mlflow`` is currently the only tool which adresses model serving. This is currently not the top priority for ``Kedro``, but may come in the future ([through Kedro Server maybe?](https://github.com/quantumblacklabs/kedro/issues/143))**|
 |:-|
 
-#### Conclusion: Use Kedro and add Mlflow for machine learning projects
+### Conclusion: Use Kedro and add Mlflow for machine learning projects
 
 In my opinion, ``Kedro``'s will to enforce software engineering best practice makes it really useful for machine learning teams. It is extremely well documented and the support is excellent, which makes it very user friendly even for people with no CS background. However, it lacks some machine learning-specific functionalities (better versioning, model service), and it is where ``Mlflow`` fills the gap.

@@ -1,9 +1,10 @@
-# Create a kedro project
+# Setup your Kedro project
+## Create a kedro project
 This plugins must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
 
 For this tutorial and if you do not have a real-world project, I strongly suggest that you accept to include the proposed example to make a demo of this plugin out of the box.
 
-# Update the template of your kedro project
+## Update the template of your kedro project
 In order to use the ``kedro-mlflow`` plugin, you need to perform 2 actions:
 1. Create an ``mlflow.yml`` file for [configuring mlflow in a dedicated file](../04_python_objects/configuration.md).
 2. Update the ``src/PYTHON_PACKAGE/run.py`` to add the [necessary hooks](../04_python_objects/hooks.md) to the project context. The ``MlflowPipelineHook`` manages the configuration and registers the PipelineML, while the ``MlflowNodeHook`` autolog the parameters.
@@ -54,7 +55,7 @@ kedro mlflow init --force
 ```
 **USE AT YOUR OWN RISK: This will erase definitely all the modifications you made to your own ``run.py`` with no possible recovery.** In consequence, this is not the recommended way to setup the project if you have a custom ``run.py``. The best way to continue the setup is to [set up the hooks manually](#manual-update).
 
-## Manual update
+### Manual update
 
 The ``MlflowPipelineHook`` and ``MlflowNodeHook`` hooks need to be registered in the the ``run.py`` file. The kedro documenation explain sinde tail [how to register a hook](https://kedro.readthedocs.io/en/latest/04_user_guide/15_hooks.html#registering-your-hook-implementations-with-kedro).
 

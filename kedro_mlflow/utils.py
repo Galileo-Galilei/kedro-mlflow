@@ -24,8 +24,6 @@ def _is_kedro_project(project_path: Union[str, Path, None] = None) -> bool:
 
 def _get_project_globals(project_path: Union[str, Path, None] = None) -> Dict[str, str]:
 
-    if project_path is None:
-        project_path = Path.cwd()
     # for the project name, we have to load the context : it is the only place where it is recorded
     project_context = load_context(project_path)
     project_name = project_context.project_name

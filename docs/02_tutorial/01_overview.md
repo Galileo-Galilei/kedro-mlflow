@@ -5,11 +5,11 @@ This tutorial adresses the following items:
     2. [update an existing kedro project](./02_setup.md)
 2. [Configure mlflow](./03_configuration.md) inside a Kedro project
 3. Version and track objects during execution with mlflow:
-    1. [Version parameters](./04_parameters_tracking.md) inside a Kedro project
-    2. [Version data](./05_artifacts_tracking.md) inside a Kedro project
-    3. **(COMING in 0.3.0)** [Version machine learning models](./05_artifacts_tracking.md) inside a Kedro project
-    4. **(COMING in 0.3.0)** [Version metrics](./05_artifacts_tracking.md) inside a Kedro project
-    5. [Open mlflow ui](./04_mlflow_ui.md) with project configuratio
+    1. [Open mlflow ui](./04_mlflow_ui.md) with project configuration
+    4. [Version parameters](./03_parameters_tracking.md) inside a Kedro project
+    5. [Version data](./05_artifacts_tracking.md) inside a Kedro project
+    6. **(COMING in 0.3.0)** [Version machine learning models](./05_artifacts_tracking.md) inside a Kedro project
+    6. **(COMING in 0.3.0)** [Version metrics](./05_artifacts_tracking.md) inside a Kedro project
 
 This is a step by step tutorial and it is recommended to read the different chapters above order, but not mandatory.
 

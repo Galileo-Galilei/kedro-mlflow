@@ -110,7 +110,7 @@ def test_kedro_mlflow_config_experiment_was_deleted(mocker, tmp_path):
     "uri",
     [
         (r"mlruns"),  # relative
-        (pytest.lazy_fixture("tmp_path")),  # absolute
+        (r"C:\fake\path\mlruns"),  # absolute
         (r"file:///C:/fake/path/mlruns"),  # local uri
     ],
 )

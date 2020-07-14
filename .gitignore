@@ -135,4 +135,4 @@ dmypy.json
 mlruns/
 
 debug/
-*.xlsx
+docs/imgs/excel_imgs.xlsx

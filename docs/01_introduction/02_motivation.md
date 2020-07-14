@@ -1,13 +1,10 @@
-# Motivation
-## When should I use kedro-mlflow?
+# When should I use kedro-mlflow?
 Basically, you should use ``kedro-mlflow`` in **any ``Kedro`` project which involves machine learning** / deep learning. As stated in the [introduction](./01_introduction.md), ``Kedro``'s current versioning (as of version ``0.16.1``) is not sufficient for machine learning projects: it lacks a UI and a ``run`` management system. Besides, the ``KedroPipelineModel`` ability to serve a kedro pipeline as an API or a batch in one line of code is a great addition for collaboration and transition to production.
 
 If you do not use ``Kedro`` or if you do pure data manipulation which do not involve machine learning, this plugin is not what ou are seeking for ;)
 
-## Why should I use kedro-mlflow ?
-### Benchmark of existing solutions
-
-This paragraph gives a (quick) overview of existing solutions for mlflow integration inside Kedro projects.
+# Why should I use kedro-mlflow ?
+## Quick overview of existing solutions for mlflow integration inside Kedro projects
 
 ``Mlflow`` is very simple to add to any existing code. It is a 2-step process:
 - add ``log_{XXX}`` (either param, artifact, metric or model) functions where they are needed inside the code
@@ -18,9 +15,8 @@ Including mlflow inside a ``kedro project`` is consequently very easy: the loggi
 - the associated [github repo](https://github.com/tgoldenberg/kedro-mlflow-example)
 - other examples can be found on Github, but AFAIK all of them follow the very same principles.
 
-### Enforcing Kedro principles
-
-Above implementations have the advantage of being very straightforward and *mlflow compliant*, but it breaks several ``Kedro`` principles:
+## kedro-mlflow respects all kedro principles, while existing implementation don't
+The approach has the advantage of being very straightforward and "mlflow compliant", but it breaks several ``Kedro`` principles:
 - the ``MLFLOW_TRACKING_URI`` which registers the database where runs are logged is declared inside the code instead of a configuration file, which **hinders portability across environments** and makes transition to production more difficult
 - the logging of different elements can be put in many places in the ``Kedro`` template (in the code of any function involved in a ``node``, in a ``Hook``, in  the ``ProjectContext``, in a ``transformer``...). This is not compliant with the ``Kedro`` template where any object has a dedicated location. We want to avoid the logging to occur anywhere because:
     - it is **very error-prone** (one can forget to log one parameter)

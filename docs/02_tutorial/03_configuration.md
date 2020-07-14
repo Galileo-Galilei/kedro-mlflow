@@ -1,5 +1,4 @@
-# Configure mlflow inside your project
-## Context: mlflow tracking under the hood
+# Context: mlflow tracking under the hood
 
 Mlflow is composed of four modules which are described in the [introduction section](../01_introduction/01_introduction.md). The ain module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
 
@@ -11,10 +10,10 @@ Basically, this schema shows that mlflow separates WHERE the artifacts are logge
 
 The rationale behind the separation of the backend store and the artifacts store is that artifacts can be very big and are duplicated across runs, so they need a special management with extensible storage. This is typically [cloud storage like AWS S3 or Azure Blob storage](https://mlflow.org/docs/latest/tracking.html#id10).
 
-## The ``mlflow.yml`` file
+# Configuration in kedro-mlflow: the mlflow.yml file
 ``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly . The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated ](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded)value. The ``mlflow.yml`` default have this keys set to ``mlruns``. This will create a ``mlruns`` folder locally at the root of your kedro project and enable you to use the plugin without any setup of a mlflow tracking server.
 
-```yaml
+```yml
 mlflow_tracking_uri: mlruns
 ```
 

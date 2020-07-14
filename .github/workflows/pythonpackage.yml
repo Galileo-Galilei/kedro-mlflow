@@ -5,9 +5,9 @@ name: Python package
 
 on:
   push:
-    branches: [ develop, master ]
+    branches: [ master ]
   pull_request:
-    branches: [ develop, master ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -36,5 +36,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude kedro_mlflow/template/project/run.py
     - name: Test with pytest
       run: |
-        pip install -r requirements/test_requirements.txt
+        pip install pytest
         pytest

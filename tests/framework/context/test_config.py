@@ -50,11 +50,11 @@ def test_kedro_mlflow_config_init(tmp_path):
     (tmp_path / ".kedro.yml").write_text(yaml.dump(dict(context_path="fake/path")))
 
     config = KedroMlflowConfig(project_path=tmp_path)
-    assert config.to_dict() == dict(
+    config.to_dict() == dict(
         mlflow_tracking_uri=(tmp_path / "mlruns").as_uri(),
-        experiments=KedroMlflowConfig.EXPERIMENT_OPTS,
-        run=KedroMlflowConfig.RUN_OPTS,
-        ui=KedroMlflowConfig.UI_OPTS,
+        experiments_opts=KedroMlflowConfig.EXPERIMENT_OPTS,
+        run_opts=KedroMlflowConfig.RUN_OPTS,
+        ui_opts=KedroMlflowConfig.UI_OPTS,
     )
 
 

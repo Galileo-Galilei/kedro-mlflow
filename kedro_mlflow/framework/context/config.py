@@ -1,5 +1,5 @@
 import logging
-from pathlib import Path, PurePath
+from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
@@ -168,7 +168,7 @@ class KedroMlflowConfig:
 
         # if no tracking uri is provided, we register the runs locally at the root of the project
         uri = uri or "mlruns"
-        pathlib_uri = PurePath(uri)
+        pathlib_uri = Path(uri)
 
         from urllib.parse import urlparse
 

@@ -30,9 +30,10 @@
 from pathlib import Path
 from typing import Dict
 
-from {{ cookiecutter.python_package }}.pipeline import create_pipelines
 from kedro.framework.context import KedroContext, load_package_context
 from kedro.pipeline import Pipeline
+
+from {{ cookiecutter.python_package }}.pipeline import create_pipelines
 
 from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
 

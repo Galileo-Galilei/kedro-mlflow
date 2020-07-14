@@ -32,21 +32,21 @@ class PipelineML(Pipeline):
         nodes: Iterable[Union[Node, "Pipeline"]],
         *args,
         tags: Union[str, Iterable[str]] = None,
-        inference: Pipeline,
-        input_name: str,
+        inference: Pipeline
     ):
 
         super().__init__(nodes, *args, tags=tags)
 
         self.inference = inference
 
-        self._check_input_name(input_name)
-        self.input_name = input_name
+        free_input = self._check_degrees_of_freedom()
+        self._check_model_input_name(free_input)
+        self.model_input_name = free_input
 
     def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
         for data_set_name in self.inference.inputs():
-            if data_set_name == self.input_name:
+            if data_set_name == self.model_input_name:
                 # there is no obligation that this dataset is persisted
                 # thus it is allowed to be an empty memory dataset
                 data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
@@ -78,10 +78,6 @@ class PipelineML(Pipeline):
 
         return sub_catalog
 
-    @property
-    def training(self):
-        return Pipeline(self.nodes)
-
     def _check_degrees_of_freedom(self) -> str:
         # check 1 : verify there is only one free
         free_inputs_set = set(self.inference.inputs()) - set(self.outputs())
@@ -100,56 +96,48 @@ class PipelineML(Pipeline):
             )
         return free_input
 
-    def _check_input_name(self, input_name: str) -> str:
-        free_input = self._check_degrees_of_freedom()
-        if input_name != free_input:
+    def _check_model_input_name(self, model_input_name: str) -> str:
+        flag = (model_input_name is None) or (
+            model_input_name in self.inference.inputs()
+        )
+        if not flag:
             raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but the only the only unconstrained input is {{'{free_input}'}}"
+                "model_input_name='{name}' must be in inference.inputs()".format(
+                    name=model_input_name
+                )
             )
 
+        return flag
+
     def _turn_pipeline_to_ml(self, pipeline):
-        return PipelineML(
-            nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
-        )
+        return PipelineML(nodes=pipeline.nodes, inference=self.inference)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.only_nodes_with_inputs(*inputs)
+        pipeline = super().only_nodes_with_inputs(*inputs)
         return self._turn_pipeline_to_ml(pipeline)
 
     def from_inputs(self, *inputs: str) -> "PipelineML":
-        # exceptionnally, we don't call super() because it raises
-        # a self._check_degrees_of_freedom() error even if valid cases
-        # this is because the pipeline is reconstructed node by node
-        # (only the first node may lead to invalid pipeline (e.g.
-        # with not all artifacts)), even if the whole pipeline is ok
-        # we watn the call to self._check_degrees_of_freedom() only call at the end.
-        pipeline = self.training.from_inputs(*inputs)
+        pipeline = super().from_inputs(*inputs)
         return self._turn_pipeline_to_ml(pipeline)
 
     def only_nodes_with_outputs(self, *outputs: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.only_nodes_with_outputs(*outputs)
+        pipeline = super().only_nodes_with_outputs(*outputs)
         return self._turn_pipeline_to_ml(pipeline)
 
     def to_outputs(self, *outputs: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.to_outputs(*outputs)
+        pipeline = super().to_outputs(*outputs)
         return self._turn_pipeline_to_ml(pipeline)
 
     def from_nodes(self, *node_names: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.from_nodes(*node_names)
+        pipeline = super().from_nodes(*node_names)
         return self._turn_pipeline_to_ml(pipeline)
 
     def to_nodes(self, *node_names: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.to_nodes(*node_names)
+        pipeline = super().to_nodes(*node_names)
         return self._turn_pipeline_to_ml(pipeline)
 
     def only_nodes_with_tags(self, *tags: str) -> "PipelineML":
-        # see from_inputs for an explanation of why we don't call super()
-        pipeline = self.training.only_nodes_with_tags(*tags)
+        pipeline = super().only_nodes_with_tags(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
     def decorate(self, *decorators: Callable) -> "PipelineML":

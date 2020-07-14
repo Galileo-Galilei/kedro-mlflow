@@ -90,7 +90,7 @@ def test_runpy_template_is_consistent_with_kedro():
 
     # remove the 2 specific additions for kedro_mlflow
     kedro_mlflow_runpy = kedro_mlflow_runpy.replace(
-        "from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook\n\n",
+        "from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook\n\n\n",
         "",
     )
     kedro_mlflow_runpy = kedro_mlflow_runpy.replace(
@@ -100,10 +100,9 @@ def test_runpy_template_is_consistent_with_kedro():
 
     # remove wrong black linting in current (0.16.1) kedro version
     # TODO: open an issue to kedro and remove this once the correction is made
-    # this was fixed in kedro==0.16.3!
-    # kedro_runpy = kedro_runpy.replace(
-    #     "\n        package_name=Path(__file__).resolve().parent.name",
-    #     " package_name=Path(__file__).resolve().parent.name",
-    # )
+    kedro_runpy = kedro_runpy.replace(
+        "\n        package_name=Path(__file__).resolve().parent.name",
+        " package_name=Path(__file__).resolve().parent.name",
+    )
 
     assert kedro_mlflow_runpy == kedro_runpy

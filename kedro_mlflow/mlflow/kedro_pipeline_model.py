@@ -1,4 +1,5 @@
 from copy import deepcopy
+from pathlib import Path
 
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.runner import SequentialRunner
@@ -37,7 +38,7 @@ class KedroPipelineModel(PythonModel):
 
         self.loaded_catalog = deepcopy(self.initial_catalog)
         for name, uri in context.artifacts.items():
-            self.loaded_catalog._data_sets[name]._filepath = uri
+            self.loaded_catalog._data_sets[name]._filepath = Path(uri)
 
     def predict(self, context, model_input):
         # TODO : checkout out how to pass extra args in predict

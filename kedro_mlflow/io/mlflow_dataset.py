@@ -3,7 +3,6 @@ from typing import Any, Dict, Union
 import mlflow
 from kedro.io import AbstractVersionedDataSet
 from kedro.io.core import parse_dataset_definition
-from mlflow.tracking import MlflowClient
 
 
 class MlflowDataSet(AbstractVersionedDataSet):
@@ -35,42 +34,48 @@ class MlflowDataSet(AbstractVersionedDataSet):
             def _save(self, data: Any):
                 super()._save(data)
                 if self.run_id:
-                    # if a run id is specified, we have to use mlflow client
-                    # to avoid potential conflicts with an already active run
-                    mlflow_client = MlflowClient()
-                    mlflow_client.log_artifact(
-                        run_id=self.run_id,
-                        local_path=self._filepath,
-                        artifact_path=self.artifact_path,
-                    )
+                    # if a run id is specified,
+                    # we have to open and close it for logging
+                    # this forces management of active run
+                    current_run_id = None
+                    if mlflow.active_run():
+                        current_run_id = mlflow.active_run().run_id
+                        mlflow.end_run()
+                    with mlflow.start_run(run_id=self.run_id):
+                        mlflow.log_artifact(self._filepath, self.artifact_path)
+                    if current_run_id:
+                        mlflow.start_run(current_run_id)
                 else:
                     mlflow.log_artifact(self._filepath, self.artifact_path)
 
         # rename the class
-        parent_name = data_set.__name__
-        MlflowDataSetChildren.__name__ = f"Mlflow{parent_name}"
-        MlflowDataSetChildren.__qualname__ = f"{parent_name}.Mlflow{parent_name}"
+        MlflowDataSetChildren.__name__ = "Mlflow{parent_name}".format(
+            parent_name=data_set.__name__
+        )
+        MlflowDataSetChildren.__qualname__ = "{parent_name}.Mlflow{parent_name}".format(
+            parent_name=data_set.__name__
+        )
 
         mlflow_dataset_instance = MlflowDataSetChildren(
             run_id=run_id, artifact_path=artifact_path
         )
         return mlflow_dataset_instance
 
-    def _load(self) -> Any:  # pragma: no cover
+    def _load(self) -> Any:
         """
         MlowDataSet is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
-    def _save(self, data: Any) -> None:  # pragma: no cover
+    def _save(self, data: Any) -> None:
         """
         MlowDataSet is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
-    def _describe(self) -> Dict[str, Any]:  # pragma: no cover
+    def _describe(self) -> Dict[str, Any]:
         """
         MlowDataSet is a factory for DataSet
         and consequently does not implements abtracts methods

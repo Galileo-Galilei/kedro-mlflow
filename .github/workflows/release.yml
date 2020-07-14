@@ -43,6 +43,3 @@ jobs:
       run: |
       pip install twine
       twine upload dist/* -u $PYPI_USERNAME -p $PYPI_PASSWORD --verbose
-    - name: Deploy documentation to ReadTheDocs
-      run: |
-        # check the webhook

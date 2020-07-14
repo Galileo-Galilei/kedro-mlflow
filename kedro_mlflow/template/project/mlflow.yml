@@ -21,12 +21,6 @@ experiment:
 # RUN-RELATED PARAMETERS -----------------
 
 run:
-  id: null # if `id` is None, a new run will be created
-  name: null # if `name` is None, pipeline name will be used for the run name
+  id:  # if `id` is None, a new run will be created
+  name:  # if `name` is None, pipeline name will be used for the run name
   nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
-
-# UI-RELATED PARAMETERS -----------------
-
-ui:
-  port: null  # the port to use for the ui. Find a free port if null.
-  host: null  # the host to use for the ui. Default to "localhost" if null.

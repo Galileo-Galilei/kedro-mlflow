@@ -1,4 +1,3 @@
-from copy import deepcopy
 from pathlib import Path
 from typing import Dict
 
@@ -6,9 +5,16 @@ import pytest
 import yaml
 from kedro import __version__ as KEDRO_VERSION
 from kedro.context import KedroContext
+from kedro.extras.datasets.pandas import CSVDataSet
+from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
-from kedro_mlflow.pipeline import KedroMlflowPipelineMLInputsError, PipelineML
+from kedro_mlflow.pipeline import (
+    KedroMlflowPipelineMLDatasetsError,
+    KedroMlflowPipelineMLInputsError,
+    PipelineML,
+    pipeline_ml,
+)
 
 
 def _write_yaml(filepath: Path, config: Dict):
@@ -48,6 +54,7 @@ def _get_local_logging_config():
 def config_dir(tmp_path):
     """This emulates the root of a kedro project.
     This function must be called before any instantiation of DummyContext
+
     """
     for env in ["base", "local"]:
         catalog = tmp_path / "conf" / env / "catalog.yml"
@@ -75,7 +82,7 @@ def predict_fun(model, data):
 @pytest.fixture
 def pipeline_with_tag():
 
-    return Pipeline(
+    pipeline_with_tag = Pipeline(
         [
             node(
                 func=preprocess_fun,
@@ -86,18 +93,19 @@ def pipeline_with_tag():
             node(func=train_fun, inputs="data", outputs="model", tags=["training"]),
         ]
     )
+    return pipeline_with_tag
 
 
 @pytest.fixture
 def pipeline_ml_with_tag(pipeline_with_tag):
-    training_pipeline = PipelineML(
-        nodes=deepcopy(pipeline_with_tag.nodes),
+    pipeline_ml_with_tag = pipeline_ml(
+        training=pipeline_with_tag,
         inference=Pipeline(
             [node(func=predict_fun, inputs=["model", "data"], outputs="predictions")]
         ),
         input_name="data",
     )
-    return training_pipeline
+    return pipeline_ml_with_tag
 
 
 @pytest.fixture
@@ -222,3 +230,73 @@ def test_filtering_generate_invalid_pipeline_ml(
 #     pass
 
 # filtering that remove the degree of freedom constraints should fail
+def test_catalog_extraction(pipeline_ml_with_tag):
+    catalog = DataCatalog(
+        {
+            "raw_data": MemoryDataSet(),
+            "data": MemoryDataSet(),
+            "model": CSVDataSet("fake/path/to/file.csv"),
+        }
+    )
+    filtered_catalog = pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+    assert set(filtered_catalog.list()) == {"model", "data"}
+
+
+def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
+    catalog = DataCatalog({"raw_data": MemoryDataSet(), "data": MemoryDataSet()})
+    with pytest.raises(KedroMlflowPipelineMLDatasetsError) as execinfo:
+        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+
+    assert "since it is an input for inference pipeline" in execinfo.value.args[0]
+
+
+def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
+    catalog = DataCatalog(
+        {"raw_data": MemoryDataSet(), "data": MemoryDataSet(), "model": MemoryDataSet()}
+    )
+    with pytest.raises(KedroMlflowPipelineMLDatasetsError) as execinfo:
+        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+
+    assert (
+        "The datasets of the training pipeline must be persisted locally"
+        in execinfo.value.args[0]
+    )
+
+
+def test_too_many_free_inputs():
+    with pytest.raises(KedroMlflowPipelineMLInputsError) as execinfo:
+        pipeline_ml(
+            training=Pipeline(
+                [
+                    node(
+                        func=preprocess_fun,
+                        inputs="raw_data",
+                        outputs="neither_data_nor_model",
+                    )
+                ]
+            ),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+        )
+    assert "Only one free input is allowed." in execinfo.value.args[0]
+
+
+def test_tagging(pipeline_ml_with_tag):
+    new_pl = pipeline_ml_with_tag.tag(["hello"])
+    assert all(["hello" in node.tags for node in new_pl.nodes])
+
+
+def test_decorate(pipeline_ml_with_tag):
+    def fake_dec(x):
+        return x
+
+    new_pl = pipeline_ml_with_tag.decorate(fake_dec)
+    assert all([fake_dec in node._decorators for node in new_pl.nodes])

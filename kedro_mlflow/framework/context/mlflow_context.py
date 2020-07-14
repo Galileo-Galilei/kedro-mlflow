@@ -8,9 +8,7 @@ from kedro_mlflow.framework.context.config import KedroMlflowConfig
 # this could be a read-only property in the context
 # with a @property decorator
 # but for consistency with hook system, it is an external function
-def get_mlflow_conf(project_path=None, env="local"):
-    if project_path is None:
-        project_path = Path.cwd()
+def get_mlflow_conf(project_path, env):
     project_path = Path(project_path)
     conf_paths = [
         str(project_path / "conf" / "base"),

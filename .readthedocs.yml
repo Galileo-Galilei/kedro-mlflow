@@ -18,4 +18,4 @@ formats:
 python:
   version: 3.7
   install:
-    - requirements: docs/docs_requirements.txt
+    - requirements: requirements/docs_requirements.txt

@@ -1,4 +1,3 @@
-from pathlib import Path
 from typing import Callable, Iterable, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
@@ -53,7 +52,7 @@ class PipelineML(Pipeline):
                 # there is no obligation that this dataset is persisted
                 # thus it is allowed to be an empty memory dataset
                 data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
-                sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
+                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataSet())
             else:
                 try:
                     data_set = catalog._data_sets[data_set_name]
@@ -80,17 +79,6 @@ class PipelineML(Pipeline):
                     )
 
         return sub_catalog
-
-    def extract_pipeline_artifacts(self, catalog: DataCatalog):
-        pipeline_catalog = self.extract_pipeline_catalog(catalog)
-        artifacts = {
-            name: Path(dataset._filepath.as_posix())
-            .resolve()
-            .as_uri()  # weird bug when directly converting PurePosixPath to windows: it is considered as relative
-            for name, dataset in pipeline_catalog._data_sets.items()
-            if name != self.input_name
-        }
-        return artifacts
 
     @property
     def training(self):

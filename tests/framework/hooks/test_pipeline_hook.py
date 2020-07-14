@@ -9,7 +9,7 @@ from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.framework.context import get_mlflow_conf
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
     _format_conda_env,
@@ -243,7 +243,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
     # test : parameters should have been logged
-    mlflow_conf = get_mlflow_config(tmp_path)
+    mlflow_conf = get_mlflow_conf(tmp_path)
     mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
     run_data = mlflow_client.get_run(run_id).data
     # all run_params are recorded as tags

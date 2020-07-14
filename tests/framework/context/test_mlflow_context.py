@@ -1,13 +1,13 @@
 import yaml
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.framework.context import get_mlflow_conf
 
-# def test_get_mlflow_config_outside_kedro_project(tmp_path, config_with_base_mlflow_conf):
+# def test_get_mlflow_conf_outside_kedro_project(tmp_path, config_with_base_mlflow_conf):
 #     with pytest.raises(KedroMlflowConfigError, match="not a valid path to a kedro project"):
-#         get_mlflow_config(project_path=tmp_path,env="local")
+#         get_mlflow_conf(project_path=tmp_path,env="local")
 
 
-def test_get_mlflow_config(mocker, tmp_path, config_dir):
+def test_get_mlflow_conf(mocker, tmp_path, config_dir):
     # config_with_base_mlflow_conf is a pytest.fixture in conftest
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
@@ -31,4 +31,4 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
     }
-    assert get_mlflow_config(project_path=tmp_path, env="local").to_dict() == expected
+    assert get_mlflow_conf(project_path=tmp_path, env="local").to_dict() == expected

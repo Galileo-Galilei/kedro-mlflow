@@ -4,8 +4,6 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
-MSG_NOT_IMPLEMENTED = "This method is not implemented because it does not make sens for 'PipelineML'. Manipulate directly the training pipeline and recreate the 'PipelineML' with 'pipeline_ml' factory"
-
 
 class PipelineML(Pipeline):
     """
@@ -106,7 +104,7 @@ class PipelineML(Pipeline):
         free_input = self._check_degrees_of_freedom()
         if input_name != free_input:
             raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but the only unconstrained input is {{'{free_input}'}}"
+                f"input_name='{input_name}' but the only the only unconstrained input is {{'{free_input}'}}"
             )
 
     def _turn_pipeline_to_ml(self, pipeline):
@@ -114,8 +112,10 @@ class PipelineML(Pipeline):
             nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
         )
 
-    def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":
+        # see from_inputs for an explanation of why we don't call super()
+        pipeline = self.training.only_nodes_with_inputs(*inputs)
+        return self._turn_pipeline_to_ml(pipeline)
 
     def from_inputs(self, *inputs: str) -> "PipelineML":
         # exceptionnally, we don't call super() because it raises
@@ -123,17 +123,19 @@ class PipelineML(Pipeline):
         # this is because the pipeline is reconstructed node by node
         # (only the first node may lead to invalid pipeline (e.g.
         # with not all artifacts)), even if the whole pipeline is ok
-        # we want the call to self._check_degrees_of_freedom() only call at the end.
+        # we watn the call to self._check_degrees_of_freedom() only call at the end.
         pipeline = self.training.from_inputs(*inputs)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def only_nodes_with_outputs(
-        self, *outputs: str
-    ) -> "PipelineML":  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def only_nodes_with_outputs(self, *outputs: str) -> "PipelineML":
+        # see from_inputs for an explanation of why we don't call super()
+        pipeline = self.training.only_nodes_with_outputs(*outputs)
+        return self._turn_pipeline_to_ml(pipeline)
 
-    def to_outputs(self, *outputs: str) -> "PipelineML":  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def to_outputs(self, *outputs: str) -> "PipelineML":
+        # see from_inputs for an explanation of why we don't call super()
+        pipeline = self.training.to_outputs(*outputs)
+        return self._turn_pipeline_to_ml(pipeline)
 
     def from_nodes(self, *node_names: str) -> "PipelineML":
         # see from_inputs for an explanation of why we don't call super()
@@ -158,19 +160,21 @@ class PipelineML(Pipeline):
         pipeline = super().tag(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def __add__(self, other):  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def __add__(self, other):
+        new_pipeline = super().__add__(other)
+        return self._turn_pipeline_to_ml(new_pipeline)
 
-    def __sub__(self, other):  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def __sub__(self, other):
+        new_pipeline = super().__sub__(other)
+        return self._turn_pipeline_to_ml(new_pipeline)
 
     def __and__(self, other):
-        # kept for compatibility with KedroContext _filter_pipelinefunction
         new_pipeline = super().__and__(other)
         return self._turn_pipeline_to_ml(new_pipeline)
 
-    def __or__(self, other):  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+    def __or__(self, other):
+        new_pipeline = super().__or__(other)
+        return self._turn_pipeline_to_ml(new_pipeline)
 
 
 class KedroMlflowPipelineMLInputsError(Exception):

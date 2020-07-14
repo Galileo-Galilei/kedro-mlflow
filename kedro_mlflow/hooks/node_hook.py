@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 import mlflow
-from kedro.framework.hooks import hook_impl
+from kedro.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline.node import Node
 

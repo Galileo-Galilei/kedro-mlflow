@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 
 import yaml
 from kedro import __version__ as KEDRO_VERSION
-from kedro.framework.context import load_context
+from kedro.context import load_context
 from pkg_resources import working_set
 
 KEDRO_YML = ".kedro.yml"

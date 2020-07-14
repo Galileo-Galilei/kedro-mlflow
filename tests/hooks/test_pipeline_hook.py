@@ -3,7 +3,7 @@ import sys
 import pytest
 import yaml
 
-from kedro_mlflow.framework.hooks.pipeline_hook import _format_conda_env
+from kedro_mlflow.hooks.pipeline_hook import _format_conda_env
 
 
 @pytest.fixture

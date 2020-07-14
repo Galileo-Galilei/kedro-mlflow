@@ -22,3 +22,4 @@ python:
       path: .
     - requirements: requirements/docs_requirements.txt
     - method: setuptools
+      path: .

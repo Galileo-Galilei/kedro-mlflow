@@ -38,6 +38,7 @@ jobs:
     env:
       PYPI_USERNAME: ${{ secrets.pypi_username }}
       PYPI_PASSWORD: ${{ secrets.pypi_password }}
+    steps:
     - name: Deploy package to PyPI
       run: |
       pip install twine

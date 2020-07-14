@@ -33,7 +33,7 @@ class MlflowNodeHook:
             run_id: The id of the run.
         """
 
-        # only parameters will be logged. Artifacts must be declared manually in the catalog
+        # only parameters xwill be logged. Artifacts must be declared manually in the catalog
         params_inputs = {}
         for k, v in inputs.items():
             if k.startswith("params:"):

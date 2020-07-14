@@ -79,8 +79,8 @@ def test_get_mlflow_conf(mocker, tmp_path, config_with_base_mlflow_conf):
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
     expected = {
         "mlflow_tracking_uri": (tmp_path / "mlruns").as_uri(),
-        "experiments": {"name": "fake_package", "create": True},
-        "run": {"id": "123456789", "name": "my_run", "nested": True},
-        "ui": {"port": "5151", "host": "localhost"},
+        "experiments_opts": {"name": "fake_package", "create": True},
+        "run_opts": {"id": "123456789", "name": "my_run", "nested": True},
+        "ui_opts": {"port": "5151", "host": "localhost"},
     }
     assert get_mlflow_conf(project_path=tmp_path, env="local").to_dict() == expected

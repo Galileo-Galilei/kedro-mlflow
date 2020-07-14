@@ -4,6 +4,9 @@ from typing import Any, Dict, Union
 
 import mlflow
 
+# this function is only in the develop branch
+from kedro.framework.context.context import _is_relative_path
+
 from kedro_mlflow import utils as utils
 
 LOGGER = logging.getLogger(__name__)
@@ -123,9 +126,9 @@ class KedroMlflowConfig:
         """
         info = {
             "mlflow_tracking_uri": self.mlflow_tracking_uri,
-            "experiments": self.experiment_opts,
-            "run": self.run_opts,
-            "ui": self.ui_opts,
+            "experiments_opts": self.experiment_opts,
+            "run_opts": self.run_opts,
+            "ui_opts": self.ui_opts,
         }
         return info
 
@@ -168,24 +171,8 @@ class KedroMlflowConfig:
 
         # if no tracking uri is provided, we register the runs locally at the root of the project
         uri = uri or "mlruns"
-        pathlib_uri = Path(uri)
-
-        from urllib.parse import urlparse
-
-        if pathlib_uri.is_absolute():
-            valid_uri = pathlib_uri.as_uri()
-        else:
-            parsed = urlparse(uri)
-            if parsed.scheme == "":
-                # if it is a local relative path, make it absolute
-                # .resolve() does not work well on windows
-                # .absolute is undocumented and have knwon bugs
-                # Path.cwd() / uri is the recommend way by core developpers.
-                # See : https://discuss.python.org/t/pathlib-absolute-vs-resolve/2573/6
-                valid_uri = (self.project_path / uri).as_uri()
-            else:
-                # else assume it is an uri
-                valid_uri = uri
+        absolute_uri = self.project_path / uri if _is_relative_path(uri) else Path(uri)
+        valid_uri = absolute_uri.resolve().as_uri()
 
         return valid_uri
 

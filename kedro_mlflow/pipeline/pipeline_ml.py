@@ -148,22 +148,6 @@ class PipelineML(Pipeline):
         pipeline = super().tag(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def __add__(self, other):
-        new_pipeline = super().__add__(other)
-        return self._turn_pipeline_to_ml(new_pipeline)
-
-    def __sub__(self, other):
-        new_pipeline = super().__sub__(other)
-        return self._turn_pipeline_to_ml(new_pipeline)
-
-    def __and__(self, other):
-        new_pipeline = super().__and__(other)
-        return self._turn_pipeline_to_ml(new_pipeline)
-
-    def __or__(self, other):
-        new_pipeline = super().__or__(other)
-        return self._turn_pipeline_to_ml(new_pipeline)
-
 
 class KedroMlflowPipelineMLInputsError(Exception):
     """Error raised when the inputs of KedroPipelineMoel are invalid

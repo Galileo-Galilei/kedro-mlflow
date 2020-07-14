@@ -15,36 +15,19 @@ class KedroPipelineModel(PythonModel):
         self.loaded_catalog = DataCatalog()
 
     def load_context(self, context):
-
-        # a consistency check is made when loading the model
-        # it would be better to check when saving the model
-        # but we rely on a mlflow function for saving, and it is unaware of kedro
-        # pipeline structure
-        mlflow_artifacts_keys = set(context.artifacts.keys())
-        kedro_artifacts_keys = set(
-            self.pipeline_ml.inference.inputs() - {self.pipeline_ml.input_name}
-        )
-        if mlflow_artifacts_keys != kedro_artifacts_keys:
-            in_artifacts_but_not_inference = (
-                mlflow_artifacts_keys - kedro_artifacts_keys
-            )
-            in_inference_but_not_artifacts = (
-                kedro_artifacts_keys - mlflow_artifacts_keys
-            )
-            raise ValueError(
-                f"Provided artifacts do not match catalog entries:\n- 'artifacts - inference.inputs()' = : {in_artifacts_but_not_inference}'\n- 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}'"
-            )
-
         self.loaded_catalog = deepcopy(self.initial_catalog)
         for name, uri in context.artifacts.items():
-            self.loaded_catalog._data_sets[name]._filepath = uri
+            if name == self.pipeline_ml.model_input_name:
+                self.loaded_catalog._data_sets[name] = MemoryDataSet()
+            else:
+                self.loaded_catalog._data_sets[name]._filepath = uri
 
     def predict(self, context, model_input):
         # TODO : checkout out how to pass extra args in predict
         # for instance, to enable parallelization
 
         self.loaded_catalog.add(
-            data_set_name=self.pipeline_ml.input_name,
+            data_set_name=self.pipeline_ml.model_input_name,
             data_set=MemoryDataSet(model_input),
             replace=True,
         )

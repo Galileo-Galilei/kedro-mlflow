@@ -1,5 +1,10 @@
 # Upcoming release
 ## Major features and improvements
+## Bug fixes and other changes
+## Breaking changes to the API
+
+# 0.2.0
+## Major features and improvements
 - Bump the codebase test coverage to 100% to improve stability
 - Improve rendering of template with a trailing newline to make them  ```black```-valid
 - Add a ``PipelineML.extract_pipeline_artifacts`` methods to make artifacts retrieving easier for a given pipeline

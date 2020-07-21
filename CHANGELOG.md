@@ -1,6 +1,7 @@
 # Upcoming release
 ## Major features and improvements
 ## Bug fixes and other changes
+- Enable ``pipeline_ml`` to accept artifacts (encoder, binarizer...) to be "intermediary" outputs of the pipeline and not only "terminal" outputs (i.e. node outputs which are not re-used as another node input). This closes a bug discovered in a more general discussion in [#16](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16).
 ## Breaking changes to the API
 
 # 0.2.0

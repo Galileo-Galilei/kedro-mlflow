@@ -1,4 +1,25 @@
 # Setup your Kedro project
+## Check the installation
+Type  ``kedro info`` in a terminal to check if the plugin is properly discovered by ``Kedro``. If the installation has succeeded, you should see the following ascii art:
+```
+ _            _
+| | _____  __| |_ __ ___
+| |/ / _ \/ _` | '__/ _ \
+|   <  __/ (_| | | | (_) |
+|_|\_\___|\__,_|_|  \___/
+v<kedro-version>
+
+kedro allows teams to create analytics
+projects. It is developed as part of
+the Kedro initiative at QuantumBlack.
+
+Installed plugins:
+kedro_mlflow: <kedro-mlflow-version> (hooks:global,project)
+```
+The version ``<kedro-mlflow-version>`` of the plugin is installed ans has both global and project commands.
+
+That's it! You are now ready to go!
+
 ## Create a kedro project
 This plugins must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
 
@@ -63,18 +84,18 @@ Your run.py should look like the following code snippet :
 
 ```python
 from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
-from YOUR_PYTHON_PACKAGE.pipeline import create_pipelines
+from <python_package>.pipeline import create_pipelines
 
 class ProjectContext(KedroContext):
     """Users can override the remaining methods from the parent class here,
     or create new ones (e.g. as required by plugins)
     """
 
-    project_name = "YOUR PROJECT NAME"
-    project_version = "0.16.2"
+    project_name = "<project-name>"
+    project_version = "0.16.X" # must be >=0.16.0
     hooks = (
         MlflowNodeHook(flatten_dict_params=False),
-        MlflowPipelineHook(model_name="YOUR_PYTHON_PACKAGE",
+        MlflowPipelineHook(model_name="<python_package>",
                            conda_env="src/requirements.txt")
     )  # <-- the new lines to add
 ```

@@ -1,4 +1,4 @@
-# First step
+# First steps with the plugins
 ## Initialize kedro-mlflow
 Run
 ```bash

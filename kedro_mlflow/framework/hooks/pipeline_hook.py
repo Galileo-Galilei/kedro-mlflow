@@ -67,7 +67,8 @@ class MlflowPipelineHook:
             run_name=run_name,
             nested=mlflow_conf.run_opts["nested"],
         )
-        mlflow.set_tags(run_params)
+        # Set tags only for run parameters that have values.
+        mlflow.set_tags({k: v for k, v in run_params.items() if v})
         # add manually git sha for consistency with the journal
         # TODO : this does not take into account not committed files, so it
         # does not ensure reproducibility. Define what to do.

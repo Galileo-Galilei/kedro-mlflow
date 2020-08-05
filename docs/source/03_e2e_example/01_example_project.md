@@ -1,6 +1,6 @@
 # Example project
 ## Check your installation
-Create a conda envionment and ``kedro-mlflow`` (this will automatically install install ``kedro>=0.16.0``).
+Create a conda envionment and ``kedro-mlflow`` (this will automatically install ``kedro>=0.16.0``).
 
 ```bash
 conda create -n km_example python=3.6.8 --yes
@@ -8,7 +8,7 @@ conda activate km_example
 pip install kedro-mlflow
 ```
 ## Install the toy project
-For this end to end example, we will use the [kedro starter](https://kedro.readthedocs.io/en/latest/02_getting_started/05_starters.html#creating-new-projects-with-kedro-starters) of with the [iris dataset](https://github.com/quantumblacklabs/kedro-starter-pandas-iris).
+For this end to end example, we will use the [kedro starter](https://kedro.readthedocs.io/en/latest/02_getting_started/05_starters.html#creating-new-projects-with-kedro-starters) with the [iris dataset](https://github.com/quantumblacklabs/kedro-starter-pandas-iris).
 
 We use this project because:
 - it covers most of the common use cases

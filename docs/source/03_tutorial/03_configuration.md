@@ -18,4 +18,4 @@ The rationale behind the separation of the backend store and the artifacts store
 mlflow_tracking_uri: mlruns
 ```
 
-This is the only mandatory key in the mlflow.yml file, but there are many others that provides fine-grained control on your mlflow setup. Please see the [``mlflow.yml`` description](../04_python_objects/mlflow_yml.md) for further details.
+This is the only mandatory key in the mlflow.yml file, but there are many others that provides fine-grained control on your mlflow setup. Please see the [``mlflow.yml`` description](../05_python_objects/05_Configuration.md) for further details.

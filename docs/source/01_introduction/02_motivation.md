@@ -20,7 +20,7 @@ Including mlflow inside a ``kedro project`` is consequently very easy: the loggi
 
 ### Enforcing Kedro principles
 
-Above implementations have the advantage of being very straightforward and *mlflow compliant*, but they break several ``Kedro`` principles:
+Above implementations have the advantage of being very straightforward and *mlflow compliant*, but it breaks several ``Kedro`` principles:
 - the ``MLFLOW_TRACKING_URI`` which registers the database where runs are logged is declared inside the code instead of a configuration file, which **hinders portability across environments** and makes transition to production more difficult
 - the logging of different elements can be put in many places in the ``Kedro`` template (in the code of any function involved in a ``node``, in a ``Hook``, in  the ``ProjectContext``, in a ``transformer``...). This is not compliant with the ``Kedro`` template where any object has a dedicated location. We want to avoid the logging to occur anywhere because:
     - it is **very error-prone** (one can forget to log one parameter)

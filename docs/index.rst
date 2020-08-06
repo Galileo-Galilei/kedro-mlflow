@@ -10,9 +10,8 @@ Welcome to kedro-mlflow's documentation!
    :maxdepth: 4
 
    Introduction <source/01_introduction/index.rst>
-   Hello world example <source/02_hello_world_example/index.rst>
-   Getting Started <source/03_tutorial/index.rst>
-   Python objects <source/05_python_objects/index.rst>
+   Hello world example <source/03_e2e_example/index.rst>
+   Getting Started <source/02_getting_started/index.rst>
 
 
 Indices and tables

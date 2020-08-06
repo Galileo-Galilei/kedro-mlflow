@@ -41,4 +41,4 @@ jobs:
     - name: Deploy package to PyPI
       run: |
         pip install twine
-        twine upload dist/* -u "$PYPI_USERNAME" -p "$PYPI_PASSWORD" --verbose
+        python -m twine upload dist/* -u "$PYPI_USERNAME" -p "$PYPI_PASSWORD" --verbose

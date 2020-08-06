@@ -248,8 +248,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     run_data = mlflow_client.get_run(run_id).data
     # all run_params are recorded as tags
     for k, v in dummy_run_params.items():
-        if v:
-            assert run_data.tags[k] == str(v)
+        assert run_data.tags[k] == str(v)
     # params are not recorded because we don't have MlflowNodeHook here
     # and the model should not be logged when it is not a PipelineML
     nb_artifacts = len(mlflow_client.list_artifacts(run_id))

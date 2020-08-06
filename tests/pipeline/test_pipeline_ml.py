@@ -17,14 +17,6 @@ def preprocess_fun(data):
     return data
 
 
-def fit_encoder_fun(data):
-    return 4
-
-
-def apply_encoder_fun(encoder, data):
-    return data * encoder
-
-
 def train_fun(data):
     return 2
 
@@ -63,50 +55,6 @@ def pipeline_ml_with_tag(pipeline_with_tag):
 
 
 @pytest.fixture
-def pipeline_ml_with_intermediary_artifacts():
-    full_pipeline = Pipeline(
-        [
-            node(
-                func=preprocess_fun,
-                inputs="raw_data",
-                outputs="data",
-                tags=["training"],
-            ),
-            node(
-                func=fit_encoder_fun,
-                inputs="data",
-                outputs="encoder",
-                tags=["training"],
-            ),
-            node(
-                func=apply_encoder_fun,
-                inputs=["encoder", "data"],
-                outputs="encoded_data",
-                tags=["training", "inference"],
-            ),
-            node(
-                func=train_fun,
-                inputs="encoded_data",
-                outputs="model",
-                tags=["training"],
-            ),
-            node(
-                func=predict_fun,
-                inputs=["model", "encoded_data"],
-                outputs="predictions",
-                tags=["inference"],
-            ),
-        ]
-    )
-    pipeline_ml_with_tag = pipeline_ml(
-        training=full_pipeline.only_nodes_with_tags("training"),
-        inference=full_pipeline.only_nodes_with_tags("inference"),
-        input_name="data",
-    )
-    return pipeline_ml_with_tag
-
-
-@pytest.fixture
 def dummy_context(tmp_path, config_dir, mocker):
     class DummyContext(KedroContext):
         project_name = "fake project"
@@ -129,19 +77,7 @@ def dummy_catalog():
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
-            "model": CSVDataSet("fake/path/to/model.csv"),
-        }
-    )
-
-
-@pytest.fixture
-def catalog_with_encoder():
-    return DataCatalog(
-        {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
-            "encoder": CSVDataSet("fake/path/to/encoder.csv"),
-            "model": CSVDataSet("fake/path/to/model.csv"),
+            "model": CSVDataSet("fake/path/to/file.csv"),
         }
     )
 
@@ -205,13 +141,6 @@ def test_filtering_pipeline_ml(
 
 
 @pytest.mark.parametrize(
-    "pipeline_ml_obj",
-    [
-        pytest.lazy_fixture("pipeline_ml_with_tag"),
-        pytest.lazy_fixture("pipeline_ml_with_intermediary_artifacts"),
-    ],
-)
-@pytest.mark.parametrize(
     "tags,from_nodes,to_nodes,node_names,from_inputs",
     [
         (["preprocessing"], None, None, None, None),
@@ -222,7 +151,8 @@ def test_filtering_pipeline_ml(
 def test_filtering_generate_invalid_pipeline_ml(
     mocker,
     dummy_context,
-    pipeline_ml_obj,
+    pipeline_with_tag,
+    pipeline_ml_with_tag,
     tags,
     from_nodes,
     to_nodes,
@@ -235,10 +165,11 @@ def test_filtering_generate_invalid_pipeline_ml(
     """
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
     with pytest.raises(
-        KedroMlflowPipelineMLInputsError, match="No free input is allowed",
+        KedroMlflowPipelineMLInputsError,
+        match="(?:Only one free input is allowed|the only unconstrained input is)",
     ):
         dummy_context._filter_pipeline(
-            pipeline=pipeline_ml_obj,
+            pipeline=pipeline_ml_with_tag,
             tags=tags,
             from_nodes=from_nodes,
             to_nodes=to_nodes,
@@ -254,24 +185,10 @@ def test_filtering_generate_invalid_pipeline_ml(
 #     pass
 
 # filtering that remove the degree of freedom constraints should fail
-@pytest.mark.parametrize(
-    "pipeline_ml_obj,catalog,result",
-    [
-        (
-            pytest.lazy_fixture("pipeline_ml_with_tag"),
-            pytest.lazy_fixture("dummy_catalog"),
-            {"model", "data"},
-        ),
-        (
-            pytest.lazy_fixture("pipeline_ml_with_intermediary_artifacts"),
-            pytest.lazy_fixture("catalog_with_encoder"),
-            {"model", "data", "encoder"},
-        ),
-    ],
-)
-def test_catalog_extraction(pipeline_ml_obj, catalog, result):
-    filtered_catalog = pipeline_ml_obj.extract_pipeline_catalog(catalog)
-    assert set(filtered_catalog.list()) == result
+def test_catalog_extraction(pipeline_ml_with_tag, dummy_catalog):
+
+    filtered_catalog = pipeline_ml_with_tag.extract_pipeline_catalog(dummy_catalog)
+    assert set(filtered_catalog.list()) == {"model", "data"}
 
 
 def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
@@ -296,7 +213,7 @@ def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
 
 def test_too_many_free_inputs():
     with pytest.raises(
-        KedroMlflowPipelineMLInputsError, match="No free input is allowed"
+        KedroMlflowPipelineMLInputsError, match="Only one free input is allowed."
     ):
         pipeline_ml(
             training=Pipeline(

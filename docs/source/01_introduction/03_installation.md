@@ -12,9 +12,9 @@ First, install Kedro from PyPI and ensure you have a ``0.16.0`` version:
 pip install --upgrade "kedro>=0.16.0,<0.17.0"
 ```
 
-Second, and since the ``kedro-mlflow`` plugin is not on ``PyPi`` yet, you must install it from sources:
+Second, install ``kedro-mlflow`` plugin from ``PyPi``:
 ```console
-pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git
+pip install --upgrade kedro-mlflow
 ```
 
 You may want to install the develop branch which has unreleased features:

@@ -1,16 +1,40 @@
-# Upcoming release
-## Major features and improvements
-## Bug fixes and other changes
-## Breaking changes to the API
+# Changelog
 
-# 0.2.0
-## Major features and improvements
+## [Unreleased]
+
+## [0.2.1] - 2018-08-06
+
+### Added
+Many documentation improvements:
+  - add a Code of conduct
+  - add a Contributing guide
+  - Refactor README to separate clearly from documentation
+  - Fix broken links
+  - Fix bad markdwon rendering
+  - Split old readme information in dedicated sections
+
+### Changed
+
+- Enable ``pipeline_ml`` to accept artifacts (encoder, binarizer...) to be "intermediary" outputs of the pipeline and not only "terminal" outputs (i.e. node outputs which are not re-used as another node input). This closes a bug discovered in a more general discussion in [#16](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16).
+- Only non-empty CLI arguments and options are logged as tags in MLflow ([#32](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16))
+
+## [0.2.0] - 2020-07-18
+
+### Added
+
 - Bump the codebase test coverage to 100% to improve stability
 - Improve rendering of template with a trailing newline to make them  ```black```-valid
 - Add a ``PipelineML.extract_pipeline_artifacts`` methods to make artifacts retrieving easier for a given pipeline
 - Use an official kedro release (``>0.16.0, <0.17.0``) instead of the development branch
 
-## Bug fixes and other changes
+### Changed
+
+- ``hooks``, ``context`` and ``cli`` folders are moved to ``framework`` to fit kedro new folder architecture
+- Rename ``get_mlflow_conf`` in ``get_mlflow_config`` for consistency (with ``ConfigLoader``, ``KedroMlflowConfig``...)
+- Rename keys of ``KedroMlflowConfig.to_dict()`` to remove the "_opts" suffix for consistency with the ``KedroMlflowConfig.from_dict`` method
+
+### Fixed
+
 - Add ```debug``` folder to gitignore for to avoid involuntary data leakage
 - Remove the inadequate warning *"You have not initialized your project yet"* when calling ```kedro mlflow init```
 - Remove useless check to see if the commands are called inside a Kedro project since the commands are dynamically displayed based on whether the call is made inside a kedro project or not
@@ -26,14 +50,16 @@
 - Update ``run.py`` template to fit kedro new one.
 - Force ``_generate_kedro_commands`` to separate an option and its arguments with a "=" sign for readibility
 
-## Breaking changes to the API
-- ``hooks``, ``context`` and ``cli`` folders are moved to ``framework`` to fit kedro new folder architecture
-- Rename ``get_mlflow_conf`` in ``get_mlflow_config`` for consistency (with ``ConfigLoader``, ``KedroMlflowConfig``...)
-- Rename keys of ``KedroMlflowConfig.to_dict()`` to remove the "_opts" suffix for consistency with the ``KedroMlflowConfig.from_dict`` method
+## [0.1.0] - 2020-04-18
 
-# 0.1.0
-## Major features and improvements
+### Added
+
 - Add cli ``kedro mlflow init`` to udpdate the template and ``kedro mlflow ui`` to open ``mlflow`` user interface with your project configuration
 - Add hooks ``MlflowNodeHook`` and ``MlflowPipelineHook`` for parameters autologging and model autologging
 - Add ``MlflowDataSet`` for artifacts autologging
 - Add ``PipelineMl`` class and its ``pipeline_ml`` factory for pipeline packaging and service
+
+[unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.0...0.2.1
+[0.2.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.1.0...0.2.0
+[0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0

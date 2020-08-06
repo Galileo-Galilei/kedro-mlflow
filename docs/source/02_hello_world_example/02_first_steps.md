@@ -1,11 +1,11 @@
-# First step
+# First steps with the plugins
 ## Initialize kedro-mlflow
 Run
-```bash
+```console
 kedro mlflow init
 ```
 You have the following message:
-```bash
+```console
 'conf/base/mlflow.yml' successfully updated.
 'run.py' successfully updated
 ```
@@ -21,12 +21,12 @@ If you have configured your own mlflow server, you can specify the tracking uri 
 ## Run the pipeline
 
 Open a new command and launch
-```bash
+```console
 kedro run
 ```
 
 If the pipeline executes properly, you should see the following log:
-```bash
+```console
 2020-07-13 21:29:24,939 - kedro.versioning.journal - WARNING - Unable to git describe path/to/km-example
 2020-07-13 21:29:25,401 - kedro.io.data_catalog - INFO - Loading data from `example_iris_data` (CSVDataSet)...
 2020-07-13 21:29:25,562 - kedro.io.data_catalog - INFO - Loading data from `params:example_test_data_ratio` (MemoryDataSet)...
@@ -62,7 +62,7 @@ Since we have kept the default value of the ``mlflow.yml``, the tracking uri (th
 ## Open the UI
 
 Launch the ui:
-```bash
+```console
 kedro mlflow ui
 ```
 
@@ -83,7 +83,7 @@ Note that the parameters have been recorded *automagically*. Here, two parameter
 
 You can see that these are effectively the registered parameters in the pipeline with the ``kedro-viz`` plugin:
 
-```bash
+```console
 pip install kedro-viz
 kedro viz
 ```

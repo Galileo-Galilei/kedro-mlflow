@@ -96,30 +96,30 @@ class PipelineML(Pipeline):
     def training(self):
         return Pipeline(self.nodes)
 
-    def _check_degrees_of_freedom(self) -> str:
-        # check 1 : verify there is only one free
-        free_inputs_set = set(self.inference.inputs()) - set(self.outputs())
-        if len(free_inputs_set) == 1:
-            free_input = list(free_inputs_set)[0]
-        else:
-            raise KedroMlflowPipelineMLInputsError(
-                """
-        The following inputs are free for the inference pipeline:
-        - {inputs}.
-        Only one free input is allowed.
-        Please make sure that 'inference' pipeline inputs are 'training' pipeline outputs,
-        except one.""".format(
-                    inputs="\n     - ".join(free_inputs_set)
-                )
-            )
-        return free_input
-
     def _check_input_name(self, input_name: str) -> str:
-        free_input = self._check_degrees_of_freedom()
-        if input_name != free_input:
+        allowed_names = self.inference.inputs()
+        pp_allowed_names = "\n - ".join(allowed_names)
+        if input_name not in allowed_names:
             raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but the only unconstrained input is {{'{free_input}'}}"
+                f"input_name='{input_name}' but it must be an input of inference, i.e. one of: {pp_allowed_names}"
             )
+        else:
+            free_inputs_set = (
+                self.inference.inputs() - {input_name} - self.all_outputs()
+            )
+            if len(free_inputs_set) > 0:
+                raise KedroMlflowPipelineMLInputsError(
+                    """
+                    The following inputs are free for the inference pipeline:
+                    - {inputs}.
+                    No free input is allowed.
+                    Please make sure that 'inference.pipeline.inputs()' are all in 'training.pipeline.all_outputs()',
+                    except eventually 'input_name'.""".format(
+                        inputs="\n     - ".join(free_inputs_set)
+                    )
+                )
+
+        return None
 
     def _turn_pipeline_to_ml(self, pipeline):
         return PipelineML(

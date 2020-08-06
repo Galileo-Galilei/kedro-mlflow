@@ -2,17 +2,6 @@
 
 ## [Unreleased]
 
-## [0.2.1]
-
-### Added
-Many documentation improvements:
-  - add a Code of conduct
-  - add a Contributing guide
-  - Refactor README to separate clearly from documentation
-  - Fix broken links
-  - Fix bad markdwon rendering
-  - Split old readme information in dedicated sections
-
 ### Changed
 
 - Enable ``pipeline_ml`` to accept artifacts (encoder, binarizer...) to be "intermediary" outputs of the pipeline and not only "terminal" outputs (i.e. node outputs which are not re-used as another node input). This closes a bug discovered in a more general discussion in [#16](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16).

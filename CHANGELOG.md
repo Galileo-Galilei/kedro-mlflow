@@ -59,6 +59,7 @@ Many documentation improvements:
 - Add ``MlflowDataSet`` for artifacts autologging
 - Add ``PipelineMl`` class and its ``pipeline_ml`` factory for pipeline packaging and service
 
-[unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.0...HEAD
+[unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.1...HEAD
+[0.2.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.0...0.2.1
 [0.2.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0

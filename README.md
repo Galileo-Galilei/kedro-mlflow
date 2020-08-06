@@ -30,11 +30,11 @@ The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/devel
 **Important: kedro-mlflow is only compatible with ``kedro>0.16.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
 ``kedro-mlflow`` is available on PyPI, so you can install it with ``pip``:
-```console
+```bash
 pip install kedro-mlflow
 ```
 If you want to use the ``develop`` version of the package which is the most up to date, you can install the package from github:
-```console
+```bash
 pip install --upgrade git+https://github.com/quantumblacklabs/kedro.git@develop
 ```
 

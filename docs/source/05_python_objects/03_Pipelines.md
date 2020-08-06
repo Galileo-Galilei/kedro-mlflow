@@ -6,8 +6,7 @@
 The ``PipelineML`` class is not intended to be used directly. A ``pipeline_ml`` factory is provided for user friendly interface.
 
 Example within kedro template:
-
-```python
+```
 # in src/PYTHON_PACKAGE/pipeline.py
 
 from PYTHON_PACKAGE.pipelines import data_science as ds
@@ -27,8 +26,7 @@ def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
 Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
 
 *Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:*
-
-```python
+```
 from pathlib import Path
 from kedro.framework.context import load_context
 from kedro_mlflow.mlflow import KedroPipelineModel

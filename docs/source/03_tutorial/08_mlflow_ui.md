@@ -8,7 +8,7 @@ When you use a local storage for kedro mlflow, you can call a [mlflow cli comman
 
 To ensure this UI is linked to the tracking uri specified configuration, ``kedro-mlflow`` offers the following command:
 
-```console
+```bash
 kedro mlflow ui
 ```
 which is a wrapper for  ``kedro ui`` command with the tracking uri of the ``mlflow.yml`` file.

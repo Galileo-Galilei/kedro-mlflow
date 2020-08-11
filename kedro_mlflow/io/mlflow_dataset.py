@@ -33,6 +33,10 @@ class MlflowDataSet(AbstractVersionedDataSet):
                 self.artifact_path = artifact_path
 
             def _save(self, data: Any):
+                # _get_save_path needs to be called before super, otherwise
+                # it will throw exception that file under path already exist.
+                local_path = self._get_save_path()
+
                 super()._save(data)
                 if self.run_id:
                     # if a run id is specified, we have to use mlflow client
@@ -40,11 +44,11 @@ class MlflowDataSet(AbstractVersionedDataSet):
                     mlflow_client = MlflowClient()
                     mlflow_client.log_artifact(
                         run_id=self.run_id,
-                        local_path=self._filepath,
+                        local_path=local_path,
                         artifact_path=self.artifact_path,
                     )
                 else:
-                    mlflow.log_artifact(self._filepath, self.artifact_path)
+                    mlflow.log_artifact(local_path, self.artifact_path)
 
         # rename the class
         parent_name = data_set.__name__

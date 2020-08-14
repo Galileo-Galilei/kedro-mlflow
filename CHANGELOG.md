@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Add dataset ``MlflowMetricsDataSet`` for metrics logging ([#9](https://github.com/Galileo-Galilei/kedro-mlflow/issues/9)) and update documentation for metrics.`
+
 ## [0.2.1] - 2018-08-06
 
 ### Added

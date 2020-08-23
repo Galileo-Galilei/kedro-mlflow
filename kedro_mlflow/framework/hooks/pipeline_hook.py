@@ -133,20 +133,20 @@ def _generate_kedro_command(
 ):
     cmd_list = ["kedro", "run"]
     SEP = "="
-    if len(from_inputs) > 0:
+    if from_inputs:
         cmd_list.append("--from-inputs" + SEP + ",".join(from_inputs))
-    if len(from_nodes) > 0:
+    if from_nodes:
         cmd_list.append("--from-nodes" + SEP + ",".join(from_nodes))
-    if len(to_nodes) > 0:
+    if to_nodes:
         cmd_list.append("--to-nodes" + SEP + ",".join(to_nodes))
-    if len(node_names) > 0:
+    if node_names:
         cmd_list.append("--node" + SEP + ",".join(node_names))
     if pipeline_name:
         cmd_list.append("--pipeline" + SEP + pipeline_name)
-    if len(tags) > 0:
+    if tags:
         # "tag" is the name of the command, "tags" the value in run_params
         cmd_list.append("--tag" + SEP + ",".join(tags))
-    if len(load_versions) > 0:
+    if load_versions:
         # "load_version" is the name of the command, "load_versions" the value in run_params
         formatted_versions = [f"{k}:{v}" for k, v in load_versions.items()]
         cmd_list.append("--load-version" + SEP + ",".join(formatted_versions))

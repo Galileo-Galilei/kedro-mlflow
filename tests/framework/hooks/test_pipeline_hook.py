@@ -13,6 +13,7 @@ from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
     _format_conda_env,
+    _generate_kedro_command,
 )
 from kedro_mlflow.pipeline import pipeline_ml
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
@@ -271,7 +272,29 @@ def test_generate_kedro_commands():
         "load_versions": {"data_inter": "01:23:45"},
         "pipeline_name": "fake_pl",
     }
-    from kedro_mlflow.framework.hooks.pipeline_hook import _generate_kedro_command
 
     expected = "kedro run --from-inputs=data_in --from-nodes=node1 --to-nodes=node3 --node=node1,node2,node1 --pipeline=fake_pl --tag=tag1,tag2 --load-version=data_inter:01:23:45"
+    assert _generate_kedro_command(**record_data) == expected
+
+
+@pytest.mark.parametrize("default_value", [None, []])
+def test_generate_default_kedro_commands(default_value):
+    """This test ensures that the _generate_kedro_comands accepts both
+     `None` and empty `list` as default value, because CLI and interactive
+     `Journal` do not use the same default.
+
+    Args:
+        default_value ([type]): [description]
+    """
+    record_data = {
+        "tags": default_value,
+        "from_nodes": default_value,
+        "to_nodes": default_value,
+        "node_names": default_value,
+        "from_inputs": default_value,
+        "load_versions": default_value,
+        "pipeline_name": "fake_pl",
+    }
+
+    expected = "kedro run --pipeline=fake_pl"
     assert _generate_kedro_command(**record_data) == expected

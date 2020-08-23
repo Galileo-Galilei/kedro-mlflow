@@ -4,6 +4,7 @@ import mlflow
 import pytest
 import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
+from kedro.framework.context import KedroContext
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
@@ -298,3 +299,49 @@ def test_generate_default_kedro_commands(default_value):
 
     expected = "kedro run --pipeline=fake_pl"
     assert _generate_kedro_command(**record_data) == expected
+
+
+def test_on_pipeline_error(tmp_path, config_dir, mocker):
+
+    # config_dir is a global fixture in conftest that emulates
+    #  the root of a Kedro project
+
+    # Disable logging.config.dictConfig in KedroContext._setup_logging as
+    # it changes logging.config and affects other unit tests
+    mocker.patch("logging.config.dictConfig")
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    # create the extra mlflow.ymlconfig file for the plugin
+    def _write_yaml(filepath, config):
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        yaml_str = yaml.dump(config)
+        filepath.write_text(yaml_str)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(mlflow_tracking_uri=(tmp_path / "mlruns").as_posix()),
+    )
+
+    def failing_node():
+        mlflow.start_run(nested=True)
+        raise ValueError("Let's make this pipeline fail")
+
+    class DummyContextWithHook(KedroContext):
+        project_name = "fake project"
+        package_name = "fake_project"
+        project_version = "0.16.0"
+
+        hooks = (MlflowPipelineHook(),)
+
+        def _get_pipelines(self):
+            return {
+                "__default__": Pipeline(
+                    [node(func=failing_node, inputs=None, outputs="fake_output",)]
+                )
+            }
+
+    with pytest.raises(ValueError):
+        failing_context = DummyContextWithHook(tmp_path.as_posix())
+        failing_context.run()
+
+    assert mlflow.active_run() is None

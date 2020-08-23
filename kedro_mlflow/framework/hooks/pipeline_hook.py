@@ -127,6 +127,43 @@ class MlflowPipelineHook:
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
         mlflow.end_run()
 
+    @hook_impl
+    def on_pipeline_error(
+        self,
+        error: Exception,
+        run_params: Dict[str, Any],
+        pipeline: Pipeline,
+        catalog: DataCatalog,
+    ):
+        """Hook invoked when the pipeline execution fails.
+         All the mlflow runs must be closed to avoid interference with further execution.
+
+        Args:
+            error: (Not used) The uncaught exception thrown during the pipeline run.
+            run_params: (Not used) The params used to run the pipeline.
+                Should be identical to the data logged by Journal with the following schema::
+
+                   {
+                     "run_id": str
+                     "project_path": str,
+                     "env": str,
+                     "kedro_version": str,
+                     "tags": Optional[List[str]],
+                     "from_nodes": Optional[List[str]],
+                     "to_nodes": Optional[List[str]],
+                     "node_names": Optional[List[str]],
+                     "from_inputs": Optional[List[str]],
+                     "load_versions": Optional[List[str]],
+                     "pipeline_name": str,
+                     "extra_params": Optional[Dict[str, Any]]
+                   }
+            pipeline: (Not used) The ``Pipeline`` that will was run.
+            catalog: (Not used) The ``DataCatalog`` used during the run.
+        """
+
+        while mlflow.active_run():
+            mlflow.end_run()
+
 
 def _generate_kedro_command(
     tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_name

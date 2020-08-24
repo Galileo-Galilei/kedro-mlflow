@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- Versioned datasets artifacts logging are handled correctly ([#41](https://github.com/Galileo-Galilei/kedro-mlflow/issues/41))
+
 ## [0.2.1] - 2018-08-06
 
 ### Added
@@ -17,7 +21,6 @@ Many documentation improvements:
 
 - Enable ``pipeline_ml`` to accept artifacts (encoder, binarizer...) to be "intermediary" outputs of the pipeline and not only "terminal" outputs (i.e. node outputs which are not re-used as another node input). This closes a bug discovered in a more general discussion in [#16](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16).
 - Only non-empty CLI arguments and options are logged as tags in MLflow ([#32](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16))
-- Versioned datasets artifacts logging are handled correctly ([#41](https://github.com/Galileo-Galilei/kedro-mlflow/issues/41))
 
 ## [0.2.0] - 2020-07-18
 

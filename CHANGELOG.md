@@ -5,6 +5,7 @@
 ### Fixed
 
 - Versioned datasets artifacts logging are handled correctly ([#41](https://github.com/Galileo-Galilei/kedro-mlflow/issues/41))
+- MlflowDataSet handles correctly datasets which are inherited from AbstractDataSet ([#45)(https://github.com/Galileo-Galilei/kedro-mlflow/issues/45))
 
 ## [0.2.1] - 2018-08-06
 

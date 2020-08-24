@@ -35,7 +35,11 @@ class MlflowDataSet(AbstractVersionedDataSet):
             def _save(self, data: Any):
                 # _get_save_path needs to be called before super, otherwise
                 # it will throw exception that file under path already exist.
-                local_path = self._get_save_path()
+                local_path = (
+                    self._get_save_path()
+                    if hasattr(self, "_version")
+                    else self._filepath
+                )
 
                 super()._save(data)
                 if self.run_id:

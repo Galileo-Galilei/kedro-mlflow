@@ -72,6 +72,7 @@ def test_runpy_template_is_consistent_with_kedro():
         "project_name": "This is a fake project",
         "python_package": "fake_project",
         "kedro_version": "0.16.0",
+        "project_path": Path.cwd()
     }
     kedro_runpy_path = (
         Path(KEDRO_PATH).parent
@@ -94,7 +95,7 @@ def test_runpy_template_is_consistent_with_kedro():
         "",
     )
     kedro_mlflow_runpy = kedro_mlflow_runpy.replace(
-        '    hooks = (\n        MlflowNodeHook(flatten_dict_params=False),\n        MlflowPipelineHook(\n            model_name="fake_project", conda_env="src/requirements.txt",\n        ),\n    )\n',
+        f'    hooks = (\n        MlflowNodeHook(flatten_dict_params=False),\n        MlflowPipelineHook(\n            model_name="fake_project", conda_env="{Path.cwd()}/src/requirements.txt",\n        ),\n    )\n',
         "",
     )
 

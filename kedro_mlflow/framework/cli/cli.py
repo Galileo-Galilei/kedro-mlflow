@@ -138,6 +138,7 @@ def init(force, silent):
             python_package=project_globals["python_package"],
             project_name=project_globals["project_name"],
             kedro_version=project_globals["kedro_version"],
+            project_path=project_path
         )
 
         with open(runpy_project_path, mode="r") as file_handler:
@@ -156,6 +157,7 @@ def init(force, silent):
             python_package=project_globals["python_package"],
             project_name=project_globals["project_name"],
             kedro_version=project_globals["kedro_version"],
+            project_path=project_path
         )
         if not silent:
             click.secho(click.style("'run.py' successfully updated", fg="green"))

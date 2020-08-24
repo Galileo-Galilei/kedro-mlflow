@@ -37,6 +37,7 @@ class MlflowDataSet(AbstractVersionedDataSet):
                 # it will throw exception that file under path already exist.
                 local_path = self._get_save_path()
 
+                print(f"Saving dataset local_path:{local_path}, artifact_path:{self.artifact_path}")
                 super()._save(data)
                 if self.run_id:
                     # if a run id is specified, we have to use mlflow client

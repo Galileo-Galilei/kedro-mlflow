@@ -50,7 +50,7 @@ class ProjectContext(KedroContext):
     hooks = (
         MlflowNodeHook(flatten_dict_params=False),
         MlflowPipelineHook(
-            model_name="{{ cookiecutter.python_package }}", conda_env="src/requirements.txt",
+            model_name="{{ cookiecutter.python_package }}", conda_env="{{ cookiecutter.project_path }}/src/requirements.txt",
         ),
     )
 

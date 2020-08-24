@@ -12,12 +12,12 @@
 
 ### Added
 Many documentation improvements:
-  - add a Code of conduct
-  - add a Contributing guide
-  - Refactor README to separate clearly from documentation
+  - Add a Code of conduct
+  - Add a Contributing guide
+  - Refactor README.md to separate clearly from documentation
   - Fix broken links
-  - Fix bad markdwon rendering
-  - Split old readme information in dedicated sections
+  - Fix bad markdown rendering
+  - Split old README.md information in dedicated sections
 
 ### Changed
 

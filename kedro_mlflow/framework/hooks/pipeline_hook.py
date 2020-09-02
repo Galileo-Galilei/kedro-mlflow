@@ -10,6 +10,7 @@ from kedro.pipeline import Pipeline
 from kedro.versioning.journal import _git_sha
 
 from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.io import MlflowMetricsDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
@@ -23,6 +24,25 @@ class MlflowPipelineHook:
     ):
         self.conda_env = _format_conda_env(conda_env)
         self.model_name = model_name
+
+    @hook_impl
+    def after_catalog_created(
+        self,
+        catalog: DataCatalog,
+        conf_catalog: Dict[str, Any],
+        conf_creds: Dict[str, Any],
+        feed_dict: Dict[str, Any],
+        save_version: str,
+        load_versions: str,
+        run_id: str,
+    ):
+        for name, dataset in catalog._data_sets.items():
+            if isinstance(dataset, MlflowMetricsDataSet) and dataset._prefix is None:
+                if dataset._run_id is not None:
+                    catalog._data_sets[name] = MlflowMetricsDataSet(
+                        run_id=dataset._run_id, prefix=name
+                    )
+                catalog._data_sets[name] = MlflowMetricsDataSet(prefix=name)
 
     @hook_impl
     def before_pipeline_run(

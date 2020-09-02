@@ -48,7 +48,7 @@ The documentation contains:
 - A more [detailed tutorial](https://kedro-mlflow.readthedocs.io/en/latest/source/03_tutorial/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
 
 Some frequently asked questions on more advanced features:
-- You want to log additional metrics to the run? -> [See ``mlflow.log_metric`` and add it to your functions](https://www.mlflow.org/docs/latest/python_api/mlflow.html#mlflow.log_metric) !
+- You want to log additional metrics to the run? -> [Try ``MlflowMetricsDataSet``](https://kedro-mlflow.readthedocs.io/en/latest/source/03_tutorial/07_version_metrics.html) !
 - You want to log nice dataviz of your pipeline that you register with ``MatplotlibWriter``? -> [Try ``MlflowDataSet`` to log any local files (.png, .pkl, .csv...) *automagically*](https://kedro-mlflow.readthedocs.io/en/latest/source/02_hello_world_example/02_first_steps.html#artifacts)!
 - You want to create easily an API to share your awesome model to anyone? -> [See if ``pipeline_ml`` can fit your needs](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16)
 - You want to do something that is not straigthforward with current implementation? Open an issue, and let's see what happens!

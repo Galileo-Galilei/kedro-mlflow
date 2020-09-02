@@ -16,6 +16,7 @@ from kedro_mlflow.framework.hooks.pipeline_hook import (
     _format_conda_env,
     _generate_kedro_command,
 )
+from kedro_mlflow.io import MlflowMetricsDataSet
 from kedro_mlflow.pipeline import pipeline_ml
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
@@ -124,6 +125,9 @@ def dummy_pipeline():
     def train_fun(data, param):
         return 2
 
+    def metric_fun():
+        return {"metric": {"value": 1.1, "step": 0}}
+
     def predict_fun(model, data):
         return data * model
 
@@ -141,6 +145,8 @@ def dummy_pipeline():
                 outputs="model",
                 tags=["training"],
             ),
+            node(func=metric_fun, inputs=None, outputs="metrics",),
+            node(func=metric_fun, inputs=None, outputs="another_metrics",),
             node(
                 func=predict_fun,
                 inputs=["model", "data"],
@@ -171,6 +177,8 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "metrics": MlflowMetricsDataSet(),
+            "another_metrics": MlflowMetricsDataSet(prefix="foo"),
         }
     )
     return dummy_catalog
@@ -236,6 +244,17 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     monkeypatch.chdir(tmp_path)
     pipeline_hook = MlflowPipelineHook(conda_env=env_from_dict, model_name="model")
     runner = SequentialRunner()
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
     pipeline_hook.before_pipeline_run(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
@@ -259,6 +278,10 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         assert nb_artifacts == 1
     else:
         assert nb_artifacts == 0
+    # Check if metrics datasets have prefix with its names.
+    # for metric
+    assert dummy_catalog._data_sets["metrics"]._prefix == "metrics"
+    assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
 
 
 def test_generate_kedro_commands():

@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Callable, Iterable, Union
+from typing import Any, Callable, Dict, Iterable, Optional, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
@@ -13,6 +13,7 @@ class PipelineML(Pipeline):
     IMPORTANT NOTE : THIS CLASS IS NOT INTENDED TO BE USED DIRECTLY IN A KEDRO PROJECT. YOU SHOULD USE
     ``pipeline_ml`` FUNCTION FOR MODULAR PIPELINE WHICH IS MORE FLEXIBLE AND USER FRIENDLY.
     SEE INSERT_DOC_URL
+
     A ``PipelineML`` is a kedro ``Pipeline`` which we assume is a "training" (in the machine learning way)
     pipeline. Basically, "training" is a higher order function (it generates another function). It implies that:
     -  the outputs of this pipeline are considered as "fitted models", i.e. inputs
@@ -25,23 +26,58 @@ class PipelineML(Pipeline):
      in mlflow easily. The goal is to call the ``MLflowPipelineHook`` hook after a PipelineMl is called
      in order to trigger mlflow packaging.
 
-
-    Arguments:
-        Pipeline {[type]} -- [description]
     """
 
     def __init__(
         self,
-        nodes: Iterable[Union[Node, "Pipeline"]],
+        nodes: Iterable[Union[Node, Pipeline]],
         *args,
-        tags: Union[str, Iterable[str]] = None,
+        tags: Optional[Union[str, Iterable[str]]] = None,
         inference: Pipeline,
         input_name: str,
+        conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
+        model_name: Optional[str] = "model",
     ):
+
+        """Store all necessary information for calling mlflow.log_model in the pipeline.
+
+        Args:
+            nodes (Iterable[Union[Node, Pipeline]]): The `node`s
+                of the training pipeline.
+            tags (Union[str, Iterable[str]], optional): Optional
+                set of tags to be applied to all the pipeline
+                nodes. Defaults to None.
+            inference (Pipeline): A `Pipeline` object which will be
+                stored in mlflow and use the output(s)
+                of the training pipeline (namely, the model)
+                to predict the outcome.
+            input_name (str, optional): The name of the dataset in
+                the catalog.yml which the model's user must provide
+                for prediction (i.e. the data). Defaults to None.
+            conda_env (Union[str, Path, Dict[str, Any]], optional):
+                The minimal conda environment necessary for the
+                inference `Pipeline`. It can be either :
+                    - a path to a "requirements.txt": In this case
+                        the packages are parsed and a conda env with
+                        your current python_version and these
+                        dependencies is returned.
+                    - a path to an "environment.yml" : the file is
+                        uploaded "as is".
+                    - a Dict : used as the environment
+                    - None: a base conda environment with your
+                        current python version and your project
+                        version at training time.
+                Defaults to None.
+            model_name (Union[str, None], optional): The name of
+                the folder where the model will be stored in
+                remote mlflow. Defaults to "model".
+        """
 
         super().__init__(nodes, *args, tags=tags)
 
         self.inference = inference
+        self.conda_env = conda_env
+        self.model_name = model_name
 
         self._check_input_name(input_name)
         self.input_name = input_name

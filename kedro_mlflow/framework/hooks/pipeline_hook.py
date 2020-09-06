@@ -17,14 +17,6 @@ from kedro_mlflow.utils import _parse_requirements
 
 
 class MlflowPipelineHook:
-    def __init__(
-        self,
-        conda_env: Union[str, Path, Dict[str, Any]] = None,
-        model_name: Union[str, None] = "model",
-    ):
-        self.conda_env = _format_conda_env(conda_env)
-        self.model_name = model_name
-
     @hook_impl
     def after_catalog_created(
         self,
@@ -137,12 +129,12 @@ class MlflowPipelineHook:
             pipeline_catalog = pipeline.extract_pipeline_catalog(catalog)
             artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
             mlflow.pyfunc.log_model(
-                artifact_path=self.model_name,
+                artifact_path=pipeline.model_name,
                 python_model=KedroPipelineModel(
                     pipeline_ml=pipeline, catalog=pipeline_catalog
                 ),
                 artifacts=artifacts,
-                conda_env=self.conda_env,
+                conda_env=_format_conda_env(pipeline.conda_env),
             )
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
         mlflow.end_run()
@@ -218,16 +210,17 @@ def _format_conda_env(
     """Best effort to get dependecies of the project.
 
     Keyword Arguments:
-        conda_env {[type]} -- It can be either :
+        conda_env {Union[str, Path, Dict[str, Any]]} -- It can be either :
             - a path to a "requirements.txt": In this case
             the packages are parsed and a conda env with
             your current python_version and these dependencies is returned
             - a path to an "environment.yml" : data is loaded and used as they are
             - a Dict : used as the environment
-            - None (default: {None})
+            - None: a base conda environment with your current python version and your project version at training time.
+            Defaults to None.
 
     Returns:
-        Dict[str, Any] -- [description]
+        Dict[str, Any] -- A dictionnary which contains all informations to dump it to a conda environment.yml file.
     """
     python_version = ".".join(
         [

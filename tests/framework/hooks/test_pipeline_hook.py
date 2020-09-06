@@ -69,9 +69,7 @@ def env_from_requirements(requirements_path, python_version):
 
 @pytest.fixture
 def env_from_dict(python_version):
-    env_from_dict = dict(
-        python=python_version, dependencies=["pandas>=1.0.0,<2.0.0", "kedro==0.15.9"]
-    )
+    env_from_dict = dict(python=python_version, dependencies=["pandas>=1.0.0,<2.0.0"])
     return env_from_dict
 
 
@@ -159,12 +157,14 @@ def dummy_pipeline():
 
 
 @pytest.fixture
-def dummy_pipeline_ml(dummy_pipeline):
+def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
 
     dummy_pipeline_ml = pipeline_ml(
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",
+        conda_env=env_from_dict,
+        model_name="model",
     )
     return dummy_pipeline_ml
 
@@ -242,7 +242,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     # config_with_base_mlflow_conf is a conftest fixture
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
     monkeypatch.chdir(tmp_path)
-    pipeline_hook = MlflowPipelineHook(conda_env=env_from_dict, model_name="model")
+    pipeline_hook = MlflowPipelineHook()
     runner = SequentialRunner()
     pipeline_hook.after_catalog_created(
         catalog=dummy_catalog,

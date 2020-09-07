@@ -23,6 +23,7 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
+            hooks=dict(node=dict(flatten_dict_params=True, recursive=False, sep="-")),
         ),
     )
     expected = {
@@ -30,5 +31,8 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
         "experiments": {"name": "fake_package", "create": True},
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
+        "hooks": {
+            "node": {"flatten_dict_params": True, "recursive": False, "sep": "-"}
+        },
     }
     assert get_mlflow_config(project_path=tmp_path, env="local").to_dict() == expected

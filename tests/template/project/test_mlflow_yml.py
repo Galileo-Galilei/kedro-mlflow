@@ -32,6 +32,7 @@ def test_mlflow_yml_rendering(template_mlflowyml):
         ui=KedroMlflowConfig.UI_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
         experiment=KedroMlflowConfig.EXPERIMENT_OPTS,
+        hooks=dict(node=KedroMlflowConfig.NODE_HOOK_OPTS),
     )
     expected_config["experiment"]["name"] = "fake_project"  # check for proper rendering
     assert mlflow_config == expected_config

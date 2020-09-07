@@ -79,7 +79,7 @@ Click now on the last run executed, you will land on this page:
 ### Parameters versioning
 Note that the parameters have been recorded *automagically*. Here, two parameters format are used:
 1. The parameter ``example_test_data_ratio``, which is called in the ``pipeline.py`` file with the ``params:`` prefix
-2. the dictionnary of all parameters in ``parameters.yml`` which is a reserved key word in ``Kedro``. Note that **this is bad practice** because you cannot know which parameters are really used inside the function called. Another problem is that it can generate too long parameters names and lead to mlflow errors.
+2. the dictionary of all parameters in ``parameters.yml`` which is a reserved key word in ``Kedro``. Note that **this is bad practice** because you cannot know which parameters are really used inside the function called. Another problem is that it can generate too long parameters names and lead to mlflow errors.
 
 You can see that these are effectively the registered parameters in the pipeline with the ``kedro-viz`` plugin:
 

@@ -35,7 +35,7 @@ and this dataset will be automatically versioned in each pipeline execution.
 
 ## Frequently asked questions
 ### Can I pass extra parameters to the ``MlflowDataSet`` for finer control?
-The ``MlflowDataSet`` takes a ``data_set`` argument which is a python dictionnary passed to the ``__init__`` method of the dataset declared in ``type``. It means that you can pass any arguments accepted by the underlying dataset in this dictionary. If you want to pass ``load_args`` and ``save_args`` in the previous example, add them in the ``data_set`` argument:
+The ``MlflowDataSet`` takes a ``data_set`` argument which is a python dictionary passed to the ``__init__`` method of the dataset declared in ``type``. It means that you can pass any arguments accepted by the underlying dataset in this dictionary. If you want to pass ``load_args`` and ``save_args`` in the previous example, add them in the ``data_set`` argument:
 
 ```yaml
 my_dataset_to_version:

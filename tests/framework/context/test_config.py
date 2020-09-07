@@ -55,6 +55,7 @@ def test_kedro_mlflow_config_init(tmp_path):
         experiments=KedroMlflowConfig.EXPERIMENT_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
         ui=KedroMlflowConfig.UI_OPTS,
+        hooks=dict(node=KedroMlflowConfig.NODE_HOOK_OPTS),
     )
 
 

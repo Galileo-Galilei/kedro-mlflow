@@ -5,14 +5,17 @@ from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline.node import Node
 
+from kedro_mlflow.framework.context import get_mlflow_config
+
 
 class MlflowNodeHook:
     def __init__(
         self, flatten_dict_params: bool = False, recursive: bool = True, sep: str = "."
     ):
-        self.flatten = flatten_dict_params
-        self.recursive = recursive
-        self.sep = sep
+        config = get_mlflow_config()
+        self.flatten = config.node_hook_opts["flatten_dict_params"]
+        self.recursive = config.node_hook_opts["recursive"]
+        self.sep = config.node_hook_opts["sep"]
 
     @hook_impl
     def before_node_run(
@@ -41,7 +44,7 @@ class MlflowNodeHook:
             elif k == "parameters":
                 params_inputs[k] = v
 
-        # dictionnary parameters may be flattened for readibility
+        # dictionary parameters may be flattened for readibility
         if self.flatten:
             params_inputs = flatten_dict(
                 d=params_inputs, recursive=self.recursive, sep=self.sep

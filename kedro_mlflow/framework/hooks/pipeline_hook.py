@@ -220,7 +220,7 @@ def _format_conda_env(
             Defaults to None.
 
     Returns:
-        Dict[str, Any] -- A dictionnary which contains all informations to dump it to a conda environment.yml file.
+        Dict[str, Any] -- A dictionary which contains all informations to dump it to a conda environment.yml file.
     """
     python_version = ".".join(
         [

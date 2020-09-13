@@ -18,33 +18,28 @@ TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "proje
 class KedroClickGroup(click.Group):
     def reset_commands(self):
         self.commands = {}
-        self.warning_msg = None
+
         # add commands on the fly based on conditions
         if _is_kedro_project():
             self.add_command(init)
             if _already_updated():
                 self.add_command(ui)
                 # self.add_command(run) # TODO : IMPLEMENT THIS FUNCTION
-            else:
-                # single line jump "\n" is not rendered in help?
-                self.warning_msg = click.style(
-                    "\n\nYou have not updated your template yet. "
-                    "This is mandatory to use 'kedro-mlflow' plugin."
-                    + "Please run the following command before you can access to other commands :\n\n"
-                    + "$ kedro mlflow init",
-                    fg="yellow",
-                )
         else:
             self.add_command(new)
 
     def list_commands(self, ctx):
         self.reset_commands()
-        return sorted(self.commands)
+        commands_list = sorted(self.commands)
+        if commands_list == ["init"]:
+            click.secho(
+                """\n\nYou have not updated your template yet.\nThis is mandatory to use 'kedro-mlflow' plugin.\nPlease run the following command before you can access to other commands :\n\n$ kedro mlflow init""",
+                fg="yellow",
+            )
+        return commands_list
 
     def get_command(self, ctx, cmd_name):
         self.reset_commands()
-        if ctx.invoked_subcommand != "init":
-            click.secho(self.warning_msg)
         return self.commands.get(cmd_name)
 
 
@@ -59,15 +54,10 @@ def commands():
 def mlflow_commands():
     """Use mlflow-specific commands inside kedro project.
     """
-    # beware : this group must be defined at the end of the script
-    # i.e. AFTER the commands creation
-    # else the commands will not be discovered while loading
-    # entry_points from kedro
-    #
     pass
 
 
-@click.command()
+@mlflow_commands.command()
 @click.option(
     "--force",
     "-f",
@@ -173,7 +163,7 @@ def init(force, silent):
         )
 
 
-@click.command()
+@mlflow_commands.command()
 @click.option(
     "--project-path",
     "-p",
@@ -204,7 +194,7 @@ def ui(project_path, env):
     )
 
 
-@click.command()
+@mlflow_commands.command()
 def run():
     """Re-run an old run with mlflow-logged info.
     """
@@ -219,7 +209,7 @@ def run():
     raise NotImplementedError  # pragma: no cover
 
 
-@click.command()
+@mlflow_commands.command()
 def new():
     """Create a new kedro project with updated template.
     """

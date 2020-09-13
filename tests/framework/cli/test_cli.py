@@ -78,7 +78,7 @@ def test_mlflow_commands_inside_initialized_kedro_project(
 ):
     monkeypatch.chdir(tmp_path / "fake-project")
     # launch the command to initialize the project
-    subprocess.call(["kedro", "mlflow", "init", "--force"])
+    subprocess.call(["kedro", "mlflow", "init"])
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_mlflow)
     assert {"init", "ui"} == set(extract_cmd_from_help(result.output))

@@ -23,7 +23,7 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
 
         data_set, data_set_args = parse_dataset_definition(config=data_set)
 
-        # fake inheritance : this mlfow class should be a mother class which wraps
+        # fake inheritance : this mlflow class should be a mother class which wraps
         # all dataset (i.e. it should replace AbstractVersionedDataSet)
         # instead and since we can't modify the core package,
         # we create a subclass which inherits dynamically from the data_set class
@@ -41,6 +41,9 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                     if hasattr(self, "_version")
                     else self._filepath
                 )
+                # it must be converted to a string with as_posix()
+                # for logging on remote storage like Azure S3
+                local_path = local_path.as_posix()
 
                 super()._save(data)
                 if self.run_id:

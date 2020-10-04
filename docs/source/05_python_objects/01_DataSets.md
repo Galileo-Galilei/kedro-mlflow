@@ -1,9 +1,9 @@
 # New ``DataSet``:
-## ``MlflowDataSet``
-``MlflowDataSet`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
+## ``MlflowArtifactDataSet``
+``MlflowArtifactDataSet`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
 ```
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowDataSet
+    type: kedro_mlflow.io.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -11,7 +11,7 @@ my_dataset_to_version:
 or with additional parameters:
 ```
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowDataSet
+    type: kedro_mlflow.io.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -25,9 +25,9 @@ my_dataset_to_version:
 ```
 or with the python API:
 ```
-from kedro_mlflow.io import MlflowDataSet
+from kedro_mlflow.io import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
-csv_dataset = MlflowDataSet(data_set={"type": CSVDataSet,
+csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet,
                                       "filepath": r"/path/to/a/local/destination/file.csv"})
 csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
 ```

@@ -33,7 +33,7 @@ Above implementations have the advantage of being very straightforward and *mlfl
 |:----------------------------|:-----------------------|:-----------------------|
 |Set up configuration         |``mlflow.yml``          |``MlflowPipelineHook``  |
 |Logging parameters           |``run.py``              |``MlflowNodeHook``      |
-|Logging artifacts            |``catalog.yml``         |``MlflowDataSet``       |
+|Logging artifacts            |``catalog.yml``         |``MlflowArtifactDataSet``       |
 |Logging models               |NA                      |NA                      |
 |Logging metrics              |``catalog.yml``         |``MlflowMetricsDataSet``|
 |Logging Pipeline as model    |``pipeline.py``         |``KedroPipelineModel`` and ``pipeline_ml``|

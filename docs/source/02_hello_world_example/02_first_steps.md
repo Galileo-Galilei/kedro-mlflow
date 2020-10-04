@@ -112,7 +112,7 @@ First, open the ``catalog.yml`` file which should like this:
 
 ![](../imgs/default_catalog.png)
 
-And persist the model as a pickle with the ``MlflowDataSet`` class:
+And persist the model as a pickle with the ``MlflowArtifactDataSet`` class:
 
 ![](../imgs/updated_catalog.png)
 

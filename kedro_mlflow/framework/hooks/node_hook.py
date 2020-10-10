@@ -9,9 +9,7 @@ from kedro_mlflow.framework.context import get_mlflow_config
 
 
 class MlflowNodeHook:
-    def __init__(
-        self, flatten_dict_params: bool = False, recursive: bool = True, sep: str = "."
-    ):
+    def __init__(self):
         config = get_mlflow_config()
         self.flatten = config.node_hook_opts["flatten_dict_params"]
         self.recursive = config.node_hook_opts["recursive"]

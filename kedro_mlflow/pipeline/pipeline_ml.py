@@ -79,8 +79,16 @@ class PipelineML(Pipeline):
         self.conda_env = conda_env
         self.model_name = model_name
 
-        self._check_input_name(input_name)
         self.input_name = input_name
+
+    @property
+    def input_name(self) -> str:
+        return self._input_name
+
+    @input_name.setter
+    def input_name(self, name: str) -> None:
+        self._check_input_name(name)
+        self._input_name = name
 
     def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
@@ -134,10 +142,10 @@ class PipelineML(Pipeline):
 
     def _check_input_name(self, input_name: str) -> str:
         allowed_names = self.inference.inputs()
-        pp_allowed_names = "\n - ".join(allowed_names)
+        pp_allowed_names = "\n    - ".join(allowed_names)
         if input_name not in allowed_names:
             raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but it must be an input of inference, i.e. one of: {pp_allowed_names}"
+                f"input_name='{input_name}' but it must be an input of 'inference', i.e. one of: \n    - {pp_allowed_names}"
             )
         else:
             free_inputs_set = (

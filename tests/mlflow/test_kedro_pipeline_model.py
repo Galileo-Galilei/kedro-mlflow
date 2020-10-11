@@ -7,7 +7,7 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
 from kedro_mlflow.mlflow import KedroPipelineModel
-from kedro_mlflow.pipeline import pipeline_ml
+from kedro_mlflow.pipeline import pipeline_ml_factory
 
 
 def preprocess_fun(data):
@@ -42,7 +42,7 @@ def pipeline_ml_obj():
         ]
     )
 
-    pipeline_ml_obj = pipeline_ml(
+    pipeline_ml_obj = pipeline_ml_factory(
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",

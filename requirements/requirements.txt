@@ -1,2 +1,2 @@
 mlflow>=1.0.0, <2.0.0
-kedro>=0.16.0, <=0.16.4  # 0.16.5 breaks pipeline_ml, template and hooks test
+kedro>=0.16.0, <=0.16.4  # 0.16.5 breaks pipeline_ml_factory, template and hooks test

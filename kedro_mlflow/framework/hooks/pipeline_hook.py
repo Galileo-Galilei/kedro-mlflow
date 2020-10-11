@@ -12,7 +12,7 @@ from kedro.versioning.journal import _git_sha
 from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.io import MlflowMetricsDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
-from kedro_mlflow.pipeline.pipeline_ml import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml_factory import PipelineML
 from kedro_mlflow.utils import _parse_requirements
 
 

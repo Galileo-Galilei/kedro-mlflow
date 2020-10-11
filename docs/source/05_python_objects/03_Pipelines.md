@@ -1,9 +1,9 @@
 # Pipelines
-## ``PipelineML`` and ``pipeline_ml``
+## ``PipelineML`` and ``pipeline_ml_factory``
 
 ``PipelineML`` is a new class which extends ``Pipeline`` and enable to bind two pipelines (one of training, one of inference) together. This class comes with a ``KedroPipelineModel`` class for logging it in mlflow. A pipeline logged as a mlflow model can be served using ``mlflow models serve`` and ``mlflow models predict`` command.  
 
-The ``PipelineML`` class is not intended to be used directly. A ``pipeline_ml`` factory is provided for user friendly interface.
+The ``PipelineML`` class is not intended to be used directly. A ``pipeline_ml_factory`` factory is provided for user friendly interface.
 
 Example within kedro template:
 
@@ -14,8 +14,8 @@ from PYTHON_PACKAGE.pipelines import data_science as ds
 
 def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
     data_science_pipeline = ds.create_pipeline()
-    training_pipeline = pipeline_ml(training=data_science_pipeline.only_nodes_with_tags("training"), # or whatever your logic is for filtering
-                                    inference=data_science_pipeline.only_nodes_with_tags("inference"))
+    training_pipeline = pipeline_ml_factory(training=data_science_pipeline.only_nodes_with_tags("training"), # or whatever your logic is for filtering
+                                            inference=data_science_pipeline.only_nodes_with_tags("inference"))
 
     return {
         "ds": data_science_pipeline,

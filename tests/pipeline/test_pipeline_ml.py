@@ -9,6 +9,7 @@ from kedro_mlflow.pipeline import (
     KedroMlflowPipelineMLDatasetsError,
     KedroMlflowPipelineMLInputsError,
     pipeline_ml,
+    pipeline_ml_factory,
 )
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
@@ -52,7 +53,7 @@ def pipeline_with_tag():
 
 @pytest.fixture
 def pipeline_ml_with_tag(pipeline_with_tag):
-    pipeline_ml_with_tag = pipeline_ml(
+    pipeline_ml_with_tag = pipeline_ml_factory(
         training=pipeline_with_tag,
         inference=Pipeline(
             [node(func=predict_fun, inputs=["model", "data"], outputs="predictions")]
@@ -60,6 +61,23 @@ def pipeline_ml_with_tag(pipeline_with_tag):
         input_name="data",
     )
     return pipeline_ml_with_tag
+
+
+def test_raise_deprecation_warning_pipeline_ml(pipeline_with_tag):
+    with pytest.deprecated_call():
+        pipeline_ml(
+            training=pipeline_with_tag,
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+        )
 
 
 @pytest.fixture
@@ -98,7 +116,7 @@ def pipeline_ml_with_intermediary_artifacts():
             ),
         ]
     )
-    pipeline_ml_with_tag = pipeline_ml(
+    pipeline_ml_with_tag = pipeline_ml_factory(
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",

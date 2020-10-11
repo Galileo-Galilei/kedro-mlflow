@@ -17,7 +17,7 @@ from kedro_mlflow.framework.hooks.pipeline_hook import (
     _generate_kedro_command,
 )
 from kedro_mlflow.io import MlflowMetricsDataSet
-from kedro_mlflow.pipeline import pipeline_ml
+from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
@@ -159,7 +159,7 @@ def dummy_pipeline():
 @pytest.fixture
 def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
 
-    dummy_pipeline_ml = pipeline_ml(
+    dummy_pipeline_ml = pipeline_ml_factory(
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",

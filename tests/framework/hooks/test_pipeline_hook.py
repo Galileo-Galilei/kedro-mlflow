@@ -4,6 +4,7 @@ import mlflow
 import pytest
 import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
+from kedro.framework.context import KedroContext
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
@@ -13,8 +14,10 @@ from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
     _format_conda_env,
+    _generate_kedro_command,
 )
-from kedro_mlflow.pipeline import pipeline_ml
+from kedro_mlflow.io import MlflowMetricsDataSet
+from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
@@ -66,9 +69,7 @@ def env_from_requirements(requirements_path, python_version):
 
 @pytest.fixture
 def env_from_dict(python_version):
-    env_from_dict = dict(
-        python=python_version, dependencies=["pandas>=1.0.0,<2.0.0", "kedro==0.15.9"]
-    )
+    env_from_dict = dict(python=python_version, dependencies=["pandas>=1.0.0,<2.0.0"])
     return env_from_dict
 
 
@@ -122,6 +123,9 @@ def dummy_pipeline():
     def train_fun(data, param):
         return 2
 
+    def metric_fun():
+        return {"metric": {"value": 1.1, "step": 0}}
+
     def predict_fun(model, data):
         return data * model
 
@@ -139,6 +143,8 @@ def dummy_pipeline():
                 outputs="model",
                 tags=["training"],
             ),
+            node(func=metric_fun, inputs=None, outputs="metrics",),
+            node(func=metric_fun, inputs=None, outputs="another_metrics",),
             node(
                 func=predict_fun,
                 inputs=["model", "data"],
@@ -151,12 +157,14 @@ def dummy_pipeline():
 
 
 @pytest.fixture
-def dummy_pipeline_ml(dummy_pipeline):
+def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
 
-    dummy_pipeline_ml = pipeline_ml(
+    dummy_pipeline_ml = pipeline_ml_factory(
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",
+        conda_env=env_from_dict,
+        model_name="model",
     )
     return dummy_pipeline_ml
 
@@ -169,6 +177,8 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "metrics": MlflowMetricsDataSet(),
+            "another_metrics": MlflowMetricsDataSet(prefix="foo"),
         }
     )
     return dummy_catalog
@@ -232,8 +242,19 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     # config_with_base_mlflow_conf is a conftest fixture
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
     monkeypatch.chdir(tmp_path)
-    pipeline_hook = MlflowPipelineHook(conda_env=env_from_dict, model_name="model")
+    pipeline_hook = MlflowPipelineHook()
     runner = SequentialRunner()
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
     pipeline_hook.before_pipeline_run(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
@@ -257,6 +278,10 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         assert nb_artifacts == 1
     else:
         assert nb_artifacts == 0
+    # Check if metrics datasets have prefix with its names.
+    # for metric
+    assert dummy_catalog._data_sets["metrics"]._prefix == "metrics"
+    assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
 
 
 def test_generate_kedro_commands():
@@ -271,7 +296,75 @@ def test_generate_kedro_commands():
         "load_versions": {"data_inter": "01:23:45"},
         "pipeline_name": "fake_pl",
     }
-    from kedro_mlflow.framework.hooks.pipeline_hook import _generate_kedro_command
 
     expected = "kedro run --from-inputs=data_in --from-nodes=node1 --to-nodes=node3 --node=node1,node2,node1 --pipeline=fake_pl --tag=tag1,tag2 --load-version=data_inter:01:23:45"
     assert _generate_kedro_command(**record_data) == expected
+
+
+@pytest.mark.parametrize("default_value", [None, []])
+def test_generate_default_kedro_commands(default_value):
+    """This test ensures that the _generate_kedro_comands accepts both
+     `None` and empty `list` as default value, because CLI and interactive
+     `Journal` do not use the same default.
+
+    Args:
+        default_value ([type]): [description]
+    """
+    record_data = {
+        "tags": default_value,
+        "from_nodes": default_value,
+        "to_nodes": default_value,
+        "node_names": default_value,
+        "from_inputs": default_value,
+        "load_versions": default_value,
+        "pipeline_name": "fake_pl",
+    }
+
+    expected = "kedro run --pipeline=fake_pl"
+    assert _generate_kedro_command(**record_data) == expected
+
+
+def test_on_pipeline_error(tmp_path, config_dir, mocker):
+
+    # config_dir is a global fixture in conftest that emulates
+    #  the root of a Kedro project
+
+    # Disable logging.config.dictConfig in KedroContext._setup_logging as
+    # it changes logging.config and affects other unit tests
+    mocker.patch("logging.config.dictConfig")
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    # create the extra mlflow.ymlconfig file for the plugin
+    def _write_yaml(filepath, config):
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        yaml_str = yaml.dump(config)
+        filepath.write_text(yaml_str)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(mlflow_tracking_uri=(tmp_path / "mlruns").as_posix()),
+    )
+
+    def failing_node():
+        mlflow.start_run(nested=True)
+        raise ValueError("Let's make this pipeline fail")
+
+    class DummyContextWithHook(KedroContext):
+        project_name = "fake project"
+        package_name = "fake_project"
+        project_version = "0.16.0"
+
+        hooks = (MlflowPipelineHook(),)
+
+        def _get_pipelines(self):
+            return {
+                "__default__": Pipeline(
+                    [node(func=failing_node, inputs=None, outputs="fake_output",)]
+                )
+            }
+
+    with pytest.raises(ValueError):
+        failing_context = DummyContextWithHook(tmp_path.as_posix())
+        failing_context.run()
+
+    assert mlflow.active_run() is None

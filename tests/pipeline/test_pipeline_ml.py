@@ -9,6 +9,7 @@ from kedro_mlflow.pipeline import (
     KedroMlflowPipelineMLDatasetsError,
     KedroMlflowPipelineMLInputsError,
     pipeline_ml,
+    pipeline_ml_factory,
 )
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
@@ -52,7 +53,7 @@ def pipeline_with_tag():
 
 @pytest.fixture
 def pipeline_ml_with_tag(pipeline_with_tag):
-    pipeline_ml_with_tag = pipeline_ml(
+    pipeline_ml_with_tag = pipeline_ml_factory(
         training=pipeline_with_tag,
         inference=Pipeline(
             [node(func=predict_fun, inputs=["model", "data"], outputs="predictions")]
@@ -60,6 +61,23 @@ def pipeline_ml_with_tag(pipeline_with_tag):
         input_name="data",
     )
     return pipeline_ml_with_tag
+
+
+def test_raise_deprecation_warning_pipeline_ml(pipeline_with_tag):
+    with pytest.deprecated_call():
+        pipeline_ml(
+            training=pipeline_with_tag,
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+        )
 
 
 @pytest.fixture
@@ -98,7 +116,7 @@ def pipeline_ml_with_intermediary_artifacts():
             ),
         ]
     )
-    pipeline_ml_with_tag = pipeline_ml(
+    pipeline_ml_with_tag = pipeline_ml_factory(
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
@@ -119,24 +137,25 @@ def dummy_context(tmp_path, config_dir, mocker):
     # Disable logging.config.dictConfig in KedroContext._setup_logging as
     # it changes logging.config and affects other unit tests
     mocker.patch("logging.config.dictConfig")
-
-    return DummyContext(tmp_path.as_posix())
+    dummy_context = DummyContext(tmp_path.as_posix())
+    return dummy_context
 
 
 @pytest.fixture
 def dummy_catalog():
-    return DataCatalog(
+    dummy_catalog = DataCatalog(
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
             "model": CSVDataSet("fake/path/to/model.csv"),
         }
     )
+    return dummy_catalog
 
 
 @pytest.fixture
 def catalog_with_encoder():
-    return DataCatalog(
+    catalog_with_encoder = DataCatalog(
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
@@ -144,6 +163,7 @@ def catalog_with_encoder():
             "model": CSVDataSet("fake/path/to/model.csv"),
         }
     )
+    return catalog_with_encoder
 
 
 @pytest.mark.parametrize(
@@ -332,3 +352,11 @@ def test_decorate(pipeline_ml_with_tag):
 
     new_pl = pipeline_ml_with_tag.decorate(fake_dec)
     assert all([fake_dec in node._decorators for node in new_pl.nodes])
+
+
+def test_invalid_input_name(pipeline_ml_with_tag):
+    with pytest.raises(
+        KedroMlflowPipelineMLInputsError,
+        match="input_name='whoops_bad_name' but it must be an input of 'inference'",
+    ):
+        pipeline_ml_with_tag.input_name = "whoops_bad_name"

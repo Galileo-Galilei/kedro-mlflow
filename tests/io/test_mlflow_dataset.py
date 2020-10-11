@@ -8,7 +8,7 @@ from kedro.extras.datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
-from kedro_mlflow.io import MlflowDataSet
+from kedro_mlflow.io import MlflowArtifactDataSet, MlflowDataSet
 
 
 @pytest.fixture
@@ -46,7 +46,7 @@ def test_mlflow_csv_data_set_save_reload(
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     filepath = (tmp_path / "data").with_suffix(extension)
 
-    mlflow_csv_dataset = MlflowDataSet(
+    mlflow_csv_dataset = MlflowArtifactDataSet(
         artifact_path=artifact_path,
         data_set=dict(type=CSVDataSet, filepath=filepath.as_posix()),
     )
@@ -91,7 +91,7 @@ def test_mlflow_data_set_save_with_run_id(
         nb_runs += 1
 
     # then same scenario but the run_id where data is saved is specified
-    mlflow_csv_dataset = MlflowDataSet(
+    mlflow_csv_dataset = MlflowArtifactDataSet(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
         run_id=run_id,
     )
@@ -114,3 +114,55 @@ def test_mlflow_data_set_save_with_run_id(
 
     if exists_active_run:
         mlflow.end_run()
+
+
+def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri, df1):
+    """Check if versioned dataset is logged correctly in MLflow as artifact.
+
+    For versioned datasets just artifacts from current run should be logged.
+    """
+    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+
+    mlflow.start_run()
+
+    run_id = mlflow.active_run().info.run_id
+    active_run_id = mlflow.active_run().info.run_id
+
+    mlflow_csv_dataset = MlflowArtifactDataSet(
+        data_set=dict(
+            type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix(), versioned=True
+        ),
+        run_id=run_id,
+    )
+    mlflow_csv_dataset.save(df1)
+
+    run_artifacts = [
+        fileinfo.path for fileinfo in mlflow_client.list_artifacts(run_id=run_id)
+    ]
+
+    # Check if just one artifact was created in given run.
+    assert len(run_artifacts) == 1
+
+    artifact_path = mlflow_client.download_artifacts(
+        run_id=run_id, path=run_artifacts[0]
+    )
+
+    # Check if saved artifact is file and not folder where versioned datasets are stored.
+    assert Path(artifact_path).is_file()
+
+    assert (
+        mlflow.active_run().info.run_id == active_run_id
+        if mlflow.active_run()
+        else True
+    )  # if a run was opened before saving, it must be reopened
+    assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
+
+    mlflow.end_run()
+
+
+def test_raise_deprecation_warning_mlflow_dataset():
+    with pytest.deprecated_call():
+        MlflowDataSet(
+            data_set=dict(type="pandas.CSVDataSet", filepath="fake/path/to/file.csv"),
+        )

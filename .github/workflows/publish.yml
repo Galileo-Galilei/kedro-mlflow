@@ -1,0 +1,73 @@
+name: publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    env:
+      PYTHON_PACKAGE: kedro_mlflow
+    steps:
+    - name: Checkout the repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # necessary to enable merging, all the history is needed
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Build package dist from source # A better way will be : https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/ but pep 517 is still marked as experimental
+      run: |
+        python setup.py sdist
+    - name:  Merge back to develop  # we have to set the config first on a fresh machine
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git checkout -b develop --track origin/develop
+        git merge master
+        git push
+    - name: Set dynamically package version as environment variable
+      # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+      run: |
+        echo "::set-env name=PACKAGE_VERSION::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
+    - name: Create temporary file with the body content for the release
+      run: |
+        grep -Poz "## \[${{env.PACKAGE_VERSION}}] - \d{4}-\d{2}-\d{2}[\S\s]+?(?=## \[\d+\.\d+\.\d+\]|\[.+\]:)" CHANGELOG.md > release_body.md
+    - name: Create Release # https://github.com/actions/create-release
+      id: create_release
+      uses: actions/create-release@v1.1.4
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ env.PACKAGE_VERSION }}
+        release_name: Release ${{ env.PACKAGE_VERSION }}
+        body_path: ./release_body.md
+        draft: false
+        prerelease: false
+    - name: Rollback Release in case of run failure
+      if: failure() && steps.create_release.outputs.id != ''
+      uses: author/action-rollback@stable
+      with:
+        # Using a known release ID
+        release_id: ${{ steps.create_release.outputs.id }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Publish distribution to Test PyPI  # official action from python maintainers
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: __token__
+    #     password: ${{ secrets.TEST_PYPI_PASSWORD }}
+    #     repository_url: https://test.pypi.org/legacy/
+    #     verbose: true  # trace if the upload fails
+    - name: Publish distribution to PyPI  # official action from python maintainers
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_PASSWORD }}
+        verbose: true  # trace if the upload fails

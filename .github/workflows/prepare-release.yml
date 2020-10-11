@@ -1,0 +1,54 @@
+name: create-release-candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_part:
+        description: The part of the version to update (patch, minor or major)
+        required: true
+        default: 'minor'
+
+jobs:
+  prepare-release:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7]
+    env:
+      PYTHON_PACKAGE: kedro_mlflow
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Validate inputs
+      run: |
+        echo "INPUT_VERSION_PART: ${{ github.event.inputs.version_part }}"
+        python -c "if '${{ github.event.inputs.version_part }}' not in ['patch', 'minor', 'major']:   raise ValueError(\"'${{ github.event.inputs.version_part }}' must be one of ['patch', 'minor', 'major'])\")"
+    - name: Bump the version number  # bump2version is a maintained fork of original bumpversion
+      id: bump_version
+      run: |
+        pip install bump2version
+        bump2version ${{ github.event.inputs.version_part }}
+        echo "::set-output name=package_version::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
+    - name: Update the CHANGELOG according to 'Keep a Changelog' guidelines
+      uses: thomaseizinger/keep-a-changelog-new-release@v1
+      with:
+        version: ${{ steps.bump_version.outputs.package_version }}
+    - name: Commit changes to a release-candidate branch
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+        git checkout -b release-candidate-${{ steps.bump_version.outputs.package_version }}
+        git commit -am "Release ${{ steps.bump_version.outputs.package_version }} - Bump version and CHANGELOG"
+        git push -u origin release-candidate-${{ steps.bump_version.outputs.package_version }}
+    - name: Open a PR to merge the release candidate to master
+      uses: vsoch/pull-request-action@1.0.6
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        PULL_REQUEST_BRANCH: master
+        PULL_REQUEST_FROM_BRANCH: release-candidate-${{ steps.bump_version.outputs.package_version }}
+        PULL_REQUEST_TITLE: "Release candidate ${{ steps.bump_version.outputs.package_version }}"
+        PULL_REQUEST_BODY: "Bump version and CHANGELOG for next release."
+        # PULL_REQUEST_ASSIGNEES: "${{ github.repository_owner }}"  # currently buggued in the action

@@ -17,6 +17,8 @@ class KedroMlflowConfig:
 
     UI_OPTS = {"port": None, "host": None}
 
+    NODE_HOOK_OPTS = {"flatten_dict_params": False, "recursive": True, "sep": "."}
+
     def __init__(
         self,
         project_path: Union[str, Path],
@@ -24,6 +26,7 @@ class KedroMlflowConfig:
         experiment_opts: Union[Dict[str, Any], None] = None,
         run_opts: Union[Dict[str, Any], None] = None,
         ui_opts: Union[Dict[str, Any], None] = None,
+        node_hook_opts: Union[Dict[str, Any], None] = None,
     ):
 
         # declare attributes in __init__.py to avoid pylint complaining
@@ -39,6 +42,7 @@ class KedroMlflowConfig:
         self.experiment_opts = None
         self.run_opts = None
         self.ui_opts = None
+        self.node_hook_opts = None
         self.mlflow_client = None  # the client to interact with the mlflow database
         self.experiment = (
             None  # the mlflow experiment object to interact directly with it
@@ -52,6 +56,7 @@ class KedroMlflowConfig:
             experiment=experiment_opts,
             run=run_opts,
             ui=ui_opts,
+            hooks=dict(node=node_hook_opts),
         )
         self.from_dict(configuration)
 
@@ -65,19 +70,28 @@ class KedroMlflowConfig:
             configuration {Dict[str, str]} -- A dict with the following format :
             {
                 mlflow_tracking_uri: a valid string for mlflow tracking storage,
-                experiments_opts:
+                experiments:
                     {
                         name {str}: the name of the experiment
                         create {bool} : should the experiment be created if it does not exists?
                     },
-                run_opts:
+                run:
                     {
                         nested {bool}: should we allow nested run within the context?
                     },
-                ui_opts:
+                ui:
                     {
                         port {int} : the port where the ui must be served
                         host {str} : the host for the ui
+                    }
+                hooks:
+                    {
+                        node:
+                            {
+                             flatten_dict_params {bool}: When the parameter is a dict, should we crete several parameters i the dict, one for each entry? This may be necessary beacuase mlflow has a liit size for parameters. Default to False.
+                             recursive {bool}: In we flatten dict parameters, should we apply the strategy recusrively in case of nested dicts? Default to True.
+                             sep {str}: The separator in case of nested dict flattening {level1:{p1:1, p2:2}} will be logged as level1.p1, level.p2. Default to "."
+                            }
                     }
             }
 
@@ -87,6 +101,7 @@ class KedroMlflowConfig:
         experiment_opts = configuration.get("experiment")
         run_opts = configuration.get("run")
         ui_opts = configuration.get("ui")
+        node_hook_opts = configuration.get("hooks", {}).get("node")
 
         self.mlflow_tracking_uri = self._validate_uri(uri=mlflow_tracking_uri)
         self.experiment_opts = _validate_opts(
@@ -94,6 +109,9 @@ class KedroMlflowConfig:
         )
         self.run_opts = _validate_opts(opts=run_opts, default=self.RUN_OPTS)
         self.ui_opts = _validate_opts(opts=ui_opts, default=self.UI_OPTS)
+        self.node_hook_opts = _validate_opts(
+            opts=node_hook_opts, default=self.NODE_HOOK_OPTS
+        )
 
         # instantiate mlflow objects to interact with the database
         # the client must not be create dbefore carefully checking the uri,
@@ -126,6 +144,7 @@ class KedroMlflowConfig:
             "experiments": self.experiment_opts,
             "run": self.run_opts,
             "ui": self.ui_opts,
+            "hooks": {"node": self.node_hook_opts},
         }
         return info
 
@@ -191,22 +210,22 @@ class KedroMlflowConfig:
 
 
 def _validate_opts(opts: Dict[str, Any], default: Dict[str, Any]) -> Dict:
-    """This functions creates a valid dictionnary containing options
+    """This functions creates a valid dictionary containing options
         for different mlflow setup.
-        Only the keys provided in the default dictionnary are allowed.
-        If provided, value of the opts dictionnary are kept, otherwise
+        Only the keys provided in the default dictionary are allowed.
+        If provided, value of the opts dictionary are kept, otherwise
         default values are retrieved.
 
 
     Arguments:
-        opts {Dict[str, Any]} -- A dictionnary containing the configuration.
-        default_opts {Dict[str, Any]} -- A default dictionnary that enforces valid keys and provides default values
+        opts {Dict[str, Any]} -- A dictionary containing the configuration.
+        default_opts {Dict[str, Any]} -- A default dictionary that enforces valid keys and provides default values
 
     Raises:
-        KedroMlflowConfigError: If a key in the opt dictionnary does not exist in the default, it is not a valid key.
+        KedroMlflowConfigError: If a key in the opt dictionary does not exist in the default, it is not a valid key.
 
     Returns:
-        Dict -- A dictionnary with all the keys of 'default' and the values of 'opts' if provided.
+        Dict -- A dictionary with all the keys of 'default' and the values of 'opts' if provided.
     """
     # makes a deepcopy to avoid modifying class constants
     default_copy = default.copy()

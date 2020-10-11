@@ -94,7 +94,7 @@ def test_runpy_template_is_consistent_with_kedro():
         "",
     )
     kedro_mlflow_runpy = kedro_mlflow_runpy.replace(
-        '    hooks = (\n        MlflowNodeHook(flatten_dict_params=False),\n        MlflowPipelineHook(\n            model_name="fake_project", conda_env="src/requirements.txt",\n        ),\n    )\n',
+        "    hooks = (\n        MlflowNodeHook(),\n        MlflowPipelineHook(),\n    )\n",
         "",
     )
 

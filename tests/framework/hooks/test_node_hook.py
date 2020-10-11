@@ -1,8 +1,10 @@
 import mlflow
+import pytest
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import node
 from mlflow.tracking import MlflowClient
 
+from kedro_mlflow.framework.context.config import KedroMlflowConfig
 from kedro_mlflow.framework.hooks import MlflowNodeHook
 from kedro_mlflow.framework.hooks.node_hook import flatten_dict
 
@@ -36,8 +38,26 @@ def test_flatten_dict_nested_2_levels():
     }
 
 
-def test_node_hook(tmp_path):
-    mlflow_node_hook = MlflowNodeHook(flatten_dict_params=True, recursive=True, sep="-")
+@pytest.mark.parametrize(
+    "flatten_dict_params,expected",
+    [
+        (True, {"param1": "1", "parameters-param1": "1", "parameters-param2": "2"}),
+        (False, {"param1": "1", "parameters": "{'param1': 1, 'param2': 2}"}),
+    ],
+)
+def test_node_hook_logging(tmp_path, mocker, flatten_dict_params, expected):
+
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    config = KedroMlflowConfig(
+        project_path=tmp_path,
+        node_hook_opts={"flatten_dict_params": flatten_dict_params, "sep": "-"},
+    )
+    # the function is imported inside the other file antd this is the file to patch
+    # see https://stackoverflow.com/questions/30987973/python-mock-patch-doesnt-work-as-expected-for-public-method
+    mocker.patch(
+        "kedro_mlflow.framework.hooks.node_hook.get_mlflow_config", return_value=config
+    )
+    mlflow_node_hook = MlflowNodeHook()
 
     def fake_fun(arg1, arg2, arg3):
         return None
@@ -71,8 +91,4 @@ def test_node_hook(tmp_path):
 
     mlflow_client = MlflowClient(mlflow_tracking_uri)
     current_run = mlflow_client.get_run(run_id)
-    assert current_run.data.params == {
-        "param1": "1",
-        "parameters-param1": "1",
-        "parameters-param2": "2",
-    }
+    assert current_run.data.params == expected

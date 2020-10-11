@@ -1,4 +1,5 @@
 import yaml
+from kedro.framework.context import load_context
 
 from kedro_mlflow.framework.context import get_mlflow_config
 
@@ -9,6 +10,7 @@ from kedro_mlflow.framework.context import get_mlflow_config
 
 def test_get_mlflow_config(mocker, tmp_path, config_dir):
     # config_with_base_mlflow_conf is a pytest.fixture in conftest
+    mocker.patch("logging.config.dictConfig")
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
     def _write_yaml(filepath, config):
@@ -35,4 +37,5 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
             "node": {"flatten_dict_params": True, "recursive": False, "sep": "-"}
         },
     }
-    assert get_mlflow_config(project_path=tmp_path, env="local").to_dict() == expected
+    context = load_context(tmp_path)
+    assert get_mlflow_config(context).to_dict() == expected

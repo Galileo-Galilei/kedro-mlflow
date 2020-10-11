@@ -1,19 +1,11 @@
 import pathlib
-import re
 
 from setuptools import find_packages, setup
 
+from kedro_mlflow import __version__ as VERSION
+
 NAME = "kedro_mlflow"
 HERE = pathlib.Path(__file__).parent
-
-# get package version
-with open((HERE / NAME / "__init__.py").as_posix(), encoding="utf-8") as file_handler:
-    result = re.search(r'__version__ *= *["\']([^"\']+)', file_handler.read())
-
-    if not result:
-        raise ValueError("Can't find the version in kedro/__init__.py")
-
-    VERSION = result.group(1)
 
 
 def _parse_requirements(path, encoding="utf-8"):
@@ -51,10 +43,14 @@ setup(
     author="Galileo-Galilei",
     entry_points={
         "kedro.project_commands": [
-            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
+            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands",
         ],
         "kedro.global_commands": [
-            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
+            "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands",
+        ],
+        "kedro.hooks": [
+            "mlflow_pipeline_hooks =  kedro_mlflow.framework.hooks.pipeline_hook:mlflow_pipeline_hooks",
+            "mlflow_node_hooks =  kedro_mlflow.framework.hooks.node_hook:mlflow_node_hooks",
         ],
     },
     zip_safe=False,

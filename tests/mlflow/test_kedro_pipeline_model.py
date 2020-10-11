@@ -85,6 +85,9 @@ def test_model_packaging(tmp_path, pipeline_ml_obj):
     )
     assert loaded_model.predict(1) == {"predictions": 2}
 
+    if mlflow.active_run():
+        mlflow.end_run()
+
 
 # should very likely add tests to see what happens when the artifacts
 # are incorrect

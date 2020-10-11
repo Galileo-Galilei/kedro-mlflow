@@ -1,4 +1,6 @@
+import os
 from pathlib import Path
+from shutil import copyfile
 from typing import Dict
 
 import pytest
@@ -49,7 +51,24 @@ def config_dir(tmp_path):
         credentials = tmp_path / "conf" / env / "credentials.yml"
         logging = tmp_path / "conf" / env / "logging.yml"
         parameters = tmp_path / "conf" / env / "parameters.yml"
+        kedro_yaml = tmp_path / ".kedro.yml"
         _write_yaml(catalog, dict())
         _write_yaml(parameters, dict())
         _write_yaml(credentials, dict())
-        _write_yaml(logging, _get_local_logging_config())
+        _write_yaml(logging, _get_local_logging_config()),
+
+    _write_yaml(
+        kedro_yaml,
+        dict(
+            {
+                "context_path": "dummy_package.run.ProjectContext",
+                "project_name": "dummy_package",
+                "project_version": "0.16.5",
+                "package_name": "dummy_package",
+            }
+        ),
+    )
+
+    os.mkdir(tmp_path / "src")
+    os.mkdir(tmp_path / "src" / "dummy_package")
+    copyfile("tests/dummy_run.py", tmp_path / "src" / "dummy_package" / "run.py")

@@ -4,13 +4,13 @@ import mlflow
 import pytest
 import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.framework.context import KedroContext
+from kedro.framework.context import get_static_project_data
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
+from kedro.utils import load_obj
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
     _format_conda_env,
@@ -264,8 +264,9 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
     # test : parameters should have been logged
-    mlflow_conf = get_mlflow_config(tmp_path)
-    mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
+    # mlflow_conf = get_mlflow_config(tmp_path)
+    tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow_client = MlflowClient(tracking_uri)
     run_data = mlflow_client.get_run(run_id).data
     # all run_params are recorded as tags
     for k, v in dummy_run_params.items():
@@ -324,7 +325,7 @@ def test_generate_default_kedro_commands(default_value):
     assert _generate_kedro_command(**record_data) == expected
 
 
-def test_on_pipeline_error(tmp_path, config_dir, mocker):
+def test_on_pipeline_error(tmp_path, monkeypatch, config_dir, mocker):
 
     # config_dir is a global fixture in conftest that emulates
     #  the root of a Kedro project
@@ -333,6 +334,8 @@ def test_on_pipeline_error(tmp_path, config_dir, mocker):
     # it changes logging.config and affects other unit tests
     mocker.patch("logging.config.dictConfig")
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    # monkeypatch.chdir(tmp_path)
 
     # create the extra mlflow.ymlconfig file for the plugin
     def _write_yaml(filepath, config):
@@ -349,10 +352,11 @@ def test_on_pipeline_error(tmp_path, config_dir, mocker):
         mlflow.start_run(nested=True)
         raise ValueError("Let's make this pipeline fail")
 
-    class DummyContextWithHook(KedroContext):
-        project_name = "fake project"
-        package_name = "fake_project"
-        project_version = "0.16.0"
+    context_path = get_static_project_data(tmp_path)["context_path"]
+
+    DummyContext = load_obj(context_path)
+
+    class DummyContextWithHook(DummyContext):
 
         hooks = (MlflowPipelineHook(),)
 

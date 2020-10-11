@@ -1,19 +1,9 @@
 import pathlib
-import re
 
 from setuptools import find_packages, setup
 
 NAME = "kedro_mlflow"
 HERE = pathlib.Path(__file__).parent
-
-# get package version
-with open((HERE / NAME / "__init__.py").as_posix(), encoding="utf-8") as file_handler:
-    result = re.search(r'__version__ *= *["\']([^"\']+)', file_handler.read())
-
-    if not result:
-        raise ValueError("Can't find the version in kedro/__init__.py")
-
-    VERSION = result.group(1)
 
 
 def _parse_requirements(path, encoding="utf-8"):
@@ -36,7 +26,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version=VERSION,
+    version="0.2.1",  # this will be bumped automatically by bump2version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,

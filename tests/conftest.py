@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from shutil import copyfile
 from typing import Dict
 
 import pytest
@@ -71,4 +70,13 @@ def config_dir(tmp_path):
 
     os.mkdir(tmp_path / "src")
     os.mkdir(tmp_path / "src" / "dummy_package")
-    copyfile("tests/dummy_run.py", tmp_path / "src" / "dummy_package" / "run.py")
+    with open(tmp_path / "src" / "dummy_package" / "run.py", "w") as f:
+        f.writelines(
+            [
+                "from kedro.framework.context import KedroContext\n",
+                "class ProjectContext(KedroContext):\n",
+                "    project_name = 'dummy_package'\n",
+                "    project_version = '0.16.5'\n",
+                "    package_name = 'dummy_package'\n",
+            ]
+        )

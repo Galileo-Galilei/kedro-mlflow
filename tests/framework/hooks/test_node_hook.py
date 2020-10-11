@@ -1,3 +1,6 @@
+from pathlib import Path
+from typing import Dict
+
 import mlflow
 import pytest
 import yaml
@@ -7,6 +10,12 @@ from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.hooks import MlflowNodeHook
 from kedro_mlflow.framework.hooks.node_hook import flatten_dict
+
+
+def _write_yaml(filepath: Path, config: Dict):
+    filepath.parent.mkdir(parents=True, exist_ok=True)
+    yaml_str = yaml.dump(config)
+    filepath.write_text(yaml_str)
 
 
 def test_flatten_dict_non_nested():
@@ -41,10 +50,10 @@ def test_flatten_dict_nested_2_levels():
 @pytest.fixture
 def dummy_run_params(tmp_path):
     dummy_run_params = {
-        "run_id": "abcdef",
+        "run_id": "",
         "project_path": tmp_path.as_posix(),
         "env": "local",
-        "kedro_version": "0.16.0",
+        "kedro_version": "0.16.5",
         "tags": [],
         "from_nodes": [],
         "to_nodes": [],
@@ -55,6 +64,68 @@ def dummy_run_params(tmp_path):
         "extra_params": [],
     }
     return dummy_run_params
+
+
+@pytest.fixture
+def dummy_node():
+    def fake_fun(arg1, arg2, arg3):
+        return None
+
+    node_test = node(
+        func=fake_fun,
+        inputs={"arg1": "params:param1", "arg2": "foo", "arg3": "parameters"},
+        outputs="out",
+    )
+
+    return node_test
+
+
+@pytest.fixture
+def dummy_pipeline(dummy_node):
+
+    dummy_pipeline = Pipeline([dummy_node])
+
+    return dummy_pipeline
+
+
+@pytest.fixture
+def dummy_catalog():
+
+    catalog = DataCatalog(
+        {
+            "params:param1": 1,
+            "foo": MemoryDataSet(),
+            "bar": MemoryDataSet(),
+            "parameters": {"param1": 1, "param2": 2},
+        }
+    )
+
+    return catalog
+
+
+def test_pipeline_run_getting_configs(
+    tmp_path, config_dir, monkeypatch, dummy_run_params, dummy_pipeline, dummy_catalog
+):
+
+    monkeypatch.chdir(tmp_path)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(
+            hooks=dict(node=dict(flatten_dict_params=True, recursive=False, sep="-")),
+        ),
+    ),
+
+    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook.before_pipeline_run(
+        run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
+    )
+
+    assert (
+        mlflow_node_hook.flatten,
+        mlflow_node_hook.recursive,
+        mlflow_node_hook.sep,
+    ) == (True, False, "-")
 
 
 @pytest.mark.parametrize(
@@ -69,6 +140,9 @@ def test_node_hook_logging(
     mocker,
     monkeypatch,
     dummy_run_params,
+    dummy_catalog,
+    dummy_pipeline,
+    dummy_node,
     config_dir,
     flatten_dict_params,
     expected,
@@ -87,11 +161,6 @@ def test_node_hook_logging(
     #     "kedro_mlflow.framework.hooks.node_hook.get_mlflow_config", return_value=config
     # )
 
-    def _write_yaml(filepath, config):
-        filepath.parent.mkdir(parents=True, exist_ok=True)
-        yaml_str = yaml.dump(config)
-        filepath.write_text(yaml_str)
-
     _write_yaml(
         tmp_path / "conf" / "base" / "mlflow.yml",
         dict(
@@ -105,35 +174,19 @@ def test_node_hook_logging(
 
     mlflow_node_hook = MlflowNodeHook()
 
-    def fake_fun(arg1, arg2, arg3):
-        return None
-
-    node_test = node(
-        func=fake_fun,
-        inputs={"arg1": "params:param1", "arg2": "foo", "arg3": "parameters"},
-        outputs="out",
-    )
-    dummy_pipeline = Pipeline([node_test])
-
-    catalog = DataCatalog(
-        {
-            "params:param1": 1,
-            "foo": MemoryDataSet(),
-            "bar": MemoryDataSet(),
-            "parameters": {"param1": 1, "param2": 2},
-        }
-    )
-    node_inputs = {v: catalog._data_sets.get(v) for k, v in node_test._inputs.items()}
+    node_inputs = {
+        v: dummy_catalog._data_sets.get(v) for k, v in dummy_node._inputs.items()
+    }
 
     mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
     with mlflow.start_run():
         mlflow_node_hook.before_pipeline_run(
-            run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=catalog
+            run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
         )
         mlflow_node_hook.before_node_run(
-            node=node_test,
-            catalog=catalog,
+            node=dummy_node,
+            catalog=dummy_catalog,
             inputs=node_inputs,
             is_async=False,
             run_id="132",

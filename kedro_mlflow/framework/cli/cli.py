@@ -4,6 +4,7 @@ from pathlib import Path
 
 import click
 from kedro import __file__ as KEDRO_PATH
+from kedro.framework.context import load_context
 
 from kedro_mlflow.framework.cli.cli_utils import (
     render_jinja_template,
@@ -88,6 +89,8 @@ def init(force, silent):
     # get constants
     project_path = Path().cwd()
     project_globals = _get_project_globals()
+    context = load_context(project_path)
+    conf_root = context.CONF_ROOT
 
     # mlflow.yml is just a static file,
     # but the name of the experiment is set to be the same as the project
@@ -95,12 +98,14 @@ def init(force, silent):
     write_jinja_template(
         src=TEMPLATE_FOLDER_PATH / mlflow_yml,
         is_cookiecutter=False,
-        dst=project_path / "conf" / "base" / mlflow_yml,
+        dst=project_path / conf_root / "base" / mlflow_yml,
         python_package=project_globals["python_package"],
     )
     if not silent:
         click.secho(
-            click.style("'conf/base/mlflow.yml' successfully updated.", fg="green")
+            click.style(
+                f"'{conf_root}/base/mlflow.yml' successfully updated.", fg="green"
+            )
         )
     # make a check whether the project run.py is strictly identical to the template
     # if yes, replace the script by the template silently
@@ -184,8 +189,11 @@ def ui(project_path, env):
 
     """
 
+    if not project_path:
+        project_path = Path().cwd()
+    context = load_context(project_path=project_path, env=env)
     # the context must contains the self.mlflow attribues with mlflow configuration
-    mlflow_conf = get_mlflow_config(project_path=project_path, env=env)
+    mlflow_conf = get_mlflow_config(context)
 
     # call mlflow ui with specific options
     # TODO : add more options for ui

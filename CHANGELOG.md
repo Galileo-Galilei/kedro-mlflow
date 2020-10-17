@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Added
+
+-
+
+### Fixed
+
+- `get_mlflow_config` now uses the kedro context config_loader to get configs (#66). This indirectly solves the following issues:
+    -  `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory (#30)
+    - kedro_mlflow now works fine with kedro jupyter notebook independently of the working directory (#64)
+    - You can use global variables in `mlflow.yml` which  is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
+- `mlflow init` is now getting conf path from context.CONF_ROOT instead of hardcoded conf folder. This makes the package robust to Kedro changes.
+
+### Changed
+
+- `MlflowNodeHook` have now a before_pipeline_run hook which stores the ProjectContext and enable to retrieve configuration.
+
 ## [0.3.0] - 2020-10-11
 
 ### Added

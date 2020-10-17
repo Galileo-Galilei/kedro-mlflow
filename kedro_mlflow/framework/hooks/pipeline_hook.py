@@ -4,6 +4,7 @@ from typing import Any, Dict, Union
 
 import mlflow
 import yaml
+from kedro.framework.context import load_context
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -12,11 +13,14 @@ from kedro.versioning.journal import _git_sha
 from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.io import MlflowMetricsDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
-from kedro_mlflow.pipeline.pipeline_ml_factory import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
 
 
 class MlflowPipelineHook:
+    def __init__(self):
+        self.context = None
+
     @hook_impl
     def after_catalog_created(
         self,
@@ -62,9 +66,13 @@ class MlflowPipelineHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        mlflow_conf = get_mlflow_config(
-            project_path=run_params["project_path"], env=run_params["env"]
+        self.context = load_context(
+            project_path=run_params["project_path"],
+            env=run_params["env"],
+            extra_params=run_params["extra_params"],
         )
+
+        mlflow_conf = get_mlflow_config(self.context)
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
         # TODO : if the pipeline fails, we need to be able to end stop the mlflow run
         # cannot figure out how to do this within hooks

@@ -4,7 +4,7 @@ import mlflow
 import pytest
 import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.framework.context import KedroContext
+from kedro.framework.context import KedroContext, load_context
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
@@ -264,7 +264,8 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
     # test : parameters should have been logged
-    mlflow_conf = get_mlflow_config(tmp_path)
+    context = load_context(tmp_path)
+    mlflow_conf = get_mlflow_config(context)
     mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
     run_data = mlflow_client.get_run(run_id).data
     # all run_params are recorded as tags

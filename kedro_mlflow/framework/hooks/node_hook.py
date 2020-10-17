@@ -1,8 +1,10 @@
 from typing import Any, Dict
 
 import mlflow
+from kedro.framework.context import load_context
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
+from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
 from kedro_mlflow.framework.context import get_mlflow_config
@@ -10,7 +12,44 @@ from kedro_mlflow.framework.context import get_mlflow_config
 
 class MlflowNodeHook:
     def __init__(self):
-        config = get_mlflow_config()
+        self.context = None
+        self.flatten = False
+        self.recursive = True
+        self.sep = "."
+
+    @hook_impl
+    def before_pipeline_run(
+        self, run_params: Dict[str, Any], pipeline: Pipeline, catalog: DataCatalog
+    ) -> None:
+        """Hook to be invoked before a pipeline runs.
+        Args:
+            run_params: The params needed for the given run.
+                Should be identical to the data logged by Journal.
+                # @fixme: this needs to be modelled explicitly as code, instead of comment
+                Schema: {
+                    "run_id": str,
+                    "project_path": str,
+                    "env": str,
+                    "kedro_version": str,
+                    "tags": Optional[List[str]],
+                    "from_nodes": Optional[List[str]],
+                    "to_nodes": Optional[List[str]],
+                    "node_names": Optional[List[str]],
+                    "from_inputs": Optional[List[str]],
+                    "load_versions": Optional[List[str]],
+                    "pipeline_name": str,
+                    "extra_params": Optional[Dict[str, Any]],
+                }
+            pipeline: The ``Pipeline`` that will be run.
+            catalog: The ``DataCatalog`` to be used during the run.
+        """
+
+        self.context = load_context(
+            project_path=run_params["project_path"],
+            env=run_params["env"],
+            extra_params=run_params["extra_params"],
+        )
+        config = get_mlflow_config(self.context)
         self.flatten = config.node_hook_opts["flatten_dict_params"]
         self.recursive = config.node_hook_opts["recursive"]
         self.sep = config.node_hook_opts["sep"]

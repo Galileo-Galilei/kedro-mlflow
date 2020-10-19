@@ -9,19 +9,20 @@
 
 ### Fixed
 
-- `get_mlflow_config` now uses the kedro context config_loader to get configs (#66). This indirectly solves the following issues:
-    -  `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory (#30)
+- `get_mlflow_config` now uses the Kedro `ProjectContext` `ConfigLoader` to get configs (#66). This indirectly solves the following issues:
+    - `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory (#30)
     - kedro_mlflow now works fine with kedro jupyter notebook independently of the working directory (#64)
-    - You can use global variables in `mlflow.yml` which  is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
+    - You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
 - `mlflow init` is now getting conf path from context.CONF_ROOT instead of hardcoded conf folder. This makes the package robust to Kedro changes.
 
 ### Changed
 
-- `MlflowNodeHook` now has a before_pipeline_run hook which stores the ProjectContext and enable to retrieve configuration.
+- `MlflowNodeHook` now has a `before_pipeline_run` hook which stores the `ProjectContext` and enable to retrieve configuration (#66).
+- Documentation reference to the plugin is now dynamic when necessary (#6).
 
 ### Removed
 
-`kedro mlflow init` command is no longer declaring hooks in `run.py`. You must now [register your hooks manually](docs/source/03_tutorial/02_setup.md#declaring-kedro-mlflow-hooks) in the ``run.py`` (kedro > 0.16.0), ``.kedro.yml`` (kedro >= 0.16.5) or ``pyproject.toml`` (kedro >= 0.16.5)
+- `kedro mlflow init` command is no longer declaring hooks in `run.py`. You must now [register your hooks manually](docs/source/03_tutorial/02_setup.md#declaring-kedro-mlflow-hooks) in the ``run.py`` (kedro > 0.16.0), ``.kedro.yml`` (kedro >= 0.16.5) or ``pyproject.toml`` (kedro >= 0.16.5)
 
 ## [0.3.0] - 2020-10-11
 

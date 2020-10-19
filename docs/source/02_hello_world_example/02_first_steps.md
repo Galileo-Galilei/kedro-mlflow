@@ -121,4 +121,4 @@ Reopen the ui, select the last run and see that the file was uploaded:
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 
-*Note: Mlflow offers specific logging for machine learning models that should be better suited for your use case, but is not supported yet in ``kedro-mlflow==0.2.0``*
+*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, but is not supported yet in ``kedro-mlflow==0.3.0``*

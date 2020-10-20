@@ -1,3 +1,4 @@
+import logging
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 
@@ -85,13 +86,27 @@ class PipelineML(Pipeline):
         self.model_name = model_name
         self.input_name = input_name
 
+        self._check_consistency()
+
     @property
     def input_name(self) -> str:
         return self._input_name
 
+    @property
+    def _logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
+
     @input_name.setter
     def input_name(self, name: str) -> None:
-        self._check_input_name(name)
+        allowed_names = self.inference.inputs()
+        pp_allowed_names = "\n    - ".join(allowed_names)
+        if name not in allowed_names:
+            raise KedroMlflowPipelineMLInputsError(
+                (
+                    f"input_name='{name}' but it must be an input of 'inference'"
+                    f", i.e. one of: \n    - {pp_allowed_names}"
+                )
+            )
         self._input_name = name
 
     @property
@@ -106,31 +121,6 @@ class PipelineML(Pipeline):
     @property
     def training(self) -> Pipeline:
         return Pipeline(self.nodes)
-
-    def _check_input_name(self, input_name: str) -> str:
-        allowed_names = self.inference.inputs()
-        pp_allowed_names = "\n    - ".join(allowed_names)
-        if input_name not in allowed_names:
-            raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but it must be an input of 'inference', i.e. one of: \n    - {pp_allowed_names}"
-            )
-        else:
-            free_inputs_set = (
-                self.inference.inputs() - {input_name} - self.all_outputs()
-            )
-            if len(free_inputs_set) > 0:
-                raise KedroMlflowPipelineMLInputsError(
-                    """
-                    The following inputs are free for the inference pipeline:
-                    - {inputs}.
-                    No free input is allowed.
-                    Please make sure that 'inference.pipeline.inputs()' are all in 'training.pipeline.all_outputs()',
-                    except eventually 'input_name'.""".format(
-                        inputs="\n     - ".join(free_inputs_set)
-                    )
-                )
-
-        return None
 
     def _check_inference(self, inference: Pipeline) -> None:
         nb_outputs = len(inference.outputs())
@@ -147,6 +137,10 @@ class PipelineML(Pipeline):
             )
 
     def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
+
+        # check that the pipeline is consistent in case its attributes have been
+        self._check_consistency()
+
         sub_catalog = DataCatalog()
         for data_set_name in self.inference.inputs():
             if data_set_name == self.input_name:
@@ -168,6 +162,9 @@ class PipelineML(Pipeline):
                                 data_set_name=data_set_name
                             )
                         )
+                    self._logger.info(
+                        f"The data_set '{data_set_name}' is added to the PipelineML catalog."
+                    )
                     sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
                 except KeyError:
                     raise KedroMlflowPipelineMLDatasetsError(
@@ -191,6 +188,28 @@ class PipelineML(Pipeline):
             if name != self.input_name
         }
         return artifacts
+
+    def _check_consistency(self) -> None:
+        free_inputs_set = (
+            self.inference.inputs()
+            - {self.input_name}
+            - self.all_outputs()
+            - self.inputs()
+        )
+        if len(free_inputs_set) > 0:
+            input_set_txt = "\n     - ".join(free_inputs_set)
+            raise KedroMlflowPipelineMLInputsError(
+                (
+                    "The following inputs are free for the inference pipeline:"
+                    f"    - {input_set_txt}."
+                    " No free input is allowed."
+                    " Please make sure that 'inference.inputs()' are all"
+                    " in 'training.all_outputs() + training.inputs()'"
+                    "except 'input_name'."
+                )
+            )
+
+        return None
 
     def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(

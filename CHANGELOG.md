@@ -6,13 +6,14 @@
 
 - `kedro-mlflow` now supports kedro 0.16.5 (#62)
 - `kedro-mlflow` hooks can now be declared in `.kedro.yml` or `pyproject.toml` by adding `kedro_mlflow.framework.hooks.mlflow_pipeline_hook` and `kedro_mlflow.framework.hooks.mlflow_node_hook` into the hooks entry. _Only for kedro>=0.16.5_
+- `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` (#71)
 
 ### Fixed
 
 - `get_mlflow_config` now uses the Kedro `ProjectContext` `ConfigLoader` to get configs (#66). This indirectly solves the following issues:
-    - `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory (#30)
-    - kedro_mlflow now works fine with kedro jupyter notebook independently of the working directory (#64)
-    - You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
+  - `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory (#30)
+  - `kedro-mlflow` now works fine with `kedro jupyter notebook` command independently of the working directory (#64)
+  - You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
 - `mlflow init` is now getting conf path from context.CONF_ROOT instead of hardcoded conf folder. This makes the package robust to Kedro changes.
 - `MlflowMetricsDataset` now saves in the specified `run_id` instead of the current one when the prefix is not specified (#102)
 
@@ -21,6 +22,7 @@
 - Documentation reference to the plugin is now dynamic when necessary (#6).
 - The test coverage now excludes `tests` and `setup.py` (#99).
 - The `KedroPipelineModel` now unpacks the result of the `inference` pipeline and no longer returns a dictionary with the name in the `DataCatalog` but only the predicted value (#93).
+- The `PipelineML.extract_pipeline_catalog` is renamed `PipelineML._extract_pipeline_catalog` to indicate it is a private method and is not intended to be used directly by end users (#100)
 
 ### Removed
 

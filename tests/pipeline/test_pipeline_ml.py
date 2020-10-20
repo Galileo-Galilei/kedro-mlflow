@@ -43,6 +43,10 @@ def predict_fun_return_nothing(model, data):
     pass
 
 
+def remove_stopwords(data, stopwords):
+    return data
+
+
 @pytest.fixture
 def pipeline_with_tag():
 
@@ -125,12 +129,44 @@ def pipeline_ml_with_intermediary_artifacts():
             ),
         ]
     )
-    pipeline_ml_with_tag = pipeline_ml_factory(
+    pipeline_ml_with_intermediary_artifacts = pipeline_ml_factory(
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
     )
-    return pipeline_ml_with_tag
+    return pipeline_ml_with_intermediary_artifacts
+
+
+@pytest.fixture
+def pipeline_ml_with_inputs_artifacts():
+    full_pipeline = Pipeline(
+        [
+            node(
+                func=remove_stopwords,
+                inputs=dict(data="data", stopwords="stopwords_from_nltk"),
+                outputs="cleaned_data",
+                tags=["training", "inference"],
+            ),
+            node(
+                func=train_fun,
+                inputs="cleaned_data",
+                outputs="model",
+                tags=["training"],
+            ),
+            node(
+                func=predict_fun,
+                inputs=["model", "cleaned_data"],
+                outputs="predictions",
+                tags=["inference"],
+            ),
+        ]
+    )
+    pipeline_ml_with_inputs_artifacts = pipeline_ml_factory(
+        training=full_pipeline.only_nodes_with_tags("training"),
+        inference=full_pipeline.only_nodes_with_tags("inference"),
+        input_name="data",
+    )
+    return pipeline_ml_with_inputs_artifacts
 
 
 @pytest.fixture
@@ -173,6 +209,19 @@ def catalog_with_encoder():
         }
     )
     return catalog_with_encoder
+
+
+@pytest.fixture
+def catalog_with_stopwords():
+    catalog_with_stopwords = DataCatalog(
+        {
+            "data": MemoryDataSet(),
+            "cleaned_data": MemoryDataSet(),
+            "stopwords_from_nltk": CSVDataSet("fake/path/to/stopwords.csv"),
+            "model": CSVDataSet("fake/path/to/model.csv"),
+        }
+    )
+    return catalog_with_stopwords
 
 
 @pytest.mark.parametrize(
@@ -295,6 +344,11 @@ def test_filtering_generate_invalid_pipeline_ml(
             pytest.lazy_fixture("pipeline_ml_with_intermediary_artifacts"),
             pytest.lazy_fixture("catalog_with_encoder"),
             {"model", "data", "encoder"},
+        ),
+        (
+            pytest.lazy_fixture("pipeline_ml_with_inputs_artifacts"),
+            pytest.lazy_fixture("catalog_with_stopwords"),
+            {"model", "data", "stopwords_from_nltk"},
         ),
     ],
 )

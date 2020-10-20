@@ -299,7 +299,7 @@ def test_filtering_generate_invalid_pipeline_ml(
     ],
 )
 def test_catalog_extraction(pipeline_ml_obj, catalog, result):
-    filtered_catalog = pipeline_ml_obj.extract_pipeline_catalog(catalog)
+    filtered_catalog = pipeline_ml_obj._extract_pipeline_catalog(catalog)
     assert set(filtered_catalog.list()) == result
 
 
@@ -309,7 +309,7 @@ def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
         KedroMlflowPipelineMLDatasetsError,
         match="since it is an input for inference pipeline",
     ):
-        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
 
 
 def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
@@ -320,7 +320,7 @@ def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
         KedroMlflowPipelineMLDatasetsError,
         match="The datasets of the training pipeline must be persisted locally",
     ):
-        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
 
 
 def test_too_many_free_inputs():

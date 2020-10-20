@@ -12,7 +12,7 @@ class KedroPipelineModel(PythonModel):
     def __init__(self, pipeline_ml: PipelineML, catalog: DataCatalog):
 
         self.pipeline_ml = pipeline_ml
-        self.initial_catalog = pipeline_ml.extract_pipeline_catalog(catalog)
+        self.initial_catalog = pipeline_ml._extract_pipeline_catalog(catalog)
         self.loaded_catalog = DataCatalog()
         # we have the guarantee that there is only one output in inference
         self.output_name = list(pipeline_ml.inference.outputs())[0]

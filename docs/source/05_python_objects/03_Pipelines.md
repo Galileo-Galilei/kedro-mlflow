@@ -43,15 +43,15 @@ from kedro_mlflow.mlflow import KedroPipelineModel
 catalog = load_context(".").io
 
 # artifacts are all the inputs of the inference pipelines that are persisted in the catalog
-pipeline_catalog = pipeline_training.extract_pipeline_catalog(catalog)
-artifacts = {name: Path(dataset._filepath).resolve().as_uri()
-                for name, dataset in pipeline_catalog._data_sets.items()
-                if name != pipeline_training.model_input_name}
+artifacts = pipeline_training.extract_pipeline_artifacts(catalog)
 
-
-mlflow.pyfunc.log_model(artifact_path="model",
-                        python_model=KedroPipelineModel(pipeline_ml=pipeline_training,
-                                                        catalog=pipeline_catalog),
-                        artifacts=artifacts,
-                            conda_env={"python": "3.7.0"})
+mlflow.pyfunc.log_model(
+    artifact_path="model",
+    python_model=KedroPipelineModel(
+            pipeline_ml=pipeline_training,
+            catalog=catalog
+        ),
+    artifacts=artifacts,
+    conda_env={"python": "3.7.0"}
+)
 ```

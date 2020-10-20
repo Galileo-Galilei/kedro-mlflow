@@ -146,7 +146,7 @@ class PipelineML(Pipeline):
                 )
             )
 
-    def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
+    def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
         for data_set_name in self.inference.inputs():
             if data_set_name == self.input_name:
@@ -182,7 +182,7 @@ class PipelineML(Pipeline):
         return sub_catalog
 
     def extract_pipeline_artifacts(self, catalog: DataCatalog):
-        pipeline_catalog = self.extract_pipeline_catalog(catalog)
+        pipeline_catalog = self._extract_pipeline_catalog(catalog)
         artifacts = {
             name: Path(dataset._filepath.as_posix())
             .resolve()

@@ -134,7 +134,7 @@ class MlflowPipelineHook:
         """
 
         if isinstance(pipeline, PipelineML):
-            pipeline_catalog = pipeline.extract_pipeline_catalog(catalog)
+            pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
             artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
             mlflow.pyfunc.log_model(
                 artifact_path=pipeline.model_name,

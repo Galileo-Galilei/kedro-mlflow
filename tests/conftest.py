@@ -2,8 +2,17 @@ import os
 from pathlib import Path
 from typing import Dict
 
+import mlflow
 import pytest
 import yaml
+
+
+@pytest.fixture(autouse=True)
+def cleanup_mlflow_after_runs():
+    # A test function will be run at this point
+    yield
+    while mlflow.active_run():
+        mlflow.end_run()
 
 
 def _write_yaml(filepath: Path, config: Dict):

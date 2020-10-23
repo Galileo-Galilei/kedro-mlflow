@@ -24,6 +24,28 @@ class MlflowMetricsDataSet(AbstractDataSet):
             run_id (str): ID of MLflow run.
         """
         self._prefix = prefix
+        self.run_id = run_id
+
+    @property
+    def run_id(self):
+        """Get run id.
+
+        If active run is not found, tries to find last experiment.
+
+        Raise `DataSetError` exception if run id can't be found.
+
+        Returns:
+            str: String contains run_id.
+        """
+        if self._run_id is not None:
+            return self._run_id
+        run = mlflow.active_run()
+        if run:
+            return run.info.run_id
+        raise DataSetError("Cannot find run id.")
+
+    @run_id.setter
+    def run_id(self, run_id):
         self._run_id = run_id
 
     def _load(self) -> MetricsDict:
@@ -33,7 +55,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
             Dict[str, Union[int, float]]: Dictionary with MLflow metrics dataset.
         """
         client = MlflowClient()
-        run_id = self._get_run_id()
+        run_id = self.run_id
         all_metrics = client._tracking_client.store.get_all_metrics(run_uuid=run_id)
         dataset_metrics = filter(self._is_dataset_metric, all_metrics)
         dataset = reduce(
@@ -56,7 +78,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
         """
         client = MlflowClient()
         try:
-            run_id = self._get_run_id()
+            run_id = self.run_id
         except DataSetError:
             # If run_id can't be found log_metric would create new run.
             run_id = None
@@ -67,7 +89,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
             else mlflow.log_metric
         )
         metrics = (
-            self._build_args_list_from_metric_item(k, v) for k, v, in data.items()
+            self._build_args_list_from_metric_item(k, v) for k, v in data.items()
         )
         for k, v, i in chain.from_iterable(metrics):
             log_metric(k, v, step=i)
@@ -79,8 +101,9 @@ class MlflowMetricsDataSet(AbstractDataSet):
             bool: Is MLflow metrics dataset exists?
         """
         client = MlflowClient()
-        run_id = self._get_run_id()
-        all_metrics = client._tracking_client.store.get_all_metrics(run_uuid=run_id)
+        all_metrics = client._tracking_client.store.get_all_metrics(
+            run_uuid=self.run_id
+        )
         return any(self._is_dataset_metric(x) for x in all_metrics)
 
     def _describe(self) -> Dict[str, Any]:
@@ -93,23 +116,6 @@ class MlflowMetricsDataSet(AbstractDataSet):
             "run_id": self._run_id,
             "prefix": self._prefix,
         }
-
-    def _get_run_id(self) -> str:
-        """Get run id.
-
-        If active run is not found, tries to find last experiment.
-
-        Raise `DataSetError` exception if run id can't be found.
-
-        Returns:
-            str: String contains run_id.
-        """
-        if self._run_id is not None:
-            return self._run_id
-        run = mlflow.active_run()
-        if run:
-            return run.info.run_id
-        raise DataSetError("Cannot find run id.")
 
     def _is_dataset_metric(self, metric: mlflow.entities.Metric) -> bool:
         """Check if given metric belongs to dataset.

@@ -123,8 +123,8 @@ def dummy_pipeline():
     def train_fun(data, param):
         return 2
 
-    def metric_fun():
-        return {"metric": {"value": 1.1, "step": 0}}
+    def metric_fun(data, model):
+        return {"metric_key": {"value": 1.1, "step": 0}}
 
     def predict_fun(model, data):
         return data * model
@@ -143,8 +143,18 @@ def dummy_pipeline():
                 outputs="model",
                 tags=["training"],
             ),
-            node(func=metric_fun, inputs=None, outputs="metrics",),
-            node(func=metric_fun, inputs=None, outputs="another_metrics",),
+            node(
+                func=metric_fun,
+                inputs=["model", "data"],
+                outputs="my_metrics",
+                tags=["training"],
+            ),
+            node(
+                func=metric_fun,
+                inputs=["model", "data"],
+                outputs="another_metrics",
+                tags=["training"],
+            ),
             node(
                 func=predict_fun,
                 inputs=["model", "data"],
@@ -177,7 +187,7 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
-            "metrics": MlflowMetricsDataSet(),
+            "my_metrics": MlflowMetricsDataSet(),
             "another_metrics": MlflowMetricsDataSet(prefix="foo"),
         }
     )
@@ -258,7 +268,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     pipeline_hook.before_pipeline_run(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
     )
-    runner.run(pipeline_to_run, dummy_catalog, dummy_run_params["run_id"])
+    runner.run(pipeline_to_run, dummy_catalog)
     run_id = mlflow.active_run().info.run_id
     pipeline_hook.after_pipeline_run(
         run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
@@ -281,8 +291,86 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         assert nb_artifacts == 0
     # Check if metrics datasets have prefix with its names.
     # for metric
-    assert dummy_catalog._data_sets["metrics"]._prefix == "metrics"
+    assert dummy_catalog._data_sets["my_metrics"]._prefix == "my_metrics"
     assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
+
+
+def test_mlflow_pipeline_hook_metrics_with_run_id(
+    mocker,
+    monkeypatch,
+    tmp_path,
+    config_dir,
+    env_from_dict,
+    dummy_pipeline_ml,
+    dummy_run_params,
+    dummy_mlflow_conf,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    monkeypatch.chdir(tmp_path)
+
+    context = load_context(tmp_path)
+    mlflow_conf = get_mlflow_config(context)
+    mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
+
+    with mlflow.start_run():
+        existing_run_id = mlflow.active_run().info.run_id
+
+    dummy_catalog_with_run_id = DataCatalog(
+        {
+            "raw_data": MemoryDataSet(1),
+            "params:unused_param": MemoryDataSet("blah"),
+            "data": MemoryDataSet(),
+            "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "my_metrics": MlflowMetricsDataSet(run_id=existing_run_id),
+            "another_metrics": MlflowMetricsDataSet(
+                run_id=existing_run_id, prefix="foo"
+            ),
+        }
+    )
+
+    pipeline_hook = MlflowPipelineHook()
+
+    runner = SequentialRunner()
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog_with_run_id,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
+    pipeline_hook.before_pipeline_run(
+        run_params=dummy_run_params,
+        pipeline=dummy_pipeline_ml,
+        catalog=dummy_catalog_with_run_id,
+    )
+    runner.run(dummy_pipeline_ml, dummy_catalog_with_run_id)
+
+    current_run_id = mlflow.active_run().info.run_id
+
+    pipeline_hook.after_pipeline_run(
+        run_params=dummy_run_params,
+        pipeline=dummy_pipeline_ml,
+        catalog=dummy_catalog_with_run_id,
+    )
+
+    mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
+    all_runs_id = set(
+        [run.run_id for run in mlflow_client.list_run_infos(experiment_id="0")]
+    )
+
+    # the metrics are supposed to have been logged inside existing_run_id
+    run_data = mlflow_client.get_run(existing_run_id).data
+
+    # Check if metrics datasets have prefix with its names.
+    # for metric
+    assert all_runs_id == {current_run_id, existing_run_id}
+    assert run_data.metrics["my_metrics.metric_key"] == 1.1
+    assert run_data.metrics["foo.metric_key"] == 1.1
 
 
 def test_generate_kedro_commands():

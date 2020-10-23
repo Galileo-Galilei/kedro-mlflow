@@ -38,7 +38,8 @@ class MlflowPipelineHook:
                     catalog._data_sets[name] = MlflowMetricsDataSet(
                         run_id=dataset._run_id, prefix=name
                     )
-                catalog._data_sets[name] = MlflowMetricsDataSet(prefix=name)
+                else:
+                    catalog._data_sets[name] = MlflowMetricsDataSet(prefix=name)
 
     @hook_impl
     def before_pipeline_run(
@@ -74,8 +75,7 @@ class MlflowPipelineHook:
 
         mlflow_conf = get_mlflow_config(self.context)
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
-        # TODO : if the pipeline fails, we need to be able to end stop the mlflow run
-        # cannot figure out how to do this within hooks
+
         run_name = (
             mlflow_conf.run_opts["name"]
             if mlflow_conf.run_opts["name"] is not None

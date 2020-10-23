@@ -18,21 +18,21 @@ def _get_local_logging_config():
         "formatters": {
             "simple": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"}
         },
-        "root": {"level": "INFO", "handlers": ["console"]},
+        "root": {"level": "ERROR", "handlers": ["console"]},
         "loggers": {
-            "kedro": {"level": "INFO", "handlers": ["console"], "propagate": False}
+            "kedro": {"level": "ERROR", "handlers": ["console"], "propagate": False}
         },
         "handlers": {
             "console": {
                 "class": "logging.StreamHandler",
-                "level": "INFO",
+                "level": "ERROR",
                 "formatter": "simple",
                 "stream": "ext://sys.stdout",
             }
         },
         "info_file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
-            "level": "INFO",
+            "level": "ERROR",
             "formatter": "simple",
             "filename": "logs/info.log",
         },

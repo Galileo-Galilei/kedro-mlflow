@@ -14,6 +14,7 @@
     - kedro_mlflow now works fine with kedro jupyter notebook independently of the working directory (#64)
     - You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader`  (#72)
 - `mlflow init` is now getting conf path from context.CONF_ROOT instead of hardcoded conf folder. This makes the package robust to Kedro changes.
+- `MlflowMetricsDataset` now saves in the specified `run_id` instead of the current one when the prefix is not specified (#102)
 
 ### Changed
 

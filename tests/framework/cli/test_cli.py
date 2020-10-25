@@ -100,42 +100,6 @@ def test_cli_init(monkeypatch, tmp_path, kedro_project):
     assert "'conf/base/mlflow.yml' successfully updated." in result.output
     assert (project_path / "conf" / "base" / "mlflow.yml").is_file()
 
-    # check runpy file
-    assert "'run.py' successfully updated" in result.output
-    with open(project_path / "src" / "fake_project" / "run.py", "r") as file_handler:
-        runpy_txt = file_handler.read()
-    assert "MlflowPipelineHook" in runpy_txt
-    assert "MlflowNodeHook" in runpy_txt
-
-
-def test_cli_init_with_modified_runpy(monkeypatch, tmp_path, kedro_project):
-    # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
-
-    # modify run.py
-    with open(project_path / "src" / "fake_project" / "run.py", "a") as file_handler:
-        file_handler.write("\n    # hello")
-
-    cli_runner = CliRunner()
-    result = cli_runner.invoke(cli_init)
-
-    # FIRST TEST:
-    # the command should have executed propery
-    assert result.exit_code == 0
-
-    # mlflow.yml file must be updated whatsoever
-    assert "'conf/base/mlflow.yml' successfully updated." in result.output
-    assert (project_path / "conf" / "base" / "mlflow.yml").is_file()
-
-    # the call should raise a warning and
-    # runpy file must NOT be updated
-    assert "You have modified your 'run.py' since project creation" in result.output
-    with open(project_path / "src" / "fake_project" / "run.py", "r") as file_handler:
-        runpy_txt = file_handler.read()
-    assert "MlflowPipelineHook" not in runpy_txt
-    assert "MlflowNodeHook" not in runpy_txt
-
 
 # TODO : This is a fake test. add a test to see if ui is properly up
 # I tried mimicking mlflow_cli with mock but did not achieve desired result

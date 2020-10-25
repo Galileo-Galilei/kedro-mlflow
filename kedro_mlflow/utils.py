@@ -1,7 +1,8 @@
 import re
 from pathlib import Path
-from typing import Dict, Union
+from typing import Any, Dict, Union
 
+import anyconfig
 import yaml
 from kedro import __version__ as KEDRO_VERSION
 from kedro.framework.context import load_context
@@ -21,10 +22,10 @@ def _is_kedro_project(project_path: Union[str, Path, None] = None) -> bool:
     return flag
 
 
-def _get_project_globals(project_path: Union[str, Path, None] = None) -> Dict[str, str]:
+def _get_project_globals(project_path: Union[str, Path, None]) -> Dict[str, str]:
 
-    if project_path is None:
-        project_path = Path.cwd()
+    # if project_path is None:
+    #     project_path = Path.cwd()
     # for the project name, we have to load the context : it is the only place where it is recorded
     project_context = load_context(project_path)
     project_name = project_context.project_name
@@ -37,7 +38,7 @@ def _get_project_globals(project_path: Union[str, Path, None] = None) -> Dict[st
     return dict(
         context_path=context_path,
         project_name=project_name,
-        python_package=python_package,
+        package_name=python_package,
         kedro_version=KEDRO_VERSION,
     )
 
@@ -75,3 +76,7 @@ def _parse_requirements(path, encoding="utf-8"):
             x.strip() for x in file_handler if x.strip() and not x.startswith("-r")
         ]
     return requirements
+
+
+class KedroContextError(Exception):
+    """Error occurred when loading project and running context pipeline."""

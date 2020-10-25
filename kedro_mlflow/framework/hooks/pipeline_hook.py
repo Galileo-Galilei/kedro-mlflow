@@ -185,6 +185,9 @@ class MlflowPipelineHook:
             mlflow.end_run()
 
 
+mlflow_pipeline_hook = MlflowPipelineHook()
+
+
 def _generate_kedro_command(
     tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_name
 ):

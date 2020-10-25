@@ -8,6 +8,7 @@ from kedro.pipeline import Pipeline, node
 from kedro_mlflow.pipeline import (
     KedroMlflowPipelineMLDatasetsError,
     KedroMlflowPipelineMLInputsError,
+    KedroMlflowPipelineMLOutputsError,
     pipeline_ml,
     pipeline_ml_factory,
 )
@@ -32,6 +33,14 @@ def train_fun(data):
 
 def predict_fun(model, data):
     return data * model
+
+
+def predict_fun_with_metric(model, data):
+    return data * model, "super_metric"
+
+
+def predict_fun_return_nothing(model, data):
+    pass
 
 
 @pytest.fixture
@@ -360,3 +369,43 @@ def test_invalid_input_name(pipeline_ml_with_tag):
         match="input_name='whoops_bad_name' but it must be an input of 'inference'",
     ):
         pipeline_ml_with_tag.input_name = "whoops_bad_name"
+
+
+def test_too_many_inference_outputs():
+    with pytest.raises(
+        KedroMlflowPipelineMLOutputsError,
+        match="The inference pipeline must have one and only one output",
+    ):
+        pipeline_ml_factory(
+            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun_with_metric,
+                        inputs=["model", "data"],
+                        outputs=["predictions", "metric"],
+                    )
+                ]
+            ),
+            input_name="data",
+        )
+
+
+def test_not_enough_inference_outputs():
+    with pytest.raises(
+        KedroMlflowPipelineMLOutputsError,
+        match="The inference pipeline must have one and only one output",
+    ):
+        pipeline_ml_factory(
+            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun_return_nothing,
+                        inputs=["model", "data"],
+                        outputs=None,
+                    )
+                ]
+            ),
+            input_name="data",
+        )

@@ -5,7 +5,12 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
-MSG_NOT_IMPLEMENTED = "This method is not implemented because it does not make sens for 'PipelineML'. Manipulate directly the training pipeline and recreate the 'PipelineML' with 'pipeline_ml_factory' factory"
+MSG_NOT_IMPLEMENTED = (
+    "This method is not implemented because it does"
+    "not make sense for 'PipelineML'."
+    "Manipulate directly the training pipeline and"
+    "recreate the 'PipelineML' with 'pipeline_ml_factory' factory."
+)
 
 
 class PipelineML(Pipeline):
@@ -78,7 +83,6 @@ class PipelineML(Pipeline):
         self.inference = inference
         self.conda_env = conda_env
         self.model_name = model_name
-
         self.input_name = input_name
 
     @property
@@ -89,6 +93,58 @@ class PipelineML(Pipeline):
     def input_name(self, name: str) -> None:
         self._check_input_name(name)
         self._input_name = name
+
+    @property
+    def inference(self) -> str:
+        return self._inference
+
+    @inference.setter
+    def inference(self, inference: Pipeline) -> None:
+        self._check_inference(inference)
+        self._inference = inference
+
+    @property
+    def training(self) -> Pipeline:
+        return Pipeline(self.nodes)
+
+    def _check_input_name(self, input_name: str) -> str:
+        allowed_names = self.inference.inputs()
+        pp_allowed_names = "\n    - ".join(allowed_names)
+        if input_name not in allowed_names:
+            raise KedroMlflowPipelineMLInputsError(
+                f"input_name='{input_name}' but it must be an input of 'inference', i.e. one of: \n    - {pp_allowed_names}"
+            )
+        else:
+            free_inputs_set = (
+                self.inference.inputs() - {input_name} - self.all_outputs()
+            )
+            if len(free_inputs_set) > 0:
+                raise KedroMlflowPipelineMLInputsError(
+                    """
+                    The following inputs are free for the inference pipeline:
+                    - {inputs}.
+                    No free input is allowed.
+                    Please make sure that 'inference.pipeline.inputs()' are all in 'training.pipeline.all_outputs()',
+                    except eventually 'input_name'.""".format(
+                        inputs="\n     - ".join(free_inputs_set)
+                    )
+                )
+
+        return None
+
+    def _check_inference(self, inference: Pipeline) -> None:
+        nb_outputs = len(inference.outputs())
+        outputs_txt = "\n - ".join(inference.outputs())
+        if len(inference.outputs()) != 1:
+            raise KedroMlflowPipelineMLOutputsError(
+                (
+                    "The inference pipeline must have one"
+                    " and only one output. You are trying"
+                    " to set a inference pipeline with"
+                    f" '{nb_outputs}' output(s): \n - {outputs_txt}"
+                    " "
+                )
+            )
 
     def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
@@ -136,36 +192,7 @@ class PipelineML(Pipeline):
         }
         return artifacts
 
-    @property
-    def training(self):
-        return Pipeline(self.nodes)
-
-    def _check_input_name(self, input_name: str) -> str:
-        allowed_names = self.inference.inputs()
-        pp_allowed_names = "\n    - ".join(allowed_names)
-        if input_name not in allowed_names:
-            raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but it must be an input of 'inference', i.e. one of: \n    - {pp_allowed_names}"
-            )
-        else:
-            free_inputs_set = (
-                self.inference.inputs() - {input_name} - self.all_outputs()
-            )
-            if len(free_inputs_set) > 0:
-                raise KedroMlflowPipelineMLInputsError(
-                    """
-                    The following inputs are free for the inference pipeline:
-                    - {inputs}.
-                    No free input is allowed.
-                    Please make sure that 'inference.pipeline.inputs()' are all in 'training.pipeline.all_outputs()',
-                    except eventually 'input_name'.""".format(
-                        inputs="\n     - ".join(free_inputs_set)
-                    )
-                )
-
-        return None
-
-    def _turn_pipeline_to_ml(self, pipeline):
+    def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(
             nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
         )
@@ -230,10 +257,15 @@ class PipelineML(Pipeline):
 
 
 class KedroMlflowPipelineMLInputsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid
+    """Error raised when the inputs of KedroPipelineModel are invalid
     """
 
 
 class KedroMlflowPipelineMLDatasetsError(Exception):
     """Error raised when the inputs of KedroPipelineMoel are invalid
+    """
+
+
+class KedroMlflowPipelineMLOutputsError(Exception):
+    """Error raised when the outputs of KedroPipelineModel are invalid
     """

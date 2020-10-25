@@ -83,7 +83,7 @@ def test_model_packaging(tmp_path, pipeline_ml_obj):
     loaded_model = mlflow.pyfunc.load_model(
         model_uri=(Path(r"runs:/") / run_id / "model").as_posix()
     )
-    assert loaded_model.predict(1) == {"predictions": 2}
+    assert loaded_model.predict(1) == 2
 
 
 # should very likely add tests to see what happens when the artifacts

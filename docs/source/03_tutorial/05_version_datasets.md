@@ -67,7 +67,7 @@ The location where artifact will be stored does not depends of the logging funct
 
 You can also refer to [this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/15) for further details.
 
-In ``kedro-mlflow==0.2.0`` you must configure these elements by yourself. Further releases will introduce helpers for configuration.
+In ``kedro-mlflow==0.3.0`` you must configure these elements by yourself. Further releases will introduce helpers for configuration.
 
 ### Can I log an artifact in a specific run?
 The ``MlflowArtifactDataSet`` has an extra argument ``run_id`` which specifies the run in which the artifact will be logged. **Be cautious, because this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be logged in another run that all the other data of the run.

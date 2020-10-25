@@ -19,6 +19,8 @@
 
 - Documentation reference to the plugin is now dynamic when necessary (#6).
 - The test coverage now excludes `tests` and `setup.py` (#99).
+- The `KedroPipelineModel` now unpacks the result of the `inference` pipeline and no longer returns a dictionary with the name in the `DataCatalog` but only the predicted value (#93).
+
 
 ### Removed
 

@@ -17,8 +17,8 @@
 
 ### Changed
 
-- `MlflowNodeHook` now has a `before_pipeline_run` hook which stores the `ProjectContext` and enable to retrieve configuration (#66).
 - Documentation reference to the plugin is now dynamic when necessary (#6).
+- The test coverage now excludes `tests` and `setup.py` (#99).
 
 ### Removed
 

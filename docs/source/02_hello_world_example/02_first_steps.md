@@ -7,7 +7,6 @@ kedro mlflow init
 You have the following message:
 ```console
 'conf/base/mlflow.yml' successfully updated.
-'run.py' successfully updated
 ```
 
 The ``conf/base`` folder is updated:

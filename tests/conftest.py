@@ -64,7 +64,7 @@ def config_dir(tmp_path):
             {
                 "context_path": "dummy_package.run.ProjectContext",
                 "project_name": "dummy_package",
-                "project_version": "0.16.4",
+                "project_version": "0.16.5",
                 "package_name": "dummy_package",
             }
         ),
@@ -79,7 +79,7 @@ def config_dir(tmp_path):
                 "from kedro.config import TemplatedConfigLoader \n"
                 "class ProjectContext(KedroContext):\n",
                 "    project_name = 'dummy_package'\n",
-                "    project_version = '0.16.4'\n",
+                "    project_version = '0.16.5'\n",
                 "    package_name = 'dummy_package'\n",
             ]
         )

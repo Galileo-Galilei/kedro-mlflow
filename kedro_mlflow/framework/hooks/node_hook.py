@@ -90,6 +90,9 @@ class MlflowNodeHook:
         mlflow.log_params(params_inputs)
 
 
+mlflow_node_hook = MlflowNodeHook()
+
+
 def flatten_dict(d, recursive: bool = True, sep="."):
     def expand(key, value):
         if isinstance(value, dict):

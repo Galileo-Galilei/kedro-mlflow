@@ -53,7 +53,7 @@ def dummy_run_params(tmp_path):
         "run_id": "",
         "project_path": tmp_path.as_posix(),
         "env": "local",
-        "kedro_version": "0.16.4",
+        "kedro_version": "0.16.5",
         "tags": [],
         "from_nodes": [],
         "to_nodes": [],

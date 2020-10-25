@@ -4,7 +4,8 @@
 
 ### Added
 
--
+- `kedro-mlflow` now supports kedro 0.16.5 (#62)
+- `kedro-mlflow` hooks can now be declared in `.kedro.yml` or `pyproject.toml` by adding `kedro_mlflow.framework.hooks.mlflow_pipeline_hook` and `kedro_mlflow.framework.hooks.mlflow_node_hook` into the hooks entry. _Only for kedro>=0.16.5_
 
 ### Fixed
 
@@ -16,7 +17,11 @@
 
 ### Changed
 
-- `MlflowNodeHook` have now a before_pipeline_run hook which stores the ProjectContext and enable to retrieve configuration.
+- `MlflowNodeHook` now has a before_pipeline_run hook which stores the ProjectContext and enable to retrieve configuration.
+
+### Removed
+
+`kedro mlflow init` command is no longer declaring hooks in `run.py`. You must now [register your hooks manually](docs/source/03_tutorial/02_setup.md#declaring-kedro-mlflow-hooks) in the ``run.py`` (kedro > 0.16.0), ``.kedro.yml`` (kedro >= 0.16.5) or ``pyproject.toml`` (kedro >= 0.16.5)
 
 ## [0.3.0] - 2020-10-11
 

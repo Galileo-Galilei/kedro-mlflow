@@ -1,6 +1,7 @@
 import sys
 
 import mlflow
+import pandas as pd
 import pytest
 import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
@@ -8,6 +9,7 @@ from kedro.framework.context import KedroContext, load_context
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
+from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.context import get_mlflow_config
@@ -79,7 +81,9 @@ def env_from_environment(environment_path, env_from_dict):
     with open(environment_path, mode="w") as file_handler:
         yaml.dump(env_from_dict, file_handler)
 
-    return env_from_dict
+    env_from_environment = env_from_dict
+
+    return env_from_environment
 
 
 @pytest.mark.parametrize(
@@ -183,7 +187,7 @@ def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(1),
+            "raw_data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
@@ -192,6 +196,13 @@ def dummy_catalog(tmp_path):
         }
     )
     return dummy_catalog
+
+
+@pytest.fixture
+def dummy_signature(dummy_catalog, dummy_pipeline_ml):
+    input_data = dummy_catalog.load(dummy_pipeline_ml.input_name)
+    dummy_signature = infer_signature(input_data)
+    return dummy_signature
 
 
 @pytest.fixture
@@ -278,10 +289,12 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     mlflow_conf = get_mlflow_config(context)
     mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
     run_data = mlflow_client.get_run(run_id).data
+
     # all run_params are recorded as tags
     for k, v in dummy_run_params.items():
         if v:
             assert run_data.tags[k] == str(v)
+
     # params are not recorded because we don't have MlflowNodeHook here
     # and the model should not be logged when it is not a PipelineML
     nb_artifacts = len(mlflow_client.list_artifacts(run_id))
@@ -289,10 +302,18 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         assert nb_artifacts == 1
     else:
         assert nb_artifacts == 0
+
     # Check if metrics datasets have prefix with its names.
     # for metric
     assert dummy_catalog._data_sets["my_metrics"]._prefix == "my_metrics"
     assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
+
+    if isinstance(pipeline_to_run, PipelineML):
+        trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
+        assert trained_model.metadata.signature.to_dict() == {
+            "inputs": '[{"name": "a", "type": "long"}]',
+            "outputs": None,
+        }
 
 
 def test_mlflow_pipeline_hook_metrics_with_run_id(
@@ -318,7 +339,7 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
 
     dummy_catalog_with_run_id = DataCatalog(
         {
-            "raw_data": MemoryDataSet(1),
+            "raw_data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
@@ -371,6 +392,70 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
     assert all_runs_id == {current_run_id, existing_run_id}
     assert run_data.metrics["my_metrics.metric_key"] == 1.1
     assert run_data.metrics["foo.metric_key"] == 1.1
+
+
+@pytest.mark.parametrize(
+    "model_signature,expected_signature",
+    (
+        [None, None],
+        ["auto", pytest.lazy_fixture("dummy_signature")],
+        [
+            pytest.lazy_fixture("dummy_signature"),
+            pytest.lazy_fixture("dummy_signature"),
+        ],
+    ),
+)
+def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
+    mocker,
+    monkeypatch,
+    tmp_path,
+    config_dir,
+    env_from_dict,
+    dummy_pipeline,
+    dummy_catalog,
+    dummy_run_params,
+    dummy_mlflow_conf,
+    model_signature,
+    expected_signature,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    monkeypatch.chdir(tmp_path)
+    pipeline_hook = MlflowPipelineHook()
+    runner = SequentialRunner()
+
+    pipeline_to_run = pipeline_ml_factory(
+        training=dummy_pipeline.only_nodes_with_tags("training"),
+        inference=dummy_pipeline.only_nodes_with_tags("inference"),
+        input_name="raw_data",
+        conda_env=env_from_dict,
+        model_name="model",
+        model_signature=model_signature,
+    )
+
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
+    pipeline_hook.before_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+    runner.run(pipeline_to_run, dummy_catalog)
+    run_id = mlflow.active_run().info.run_id
+    pipeline_hook.after_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+
+    # test : parameters should have been logged
+    trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
+    assert trained_model.metadata.signature == expected_signature
 
 
 def test_generate_kedro_commands():

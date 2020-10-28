@@ -2,9 +2,7 @@ import subprocess
 from pathlib import Path
 
 import click
-from kedro import __version__ as kedro_version
 from kedro.framework.context import load_context
-from packaging import version
 
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 from kedro_mlflow.framework.context import get_mlflow_config
@@ -12,8 +10,10 @@ from kedro_mlflow.utils import _already_updated, _is_kedro_project
 
 try:
     from kedro.framework.context import get_static_project_data
-except ImportError: # pragma: no cover
-    from kedro_mlflow.utils import _get_project_globals as get_static_project_data # pragma: no cover
+except ImportError:  # pragma: no cover
+    from kedro_mlflow.utils import (
+        _get_project_globals as get_static_project_data,  # pragma: no cover
+    )
 
 
 TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
@@ -49,15 +49,13 @@ class KedroClickGroup(click.Group):
 
 @click.group(name="Mlflow")
 def commands():
-    """Kedro plugin for interactions with mlflow.
-    """
+    """Kedro plugin for interactions with mlflow."""
     pass  # pragma: no cover
 
 
 @commands.command(name="mlflow", cls=KedroClickGroup)
 def mlflow_commands():
-    """Use mlflow-specific commands inside kedro project.
-    """
+    """Use mlflow-specific commands inside kedro project."""
     pass
 
 
@@ -128,8 +126,8 @@ def init(force, silent):
 )
 def ui(project_path, env):
     """Opens the mlflow user interface with the
-        project-specific settings of mlflow.yml. This interface
-        enables to browse and compares runs.
+    project-specific settings of mlflow.yml. This interface
+    enables to browse and compares runs.
 
     """
 
@@ -148,8 +146,7 @@ def ui(project_path, env):
 
 @mlflow_commands.command()
 def run():
-    """Re-run an old run with mlflow-logged info.
-    """
+    """Re-run an old run with mlflow-logged info."""
 
     # TODO (HARD) : define general assumptions to check whether a run
     #  is reproductible or not
@@ -163,13 +160,11 @@ def run():
 
 @mlflow_commands.command()
 def new():
-    """Create a new kedro project with updated template.
-    """
+    """Create a new kedro project with updated template."""
     raise NotImplementedError  # pragma: no cover
 
 
 class KedroMlflowCliError(Exception):
-    """ kedro-mlflow cli specific error
-    """
+    """kedro-mlflow cli specific error"""
 
     pass

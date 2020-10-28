@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Iterable, Optional, Union
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
+from mlflow.models import ModelSignature
 
 MSG_NOT_IMPLEMENTED = (
     "This method is not implemented because it does"
@@ -43,6 +44,7 @@ class PipelineML(Pipeline):
         input_name: str,
         conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
         model_name: Optional[str] = "model",
+        model_signature: Union[ModelSignature, str, None] = "auto",
     ):
 
         """Store all necessary information for calling mlflow.log_model in the pipeline.
@@ -77,6 +79,13 @@ class PipelineML(Pipeline):
             model_name (Union[str, None], optional): The name of
                 the folder where the model will be stored in
                 remote mlflow. Defaults to "model".
+            model_signature (Union[ModelSignature, bool]): The mlflow
+             signature of the input dataframe common to training
+             and inference.
+                   - If 'auto', it is infered automatically
+                   - If None, no signature is used
+                   - if a `ModelSignature` instance, passed
+                   to the underlying dataframe
         """
 
         super().__init__(nodes, *args, tags=tags)
@@ -85,16 +94,30 @@ class PipelineML(Pipeline):
         self.conda_env = conda_env
         self.model_name = model_name
         self.input_name = input_name
+        self.model_signature = model_signature
 
         self._check_consistency()
 
     @property
-    def input_name(self) -> str:
-        return self._input_name
-
-    @property
     def _logger(self) -> logging.Logger:
         return logging.getLogger(__name__)
+
+    @property
+    def training(self) -> Pipeline:
+        return Pipeline(self.nodes)
+
+    @property
+    def inference(self) -> str:
+        return self._inference
+
+    @inference.setter
+    def inference(self, inference: Pipeline) -> None:
+        self._check_inference(inference)
+        self._inference = inference
+
+    @property
+    def input_name(self) -> str:
+        return self._input_name
 
     @input_name.setter
     def input_name(self, name: str) -> None:
@@ -110,17 +133,18 @@ class PipelineML(Pipeline):
         self._input_name = name
 
     @property
-    def inference(self) -> str:
-        return self._inference
+    def model_signature(self) -> str:
+        return self._model_signature
 
-    @inference.setter
-    def inference(self, inference: Pipeline) -> None:
-        self._check_inference(inference)
-        self._inference = inference
-
-    @property
-    def training(self) -> Pipeline:
-        return Pipeline(self.nodes)
+    @model_signature.setter
+    def model_signature(self, model_signature: ModelSignature) -> None:
+        if model_signature is not None:
+            if not isinstance(model_signature, ModelSignature):
+                if model_signature != "auto":
+                    raise ValueError(
+                        f"model_signature must be one of 'None', 'auto', or a 'ModelSignature' Object, got '{type(model_signature)}'"
+                    )
+        self._model_signature = model_signature
 
     def _check_inference(self, inference: Pipeline) -> None:
         nb_outputs = len(inference.outputs())
@@ -276,15 +300,12 @@ class PipelineML(Pipeline):
 
 
 class KedroMlflowPipelineMLInputsError(Exception):
-    """Error raised when the inputs of KedroPipelineModel are invalid
-    """
+    """Error raised when the inputs of KedroPipelineModel are invalid"""
 
 
 class KedroMlflowPipelineMLDatasetsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid
-    """
+    """Error raised when the inputs of KedroPipelineMoel are invalid"""
 
 
 class KedroMlflowPipelineMLOutputsError(Exception):
-    """Error raised when the outputs of KedroPipelineModel are invalid
-    """
+    """Error raised when the outputs of KedroPipelineModel are invalid"""

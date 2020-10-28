@@ -9,6 +9,7 @@ from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.versioning.journal import _git_sha
+from mlflow.models import infer_signature
 
 from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.io import MlflowMetricsDataSet
@@ -136,6 +137,13 @@ class MlflowPipelineHook:
         if isinstance(pipeline, PipelineML):
             pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
             artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
+
+            if pipeline.model_signature == "auto":
+                input_data = pipeline_catalog.load(pipeline.input_name)
+                model_signature = infer_signature(model_input=input_data)
+            else:
+                model_signature = pipeline.model_signature
+
             mlflow.pyfunc.log_model(
                 artifact_path=pipeline.model_name,
                 python_model=KedroPipelineModel(
@@ -143,6 +151,7 @@ class MlflowPipelineHook:
                 ),
                 artifacts=artifacts,
                 conda_env=_format_conda_env(pipeline.conda_env),
+                signature=model_signature,
             )
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
         mlflow.end_run()

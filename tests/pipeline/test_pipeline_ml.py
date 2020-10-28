@@ -248,9 +248,9 @@ def test_filtering_pipeline_ml(
     from_inputs,
 ):
     """When the pipeline is filtered by the context (e.g calling only_nodes_with_tags,
-     from_inputs...), it must return a PipelineML instance with unmodified inference.
-     We loop dynamically on the arguments of the function in case of kedro
-     modify the filters.
+    from_inputs...), it must return a PipelineML instance with unmodified inference.
+    We loop dynamically on the arguments of the function in case of kedro
+    modify the filters.
     """
 
     # dummy_context, pipeline_with_tag, pipeline_ml_with_tag are fixture in conftest
@@ -462,4 +462,25 @@ def test_not_enough_inference_outputs():
                 ]
             ),
             input_name="data",
+        )
+
+
+def test_wrong_pipeline_ml_signature_type(pipeline_with_tag):
+    with pytest.raises(
+        ValueError,
+        match="model_signature must be one of 'None', 'auto', or a 'ModelSignature'",
+    ):
+        pipeline_ml_factory(
+            training=pipeline_with_tag,
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+            model_signature="wrong_type",
         )

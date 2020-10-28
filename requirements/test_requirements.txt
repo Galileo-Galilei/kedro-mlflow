@@ -4,4 +4,4 @@ pytest-lazy-fixture>=0.6.0, <1.0.0
 pytest-mock>=3.1.0, <4.0.0
 flake8>=3.0.0, <4.0.0
 black==19.10b0  # pin black version because it is not compatible with a pip range (because of non semver version number)
-isort>=4.0.0, <5.0.0
+isort>=5.0.0, <6.0.0

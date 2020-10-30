@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
-from warnings import warn
 
 from kedro.pipeline import Pipeline
 from mlflow.models import ModelSignature
@@ -73,24 +72,3 @@ def pipeline_ml_factory(
         model_signature=model_signature,
     )
     return pipeline
-
-
-def pipeline_ml(
-    training: Pipeline,
-    inference: Pipeline,
-    input_name: str = None,
-    conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
-    model_name: Optional[str] = "model",
-) -> PipelineML:
-
-    deprecation_msg = (
-        "'pipeline_ml' is now deprecated and "
-        "has been renamed 'pipeline_ml_factory' "
-        "in 'kedro-mlflow>=0.3.0'. "
-        "\nPlease change your 'pipeline.py' or 'hooks.py' entries "
-        "accordingly, since 'pipeline_ml' will be removed in next release."
-    )
-
-    warn(deprecation_msg, DeprecationWarning, stacklevel=2)
-
-    return pipeline_ml_factory(training, inference, input_name, conda_env, model_name)

@@ -33,13 +33,13 @@ Above implementations have the advantage of being very straightforward and *mlfl
 ``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by kedro-mlflow and the location in Kedro template where the action should be performed.
 
 |Mlflow action                |Template file           |Python API                                        |
-|:----------------------------|:-----------------------|:-------------------------------------------------|
-|Set up configuration         |``mlflow.yml``          |``MlflowPipelineHook``                            |
-|Logging parameters           |``run.py``              |``MlflowNodeHook``                                |
-|Logging artifacts            |``catalog.yml``         |``MlflowArtifactDataSet``                         |
-|Logging models               |NA                      |NA                                                |
-|Logging metrics              |``catalog.yml``         |``MlflowMetricsDataSet``                          |
-|Logging Pipeline as model    |``pipeline.py``         |``KedroPipelineModel`` and ``pipeline_ml_factory``|
+|:----------------------------|:-----------------------|:------------------------------------------------------|
+|Set up configuration         |``mlflow.yml``     |``MlflowPipelineHook``                            |
+|Logging parameters           |``mlflow.yml``     |``MlflowNodeHook``                                |
+|Logging artifacts            |``catalog.yml``    |``MlflowArtifactDataSet``                         |
+|Logging models               |``catalog.yml``    |`MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet`                                             |
+|Logging metrics              |``catalog.yml``    |``MlflowMetricsDataSet``                          |
+|Logging Pipeline as model    |``hooks.py``    |``KedroPipelineModel`` and ``pipeline_ml_factory``|
 
 In the current version (``kedro_mlflow=0.3.0``), `kedro-mlflow` does not provide interface to set tags or log models outside a Kedro ``Pipeline``. These decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 

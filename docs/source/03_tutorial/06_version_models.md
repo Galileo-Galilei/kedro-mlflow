@@ -2,40 +2,52 @@
 
 ## What is model tracking?
 
-MLflow allows to serialize and deserialize models to a common format, track those models in MLflow Tracking and manage them using MLflow Model Registry. Many popular Machine / Deep Learning frameworks have built-in support through what MLflow calls flavors. Even if there's no flavor for your framework of choice, it's easy to create your own flavor and integrate it with MLflow.
+MLflow allows to serialize and deserialize models to a common format, track those models in MLflow Tracking and manage them using MLflow Model Registry. Many popular Machine / Deep Learning frameworks have built-in support through what MLflow calls [flavors](https://www.mlflow.org/docs/latest/models.html#built-in-model-flavors). Even if there's no flavor for your framework of choice, it's easy to [create your own flavor](https://www.mlflow.org/docs/latest/models.html#custom-python-models) and integrate it with MLflow.
 
 ## How to track models using MLflow in Kedro project?
 
-kedro-mlflow introduces a new dataset type that can be used in Data Catalog called ``MlflowModelDataSet``. Suppose you would like to add a scikit-learn model to your Data Catalog. For that you need to an entry like this:
+`kedro-mlflow` introduces two new `DataSet` types that can be used in `DataCatalog` called `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet`. The two have very similar API, except that:
+
+- the ``MlflowModelLoggerDataSet`` is used to load from and save to from the mlflow artifact store. It uses optional `run_id` argument to load and save from a given `run_id` which must exists in the mlflow server you are logging to.
+- the ``MlflowModelSaverDataSet`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
+
+*Important: The ``MlflowModelSaverDataSet`` is a dataset for advanced users who want fine grained control and eventually tweak mlflow models management. You very likely want to __use the ``MlflowModelLoggerDataSet``__ instead.*
+
+Suppose you would like to register a `scikit-learn` model of your `DataCatalog` in mlflow, you can use the following yaml API:
 
 ```yaml
 my_sklearn_model:
-    type: kedro_mlflow.io.MlflowModelDataSet
+    type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
     flavor: mlflow.sklearn
-    path: data/06_models/my_sklearn_model
 ```
 
-You are now able to use ``my_sklearn_model`` in your nodes.
+More informations on available parameters are available in the [dedicated section](docs\source\05_python_objects\01_DataSets.md#mlflowmodelloggerdataset).
+
+You are now able to use ``my_sklearn_model`` in your nodes. Since this model is registered in mlflow, you can also leverage the [mlflow model serving abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-serve) or [predicting on batch abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-predict), as well as the [mlflow models registry](https://www.mlflow.org/docs/latest/model-registry.html) to manage the lifecycle of this model.
 
 ## Frequently asked questions?
 
-## How is it working under the hood?
+### How is it working under the hood?
 
-During save, a model object from node output is save locally under specified ``path`` using ``save_model`` function of the specified ``flavor``. It is then logged to MLflow using ``log_model``.
+**For ``MlflowModelLoggerDataSet``**
 
-When model is loaded, the latest version stored locally is read using ``load_model`` function of the specified ``flavor``. You can also load a model from a specific [Kedro run](#can-i-use-kedro-versioning-with-mlflowmodeldataset) or [MLflow run](#can-i-load-a-model-from-a-specific-mlflow-run-id).
+During save, a model object from node output is logged to mlflow using ``log_model`` function of the specified ``flavor``. It is logged in the `run_id` run if specified and if there is no active run, else in the currently active mlflow run. If the `run_id` is specified and there is an active run, the saving operation will fail. Consequently it will **never be possible to save in a specific mlflow run_id** if you launch a pipeline with the `kedro run` command because the `MlflowPipelineHook` creates a new run before each pipeline run.
+
+During load, the model is retrieved from the ``run_id`` if specified, else it is retrieved from the mlflow active run. If there is no mlflow active run, the loading fails. This will never happen if you are using the `kedro run` command, because the `MlflowPipelineHook` creates a new run before each pipeline run.
+
+**For ``MlflowModelSaverDataSet``**
+
+During save, a model object from node output is saved locally under specified ``filepath`` using ``save_model`` function of the specified ``flavor``.
+
+When model is loaded, the latest version stored locally is read using ``load_model`` function of the specified ``flavor``. You can also load a model from a specific kedro run by specifying the `version` argument to the constructor.
 
 ### How can I track a custom MLflow model flavor?
 
-To track a custom MLflow model flavor you need to set the `flavor` parameter to import path of your custom flavor:
+To track a custom MLflow model flavor you need to set the `flavor` parameter to import path of your custom flavor and to specify a [pyfunc workflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#pyfunc-create-custom-workflows) which can be set either to `python_model` or `loader_module`. The former is the more high level and user friendly and is [recommend by mlflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#which-workflow-is-right-for-my-use-case) while the latter offer more control. We haven't tested the integration in `kedro-mlflow` of this second workflow extensively, and it should be use with caution.
 
 ```yaml
 my_custom_model:
-    type: kedro_mlflow.io.MlflowModelDataSet
+    type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
     flavor: my_package.custom_mlflow_flavor
-    path: data/06_models/my_sklearn_model
+    pyfunc_workflow: python_model # or loader_module
 ```
-
-### Can I use Kedro versioning with `MlflowModelDataSet`?
-
-### Can I load a model from a specific MLflow Run ID?

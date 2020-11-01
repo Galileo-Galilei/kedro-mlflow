@@ -10,20 +10,17 @@ from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import pipeline_ml_factory
 
 
-def preprocess_fun(data):
-    return data
-
-
-def fit_fun(data):
-    return 2
-
-
-def predict_fun(model, data):
-    return data * model
-
-
 @pytest.fixture
 def pipeline_ml_obj():
+    def preprocess_fun(data):
+        return data
+
+    def fit_fun(data):
+        return 2
+
+    def predict_fun(model, data):
+        return data * model
+
     full_pipeline = Pipeline(
         [
             node(

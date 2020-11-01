@@ -1,15 +1,20 @@
-# New ``DataSet``:
+# New ``DataSet``
+
 ## ``MlflowArtifactDataSet``
+
 ``MlflowArtifactDataSet`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
-```
+
+```yaml
 my_dataset_to_version:
     type: kedro_mlflow.io.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
 ```
+
 or with additional parameters:
-```
+
+```python
 my_dataset_to_version:
     type: kedro_mlflow.io.MlflowArtifactDataSet
     data_set:
@@ -23,11 +28,90 @@ my_dataset_to_version:
     run_id: 13245678910111213  # a valid mlflow run to log in. If None, default to active run
     artifact_path: reporting  # relative path where the artifact must be stored. if None, saved in root folder.
 ```
+
 or with the python API:
-```
+
+```python
 from kedro_mlflow.io import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
 csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet,
                                       "filepath": r"/path/to/a/local/destination/file.csv"})
 csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
+```
+
+## Models `DataSets`
+
+### ``MlflowModelLoggerDataSet``
+
+The ``MlflowModelLoggerDataSet`` accepts the following arguments:
+
+- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
+- run_id (Optional[str], optional): MLflow run ID to use to load the model from or save the model to. It plays the same role as "filepath" for standard mlflow datasets. Defaults to None.
+- artifact_path (str, optional): the run relative path tothe model.
+- pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
+- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- save_args (Dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`. Defaults to None.
+
+You can either only specify the flavor:
+
+```python
+from kedro_mlflow.io.models import MlflowModelLoggerDataSet
+from sklearn.linear_model import LinearRegression
+
+mlflow_model_logger=MlflowModelLoggerDataSet(flavor="mlflow.sklearn")
+mlflow_model_logger.save(LinearRegression())
+```
+
+Let assume that this first model has been saved once, and you xant to retrieve it (for prediction for instance):
+
+```python
+mlflow_model_logger=MlflowModelLoggerDataSet(flavor="mlflow.sklearn", run_id=<the-model-run-id>)
+my_linear_regression=mlflow_model_logger.load()
+my_linear_regression.predict(<data>) # will obviously fail if you have not fitted your model object first :)
+```
+
+You can also specify some [logging parameters](https://www.mlflow.org/docs/latest/python_api/mlflow.sklearn.html#mlflow.sklearn.log_model):
+
+```python
+mlflow_model_logger=MlflowModelLoggerDataSet(
+    flavor="mlflow.sklearn",
+     run_id=<the-model-run-id>,
+     save_args={
+         "conda_env": {"python": "3.7.0"},
+          "input_example": data.iloc[0:5,:]
+          }
+    )
+mlflow_model_logger.save(LinearRegression().fit(data))
+```
+
+### ``MlflowModelSaverDataSet``
+
+The ``MlflowModelLoggerDataSet`` accepts the following arguments:
+
+- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
+- filepath (str): Path to store the dataset locally.
+- pyfunc_workflow (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
+- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- save_args (Dict[str, Any], optional): Arguments to `save_model` function from specified `flavor`. Defaults to None.
+- version (Version, optional): Kedro version to use. Defaults to None.
+
+The use ifs very similar to MlflowModelLoggerDataSet, but that you specify a filepath instead of a `run_id`:
+
+```python
+from kedro_mlflow.io.models import MlflowModelLoggerDataSet
+from sklearn.linear_model import LinearRegression
+
+mlflow_model_logger=MlflowModelSaverDataSet(flavor="mlflow.sklearn", filepath="path/to/where/you/want/model")
+mlflow_model_logger.save(LinearRegression().fit(data))
+```
+
+The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataSet`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataSet.html)
+
+```python
+
+mlflow_model_logger=MlflowModelSaverDataSet(
+    flavor="mlflow.sklearn",
+    filepath="path/to/where/you/want/model",
+    version="<valid-kedro-version>")
+my_model= mlflow_model_logger.load()
 ```

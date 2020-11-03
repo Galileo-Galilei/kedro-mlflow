@@ -8,7 +8,7 @@ from kedro.extras.datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
-from kedro_mlflow.io import MlflowArtifactDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 
 
 @pytest.fixture

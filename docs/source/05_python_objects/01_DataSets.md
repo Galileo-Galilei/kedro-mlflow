@@ -6,7 +6,7 @@
 
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -16,7 +16,7 @@ or with additional parameters:
 
 ```python
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -32,7 +32,7 @@ my_dataset_to_version:
 or with the python API:
 
 ```python
-from kedro_mlflow.io import MlflowArtifactDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
 csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet,
                                       "filepath": r"/path/to/a/local/destination/file.csv"})

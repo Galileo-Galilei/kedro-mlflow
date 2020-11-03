@@ -18,7 +18,7 @@ from kedro_mlflow.framework.hooks.pipeline_hook import (
     _format_conda_env,
     _generate_kedro_command,
 )
-from kedro_mlflow.io import MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import MlflowMetricsDataSet
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 

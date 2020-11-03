@@ -26,7 +26,7 @@ You can change it to:
 
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/LOCAL/destination/file.csv # must be a local file, wherever you want to log the data in the end
@@ -39,7 +39,7 @@ The ``MlflowArtifactDataSet`` takes a ``data_set`` argument which is a python di
 
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -53,7 +53,7 @@ my_dataset_to_version:
 ### Can I use the ``MlflowArtifactDataSet`` in interactive mode?
 Like all Kedro ``AbstractDataSet``, ``MlflowArtifactDataSet`` is callable in the python API:
 ```python
-from kedro_mlflow.io import MlflowArtifactDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
 csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet, # either a string "pandas.CSVDataSet" or the class
                                       "filepath": r"/path/to/a/local/destination/file.csv"})
@@ -73,7 +73,7 @@ In ``kedro-mlflow==0.3.0`` you must configure these elements by yourself. Furthe
 The ``MlflowArtifactDataSet`` has an extra argument ``run_id`` which specifies the run in which the artifact will be logged. **Be cautious, because this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be logged in another run that all the other data of the run.
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -84,7 +84,7 @@ my_dataset_to_version:
 The ``MlflowArtifactDataSet`` has an extra argument ``run_id`` which specifies a remote subfolder where the artifact will be logged. It must be a relative path.
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv

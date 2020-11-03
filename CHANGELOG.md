@@ -8,7 +8,7 @@
 - `kedro-mlflow` now supports configuring the project in `pyproject.toml`  (_Only for kedro>=0.16.5_) ([#96](https://github.com/Galileo-Galilei/kedro-mlflow/issues/96))
 - `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` ([#71](https://github.com/Galileo-Galilei/kedro-mlflow/issues/71))
 - `pipeline_ml_factory` now infer automatically the schema of the input dataset to validate data automatically at inference time. The output schema can be declared manually in `model_signature` argument ([#70](https://github.com/Galileo-Galilei/kedro-mlflow/issues/70))
-- Add two Datasets for model logging and saving: `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
+- Add two DataSets for model logging and saving: `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
 - `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/07_extend_kedro/04_hooks.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
 
 ### Fixed
@@ -24,6 +24,8 @@
 
 - The `KedroPipelineModel` now unpacks the result of the `inference` pipeline and no longer returns a dictionary with the name in the `DataCatalog` but only the predicted value ([#93](https://github.com/Galileo-Galilei/kedro-mlflow/issues/93))
 - The `PipelineML.extract_pipeline_catalog` is renamed `PipelineML._extract_pipeline_catalog` to indicate it is a private method and is not intended to be used directly by end users who should rely on `PipelineML.extract_pipeline_artifacts` ([#100](https://github.com/Galileo-Galilei/kedro-mlflow/issues/100))
+- The `MlflowArtifactDataSet` is moved from `kedro_mlflow.io` folder to `kedro_mlflow.io.artifacts`. ([#109](https://github.com/Galileo-Galilei/kedro-mlflow/issues/109))
+- The `MlflowMetricsDataSet` is moved from `kedro_mlflow.io` folder to `kedro_mlflow.io.metrics`. ([#109](https://github.com/Galileo-Galilei/kedro-mlflow/issues/109))
 
 ### Removed
 

@@ -8,9 +8,8 @@ This page explains how to migrate between versions with breaking changes, if you
 
 Replace the follwoing entries:
 
-|---------------------------------------|-------------------------------------------------|
 |old                                    |new                                              |
-|---------------------------------------|-------------------------------------------------|
+|:--------------------------------------|:------------------------------------------------|
 |`kedro_mlflow.io.MlflowArtifactDataSet`|`kedro_mlflow.io.artifacts.MlflowArtifactDataSet`|
 |`kedro_mlflow.io.MlflowMetricsDataSet` |`kedro_mlflow.io.metrics.MlflowMetricsDataSet`   |
 

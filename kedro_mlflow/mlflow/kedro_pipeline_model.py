@@ -12,8 +12,10 @@ class KedroPipelineModel(PythonModel):
     def __init__(self, pipeline_ml: PipelineML, catalog: DataCatalog):
 
         self.pipeline_ml = pipeline_ml
-        self.initial_catalog = pipeline_ml.extract_pipeline_catalog(catalog)
+        self.initial_catalog = pipeline_ml._extract_pipeline_catalog(catalog)
         self.loaded_catalog = DataCatalog()
+        # we have the guarantee that there is only one output in inference
+        self.output_name = list(pipeline_ml.inference.outputs())[0]
 
     def load_context(self, context):
 
@@ -33,7 +35,11 @@ class KedroPipelineModel(PythonModel):
                 kedro_artifacts_keys - mlflow_artifacts_keys
             )
             raise ValueError(
-                f"Provided artifacts do not match catalog entries:\n- 'artifacts - inference.inputs()' = : {in_artifacts_but_not_inference}'\n- 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}'"
+                (
+                    "Provided artifacts do not match catalog entries:"
+                    f"\n    - 'artifacts - inference.inputs()' = : {in_artifacts_but_not_inference}"
+                    f"\n    - 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}"
+                )
             )
 
         self.loaded_catalog = deepcopy(self.initial_catalog)
@@ -53,4 +59,6 @@ class KedroPipelineModel(PythonModel):
         run_outputs = runner.run(
             pipeline=self.pipeline_ml.inference, catalog=self.loaded_catalog
         )
-        return run_outputs
+        return run_outputs[
+            self.output_name
+        ]  # unpack the result to avoid messing the json output

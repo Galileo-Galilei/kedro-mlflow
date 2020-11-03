@@ -1,5 +1,4 @@
 from typing import Any, Dict, Union
-from warnings import warn
 
 import mlflow
 from kedro.io import AbstractVersionedDataSet
@@ -90,29 +89,3 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
         and consequently does not implements abtracts methods
         """
         pass
-
-
-class MlflowDataSet(MlflowArtifactDataSet):
-    def __new__(
-        cls,
-        data_set: Union[str, Dict],
-        run_id: str = None,
-        artifact_path: str = None,
-        credentials: Dict[str, Any] = None,
-    ):
-        deprecation_msg = (
-            "'MlflowDataSet' is now deprecated and "
-            "has been renamed 'MlflowArtifactDataSet' "
-            "in 'kedro-mlflow>=0.3.0'. "
-            "\nPlease change your 'catalog.yml' entries accordingly, "
-            "since 'MlflowDataSet' will be removed in next release."
-        )
-
-        warn(deprecation_msg, DeprecationWarning, stacklevel=2)
-        super().__new__(
-            cls=cls,
-            data_set=data_set,
-            run_id=run_id,
-            artifact_path=artifact_path,
-            credentials=credentials,
-        )

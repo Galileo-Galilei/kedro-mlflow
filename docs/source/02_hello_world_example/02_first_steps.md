@@ -1,31 +1,37 @@
 # First steps with the plugins
+
 ## Initialize kedro-mlflow
+
 Run
+
 ```console
 kedro mlflow init
 ```
+
 You have the following message:
+
 ```console
 'conf/base/mlflow.yml' successfully updated.
-'run.py' successfully updated
 ```
 
 The ``conf/base`` folder is updated:
 
-![](../imgs/initialized_project.png)
+![initialized_project](../imgs/initialized_project.png)
 
 If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below:):
 
-![](../imgs/mlflow_yml.png)
+![mlflow_yml](../imgs/mlflow_yml.png)
 
 ## Run the pipeline
 
 Open a new command and launch
+
 ```console
 kedro run
 ```
 
 If the pipeline executes properly, you should see the following log:
+
 ```console
 2020-07-13 21:29:24,939 - kedro.versioning.journal - WARNING - Unable to git describe path/to/km-example
 2020-07-13 21:29:25,401 - kedro.io.data_catalog - INFO - Loading data from `example_iris_data` (CSVDataSet)...
@@ -57,11 +63,12 @@ If the pipeline executes properly, you should see the following log:
 
 Since we have kept the default value of the ``mlflow.yml``, the tracking uri (the place where runs are recorded) is a local ``mlruns`` folder which has just been created with the execution:
 
-![](../imgs/once_run_project.png)
+![once_run_project](../imgs/once_run_project.png)
 
 ## Open the UI
 
 Launch the ui:
+
 ```console
 kedro mlflow ui
 ```
@@ -70,15 +77,18 @@ And open the following adress in your favorite browser
 
 ``http://localhost:5000/``
 
-![](../imgs/mlflow_host_page.png)
+![mlflow_host_page](../imgs/mlflow_host_page.png)
 
 Click now on the last run executed, you will land on this page:
 
-![](../imgs/mlflow_run.png)
+![mlflow_run](../imgs/mlflow_run.png)
 
 ### Parameters versioning
+
 Note that the parameters have been recorded *automagically*. Here, two parameters format are used:
-1. The parameter ``example_test_data_ratio``, which is called in the ``pipeline.py`` file with the ``params:`` prefix
+
+1. The parameter ``example_test_data_ratio``, which is called in the ``pipeline.py`` file with the
+``params:`` prefix
 2. the dictionary of all parameters in ``parameters.yml`` which is a reserved key word in ``Kedro``. Note that **this is bad practice** because you cannot know which parameters are really used inside the function called. Another problem is that it can generate too long parameters names and lead to mlflow errors.
 
 You can see that these are effectively the registered parameters in the pipeline with the ``kedro-viz`` plugin:
@@ -90,13 +100,13 @@ kedro viz
 
 Open your browser at the following adress:
 
-```
+```browser
 http://localhost:4141/
 ```
 
 You should see the following graph:
 
-![](../imgs/kedro_viz_params.png)
+![kedro_viz_params](../imgs/kedro_viz_params.png)
 
 which indicates clearly which parameters are logged (in the red boxes with the "parameter" icon).
 
@@ -110,16 +120,16 @@ With this run, artifacts are empty. This is expected: mlflow does not know what 
 
 First, open the ``catalog.yml`` file which should like this:
 
-![](../imgs/default_catalog.png)
+![default_catalog](../imgs/default_catalog.png)
 
 And persist the model as a pickle with the ``MlflowArtifactDataSet`` class:
 
-![](../imgs/updated_catalog.png)
+![updated_catalog](../imgs/updated_catalog.png)
 
 Reopen the ui, select the last run and see that the file was uploaded:
 
-![](../imgs/run_with_artifact.png)
+![run_with_artifact](../imgs/run_with_artifact.png)
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 
-*Note: Mlflow offers specific logging for machine learning models that should be better suited for your use case, but is not supported yet in ``kedro-mlflow==0.2.0``*
+*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowModelLoggerDataSet`*

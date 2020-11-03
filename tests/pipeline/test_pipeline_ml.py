@@ -8,7 +8,7 @@ from kedro.pipeline import Pipeline, node
 from kedro_mlflow.pipeline import (
     KedroMlflowPipelineMLDatasetsError,
     KedroMlflowPipelineMLInputsError,
-    pipeline_ml,
+    KedroMlflowPipelineMLOutputsError,
     pipeline_ml_factory,
 )
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
@@ -32,6 +32,18 @@ def train_fun(data):
 
 def predict_fun(model, data):
     return data * model
+
+
+def predict_fun_with_metric(model, data):
+    return data * model, "super_metric"
+
+
+def predict_fun_return_nothing(model, data):
+    pass
+
+
+def remove_stopwords(data, stopwords):
+    return data
 
 
 @pytest.fixture
@@ -61,23 +73,6 @@ def pipeline_ml_with_tag(pipeline_with_tag):
         input_name="data",
     )
     return pipeline_ml_with_tag
-
-
-def test_raise_deprecation_warning_pipeline_ml(pipeline_with_tag):
-    with pytest.deprecated_call():
-        pipeline_ml(
-            training=pipeline_with_tag,
-            inference=Pipeline(
-                [
-                    node(
-                        func=predict_fun,
-                        inputs=["model", "data"],
-                        outputs="predictions",
-                    )
-                ]
-            ),
-            input_name="data",
-        )
 
 
 @pytest.fixture
@@ -116,12 +111,44 @@ def pipeline_ml_with_intermediary_artifacts():
             ),
         ]
     )
-    pipeline_ml_with_tag = pipeline_ml_factory(
+    pipeline_ml_with_intermediary_artifacts = pipeline_ml_factory(
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
     )
-    return pipeline_ml_with_tag
+    return pipeline_ml_with_intermediary_artifacts
+
+
+@pytest.fixture
+def pipeline_ml_with_inputs_artifacts():
+    full_pipeline = Pipeline(
+        [
+            node(
+                func=remove_stopwords,
+                inputs=dict(data="data", stopwords="stopwords_from_nltk"),
+                outputs="cleaned_data",
+                tags=["training", "inference"],
+            ),
+            node(
+                func=train_fun,
+                inputs="cleaned_data",
+                outputs="model",
+                tags=["training"],
+            ),
+            node(
+                func=predict_fun,
+                inputs=["model", "cleaned_data"],
+                outputs="predictions",
+                tags=["inference"],
+            ),
+        ]
+    )
+    pipeline_ml_with_inputs_artifacts = pipeline_ml_factory(
+        training=full_pipeline.only_nodes_with_tags("training"),
+        inference=full_pipeline.only_nodes_with_tags("inference"),
+        input_name="data",
+    )
+    return pipeline_ml_with_inputs_artifacts
 
 
 @pytest.fixture
@@ -166,6 +193,19 @@ def catalog_with_encoder():
     return catalog_with_encoder
 
 
+@pytest.fixture
+def catalog_with_stopwords():
+    catalog_with_stopwords = DataCatalog(
+        {
+            "data": MemoryDataSet(),
+            "cleaned_data": MemoryDataSet(),
+            "stopwords_from_nltk": CSVDataSet("fake/path/to/stopwords.csv"),
+            "model": CSVDataSet("fake/path/to/model.csv"),
+        }
+    )
+    return catalog_with_stopwords
+
+
 @pytest.mark.parametrize(
     "tags,from_nodes,to_nodes,node_names,from_inputs",
     [
@@ -190,9 +230,9 @@ def test_filtering_pipeline_ml(
     from_inputs,
 ):
     """When the pipeline is filtered by the context (e.g calling only_nodes_with_tags,
-     from_inputs...), it must return a PipelineML instance with unmodified inference.
-     We loop dynamically on the arguments of the function in case of kedro
-     modify the filters.
+    from_inputs...), it must return a PipelineML instance with unmodified inference.
+    We loop dynamically on the arguments of the function in case of kedro
+    modify the filters.
     """
 
     # dummy_context, pipeline_with_tag, pipeline_ml_with_tag are fixture in conftest
@@ -287,10 +327,15 @@ def test_filtering_generate_invalid_pipeline_ml(
             pytest.lazy_fixture("catalog_with_encoder"),
             {"model", "data", "encoder"},
         ),
+        (
+            pytest.lazy_fixture("pipeline_ml_with_inputs_artifacts"),
+            pytest.lazy_fixture("catalog_with_stopwords"),
+            {"model", "data", "stopwords_from_nltk"},
+        ),
     ],
 )
 def test_catalog_extraction(pipeline_ml_obj, catalog, result):
-    filtered_catalog = pipeline_ml_obj.extract_pipeline_catalog(catalog)
+    filtered_catalog = pipeline_ml_obj._extract_pipeline_catalog(catalog)
     assert set(filtered_catalog.list()) == result
 
 
@@ -300,7 +345,7 @@ def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
         KedroMlflowPipelineMLDatasetsError,
         match="since it is an input for inference pipeline",
     ):
-        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
 
 
 def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
@@ -311,14 +356,14 @@ def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
         KedroMlflowPipelineMLDatasetsError,
         match="The datasets of the training pipeline must be persisted locally",
     ):
-        pipeline_ml_with_tag.extract_pipeline_catalog(catalog)
+        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
 
 
 def test_too_many_free_inputs():
     with pytest.raises(
         KedroMlflowPipelineMLInputsError, match="No free input is allowed"
     ):
-        pipeline_ml(
+        pipeline_ml_factory(
             training=Pipeline(
                 [
                     node(
@@ -360,3 +405,64 @@ def test_invalid_input_name(pipeline_ml_with_tag):
         match="input_name='whoops_bad_name' but it must be an input of 'inference'",
     ):
         pipeline_ml_with_tag.input_name = "whoops_bad_name"
+
+
+def test_too_many_inference_outputs():
+    with pytest.raises(
+        KedroMlflowPipelineMLOutputsError,
+        match="The inference pipeline must have one and only one output",
+    ):
+        pipeline_ml_factory(
+            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun_with_metric,
+                        inputs=["model", "data"],
+                        outputs=["predictions", "metric"],
+                    )
+                ]
+            ),
+            input_name="data",
+        )
+
+
+def test_not_enough_inference_outputs():
+    with pytest.raises(
+        KedroMlflowPipelineMLOutputsError,
+        match="The inference pipeline must have one and only one output",
+    ):
+        pipeline_ml_factory(
+            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun_return_nothing,
+                        inputs=["model", "data"],
+                        outputs=None,
+                    )
+                ]
+            ),
+            input_name="data",
+        )
+
+
+def test_wrong_pipeline_ml_signature_type(pipeline_with_tag):
+    with pytest.raises(
+        ValueError,
+        match="model_signature must be one of 'None', 'auto', or a 'ModelSignature'",
+    ):
+        pipeline_ml_factory(
+            training=pipeline_with_tag,
+            inference=Pipeline(
+                [
+                    node(
+                        func=predict_fun,
+                        inputs=["model", "data"],
+                        outputs="predictions",
+                    )
+                ]
+            ),
+            input_name="data",
+            model_signature="wrong_type",
+        )

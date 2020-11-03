@@ -12,7 +12,7 @@ Since it is a ``AbstractDataSet``, it can be used with the YAML API. You can def
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.MlflowMetricsDataSet
+    type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 ```
 
 You can provide a prefix key, which is useful in situations like when you have multiple nodes producing metrics with the same names which you want to distinguish. If you are using the ``MlflowPipelineHook``, it will handle that automatically for you by giving as prefix metrics data set name. In the example above the prefix would be ``my_model_metrics``.
@@ -21,7 +21,7 @@ Let's look at an example with custom prefix:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.MlflowMetricsDataSet
+    type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
     prefix: foo
 ```
 
@@ -37,7 +37,7 @@ def metrics_node() -> Dict[str, Union[float, List[float]]]:
     }
 ```
 
-As you can see above, ``kedro_mlflow.io.MlflowMetricsDataSet`` can take metrics as:
+As you can see above, ``kedro_mlflow.io.metrics.MlflowMetricsDataSet`` can take metrics as:
  - ``Dict[str, key]``,
  - ``List[Dict[str, key]]``
 
@@ -45,7 +45,7 @@ To store metrics we need to define metrics dataset in Kedro Catalog:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.MlflowMetricsDataSet
+    type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 ```
 
 Thanks to ``MlflowPipelineHook`` metrics stored in MLflow will have data set name as a prefix. In our example, it would be: ``my_model_metrics.metric1``, ``my_model_metrics.metric2``.
@@ -54,7 +54,7 @@ We could provide a prefix manually:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.MlflowMetricsDataSet
+    type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
     prefix: foo
 ```
 

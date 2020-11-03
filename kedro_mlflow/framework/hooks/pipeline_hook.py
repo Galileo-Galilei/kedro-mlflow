@@ -4,19 +4,24 @@ from typing import Any, Dict, Union
 
 import mlflow
 import yaml
+from kedro.framework.context import load_context
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.versioning.journal import _git_sha
+from mlflow.models import infer_signature
 
 from kedro_mlflow.framework.context import get_mlflow_config
-from kedro_mlflow.io import MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import MlflowMetricsDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
-from kedro_mlflow.pipeline.pipeline_ml_factory import PipelineML
+from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
 
 
 class MlflowPipelineHook:
+    def __init__(self):
+        self.context = None
+
     @hook_impl
     def after_catalog_created(
         self,
@@ -34,7 +39,8 @@ class MlflowPipelineHook:
                     catalog._data_sets[name] = MlflowMetricsDataSet(
                         run_id=dataset._run_id, prefix=name
                     )
-                catalog._data_sets[name] = MlflowMetricsDataSet(prefix=name)
+                else:
+                    catalog._data_sets[name] = MlflowMetricsDataSet(prefix=name)
 
     @hook_impl
     def before_pipeline_run(
@@ -62,12 +68,15 @@ class MlflowPipelineHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        mlflow_conf = get_mlflow_config(
-            project_path=run_params["project_path"], env=run_params["env"]
+        self.context = load_context(
+            project_path=run_params["project_path"],
+            env=run_params["env"],
+            extra_params=run_params["extra_params"],
         )
+
+        mlflow_conf = get_mlflow_config(self.context)
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
-        # TODO : if the pipeline fails, we need to be able to end stop the mlflow run
-        # cannot figure out how to do this within hooks
+
         run_name = (
             mlflow_conf.run_opts["name"]
             if mlflow_conf.run_opts["name"] is not None
@@ -126,8 +135,15 @@ class MlflowPipelineHook:
         """
 
         if isinstance(pipeline, PipelineML):
-            pipeline_catalog = pipeline.extract_pipeline_catalog(catalog)
+            pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
             artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
+
+            if pipeline.model_signature == "auto":
+                input_data = pipeline_catalog.load(pipeline.input_name)
+                model_signature = infer_signature(model_input=input_data)
+            else:
+                model_signature = pipeline.model_signature
+
             mlflow.pyfunc.log_model(
                 artifact_path=pipeline.model_name,
                 python_model=KedroPipelineModel(
@@ -135,6 +151,7 @@ class MlflowPipelineHook:
                 ),
                 artifacts=artifacts,
                 conda_env=_format_conda_env(pipeline.conda_env),
+                signature=model_signature,
             )
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
         mlflow.end_run()
@@ -175,6 +192,9 @@ class MlflowPipelineHook:
 
         while mlflow.active_run():
             mlflow.end_run()
+
+
+mlflow_pipeline_hook = MlflowPipelineHook()
 
 
 def _generate_kedro_command(

@@ -1,4 +1,5 @@
 # Pipelines
+
 ## ``PipelineML`` and ``pipeline_ml_factory``
 
 ``PipelineML`` is a new class which extends ``Pipeline`` and enable to bind two pipelines (one of training, one of inference) together. This class comes with a ``KedroPipelineModel`` class for logging it in mlflow. A pipeline logged as a mlflow model can be served using ``mlflow models serve`` and ``mlflow models predict`` command.  
@@ -24,7 +25,15 @@ def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
     }
 
 ```
-Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
+
+Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning model, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
+
+Note that:
+
+- the `inference` pipeline `input_name` can be a `MemoryDataSet` and it belongs to inference pipeline `inputs`
+- Apart form `input_name`, all other `inference` pipeline `inputs` must be persisted locally on disk (i.e. it must not be `MemoryDataSet` and must have a local `filepath`)
+- the `inference` pipeline `inputs` must belong to training `outputs` (vectorizer, binarizer, machine learning model...)
+- the `inference` pipeline must have one and only one `output`
 
 *Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:*
 
@@ -32,20 +41,26 @@ Now each time you will run ``kedro run --pipeline=training`` (provided you regis
 from pathlib import Path
 from kedro.framework.context import load_context
 from kedro_mlflow.mlflow import KedroPipelineModel
+from mlflow.models import ModelSignature
 
 # pipeline_training is your PipelineML object, created as previsously
 catalog = load_context(".").io
 
 # artifacts are all the inputs of the inference pipelines that are persisted in the catalog
-pipeline_catalog = pipeline_training.extract_pipeline_catalog(catalog)
-artifacts = {name: Path(dataset._filepath).resolve().as_uri()
-                for name, dataset in pipeline_catalog._data_sets.items()
-                if name != pipeline_training.model_input_name}
+artifacts = pipeline_training.extract_pipeline_artifacts(catalog)
 
+# get the schema of the input dataset
+input_data = catalog.load(pipeline_training.input_name)
+model_signature = infer_signature(model_input=input_data)
 
-mlflow.pyfunc.log_model(artifact_path="model",
-                        python_model=KedroPipelineModel(pipeline_ml=pipeline_training,
-                                                        catalog=pipeline_catalog),
-                        artifacts=artifacts,
-                            conda_env={"python": "3.7.0"})
+mlflow.pyfunc.log_model(
+    artifact_path="model",
+    python_model=KedroPipelineModel(
+            pipeline_ml=pipeline_training,
+            catalog=catalog
+        ),
+    artifacts=artifacts,
+    conda_env={"python": "3.7.0"},
+    model_signature=model_signature
+)
 ```

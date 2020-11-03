@@ -10,20 +10,17 @@ from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import pipeline_ml_factory
 
 
-def preprocess_fun(data):
-    return data
-
-
-def fit_fun(data):
-    return 2
-
-
-def predict_fun(model, data):
-    return data * model
-
-
 @pytest.fixture
 def pipeline_ml_obj():
+    def preprocess_fun(data):
+        return data
+
+    def fit_fun(data):
+        return 2
+
+    def predict_fun(model, data):
+        return data * model
+
     full_pipeline = Pipeline(
         [
             node(
@@ -83,7 +80,7 @@ def test_model_packaging(tmp_path, pipeline_ml_obj):
     loaded_model = mlflow.pyfunc.load_model(
         model_uri=(Path(r"runs:/") / run_id / "model").as_posix()
     )
-    assert loaded_model.predict(1) == {"predictions": 2}
+    assert loaded_model.predict(1) == 2
 
 
 # should very likely add tests to see what happens when the artifacts

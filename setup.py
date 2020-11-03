@@ -26,7 +26,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version="0.3.0",  # this will be bumped automatically by bump2version
+    version="0.4.0",  # this will be bumped automatically by bump2version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
@@ -45,6 +45,10 @@ setup(
         ],
         "kedro.global_commands": [
             "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
+        ],
+        "kedro.hooks": [
+            "mlflow_pipeline_hook = kedro_mlflow.framework.hooks.pipeline_hook:mlflow_pipeline_hook",
+            "mlflow_node_hooks = kedro_mlflow.framework.hooks.node_hook:mlflow_node_hook",
         ],
     },
     zip_safe=False,

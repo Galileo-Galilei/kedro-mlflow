@@ -8,7 +8,7 @@ from kedro.extras.datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
-from kedro_mlflow.io import MlflowArtifactDataSet, MlflowDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 
 
 @pytest.fixture
@@ -159,10 +159,3 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
     assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
 
     mlflow.end_run()
-
-
-def test_raise_deprecation_warning_mlflow_dataset():
-    with pytest.deprecated_call():
-        MlflowDataSet(
-            data_set=dict(type="pandas.CSVDataSet", filepath="fake/path/to/file.csv"),
-        )

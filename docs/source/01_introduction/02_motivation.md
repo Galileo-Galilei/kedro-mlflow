@@ -4,7 +4,7 @@
 
 Basically, you should use ``kedro-mlflow`` in **any ``Kedro`` project which involves machine learning** / deep learning. As stated in the [introduction](./01_introduction.md), ``Kedro``'s current versioning (as of version ``0.16.1``) is not sufficient for machine learning projects: it lacks a UI and a ``run`` management system. Besides, the ``KedroPipelineModel`` ability to serve a kedro pipeline as an API or a batch in one line of code is a great addition for collaboration and transition to production.
 
-If you do not use ``Kedro`` or if you do pure data manipulation which do not involve machine learning, this plugin is not what you are seeking for ;)
+If you do not use ``Kedro`` or if you do pure data manipulation which does not involve *machine learning*, this plugin is not what you are seeking for ;)
 
 ## Why should I use kedro-mlflow ?
 
@@ -32,15 +32,15 @@ Above implementations have the advantage of being very straightforward and *mlfl
 
 ``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by kedro-mlflow and the location in Kedro template where the action should be performed.
 
-|Mlflow action                |Template file           |Python API              |
-|:----------------------------|:-----------------------|:-----------------------|
-|Set up configuration         |``mlflow.yml``          |``MlflowPipelineHook``  |
-|Logging parameters           |``run.py``              |``MlflowNodeHook``      |
-|Logging artifacts            |``catalog.yml``         |``MlflowArtifactDataSet``       |
-|Logging models               |NA                      |NA                      |
-|Logging metrics              |``catalog.yml``         |``MlflowMetricsDataSet``|
-|Logging Pipeline as model    |``pipeline.py``         |``KedroPipelineModel`` and ``pipeline_ml_factory``|
+|Mlflow action                |Template file           |Python API                                        |
+|:----------------------------|:-----------------------|:------------------------------------------------------|
+|Set up configuration         |``mlflow.yml``     |``MlflowPipelineHook``                            |
+|Logging parameters           |``mlflow.yml``     |``MlflowNodeHook``                                |
+|Logging artifacts            |``catalog.yml``    |``MlflowArtifactDataSet``                         |
+|Logging models               |``catalog.yml``    |`MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet`                                             |
+|Logging metrics              |``catalog.yml``    |``MlflowMetricsDataSet``                          |
+|Logging Pipeline as model    |``hooks.py``    |``KedroPipelineModel`` and ``pipeline_ml_factory``|
 
-In the current version (``kedro_mlflow=0.2.0``), kedro-mlflow does not provide interface to log metrics, set tags or log models outside a Kedro ``Pipeline``. These decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
+In the current version (``kedro_mlflow=0.4.0``), `kedro-mlflow` does not provide interface to set tags or log models outside a Kedro ``Pipeline``. These decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 
-_**Note:** the version ``0.2.0`` does not need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files._
+_**Note:** the version ``0.4.0`` does not need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files._

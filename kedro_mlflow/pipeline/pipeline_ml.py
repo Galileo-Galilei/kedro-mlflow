@@ -1,11 +1,18 @@
+import logging
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
+from mlflow.models import ModelSignature
 
-MSG_NOT_IMPLEMENTED = "This method is not implemented because it does not make sens for 'PipelineML'. Manipulate directly the training pipeline and recreate the 'PipelineML' with 'pipeline_ml_factory' factory"
+MSG_NOT_IMPLEMENTED = (
+    "This method is not implemented because it does"
+    "not make sense for 'PipelineML'."
+    "Manipulate directly the training pipeline and"
+    "recreate the 'PipelineML' with 'pipeline_ml_factory' factory."
+)
 
 
 class PipelineML(Pipeline):
@@ -37,6 +44,7 @@ class PipelineML(Pipeline):
         input_name: str,
         conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
         model_name: Optional[str] = "model",
+        model_signature: Union[ModelSignature, str, None] = "auto",
     ):
 
         """Store all necessary information for calling mlflow.log_model in the pipeline.
@@ -71,6 +79,13 @@ class PipelineML(Pipeline):
             model_name (Union[str, None], optional): The name of
                 the folder where the model will be stored in
                 remote mlflow. Defaults to "model".
+            model_signature (Union[ModelSignature, bool]): The mlflow
+             signature of the input dataframe common to training
+             and inference.
+                   - If 'auto', it is infered automatically
+                   - If None, no signature is used
+                   - if a `ModelSignature` instance, passed
+                   to the underlying dataframe
         """
 
         super().__init__(nodes, *args, tags=tags)
@@ -78,8 +93,27 @@ class PipelineML(Pipeline):
         self.inference = inference
         self.conda_env = conda_env
         self.model_name = model_name
-
         self.input_name = input_name
+        self.model_signature = model_signature
+
+        self._check_consistency()
+
+    @property
+    def _logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
+
+    @property
+    def training(self) -> Pipeline:
+        return Pipeline(self.nodes)
+
+    @property
+    def inference(self) -> str:
+        return self._inference
+
+    @inference.setter
+    def inference(self, inference: Pipeline) -> None:
+        self._check_inference(inference)
+        self._inference = inference
 
     @property
     def input_name(self) -> str:
@@ -87,10 +121,50 @@ class PipelineML(Pipeline):
 
     @input_name.setter
     def input_name(self, name: str) -> None:
-        self._check_input_name(name)
+        allowed_names = self.inference.inputs()
+        pp_allowed_names = "\n    - ".join(allowed_names)
+        if name not in allowed_names:
+            raise KedroMlflowPipelineMLInputsError(
+                (
+                    f"input_name='{name}' but it must be an input of 'inference'"
+                    f", i.e. one of: \n    - {pp_allowed_names}"
+                )
+            )
         self._input_name = name
 
-    def extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
+    @property
+    def model_signature(self) -> str:
+        return self._model_signature
+
+    @model_signature.setter
+    def model_signature(self, model_signature: ModelSignature) -> None:
+        if model_signature is not None:
+            if not isinstance(model_signature, ModelSignature):
+                if model_signature != "auto":
+                    raise ValueError(
+                        f"model_signature must be one of 'None', 'auto', or a 'ModelSignature' Object, got '{type(model_signature)}'"
+                    )
+        self._model_signature = model_signature
+
+    def _check_inference(self, inference: Pipeline) -> None:
+        nb_outputs = len(inference.outputs())
+        outputs_txt = "\n - ".join(inference.outputs())
+        if len(inference.outputs()) != 1:
+            raise KedroMlflowPipelineMLOutputsError(
+                (
+                    "The inference pipeline must have one"
+                    " and only one output. You are trying"
+                    " to set a inference pipeline with"
+                    f" '{nb_outputs}' output(s): \n - {outputs_txt}"
+                    " "
+                )
+            )
+
+    def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
+
+        # check that the pipeline is consistent in case its attributes have been
+        self._check_consistency()
+
         sub_catalog = DataCatalog()
         for data_set_name in self.inference.inputs():
             if data_set_name == self.input_name:
@@ -112,6 +186,9 @@ class PipelineML(Pipeline):
                                 data_set_name=data_set_name
                             )
                         )
+                    self._logger.info(
+                        f"The data_set '{data_set_name}' is added to the PipelineML catalog."
+                    )
                     sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
                 except KeyError:
                     raise KedroMlflowPipelineMLDatasetsError(
@@ -126,7 +203,7 @@ class PipelineML(Pipeline):
         return sub_catalog
 
     def extract_pipeline_artifacts(self, catalog: DataCatalog):
-        pipeline_catalog = self.extract_pipeline_catalog(catalog)
+        pipeline_catalog = self._extract_pipeline_catalog(catalog)
         artifacts = {
             name: Path(dataset._filepath.as_posix())
             .resolve()
@@ -136,36 +213,29 @@ class PipelineML(Pipeline):
         }
         return artifacts
 
-    @property
-    def training(self):
-        return Pipeline(self.nodes)
-
-    def _check_input_name(self, input_name: str) -> str:
-        allowed_names = self.inference.inputs()
-        pp_allowed_names = "\n    - ".join(allowed_names)
-        if input_name not in allowed_names:
+    def _check_consistency(self) -> None:
+        free_inputs_set = (
+            self.inference.inputs()
+            - {self.input_name}
+            - self.all_outputs()
+            - self.inputs()
+        )
+        if len(free_inputs_set) > 0:
+            input_set_txt = "\n     - ".join(free_inputs_set)
             raise KedroMlflowPipelineMLInputsError(
-                f"input_name='{input_name}' but it must be an input of 'inference', i.e. one of: \n    - {pp_allowed_names}"
-            )
-        else:
-            free_inputs_set = (
-                self.inference.inputs() - {input_name} - self.all_outputs()
-            )
-            if len(free_inputs_set) > 0:
-                raise KedroMlflowPipelineMLInputsError(
-                    """
-                    The following inputs are free for the inference pipeline:
-                    - {inputs}.
-                    No free input is allowed.
-                    Please make sure that 'inference.pipeline.inputs()' are all in 'training.pipeline.all_outputs()',
-                    except eventually 'input_name'.""".format(
-                        inputs="\n     - ".join(free_inputs_set)
-                    )
+                (
+                    "The following inputs are free for the inference pipeline:"
+                    f"    - {input_set_txt}."
+                    " No free input is allowed."
+                    " Please make sure that 'inference.inputs()' are all"
+                    " in 'training.all_outputs() + training.inputs()'"
+                    "except 'input_name'."
                 )
+            )
 
         return None
 
-    def _turn_pipeline_to_ml(self, pipeline):
+    def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(
             nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
         )
@@ -230,10 +300,12 @@ class PipelineML(Pipeline):
 
 
 class KedroMlflowPipelineMLInputsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid
-    """
+    """Error raised when the inputs of KedroPipelineModel are invalid"""
 
 
 class KedroMlflowPipelineMLDatasetsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid
-    """
+    """Error raised when the inputs of KedroPipelineMoel are invalid"""
+
+
+class KedroMlflowPipelineMLOutputsError(Exception):
+    """Error raised when the outputs of KedroPipelineModel are invalid"""

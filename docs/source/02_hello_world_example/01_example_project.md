@@ -102,7 +102,7 @@ Install the project dependencies:
 
 ```console
 pip install -r src/requirements.txt
-pip install --upgrade kedro-mlflow==0.3.0
+pip install --upgrade kedro-mlflow==0.4.0
 ```
 
 **Warning: Do not use ``kedro install`` commands does not seem to install the packages in your activated environment.**

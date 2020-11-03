@@ -4,6 +4,7 @@ Introduction
 .. toctree::
    :maxdepth: 4
 
+   Migration guide <00_migration_guide.md>
    Scope of the section <01_overview.md>
    Set up a Kedro project <02_setup.md>
    Configure mlflow <03_configuration.md>

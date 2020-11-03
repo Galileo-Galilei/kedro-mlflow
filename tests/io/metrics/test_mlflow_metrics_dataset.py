@@ -6,7 +6,7 @@ from kedro.io import DataSetError
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
-from kedro_mlflow.io import MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import MlflowMetricsDataSet
 
 
 def assert_are_metrics_logged(

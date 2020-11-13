@@ -1,5 +1,5 @@
 import shutil
-from pathlib import Path
+from os.path import exists
 from typing import Any, Dict, Optional
 
 from kedro.io import Version
@@ -27,7 +27,7 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
 
         Parameters are passed from the Data Catalog.
 
-        During save, the model is saved locally at `filepat`
+        During save, the model is saved locally at `filepath`
         During load, the model is loaded from the local `filepath`.
 
         Args:
@@ -41,7 +41,6 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
             save_args (Dict[str, Any], optional): Arguments to `save_model`
                 function from specified `flavor`. Defaults to None.
             version (Version, optional): Kedro version to use. Defaults to None.
-
         Raises:
             DataSetError: When passed `flavor` does not exist.
         """
@@ -60,11 +59,8 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
         Returns:
             Any: Deserialized model.
         """
-
-        model_uri = self._get_load_path().as_uri()
-
         return self._mlflow_model_module.load_model(
-            model_uri=model_uri, **self._load_args
+            model_uri=self._get_load_path().as_uri(), **self._load_args
         )
 
     def _save(self, model: Any) -> None:
@@ -76,7 +72,7 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
         save_path = self._get_save_path()
         # In case of an unversioned model we need to remove the save path
         # because MLflow cannot overwrite the target directory.
-        if Path(save_path).exists():
+        if exists(save_path):
             shutil.rmtree(save_path)
 
         if self._flavor == "mlflow.pyfunc":

@@ -1,4 +1,5 @@
 import importlib
+from pathlib import Path
 from typing import Any, Dict, Optional
 
 from kedro.io import AbstractVersionedDataSet, Version
@@ -12,7 +13,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
 
     def __init__(
         self,
-        filepath,
+        filepath: str,
         flavor: str,
         pyfunc_workflow: Optional[str] = None,
         load_args: Dict[str, Any] = None,
@@ -27,23 +28,23 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
         During load, the model is pulled from MLflow run with `run_id`.
 
         Args:
+            filepath (str): Path to store the dataset locally.
             flavor (str): Built-in or custom MLflow model flavor module.
                 Must be Python-importable.
-            filepath (str): Path to store the dataset locally.
-            run_id (Optional[str], optional): MLflow run ID to use to load
-                the model from or save the model to. If provided,
-                takes precedence over filepath. Defaults to None.
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
             load_args (Dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to {}.
             save_args (Dict[str, Any], optional): Arguments to `log_model`
                 function from specified `flavor`. Defaults to {}.
+            version (Version, optional): Specific version to load.
 
         Raises:
             DataSetError: When passed `flavor` does not exist.
         """
-        super().__init__(filepath, version)
+
+        super().__init__(Path(filepath), version)
+
         self._flavor = flavor
         self._pyfunc_workflow = pyfunc_workflow
 

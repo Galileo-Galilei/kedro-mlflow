@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
+
 ## [0.4.0] - 2020-11-03
 
 ### Added

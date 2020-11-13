@@ -51,3 +51,18 @@ my_custom_model:
     flavor: my_package.custom_mlflow_flavor
     pyfunc_workflow: python_model # or loader_module
 ```
+
+### Hwo can I save model locally and log it in MLflow in one step?
+
+If you want to save your model both locally and remotely within the same run, you can leverage `MlflowArtifactDataSet`:
+
+```yaml
+sklearn_model:
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+    data_set:
+        type: kedro_mlflow.io.models.MlflowModelSaverDataSet
+        flavor: mlflow.sklearn
+        filepath: data/06_models/sklearn_model
+```
+
+This might be useful if you want to always read the lastest model saved locally and log it to MLflow each time the new model is being trained for tracking purpose.

@@ -84,6 +84,18 @@ mlflow_model_logger=MlflowModelLoggerDataSet(
 mlflow_model_logger.save(LinearRegression().fit(data))
 ```
 
+As always with kedro, you can use it directly in the `catalog.yml` file:
+
+```yaml
+my_model:
+    type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+    flavor: "mlflow.sklearn"
+    run_id: <the-model-run-id>,
+    save_args:
+        conda_env:
+            python: "3.7.0"
+```
+
 ### ``MlflowModelSaverDataSet``
 
 The ``MlflowModelLoggerDataSet`` accepts the following arguments:
@@ -95,7 +107,7 @@ The ``MlflowModelLoggerDataSet`` accepts the following arguments:
 - save_args (Dict[str, Any], optional): Arguments to `save_model` function from specified `flavor`. Defaults to None.
 - version (Version, optional): Kedro version to use. Defaults to None.
 
-The use ifs very similar to MlflowModelLoggerDataSet, but that you specify a filepath instead of a `run_id`:
+The use is very similar to MlflowModelLoggerDataSet, but that you specify a filepath instead of a `run_id`:
 
 ```python
 from kedro_mlflow.io.models import MlflowModelLoggerDataSet
@@ -108,10 +120,19 @@ mlflow_model_logger.save(LinearRegression().fit(data))
 The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataSet`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataSet.html)
 
 ```python
-
 mlflow_model_logger=MlflowModelSaverDataSet(
     flavor="mlflow.sklearn",
     filepath="path/to/where/you/want/model",
     version="<valid-kedro-version>")
 my_model= mlflow_model_logger.load()
+```
+
+and with the YAML API in the `catalog.yml`:
+
+```yaml
+my_model:
+    type: kedro_mlflow.io.models.MlflowModelSaverDataSet
+    flavor: mlflow.sklearn
+    filepath: path/to/where/you/want/model
+    version: <valid-kedro-version>
 ```

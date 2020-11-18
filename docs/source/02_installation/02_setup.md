@@ -1,42 +1,20 @@
-# Setup your Kedro project
+# Initialize your Kedro project
 
-## Check the installation
-
-Type  ``kedro info`` in a terminal to check if the plugin is properly discovered by ``Kedro``. If the installation has succeeded, you should see the following ascii art:
-
-```console
- _            _
-| | _____  __| |_ __ ___
-| |/ / _ \/ _` | '__/ _ \
-|   <  __/ (_| | | | (_) |
-|_|\_\___|\__,_|_|  \___/
-v<kedro-version>
-
-kedro allows teams to create analytics
-projects. It is developed as part of
-the Kedro initiative at QuantumBlack.
-
-Installed plugins:
-kedro_mlflow: <kedro-mlflow-version> (hooks:global,project)
-```
-
-The version ``<kedro-mlflow-version>`` of the plugin is installed ans has both global and project commands.
-
-That's it! You are now ready to go!
+This section assume that [you have installed `kedro-mlflow` in your virtual environment](./01_installation.md).
 
 ## Create a kedro project
 
-This plugins must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
+This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
 
-For this tutorial and if you do not have a real-world project, I strongly suggest that you accept to include the proposed example to make a demo of this plugin out of the box.
+If you do not have a real-world project, you can use a kedro example and [follow the "Getting started" example](../03_getting_started/01_example_project.md) to make a demo of this plugin out of the box.
 
 ## Activate `kedro-mlflow` in your kedro project
 
-In order to use the ``kedro-mlflow`` plugin, you need to set up the its configuration and declare its hooks. those 2 actions are detailled in the following paragraph.
+In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration and declare its hooks. Those 2 actions are detailled in the following paragraphs.
 
 ### Setting up the kedro-mlflow configuration file
 
-``kedro-mlflow`` is [configured](../05_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the kedro-mlflow CLI](../05_python_objects/04_CLI.md). **It is mandatory for the plugin to work.**
+``kedro-mlflow`` is [configured](../07_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the kedro-mlflow CLI](../07_python_objects/04_CLI.md). **It is mandatory for the plugin to work.**
 
 Set the working directory at the root of your kedro project (i.e. the folder with the ``.kedro.yml`` file)
 
@@ -62,11 +40,11 @@ you should see the following message:
 
 **Note that you must register the two hooks provided by kedro-mlflow** (``MlflowPipelineHook`` and ``MlflowNodeHook``) for the plugin to work.
 
-#### - Declaring hooks through auto-discovery (for `kedro>=0.16.4`)
+#### Declaring hooks through auto-discovery (for `kedro>=0.16.4`) [Default behaviour]
 
 If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/07_extend_kedro/04_hooks.html#disable-auto-registered-plugins-hooks) in your `.kedro.yml` or your `pyproject.toml` file.
 
-#### - Declaring hooks through code, in ``ProjectContext`` (for `kedro>=0.16.0, <=0.16.3`)
+#### Declaring hooks through code, in ``ProjectContext`` (for `kedro>=0.16.0, <=0.16.3`)
 
 By declaring `mlflow_pipeline_hook` and `mlflow_node_hook` in ``(src/package_name/run.py) ProjectContext``:
 
@@ -86,7 +64,7 @@ class ProjectContext(KedroContext):
     )
 ```
 
-#### - Declaring hooks through static configuration in `.kedro.yml` or `pyproject.toml` **[Only for kedro >= 0.16.5 if you have disabled auto-registration]**
+#### Declaring hooks through static configuration in `.kedro.yml` or `pyproject.toml` **[Only for kedro >= 0.16.5 if you have disabled auto-registration]**
 
 In case you have disabled hooks for plugin, you can add them manually by declaring `mlflow_pipeline_hook` and `mlflow_node_hook` in ``.kedro.yml`` :
 

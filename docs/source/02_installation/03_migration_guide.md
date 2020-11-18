@@ -1,6 +1,6 @@
 # Migration guide
 
-This page explains how to migrate between versions with breaking changes, if you had an existing kedro project.
+This page explains how to migrate an existing kedro project to a more up to date `kedro-mlflow` versions with breaking changes.
 
 ## Migration from 0.3.0 to 0.4.0
 
@@ -18,15 +18,15 @@ Replace the follwoing entries:
 Hooks are now auto-registered if you use `kedro>=0.16.4`. You can remove the following entry from your `run.py`:
 
 ```python
-    hooks = (
-        MlflowPipelineHook(),
-        MlflowNodeHook()
-    )
+hooks = (
+    MlflowPipelineHook(),
+    MlflowNodeHook()
+)
 ```
 
 ### KedroPipelineModel
 
-Be aware that if you had trained saved a pipeline as a mlflow model with `pipeline_ml_factory`, retraining this pipeline with `kedro-mlflow==0.4.0` will lead to a new behaviour. Let assume the name of your output in the `DataCatalog` was `predictions`, the output of a registered model will be modified from:
+Be aware that if you have saved a pipeline as a mlflow model with `pipeline_ml_factory`, retraining this pipeline with `kedro-mlflow==0.4.0` will lead to a new behaviour. Let assume the name of your output in the `DataCatalog` was `predictions`, the output of a registered model will be modified from:
 
 ```json
 {

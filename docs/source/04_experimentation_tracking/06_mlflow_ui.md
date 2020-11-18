@@ -1,5 +1,7 @@
 # Opening the UI
+
 ## The mlflow user interface
+
 Mlflow offers a user interface (UI) that enable to browse the run history.
 
 ## The kedro-mlflow helper
@@ -11,6 +13,7 @@ To ensure this UI is linked to the tracking uri specified configuration, ``kedro
 ```console
 kedro mlflow ui
 ```
-which is a wrapper for  ``kedro ui`` command with the tracking uri of the ``mlflow.yml`` file.
+
+which is a wrapper for  ``kedro ui`` command with the tracking uri (as well as the port and host) specified the ``mlflow.yml`` file.
 
 Opens ``http://localhost:5000`` in your browser to see the UI after calling previous command.

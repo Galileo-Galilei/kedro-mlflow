@@ -2,7 +2,7 @@
 
 ## What is model tracking?
 
-MLflow allows to serialize and deserialize models to a common format, track those models in MLflow Tracking and manage them using MLflow Model Registry. Many popular Machine / Deep Learning frameworks have built-in support through what MLflow calls [flavors](https://www.mlflow.org/docs/latest/models.html#built-in-model-flavors). Even if there's no flavor for your framework of choice, it's easy to [create your own flavor](https://www.mlflow.org/docs/latest/models.html#custom-python-models) and integrate it with MLflow.
+MLflow allows to serialize and deserialize models to a common format, track those models in MLflow Tracking and manage them using MLflow Model Registry. Many popular Machine / Deep Learning frameworks have built-in support through what MLflow calls [flavors](https://www.mlflow.org/docs/latest/models.html#built-in-model-flavors). Even if there is no flavor for your framework of choice, it is easy to [create your own flavor](https://www.mlflow.org/docs/latest/models.html#custom-python-models) and integrate it with MLflow.
 
 ## How to track models using MLflow in Kedro project?
 
@@ -11,7 +11,7 @@ MLflow allows to serialize and deserialize models to a common format, track thos
 - the ``MlflowModelLoggerDataSet`` is used to load from and save to from the mlflow artifact store. It uses optional `run_id` argument to load and save from a given `run_id` which must exists in the mlflow server you are logging to.
 - the ``MlflowModelSaverDataSet`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
 
-*Important: The ``MlflowModelSaverDataSet`` is a dataset for advanced users who want fine grained control and eventually tweak mlflow models management. You very likely want to __use the ``MlflowModelLoggerDataSet``__ instead.*
+*Note: If you use ``MlflowModelLoggerDataSet``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelSaverDataSet`` and ``MlflowArtifactDataSet`` to make persist it both locally and remotely, see further.*
 
 Suppose you would like to register a `scikit-learn` model of your `DataCatalog` in mlflow, you can use the following yaml API:
 
@@ -43,7 +43,7 @@ When model is loaded, the latest version stored locally is read using ``load_mod
 
 ### How can I track a custom MLflow model flavor?
 
-To track a custom MLflow model flavor you need to set the `flavor` parameter to import path of your custom flavor and to specify a [pyfunc workflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#pyfunc-create-custom-workflows) which can be set either to `python_model` or `loader_module`. The former is the more high level and user friendly and is [recommend by mlflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#which-workflow-is-right-for-my-use-case) while the latter offer more control. We haven't tested the integration in `kedro-mlflow` of this second workflow extensively, and it should be use with caution.
+To track a custom MLflow model flavor you need to set the `flavor` parameter to import the module of your custom flavor and to specify a [pyfunc workflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#pyfunc-create-custom-workflows) which can be set either to `python_model` or `loader_module`. The former is the more high level and user friendly and is [recommend by mlflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#which-workflow-is-right-for-my-use-case) while the latter offer more control. We haven't tested the integration in `kedro-mlflow` of this second workflow extensively, and it should be used with caution.
 
 ```yaml
 my_custom_model:
@@ -52,7 +52,7 @@ my_custom_model:
     pyfunc_workflow: python_model # or loader_module
 ```
 
-### Hwo can I save model locally and log it in MLflow in one step?
+### How can I save model locally and log it in MLflow in one step?
 
 If you want to save your model both locally and remotely within the same run, you can leverage `MlflowArtifactDataSet`:
 

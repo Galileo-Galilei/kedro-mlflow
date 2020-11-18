@@ -1,24 +1,24 @@
-# First steps with the plugins
+# First steps with the plugin
 
 ## Initialize kedro-mlflow
 
-Run
+First, you need to initialize your project and add the plugin-specific configuration file with this command:
 
 ```console
 kedro mlflow init
 ```
 
-You have the following message:
+You will see the following message:
 
 ```console
 'conf/base/mlflow.yml' successfully updated.
 ```
 
-The ``conf/base`` folder is updated:
+The ``conf/base`` folder is updated and you can see the `mlflow.yml` file:
 
 ![initialized_project](../imgs/initialized_project.png)
 
-If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below:):
+*Optional: If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below):*
 
 ![mlflow_yml](../imgs/mlflow_yml.png)
 
@@ -112,7 +112,7 @@ which indicates clearly which parameters are logged (in the red boxes with the "
 
 ### Journal information
 
-The informations provided by the ``Kedro``'s ``Journal`` are also recorded as ``tags`` in the mlflow ui in order to make reproducible. In particluar, the exact command used for running the pipeline and the kedro version used are stored.
+The informations provided by the ``Kedro``'s ``Journal`` are also recorded as ``tags`` in the mlflow ui in order to make reproducible. In particular, the exact command used for running the pipeline and the kedro version used are stored.
 
 ### Artifacts
 
@@ -120,16 +120,44 @@ With this run, artifacts are empty. This is expected: mlflow does not know what 
 
 First, open the ``catalog.yml`` file which should like this:
 
-![default_catalog](../imgs/default_catalog.png)
+```yaml
+# This is a data set used by the "Hello World" example pipeline provided with the project
+# template. Please feel free to remove it once you remove the example pipeline.
+
+example_iris_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/iris.csv
+
+```
 
 And persist the model as a pickle with the ``MlflowArtifactDataSet`` class:
 
-![updated_catalog](../imgs/updated_catalog.png)
+```yaml
+# This is a data set used by the "Hello World" example pipeline provided with the project
+# template. Please feel free to remove it once you remove the example pipeline.
 
-Reopen the ui, select the last run and see that the file was uploaded:
+example_iris_data:
+  type: pandas.CSVDataSet
+  filepath: data/01_raw/iris.csv
+
+example_model:
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  data_set:
+    type: pickle.PickleDataSet
+    filepath: data/06_models/trained_model.pkl
+```
+
+Rerun the pipeline (with `kedro run`), and reopen the UI. Select the last run and see that the file was uploaded:
 
 ![run_with_artifact](../imgs/run_with_artifact.png)
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 
 *Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowModelLoggerDataSet`*
+
+## Going further
+
+Above vanilla example is just the beginning of your experience with ``kedro-mlflow``. Check out the next sections to see how `kedro-mlflow`:
+
+- offers advanced capabilities for machine learning versioning
+- can help to create standardize pipelines for deployment in production

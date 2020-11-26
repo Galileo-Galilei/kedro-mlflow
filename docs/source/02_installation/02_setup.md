@@ -12,9 +12,9 @@ If you do not have a real-world project, you can use a kedro example and [follow
 
 In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration and declare its hooks. Those 2 actions are detailled in the following paragraphs.
 
-### Setting up the kedro-mlflow configuration file
+### Setting up the ``kedro-mlflow`` configuration file
 
-``kedro-mlflow`` is [configured](../07_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the kedro-mlflow CLI](../07_python_objects/04_CLI.md). **It is mandatory for the plugin to work.**
+``kedro-mlflow`` is [configured](../07_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the ``kedro-mlflow`` CLI](../07_python_objects/04_CLI.md). **It is mandatory for the plugin to work.**
 
 Set the working directory at the root of your kedro project (i.e. the folder with the ``.kedro.yml`` file)
 
@@ -40,7 +40,7 @@ you should see the following message:
 kedro mlflow init --env=<other-environment>
 ```
 
-### Declaring kedro-mlflow hooks
+### Declaring ``kedro-mlflow`` hooks
 
 ``kedro_mlflow`` hooks implementations must be registered with Kedro. There are three ways of registering [hooks](https://kedro.readthedocs.io/en/latest/07_extend_kedro/02_hooks.html).
 

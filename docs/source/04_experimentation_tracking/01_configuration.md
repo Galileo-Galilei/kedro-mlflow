@@ -31,6 +31,24 @@ mlflow_tracking_uri: mlruns
 
 This is the **only mandatory key in the `mlflow.yml` file**, but there are many others described hereafter that provide fine-grained control on your mlflow setup.
 
+You can also specify some environment variables needed by mlflow (e.g `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) in the credentials and specify them in the `mlflow.yml`. Any key specified will be automatically exported as environment variables.
+
+Your `credentials.yml` will look as follows:
+
+```yaml
+my_mlflow_credentials:
+  AWS_ACCESS_KEY_ID: <your-key>
+  AWS_SECRET_ACCESS_KEY: <your-secret-key>
+```
+
+and your can supply the credentials key of the `mlflow.yml`:
+
+```yaml
+credentials: my_mlflow_credentials
+```
+
+For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They wil be exported as environment variables *on the fly* when running the pipeline.
+
 ### Configure mlflow experiment
 
 Mlflow enable the user to create "experiments" to organize his work. The different experiments will be visible on the left panel of the mlflow user interface. You can create an experiment through the `mlflow.yml` file witht the `experiment` key:

@@ -1,6 +1,7 @@
 import logging
+import os
 from pathlib import Path, PurePath
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional, Union
 
 import mlflow
 
@@ -23,6 +24,7 @@ class KedroMlflowConfig:
         self,
         project_path: Union[str, Path],
         mlflow_tracking_uri: str = "mlruns",
+        credentials: Optional[Dict[str, str]] = None,
         experiment_opts: Union[Dict[str, Any], None] = None,
         run_opts: Union[Dict[str, Any], None] = None,
         ui_opts: Union[Dict[str, Any], None] = None,
@@ -39,6 +41,9 @@ class KedroMlflowConfig:
         self.project_path = Path(project_path)
         # TODO we may add mlflow_registry_uri future release
         self.mlflow_tracking_uri = "mlruns"
+        self.credentials = (
+            credentials or {}
+        )  # replace None by {} but o not default to empty dict which is mutable
         self.experiment_opts = None
         self.run_opts = None
         self.ui_opts = None
@@ -53,12 +58,25 @@ class KedroMlflowConfig:
         # for loading the configuration
         configuration = dict(
             mlflow_tracking_uri=mlflow_tracking_uri,
+            credentials=credentials,
             experiment=experiment_opts,
             run=run_opts,
             ui=ui_opts,
             hooks=dict(node=node_hook_opts),
         )
         self.from_dict(configuration)
+
+    def setup(self, context):
+        """Setup all the mlflow configuration"""
+
+        self._export_credentials(context)
+
+        # we set the congiguration now: it takes priority
+        # if it has already be set in export_credentials
+
+        mlflow.set_tracking_uri(self.mlflow_tracking_uri)
+
+        self._get_or_create_experiment()
 
     def from_dict(self, configuration: Dict[str, str]):
         """This functions populates all the attributes of the class through a dictionary.
@@ -70,6 +88,7 @@ class KedroMlflowConfig:
             configuration {Dict[str, str]} -- A dict with the following format :
             {
                 mlflow_tracking_uri: a valid string for mlflow tracking storage,
+                credentials: a valid string which exists in credentials.yml,
                 experiments:
                     {
                         name {str}: the name of the experiment
@@ -98,12 +117,14 @@ class KedroMlflowConfig:
         """
 
         mlflow_tracking_uri = configuration.get("mlflow_tracking_uri")
+        credentials = configuration.get("credentials")
         experiment_opts = configuration.get("experiment")
         run_opts = configuration.get("run")
         ui_opts = configuration.get("ui")
         node_hook_opts = configuration.get("hooks", {}).get("node")
 
         self.mlflow_tracking_uri = self._validate_uri(uri=mlflow_tracking_uri)
+        self.credentials = credentials  # do not replace by value here for safety
         self.experiment_opts = _validate_opts(
             opts=experiment_opts, default=self.EXPERIMENT_OPTS
         )
@@ -119,7 +140,6 @@ class KedroMlflowConfig:
         self.mlflow_client = mlflow.tracking.MlflowClient(
             tracking_uri=self.mlflow_tracking_uri
         )
-        self._get_or_create_experiment()
 
     def to_dict(self):
         """Retrieve all the attributes needed to setup the config
@@ -128,6 +148,7 @@ class KedroMlflowConfig:
             Dict[str, Any] -- All attributes with the following format:
             {
                 mlflow_tracking_uri: a valid string for mlflow tracking storage,
+                credentials: a valid string which exists in credentials.yml,
                 experiments_opts:
                     {
                         name {str}: the name of the experiment
@@ -141,6 +162,7 @@ class KedroMlflowConfig:
         """
         info = {
             "mlflow_tracking_uri": self.mlflow_tracking_uri,
+            "credentials": self.credentials,
             "experiments": self.experiment_opts,
             "run": self.run_opts,
             "ui": self.ui_opts,
@@ -207,6 +229,12 @@ class KedroMlflowConfig:
                 valid_uri = uri
 
         return valid_uri
+
+    def _export_credentials(self, context):
+        conf_creds = context._get_config_credentials()
+        mlflow_creds = conf_creds.get(self.credentials, {})
+        for key, value in mlflow_creds.items():
+            os.environ[key] = value
 
 
 def _validate_opts(opts: Dict[str, Any], default: Dict[str, Any]) -> Dict:

@@ -75,7 +75,7 @@ class MlflowPipelineHook:
         )
 
         mlflow_conf = get_mlflow_config(self.context)
-        mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
+        mlflow_conf.setup(self.context)
 
         run_name = (
             mlflow_conf.run_opts["name"]
@@ -109,7 +109,10 @@ class MlflowPipelineHook:
 
     @hook_impl
     def after_pipeline_run(
-        self, run_params: Dict[str, Any], pipeline: Pipeline, catalog: DataCatalog,
+        self,
+        run_params: Dict[str, Any],
+        pipeline: Pipeline,
+        catalog: DataCatalog,
     ) -> None:
         """Hook to be invoked after a pipeline runs.
         Args:

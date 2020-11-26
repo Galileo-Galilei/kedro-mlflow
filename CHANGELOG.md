@@ -2,13 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- It is now possible to supply credentials for the mlflow tracking server within `mlflow.yml` and `credentials.yml`. They will be exported as environment variables during the run. ([#31](https://github.com/Galileo-Galilei/kedro-mlflow/issues/31))
+
 ### Fixed
 
--   Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
-- Fix various docs typo
+- Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
+- Fix various docs typo ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
 
 ### Changed
-- Refactor doc structure for readability
+
+- Refactor doc structure for readability ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
+- The `KedroMlflowConfig` no longer creates the mlflow experiment and access to the mlflow tracking server when it is instantiated. A new `setup()` method sets up the mlflow configuration (tracking uri, credentials and experiment management) but must now be called explicitly. ([#97](https://github.com/Galileo-Galilei/kedro-mlflow/issues/97))
 
 ## [0.4.0] - 2020-11-03
 

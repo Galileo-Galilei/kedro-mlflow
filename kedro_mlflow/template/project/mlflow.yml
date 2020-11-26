@@ -7,6 +7,17 @@
 # at the root of the project
 mlflow_tracking_uri: mlruns
 
+# All credentials needed for mlflow must be stored in credentials .yml as a dict
+# they will be exported as environment variable
+# If you want to set some credentials,  e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+# > in `credentials.yml`:
+# your_mlflow_credentials:
+#   AWS_ACCESS_KEY_ID: 132456
+#   AWS_SECRET_ACCESS_KEY: 132456
+# > in this file `mlflow.yml`:
+# credentials: mlflow_credentials
+
+credentials: null  # must be a valid key in credentials.yml
 
 # EXPERIMENT-RELATED PARAMETERS ----------
 

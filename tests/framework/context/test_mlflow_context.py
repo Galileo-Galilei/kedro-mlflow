@@ -23,6 +23,7 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
         tmp_path / "conf" / "base" / "mlflow.yml",
         dict(
             mlflow_tracking_uri="mlruns",
+            credentials=None,
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
@@ -31,6 +32,7 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
     )
     expected = {
         "mlflow_tracking_uri": (tmp_path / "mlruns").as_uri(),
+        "credentials": None,
         "experiments": {"name": "fake_package", "create": True},
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
@@ -48,6 +50,7 @@ def test_mlflow_config_with_templated_config(mocker, tmp_path, config_dir):
         tmp_path / "conf" / "base" / "mlflow.yml",
         dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
+            credentials=None,
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
@@ -62,6 +65,7 @@ def test_mlflow_config_with_templated_config(mocker, tmp_path, config_dir):
 
     expected = {
         "mlflow_tracking_uri": (tmp_path / "testruns").as_uri(),
+        "credentials": None,
         "experiments": {"name": "fake_package", "create": True},
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},

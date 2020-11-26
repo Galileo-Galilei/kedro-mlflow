@@ -1,5 +1,9 @@
+import os
+
+import mlflow
 import pytest
 import yaml
+from kedro.context import load_context
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.context.config import (
@@ -52,6 +56,7 @@ def test_kedro_mlflow_config_init(tmp_path):
     config = KedroMlflowConfig(project_path=tmp_path)
     assert config.to_dict() == dict(
         mlflow_tracking_uri=(tmp_path / "mlruns").as_uri(),
+        credentials=None,
         experiments=KedroMlflowConfig.EXPERIMENT_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
         ui=KedroMlflowConfig.UI_OPTS,
@@ -59,7 +64,9 @@ def test_kedro_mlflow_config_init(tmp_path):
     )
 
 
-def test_kedro_mlflow_config_new_experiment_does_not_exists(mocker, tmp_path):
+def test_kedro_mlflow_config_new_experiment_does_not_exists(
+    mocker, tmp_path, config_dir
+):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
@@ -68,10 +75,12 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(mocker, tmp_path):
         mlflow_tracking_uri="mlruns",
         experiment_opts=dict(name="exp1"),
     )
+    context = load_context(tmp_path)
+    config.setup(context)
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
-def test_kedro_mlflow_config_experiment_exists(mocker, tmp_path):
+def test_kedro_mlflow_config_experiment_exists(mocker, tmp_path, config_dir):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
     mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
 
@@ -83,10 +92,12 @@ def test_kedro_mlflow_config_experiment_exists(mocker, tmp_path):
         mlflow_tracking_uri="mlruns",
         experiment_opts=dict(name="exp1"),
     )
+    context = load_context(tmp_path)
+    config.setup(context)
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
-def test_kedro_mlflow_config_experiment_was_deleted(mocker, tmp_path):
+def test_kedro_mlflow_config_experiment_was_deleted(mocker, tmp_path, config_dir):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
     mocker.patch("kedro_mlflow.utils._is_kedro_project", lambda x: True)
 
@@ -104,7 +115,71 @@ def test_kedro_mlflow_config_experiment_was_deleted(mocker, tmp_path):
         mlflow_tracking_uri="mlruns",
         experiment_opts=dict(name="exp1"),
     )
+    context = load_context(tmp_path)
+    config.setup(context)
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
+
+
+def test_kedro_mlflow_config_setup_set_tracking_uri(mocker, tmp_path, config_dir):
+    # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", lambda x: True)
+
+    # create an experiment with the same name and then delete it
+    mlflow_tracking_uri = (tmp_path / "awesome_tracking").as_uri()
+
+    # the config must restore properly the experiment
+    config = KedroMlflowConfig(
+        project_path=tmp_path,
+        mlflow_tracking_uri="awesome_tracking",
+        experiment_opts=dict(name="exp1"),
+    )
+    context = load_context(tmp_path)
+    config.setup(context)
+
+    assert mlflow.get_tracking_uri() == mlflow_tracking_uri
+
+
+def test_kedro_mlflow_config_setup_export_credentials(mocker, tmp_path, config_dir):
+    # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", lambda x: True)
+
+    (tmp_path / "conf/base/credentials.yml").write_text(
+        yaml.dump(dict(my_mlflow_creds=dict(fake_mlflow_cred="my_fake_cred")))
+    )
+
+    # the config must restore properly the experiment
+    config = KedroMlflowConfig(project_path=tmp_path, credentials="my_mlflow_creds")
+    context = load_context(tmp_path)
+    config.setup(context)
+
+    assert os.environ["fake_mlflow_cred"] == "my_fake_cred"
+
+
+def test_kedro_mlflow_config_setup_tracking_priority(mocker, tmp_path, config_dir):
+    """Test if the mlflow_tracking uri set is the one of mlflow.yml
+    if it also eist in credentials.
+
+    Args:
+        mocker ([type]): [description]
+        tmp_path ([type]): [description]
+        config_dir ([type]): [description]
+    """
+    # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", lambda x: True)
+
+    (tmp_path / "conf/base/credentials.yml").write_text(
+        yaml.dump(dict(my_mlflow_creds=dict(mlflow_tracking_uri="mlruns2")))
+    )
+
+    config = KedroMlflowConfig(
+        project_path=tmp_path,
+        mlflow_tracking_uri="mlruns1",
+        credentials="my_mlflow_creds",
+    )
+    context = load_context(tmp_path)
+    config.setup(context)
+
+    assert mlflow.get_tracking_uri() == (tmp_path / "mlruns1").as_uri()
 
 
 @pytest.mark.parametrize(

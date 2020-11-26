@@ -89,7 +89,7 @@ hooks:
     flatten_dict_params: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
     recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
     sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}}will be logged as hyperaparam1.p1 and hyperaparam1.p2 oin mlflow.
-    long_parameters_strategy: fail  # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should kedro-mlflow do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
+    long_parameters_strategy: fail  # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should ``kedro-mlflow`` do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
 ```
 
 If you set `flatten_dict_params` to `True`, each key of the dictionary will be logged as a mlflow parameters, instead of a single parameter for the whole dictionary. Note that it is recommended to facilitate run comparison.

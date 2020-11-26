@@ -25,7 +25,7 @@
 
 # How do I install kedro-mlflow?
 
-**Important: kedro-mlflow is only compatible with ``kedro>=0.16.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
+**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
 ``kedro-mlflow`` is available on PyPI, so you can install it with ``pip``:
 
@@ -45,8 +45,9 @@ I strongly recommend to use ``conda`` (a package manager) to create an environme
 
 The documentation contains:
 
-- [A "hello world" example](https://kedro-mlflow.readthedocs.io/en/stable/source/03_getting_started/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
-- A more [detailed tutorial](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
+- [A  "hello world" example](https://kedro-mlflow.readthedocs.io/en/latest/source/03_getting_started/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
+- A section for [advanced machine learning versioning](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
+- A section to demonstrate how to use `kedro-mlflow` as a [machine learning framework](https://kedro-mlflow.readthedocs.io/en/latest/source/05_framework_ml/index.html) to deliver production ready pipelines and serve them. This section comes with [an example repo](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial) you can clone and try out.
 
 Some frequently asked questions on more advanced features:
 
@@ -69,9 +70,9 @@ If you want to see how to migrate from one version of `kedro-mlflow` to another,
 
 # Can I contribute?
 
-We'd be happy to receive help to maintain and improve the package. Please check the [contributing guidelines](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CONTRIBUTING.md).
+We'd be happy to receive help to maintain and improve the package. Any PR will be considered (from typo in the docs to core features add-on) Please check the [contributing guidelines](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CONTRIBUTING.md).
 
-#### Main contributors
+# Main contributors
 
 The following people actively maintain, enhance and discuss design to make this package as good as possible. Many thanks to them!
 

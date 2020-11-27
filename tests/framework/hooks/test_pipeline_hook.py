@@ -9,6 +9,7 @@ from kedro.framework.context import KedroContext, load_context
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
+from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
@@ -514,9 +515,10 @@ def test_on_pipeline_error(tmp_path, config_dir, mocker):
         yaml_str = yaml.dump(config)
         filepath.write_text(yaml_str)
 
+    tracking_uri = (tmp_path / "mlruns").as_uri()
     _write_yaml(
         tmp_path / "conf" / "base" / "mlflow.yml",
-        dict(mlflow_tracking_uri=(tmp_path / "mlruns").as_posix()),
+        dict(mlflow_tracking_uri=tracking_uri),
     )
 
     def failing_node():
@@ -533,7 +535,13 @@ def test_on_pipeline_error(tmp_path, config_dir, mocker):
         def _get_pipelines(self):
             return {
                 "__default__": Pipeline(
-                    [node(func=failing_node, inputs=None, outputs="fake_output",)]
+                    [
+                        node(
+                            func=failing_node,
+                            inputs=None,
+                            outputs="fake_output",
+                        )
+                    ]
                 )
             }
 
@@ -541,4 +549,9 @@ def test_on_pipeline_error(tmp_path, config_dir, mocker):
         failing_context = DummyContextWithHook(tmp_path.as_posix())
         failing_context.run()
 
-    assert mlflow.active_run() is None
+    # the run we want is the last one in Default experiment
+    failing_run_info = MlflowClient(tracking_uri).list_run_infos("0")[0]
+    assert mlflow.active_run() is None  # the run must have been closed
+    assert failing_run_info.status == RunStatus.to_string(
+        RunStatus.FAILED
+    )  # it must be marked as failed

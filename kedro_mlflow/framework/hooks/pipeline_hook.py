@@ -9,6 +9,7 @@ from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.versioning.journal import _git_sha
+from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 
 from kedro_mlflow.framework.context import get_mlflow_config
@@ -194,7 +195,7 @@ class MlflowPipelineHook:
         """
 
         while mlflow.active_run():
-            mlflow.end_run()
+            mlflow.end_run(RunStatus.to_string(RunStatus.FAILED))
 
 
 mlflow_pipeline_hook = MlflowPipelineHook()

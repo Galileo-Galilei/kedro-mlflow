@@ -8,13 +8,13 @@ def render_jinja_template(
     src: Union[str, Path], is_cookiecutter=False, **kwargs
 ) -> str:
     """This functions enable to copy a file and render the
-        tags (identified by {{ my_tag }}) with the values provided in kwargs.
+    tags (identified by {{ my_tag }}) with the values provided in kwargs.
 
-        Arguments:
-            src {Union[str, Path]} -- The path to the template which should be rendered
+    Arguments:
+        src {Union[str, Path]} -- The path to the template which should be rendered
 
-        Returns:
-            str -- A string that contains all the files with replaced tags.
+    Returns:
+        str -- A string that contains all the files with replaced tags.
     """
     src = Path(src)
 

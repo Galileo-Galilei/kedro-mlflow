@@ -36,7 +36,12 @@ def dummy_df2():
         (CSVDataSet, ".csv", lazy_fixture("df1"), "artifact_dir"),
         ("pandas.CSVDataSet", ".csv", lazy_fixture("df1"), "artifact_dir"),
         (PickleDataSet, ".pkl", lazy_fixture("df1"), "artifact_dir"),
-        ("pickle.PickleDataSet", ".pkl", lazy_fixture("df1"), "artifact_dir",),
+        (
+            "pickle.PickleDataSet",
+            ".pkl",
+            lazy_fixture("df1"),
+            "artifact_dir",
+        ),
     ],
 )
 def test_mlflow_csv_data_set_save_reload(
@@ -70,7 +75,8 @@ def test_mlflow_csv_data_set_save_reload(
 
 
 @pytest.mark.parametrize(
-    "exists_active_run", [(False), (True)],
+    "exists_active_run",
+    [(False), (True)],
 )
 def test_mlflow_data_set_save_with_run_id(
     tmp_path, tracking_uri, df1, exists_active_run

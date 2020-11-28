@@ -110,7 +110,7 @@ def kedro_pipeline_model(tmp_path, pipeline_ml_obj, dummy_catalog):
 
 
 def test_flavor_does_not_exists():
-    with pytest.raises(DataSetError, match="mlflow.whoops module not found"):
+    with pytest.raises(DataSetError, match="'mlflow.whoops' module not found"):
         MlflowModelLoggerDataSet.from_config(
             name="whoops",
             config={
@@ -268,7 +268,8 @@ def test_load_without_run_id_nor_active_run():
     mlflow_model_ds = MlflowModelLoggerDataSet.from_config(**model_config)
 
     with pytest.raises(
-        DataSetError, match="To access the model_uri, you must either",
+        DataSetError,
+        match="To access the model_uri, you must either",
     ):
         mlflow_model_ds.load()
 

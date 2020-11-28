@@ -1,4 +1,5 @@
-import importlib
+from importlib import import_module
+from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -60,9 +61,26 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
         self._load_args = load_args or {}
         self._save_args = save_args or {}
 
-        self._mlflow_model_module = self._import_module(self._flavor)
+        try:
+            self._mlflow_model_module
+        except ImportError as err:
+            raise DataSetError(err)
 
-    # TODO: check with Kajetan what was orignally intended here
+    # IMPORTANT:  _mlflow_model_module is a property to avoid STORING
+    # the module as an attribute but rather store a string and load on the fly
+    # The goal is to make this DataSet deepcopiable for compatibility with
+    # KedroPipelineModel, e.g we can't just do :
+    # self._mlflow_model_module = self._import_module(self._flavor)
+
+    @property
+    def _mlflow_model_module(self):  # pragma: no cover
+        pass
+
+    @_mlflow_model_module.getter
+    def _mlflow_model_module(self):
+        return self._import_module(self._flavor)
+
+    # TODO: check with Kajetan what was originally intended here
     # @classmethod
     # def _parse_args(cls, kwargs_dict: Dict[str, Any]) -> Dict[str, Any]:
     #     parsed_kargs = {}
@@ -80,9 +98,11 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
 
     @staticmethod
     def _import_module(import_path: str) -> Any:
-        exists = importlib.util.find_spec(import_path)
+        exists = find_spec(import_path)
 
         if not exists:
-            raise ImportError(f"{import_path} module not found")
+            raise ImportError(
+                f"'{import_path}' module not found. Check valid flavor in mlflow documentation: https://www.mlflow.org/docs/latest/python_api/index.html"
+            )
 
-        return importlib.import_module(import_path)
+        return import_module(import_path)

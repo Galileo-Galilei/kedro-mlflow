@@ -295,7 +295,8 @@ def test_filtering_generate_invalid_pipeline_ml(
     """
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
     with pytest.raises(
-        KedroMlflowPipelineMLInputsError, match="No free input is allowed",
+        KedroMlflowPipelineMLInputsError,
+        match="No free input is allowed",
     ):
         dummy_context._filter_pipeline(
             pipeline=pipeline_ml_obj,
@@ -413,7 +414,15 @@ def test_too_many_inference_outputs():
         match="The inference pipeline must have one and only one output",
     ):
         pipeline_ml_factory(
-            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            training=Pipeline(
+                [
+                    node(
+                        func=train_fun,
+                        inputs="data",
+                        outputs="model",
+                    )
+                ]
+            ),
             inference=Pipeline(
                 [
                     node(
@@ -433,7 +442,15 @@ def test_not_enough_inference_outputs():
         match="The inference pipeline must have one and only one output",
     ):
         pipeline_ml_factory(
-            training=Pipeline([node(func=train_fun, inputs="data", outputs="model",)]),
+            training=Pipeline(
+                [
+                    node(
+                        func=train_fun,
+                        inputs="data",
+                        outputs="model",
+                    )
+                ]
+            ),
             inference=Pipeline(
                 [
                     node(

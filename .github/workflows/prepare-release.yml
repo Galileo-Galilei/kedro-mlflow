@@ -44,7 +44,7 @@ jobs:
         git commit -am "Release ${{ steps.bump_version.outputs.package_version }} - Bump version and CHANGELOG"
         git push -u origin release-candidate-${{ steps.bump_version.outputs.package_version }}
     - name: Open a PR to merge the release candidate to master
-      uses: vsoch/pull-request-action@1.0.6
+      uses: vsoch/pull-request-action@1.0.12
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PULL_REQUEST_BRANCH: master

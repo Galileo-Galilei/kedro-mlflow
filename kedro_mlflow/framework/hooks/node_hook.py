@@ -1,4 +1,5 @@
-from typing import Any, Dict
+import logging
+from typing import Any, Dict, Union
 
 import mlflow
 from kedro.framework.context import load_context
@@ -6,6 +7,7 @@ from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
+from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.framework.context import get_mlflow_config
 
@@ -16,6 +18,11 @@ class MlflowNodeHook:
         self.flatten = False
         self.recursive = True
         self.sep = "."
+        self.long_parameters_strategy = "fail"
+
+    @property
+    def _logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
 
     @hook_impl
     def before_pipeline_run(
@@ -50,9 +57,13 @@ class MlflowNodeHook:
             extra_params=run_params["extra_params"],
         )
         config = get_mlflow_config(self.context)
+
         self.flatten = config.node_hook_opts["flatten_dict_params"]
         self.recursive = config.node_hook_opts["recursive"]
         self.sep = config.node_hook_opts["sep"]
+        self.long_parameters_strategy = config.node_hook_opts[
+            "long_parameters_strategy"
+        ]
 
     @hook_impl
     def before_node_run(
@@ -76,6 +87,7 @@ class MlflowNodeHook:
         # only parameters will be logged. Artifacts must be declared manually in the catalog
         params_inputs = {}
         for k, v in inputs.items():
+            # detect parameters automatically based on kedro reserved names
             if k.startswith("params:"):
                 params_inputs[k[7:]] = v
             elif k == "parameters":
@@ -87,9 +99,36 @@ class MlflowNodeHook:
                 d=params_inputs, recursive=self.recursive, sep=self.sep
             )
 
-        mlflow.log_params(params_inputs)
+        # logging parameters based on defined strategy
+        for k, v in params_inputs.items():
+            self.log_param(k, v)
+
+    def log_param(self, name: str, value: Union[Dict, int, bool, str]) -> None:
+        str_value = str(value)
+        str_value_length = len(str_value)
+        if str_value_length <= MAX_PARAM_VAL_LENGTH:
+            return mlflow.log_param(name, value)
+        else:
+            if self.long_parameters_strategy == "fail":
+                raise ValueError(
+                    f"Parameter '{name}' length is {str_value_length}, "
+                    f"while mlflow forces it to be lower than '{MAX_PARAM_VAL_LENGTH}'. "
+                    "If you want to bypass it, try to change 'long_parameters_strategy' to"
+                    " 'tag' or 'truncate' in the 'mlflow.yml'configuration file."
+                )
+            elif self.long_parameters_strategy == "tag":
+                self._logger.warning(
+                    f"Parameter '{name}' (value length {str_value_length}) is set as a tag."
+                )
+                mlflow.set_tag(name, value)
+            elif self.long_parameters_strategy == "truncate":
+                self._logger.warning(
+                    f"Parameter '{name}' (value length {str_value_length}) is truncated to its {MAX_PARAM_VAL_LENGTH} first characters."
+                )
+                mlflow.log_param(name, str_value[0:MAX_PARAM_VAL_LENGTH])
 
 
+# this hooks instaitation is necessary for auto-registration
 mlflow_node_hook = MlflowNodeHook()
 
 

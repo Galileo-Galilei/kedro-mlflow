@@ -7,6 +7,7 @@ import yaml
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
+from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.framework.hooks import MlflowNodeHook
 from kedro_mlflow.framework.hooks.node_hook import flatten_dict
@@ -196,3 +197,192 @@ def test_node_hook_logging(
     mlflow_client = MlflowClient(mlflow_tracking_uri)
     current_run = mlflow_client.get_run(run_id)
     assert current_run.data.params == expected
+
+
+@pytest.mark.parametrize(
+    "param_length", [MAX_PARAM_VAL_LENGTH - 10, MAX_PARAM_VAL_LENGTH]
+)
+@pytest.mark.parametrize("strategy", ["fail", "truncate", "tag"])
+def test_node_hook_logging_below_limit_all_strategy(
+    tmp_path, config_dir, dummy_run_params, dummy_node, param_length, strategy
+):
+
+    # mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(
+            hooks=dict(node=dict(long_parameters_strategy=strategy)),
+        ),
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    mlflow_node_hook = MlflowNodeHook()
+
+    param_value = param_length * "a"
+    node_inputs = {"params:my_param": param_value}
+
+    with mlflow.start_run():
+        mlflow_node_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=Pipeline([]), catalog=DataCatalog()
+        )
+        mlflow_node_hook.before_node_run(
+            node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+            catalog=DataCatalog(),  # can be empty
+            inputs=node_inputs,
+            is_async=False,
+            run_id="132",
+        )
+        run_id = mlflow.active_run().info.run_id
+
+    mlflow_client = MlflowClient(mlflow_tracking_uri)
+    current_run = mlflow_client.get_run(run_id)
+    assert current_run.data.params == {"my_param": param_value}
+
+
+@pytest.mark.parametrize(
+    "param_length",
+    [MAX_PARAM_VAL_LENGTH + 20],
+)
+def test_node_hook_logging_above_limit_truncate_strategy(
+    tmp_path, config_dir, dummy_run_params, dummy_node, param_length
+):
+
+    # mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(
+            hooks=dict(node=dict(long_parameters_strategy="truncate")),
+        ),
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    mlflow_node_hook = MlflowNodeHook()
+
+    param_value = param_length * "a"
+    node_inputs = {"params:my_param": param_value}
+
+    with mlflow.start_run():
+        mlflow_node_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=Pipeline([]), catalog=DataCatalog()
+        )
+        mlflow_node_hook.before_node_run(
+            node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+            catalog=DataCatalog(),  # can be empty
+            inputs=node_inputs,
+            is_async=False,
+            run_id="132",
+        )
+        run_id = mlflow.active_run().info.run_id
+
+    mlflow_client = MlflowClient(mlflow_tracking_uri)
+    current_run = mlflow_client.get_run(run_id)
+    assert current_run.data.params == {"my_param": param_value[0:MAX_PARAM_VAL_LENGTH]}
+
+
+@pytest.mark.parametrize(
+    "param_length",
+    [MAX_PARAM_VAL_LENGTH + 20],
+)
+def test_node_hook_logging_above_limit_fail_strategy(
+    tmp_path, config_dir, dummy_run_params, dummy_node, param_length
+):
+
+    # mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(
+            hooks=dict(node=dict(long_parameters_strategy="fail")),
+        ),
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    mlflow_node_hook = MlflowNodeHook()
+
+    param_value = param_length * "a"
+    node_inputs = {"params:my_param": param_value}
+
+    with mlflow.start_run():
+        mlflow_node_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=Pipeline([]), catalog=DataCatalog()
+        )
+
+        # IMPORTANT: Overpassing the parameters limit
+        # should raise an error for all mlflow backend
+        # but it does not on FileStore backend :
+        # https://github.com/mlflow/mlflow/issues/2814#issuecomment-628284425
+        # Since we use FileStore system for simplicty for tests logging works
+        # But we have enforced failure (which is slightly different from mlflow
+        # behaviour)
+        with pytest.raises(
+            ValueError, match=f"Parameter 'my_param' length is {param_length}"
+        ):
+            mlflow_node_hook.before_node_run(
+                node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+                catalog=DataCatalog(),  # can be empty
+                inputs=node_inputs,
+                is_async=False,
+                run_id="132",
+            )
+
+
+@pytest.mark.parametrize(
+    "param_length",
+    [MAX_PARAM_VAL_LENGTH + 20],
+)
+def test_node_hook_logging_above_limit_tag_strategy(
+    tmp_path, config_dir, dummy_run_params, dummy_node, param_length
+):
+
+    # mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+
+    _write_yaml(
+        tmp_path / "conf" / "base" / "mlflow.yml",
+        dict(
+            hooks=dict(node=dict(long_parameters_strategy="tag")),
+        ),
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    mlflow_node_hook = MlflowNodeHook()
+
+    param_value = param_length * "a"
+    node_inputs = {"params:my_param": param_value}
+
+    with mlflow.start_run():
+        mlflow_node_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=Pipeline([]), catalog=DataCatalog()
+        )
+
+        # IMPORTANT: Overpassing the parameters limit
+        # should raise an error for all mlflow backend
+        # but it does not on FileStore backend :
+        # https://github.com/mlflow/mlflow/issues/2814#issuecomment-628284425
+        # Since we use FileStore system for simplicty for tests logging works
+        # But we have enforced failure (which is slightly different from mlflow
+        # behaviour)
+        mlflow_node_hook.before_node_run(
+            node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+            catalog=DataCatalog(),  # can be empty
+            inputs=node_inputs,
+            is_async=False,
+            run_id="132",
+        )
+        run_id = mlflow.active_run().info.run_id
+
+    mlflow_client = MlflowClient(mlflow_tracking_uri)
+    current_run = mlflow_client.get_run(run_id)
+    assert current_run.data.params == {}
+    assert {
+        k: v for k, v in current_run.data.tags.items() if not k.startswith("mlflow")
+    } == {"my_param": param_value}

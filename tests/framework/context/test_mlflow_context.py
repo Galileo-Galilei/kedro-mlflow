@@ -27,7 +27,14 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
-            hooks=dict(node=dict(flatten_dict_params=True, recursive=False, sep="-")),
+            hooks=dict(
+                node=dict(
+                    flatten_dict_params=True,
+                    recursive=False,
+                    sep="-",
+                    long_parameters_strategy="truncate",
+                )
+            ),
         ),
     )
     expected = {
@@ -37,7 +44,12 @@ def test_get_mlflow_config(mocker, tmp_path, config_dir):
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
         "hooks": {
-            "node": {"flatten_dict_params": True, "recursive": False, "sep": "-"}
+            "node": {
+                "flatten_dict_params": True,
+                "recursive": False,
+                "sep": "-",
+                "long_parameters_strategy": "truncate",
+            }
         },
     }
     context = load_context(tmp_path)
@@ -54,7 +66,14 @@ def test_mlflow_config_with_templated_config(mocker, tmp_path, config_dir):
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
-            hooks=dict(node=dict(flatten_dict_params=True, recursive=False, sep="-")),
+            hooks=dict(
+                node=dict(
+                    flatten_dict_params=True,
+                    recursive=False,
+                    sep="-",
+                    long_parameters_strategy="truncate",
+                )
+            ),
         ),
     )
 
@@ -70,7 +89,12 @@ def test_mlflow_config_with_templated_config(mocker, tmp_path, config_dir):
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
         "hooks": {
-            "node": {"flatten_dict_params": True, "recursive": False, "sep": "-"}
+            "node": {
+                "flatten_dict_params": True,
+                "recursive": False,
+                "sep": "-",
+                "long_parameters_strategy": "truncate",
+            }
         },
     }
 

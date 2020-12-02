@@ -64,6 +64,18 @@ def test_kedro_mlflow_config_init(tmp_path):
     )
 
 
+def test_kedro_mlflow_config_bad_long_parameters_strategy(tmp_path):
+    # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
+    (tmp_path / ".kedro.yml").write_text(yaml.dump(dict(context_path="fake/path")))
+    with pytest.raises(
+        KedroMlflowConfigError, match="'long_parameters_strategy' must be one of "
+    ):
+        KedroMlflowConfig(
+            project_path=tmp_path,
+            node_hook_opts=dict(long_parameters_strategy="does_not_exist"),
+        )
+
+
 def test_kedro_mlflow_config_new_experiment_does_not_exists(
     mocker, tmp_path, config_dir
 ):

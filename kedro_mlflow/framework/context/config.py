@@ -18,7 +18,14 @@ class KedroMlflowConfig:
 
     UI_OPTS = {"port": None, "host": None}
 
-    NODE_HOOK_OPTS = {"flatten_dict_params": False, "recursive": True, "sep": "."}
+    NODE_HOOK_OPTS = {
+        "flatten_dict_params": False,
+        "recursive": True,
+        "sep": ".",
+        "long_parameters_strategy": "fail",
+    }
+
+    AVAILABLE_LONG_PARAMETERS_STRATEGY = ["fail", "truncate", "tag"]
 
     def __init__(
         self,
@@ -134,8 +141,21 @@ class KedroMlflowConfig:
             opts=node_hook_opts, default=self.NODE_HOOK_OPTS
         )
 
+        # this parameter validation should likely be elsewhere
+        # when refactoring KedroMlflowConfig, we shoudl use an object
+        # to validate data with a @property
+        if (
+            self.node_hook_opts["long_parameters_strategy"]
+            not in self.AVAILABLE_LONG_PARAMETERS_STRATEGY
+        ):
+            strategy_list = ", ".join(self.AVAILABLE_LONG_PARAMETERS_STRATEGY)
+            raise KedroMlflowConfigError(
+                f"'long_parameters_strategy' must be one of [{strategy_list}], "
+                f"got '{self.node_hook_opts['long_parameters_strategy']}'"
+            )
+
         # instantiate mlflow objects to interact with the database
-        # the client must not be create dbefore carefully checking the uri,
+        # the client must not be created before carefully checking the uri,
         # otherwise mlflow creates a mlruns folder to the current location
         self.mlflow_client = mlflow.tracking.MlflowClient(
             tracking_uri=self.mlflow_tracking_uri

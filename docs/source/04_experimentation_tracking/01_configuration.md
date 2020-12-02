@@ -89,9 +89,16 @@ hooks:
     flatten_dict_params: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
     recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
     sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}}will be logged as hyperaparam1.p1 and hyperaparam1.p2 oin mlflow.
+    long_parameters_strategy: fail  # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should kedro-mlflow do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
 ```
 
 If you set `flatten_dict_params` to `True`, each key of the dictionary will be logged as a mlflow parameters, instead of a single parameter for the whole dictionary. Note that it is recommended to facilitate run comparison.
+
+The `long_parameters_strategy` key enable to define different way to handle parameters over the mlflow limit (currently 250 characters):
+
+- `fail`: no special management of characters above the limit. They will be send to mlflow and as a result, in some backend they will be stored normally ([e.g. for FileStore backend](https://github.com/mlflow/mlflow/issues/2814#issuecomment-628284425)) and for some others logging will fail.
+- `truncate`: All parameters above the limit will be automatically truncated to a 250-character length to make sure logging will pass for all mlflow backend.
+- `tag`: Any parameter above the limit will be registered as a tag instead of a parameter as it seems to be the [recommended mlflow way to deal with long parameters](https://github.com/mlflow/mlflow/issues/1976).
 
 ### Configure the user interface
 

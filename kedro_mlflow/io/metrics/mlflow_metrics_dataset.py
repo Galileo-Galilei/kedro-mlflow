@@ -15,7 +15,9 @@ class MlflowMetricsDataSet(AbstractDataSet):
     """This class represent MLflow metrics dataset."""
 
     def __init__(
-        self, run_id: str = None, prefix: Optional[str] = None,
+        self,
+        run_id: str = None,
+        prefix: Optional[str] = None,
     ):
         """Initialise MlflowMetricsDataSet.
 

@@ -1,0 +1,106 @@
+# Configure mlflow inside your project
+
+We assume in this section that you have [installed `kedro-mlflow` in your virtual environment](../02_installation/01_installation.md) and you have [configured your project](../02_installation/02_setup.md) with a `mlflow.yml` configuration file and hooks declaration.
+
+## Context: mlflow tracking under the hood
+
+Mlflow is composed of four modules which are described in the [introduction section](../01_introduction/01_introduction.md). The ain module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
+
+![mlflow_tracking_schema](../imgs/mlflow_tracking_schema.png)
+
+Basically, this schema shows that mlflow separates WHERE the artifacts are logged from HOW they are logged inside your code. You need to setup your mlflow tracking server separately from your code, and then each logging will send a request to the tracking server to store the elements you want to track in the appropriate location. The advantage of such a setup are numerous:
+
+- once the mlflow tracking server is setup, there is single parameter to set before logging which is the tracking server uri. This makes configuration very easy in your project.
+- since the different storage locations are well identified, it is easy to define custom solutions for each of them. They can be [database or even local folders](https://mlflow.org/docs/latest/tracking.html#mlflow-tracking-servers).
+
+The rationale behind the separation of the backend store and the artifacts store is that artifacts can be very big and are duplicated across runs, so they need a special management with extensible storage. This is typically [cloud storage like AWS S3 or Azure Blob storage](https://mlflow.org/docs/latest/tracking.html#id10).
+
+## The ``mlflow.yml`` file
+
+The ``mlflow.yml`` file contains all configuration you can pass either to kedro or mlflow through the plugin. Note that you can duplicate `mlflow.yml` file in as many  environments (i.e. `conf/` folders) as you need.
+
+### Configure the tracking server
+
+``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly. The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded) value. The ``mlflow.yml`` default have this keys set to ``mlruns``. This will create a ``mlruns`` folder locally at the root of your kedro project and enable you to use the plugin without any setup of a mlflow tracking server.
+
+Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically.
+
+```yaml
+mlflow_tracking_uri: mlruns
+```
+
+This is the **only mandatory key in the `mlflow.yml` file**, but there are many others described hereafter that provide fine-grained control on your mlflow setup.
+
+You can also specify some environment variables needed by mlflow (e.g `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) in the credentials and specify them in the `mlflow.yml`. Any key specified will be automatically exported as environment variables.
+
+Your `credentials.yml` will look as follows:
+
+```yaml
+my_mlflow_credentials:
+  AWS_ACCESS_KEY_ID: <your-key>
+  AWS_SECRET_ACCESS_KEY: <your-secret-key>
+```
+
+and your can supply the credentials key of the `mlflow.yml`:
+
+```yaml
+credentials: my_mlflow_credentials
+```
+
+For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They wil be exported as environment variables *on the fly* when running the pipeline.
+
+### Configure mlflow experiment
+
+Mlflow enable the user to create "experiments" to organize his work. The different experiments will be visible on the left panel of the mlflow user interface. You can create an experiment through the `mlflow.yml` file witht the `experiment` key:
+
+```yaml
+experiment:
+  name: <your-experiment-name>  # by default, the name of your python package in your kedro project
+  create: True  # if the specified `name` does not exists, should it be created?
+```
+
+Note that by default, mlflow crashes if you try to start a run while you have not created the experiment first. `kedro-mlflow` has a `create` key (`True` by default) which forces the creation of the experiment if it does not exist. Set it to `False` to match mlflow default value.
+
+### Configure the run
+
+When you launch a new `kedro` run, `kedro-mlflow` instantiates an underlying `mlflow` run through the hooks. By default, we assume the user want to launch each kedro run in separated mlflow run to keep a one to one relationship between kedro runs and mlflow runs. However, one may need to *continue* an existing mlflow run (for instance, because you resume the kedro run from a later starting point of your pipeline).
+
+The `mlflow.yml` accepts the following keys:
+
+```yaml
+run:
+  id: null # if `id` is None, a new run will be created
+  name: null # if `name` is None, pipeline name will be used for the run name
+  nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
+```
+
+- If you want to continue to log in an existing mlflow run, write its id in the `id` key.
+- If you want to enable the creation of sub runs inside your nodes (for instance, for model comparison or hyperparameter tuning), set the `nested` key to `True`
+
+### Configure the hooks
+
+You may sometimes encounter an mlflow failure "parameters too long". Mlflow has indeed an upper limit on the length of the parameters you can store in it. This is a very common pattern when you log a full dictionary in mlflow (e.g. the reserved keyword `parameters` in kedro, or a dictionnary conaining all the hyperparameters you want to tune for a given model). You can configure the `kedro-mlflow` hooks to overcome this limitation by "flattening" automatically dictionaries in a kedro run.
+
+The `mlflow.yml` accepts the following keys:
+
+```yaml
+hooks:
+  node:
+    flatten_dict_params: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
+    recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
+    sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}}will be logged as hyperaparam1.p1 and hyperaparam1.p2 oin mlflow.
+```
+
+If you set `flatten_dict_params` to `True`, each key of the dictionary will be logged as a mlflow parameters, instead of a single parameter for the whole dictionary. Note that it is recommended to facilitate run comparison.
+
+### Configure the user interface
+
+You can configure mlflow user interface default params inside the `mlflow.yml`:
+
+```yaml
+ui:
+  port: null  # the port to use for the ui. Find a free port if null.
+  host: null  # the host to use for the ui. Default to "localhost" if null.
+```
+
+The port and host parameters set in this configuration will be used by default if you use `kedro mlflow ui` command (instead of `mlflow ui`) to open the user interface. Note that the `kedro mlflow ui` command will also use the `mlflow_tracking_uri` key set inside `mlflow.yml`.

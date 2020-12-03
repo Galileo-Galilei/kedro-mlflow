@@ -1,4 +1,3 @@
-# import mlflow
 import mlflow
 import pandas as pd
 import pytest
@@ -91,14 +90,15 @@ def kedro_pipeline_model(tmp_path, pipeline_ml_obj, dummy_catalog):
 
 
 def test_save_unversioned_under_same_path(
-    linreg_path, linreg_model,
+    linreg_path,
+    linreg_model,
 ):
     model_config = {
         "name": "linreg",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
             "flavor": "mlflow.sklearn",
-            "filepath": linreg_path,
+            "filepath": linreg_path.as_posix(),
         },
     }
     mlflow_model_ds = MlflowModelSaverDataSet.from_config(**model_config)
@@ -114,7 +114,7 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
         "name": "linreg",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
-            "filepath": linreg_path,
+            "filepath": linreg_path.as_posix(),
             "flavor": "mlflow.sklearn",
             "versioned": versioned,
         },
@@ -143,7 +143,9 @@ def test_pyfunc_flavor_python_model_save_and_load(
         "name": "kedro_pipeline_model",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
-            "filepath": tmp_path / "data" / "06_models" / "my_custom_model",
+            "filepath": (
+                tmp_path / "data" / "06_models" / "my_custom_model"
+            ).as_posix(),
             "flavor": "mlflow.pyfunc",
             "pyfunc_workflow": "python_model",
             "save_args": {"artifacts": artifacts, "conda_env": {"python": "3.7.0"}},

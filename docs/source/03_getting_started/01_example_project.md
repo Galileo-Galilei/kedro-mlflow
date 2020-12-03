@@ -1,13 +1,13 @@
 # Example project
 
-## Check your installation
+## Install the plugin in a virtual environment
 
-Create a conda environment and ``kedro-mlflow`` (this will automatically install ``kedro>=0.16.0``).
+Create a conda environment and install ``kedro-mlflow`` (this will automatically install ``kedro>=0.16.0``).
 
 ```console
 conda create -n km_example python=3.6.8 --yes
 conda activate km_example
-pip install kedro-mlflow
+pip install kedro-mlflow==0.4.1
 ```
 
 ## Install the toy project
@@ -90,7 +90,7 @@ Good for first-time users. (default=N)
  [y/N]: y
 ```
 
-# Install dependencies
+## Install dependencies
 
 Move to the project directory:
 
@@ -98,11 +98,8 @@ Move to the project directory:
 cd km-example
 ```
 
-Install the project dependencies:
+Install the project dependencies (**Warning: Do not use ``kedro install`` commands [does not install the packages in your activated environment](https://github.com/quantumblacklabs/kedro/issues/589)**):
 
 ```console
 pip install -r src/requirements.txt
-pip install --upgrade kedro-mlflow==0.4.0
 ```
-
-**Warning: Do not use ``kedro install`` commands does not seem to install the packages in your activated environment.**

@@ -64,7 +64,7 @@ class MlflowNodeHook:
         run_id: str,
     ) -> None:
         """Hook to be invoked before a node runs.
-        This hook logs all the paramters of the nodes in mlflow.
+        This hook logs all the parameters of the nodes in mlflow.
         Args:
             node: The ``Node`` to run.
             catalog: A ``DataCatalog`` containing the node's inputs and outputs.

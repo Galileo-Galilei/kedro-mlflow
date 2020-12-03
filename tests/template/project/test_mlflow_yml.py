@@ -29,6 +29,7 @@ def test_mlflow_yml_rendering(template_mlflowyml):
         mlflow_config = yaml.load(file_handler)
     expected_config = dict(
         mlflow_tracking_uri="mlruns",
+        credentials=None,
         ui=KedroMlflowConfig.UI_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
         experiment=KedroMlflowConfig.EXPERIMENT_OPTS,

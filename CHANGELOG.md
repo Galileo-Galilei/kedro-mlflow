@@ -2,21 +2,23 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2020-12-03
+
 ### Added
 
-- It is now possible to supply credentials for the mlflow tracking server within `mlflow.yml` and `credentials.yml`. They will be exported as environment variables during the run. ([#31](https://github.com/Galileo-Galilei/kedro-mlflow/issues/31))
+-   It is now possible to supply credentials for the mlflow tracking server within `mlflow.yml` and `credentials.yml`. They will be exported as environment variables during the run. ([#31](https://github.com/Galileo-Galilei/kedro-mlflow/issues/31))
 
 ### Fixed
 
-- Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
-- Fix various docs typo ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
-- When the underlying Kedro pipeline fails, the associated mlflow run is now marked as 'FAILED' instead of 'FINISHED'. It is rendered with a red cross instead of the green tick in the mlflow user interface ([#121](https://github.com/Galileo-Galilei/kedro-mlflow/issues/121)).
-- Fix a bug which made `KedroPipelineModel` impossible to load if one of its artifact was a `MlflowModel<Saver/Logger>DataSet`. These datasets were not deepcopiable because of one their attributes was a module ([#122](https://github.com/Galileo-Galilei/kedro-mlflow/issues/122)).
+-   Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
+-   Fix various docs typo ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
+-   When the underlying Kedro pipeline fails, the associated mlflow run is now marked as 'FAILED' instead of 'FINISHED'. It is rendered with a red cross instead of the green tick in the mlflow user interface ([#121](https://github.com/Galileo-Galilei/kedro-mlflow/issues/121)).
+-   Fix a bug which made `KedroPipelineModel` impossible to load if one of its artifact was a `MlflowModel<Saver/Logger>DataSet`. These datasets were not deepcopiable because of one their attributes was a module ([#122](https://github.com/Galileo-Galilei/kedro-mlflow/issues/122)).
 
 ### Changed
 
-- Refactor doc structure for readability ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
-- The `KedroMlflowConfig` no longer creates the mlflow experiment and access to the mlflow tracking server when it is instantiated. A new `setup()` method sets up the mlflow configuration (tracking uri, credentials and experiment management) but must now be called explicitly. ([#97](https://github.com/Galileo-Galilei/kedro-mlflow/issues/97))
+-   Refactor doc structure for readability ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
+-   The `KedroMlflowConfig` no longer creates the mlflow experiment and access to the mlflow tracking server when it is instantiated. A new `setup()` method sets up the mlflow configuration (tracking uri, credentials and experiment management) but must now be called explicitly. ([#97](https://github.com/Galileo-Galilei/kedro-mlflow/issues/97))
 
 ## [0.4.0] - 2020-11-03
 
@@ -150,7 +152,9 @@ Many documentation improvements:
 
 [0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.1...HEAD
+
+[0.4.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.0...0.4.1
 
 [0.4.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.3.0...0.4.0
 

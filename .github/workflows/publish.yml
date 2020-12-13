@@ -32,21 +32,22 @@ jobs:
         git checkout -b develop --track origin/develop
         git merge master
         git push
-    - name: Set dynamically package version as environment variable
+    - name: Set dynamically package version as output variable # see https://github.com/actions/create-release/issues/39
       # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
+      id: set_package_version
       run: |
-        echo "::set-env name=PACKAGE_VERSION::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
+        echo "::set-output name=PACKAGE_VERSION::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
     - name: Create temporary file with the body content for the release
       run: |
-        grep -Poz "## \[${{env.PACKAGE_VERSION}}] - \d{4}-\d{2}-\d{2}[\S\s]+?(?=## \[\d+\.\d+\.\d+\]|\[.+\]:)" CHANGELOG.md > release_body.md
+        grep -Poz "## \[${{steps.set_package_version.outputs.PACKAGE_VERSION}}] - \d{4}-\d{2}-\d{2}[\S\s]+?(?=## \[\d+\.\d+\.\d+\]|\[.+\]:)" CHANGELOG.md > release_body.md
     - name: Create Release # https://github.com/actions/create-release
       id: create_release
       uses: actions/create-release@v1.1.4
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
       with:
-        tag_name: ${{ env.PACKAGE_VERSION }}
-        release_name: Release ${{ env.PACKAGE_VERSION }}
+        tag_name: ${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
+        release_name: Release ${{ steps.set_package_version.outputs.PACKAGE_VERSION }}
         body_path: ./release_body.md
         draft: false
         prerelease: false

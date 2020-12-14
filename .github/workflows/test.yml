@@ -43,6 +43,7 @@ jobs:
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v1
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}  # token is not mandatory but make access more stable
         file: ./coverage.xml
         env_vars: OS,PYTHON
         fail_ci_if_error: true

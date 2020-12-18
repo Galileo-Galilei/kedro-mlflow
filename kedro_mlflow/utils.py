@@ -1,8 +1,7 @@
 import re
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Dict, Union
 
-import anyconfig
 import yaml
 from kedro import __version__ as KEDRO_VERSION
 from kedro.framework.context import load_context

@@ -4,11 +4,11 @@
 
 ### Added
 
-- A new key `long_parameters_strategy` is added in the `mlflow.yml` (under in the hook/node section). You can specify different strategies (`fail`, `truncate` or `tag`) to handle parameters over 250 characters which cause crashes for some mlflow backend. ([#69](https://github.com/Galileo-Galilei/kedro-mlflow/issues/69))
+- A new `long_parameters_strategy` key is added in the `mlflow.yml` (under in the hook/node section). You can specify different strategies (`fail`, `truncate` or `tag`) to handle parameters over 250 characters which cause crashes for some mlflow backend. ([#69](https://github.com/Galileo-Galilei/kedro-mlflow/issues/69))
 
 ### Fixed
 
-- Pin the kedro version to force it to be **strictly** inferior to `0.17` which is not compatible with current `kedro-mlflow` version
+- Pin the kedro version to force it to be **strictly** inferior to `0.17` which is not compatible with current `kedro-mlflow` version ([#143](https://github.com/Galileo-Galilei/kedro-mlflow/issues/143))
 
 ## [0.4.1] - 2020-12-03
 

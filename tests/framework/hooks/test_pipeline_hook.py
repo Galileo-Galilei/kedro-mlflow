@@ -317,6 +317,75 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         }
 
 
+@pytest.mark.parametrize(
+    "copy_mode,expected",
+    [
+        (None, {"raw_data": None, "data": None, "model": None}),
+        ("assign", {"raw_data": "assign", "data": "assign", "model": "assign"}),
+        ("deepcopy", {"raw_data": "deepcopy", "data": "deepcopy", "model": "deepcopy"}),
+        ({"model": "assign"}, {"raw_data": None, "data": None, "model": "assign"}),
+    ],
+)
+def test_mlflow_pipeline_hook_with_copy_mode(
+    mocker,
+    monkeypatch,
+    tmp_path,
+    config_dir,
+    dummy_pipeline_ml,
+    dummy_catalog,
+    dummy_run_params,
+    dummy_mlflow_conf,
+    copy_mode,
+    expected,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    monkeypatch.chdir(tmp_path)
+    pipeline_hook = MlflowPipelineHook()
+    runner = SequentialRunner()
+
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
+
+    pipeline_to_run = pipeline_ml_factory(
+        training=dummy_pipeline_ml.training,
+        inference=dummy_pipeline_ml.inference,
+        input_name=dummy_pipeline_ml.input_name,
+        conda_env={},
+        model_name=dummy_pipeline_ml.model_name,
+        copy_mode=copy_mode,
+    )
+    pipeline_hook.before_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+    runner.run(pipeline_to_run, dummy_catalog)
+    run_id = mlflow.active_run().info.run_id
+    pipeline_hook.after_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    loaded_model = mlflow.pyfunc.load_model(model_uri=f"runs:/{run_id}/model")
+
+    actual_copy_mode = {
+        name: ds._copy_mode
+        for name, ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.items()
+    }
+
+    assert actual_copy_mode == expected
+
+
 def test_mlflow_pipeline_hook_metrics_with_run_id(
     mocker,
     monkeypatch,

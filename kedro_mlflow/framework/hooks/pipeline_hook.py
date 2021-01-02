@@ -151,7 +151,7 @@ class MlflowPipelineHook:
             mlflow.pyfunc.log_model(
                 artifact_path=pipeline.model_name,
                 python_model=KedroPipelineModel(
-                    pipeline_ml=pipeline, catalog=pipeline_catalog
+                    pipeline_ml=pipeline, catalog=pipeline_catalog, **pipeline.kwargs
                 ),
                 artifacts=artifacts,
                 conda_env=_format_conda_env(pipeline.conda_env),

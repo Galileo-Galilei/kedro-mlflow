@@ -45,6 +45,7 @@ class PipelineML(Pipeline):
         conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
         model_name: Optional[str] = "model",
         model_signature: Union[ModelSignature, str, None] = "auto",
+        **kwargs,
     ):
 
         """Store all necessary information for calling mlflow.log_model in the pipeline.
@@ -86,6 +87,13 @@ class PipelineML(Pipeline):
                    - If None, no signature is used
                    - if a `ModelSignature` instance, passed
                    to the underlying dataframe
+            kwargs:
+                extra arguments to be passed to `KedroPipelineModel`
+                when the PipelineML object is automatically saved at the end of a run.
+                This includes:
+                    - `copy_mode`: the copy_mode to be used for underlying dataset
+                    when loaded in memory
+                    - `runner`: the kedro runner to run the model with
         """
 
         super().__init__(nodes, *args, tags=tags)
@@ -95,7 +103,7 @@ class PipelineML(Pipeline):
         self.model_name = model_name
         self.input_name = input_name
         self.model_signature = model_signature
-
+        self.kwargs = kwargs  # its purpose is to be eventually reused when saving the model within a hook
         self._check_consistency()
 
     @property

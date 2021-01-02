@@ -51,9 +51,9 @@ def pipeline_ml_obj():
     return pipeline_ml_obj
 
 
-def test_model_packaging(tmp_path, pipeline_ml_obj):
-
-    catalog = DataCatalog(
+@pytest.fixture
+def dummy_catalog(tmp_path):
+    dummy_catalog = DataCatalog(
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
@@ -62,12 +62,29 @@ def test_model_packaging(tmp_path, pipeline_ml_obj):
             ),
         }
     )
+    return dummy_catalog
 
-    catalog._data_sets["model"].save(2)  # emulate model fitting
 
-    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(catalog)
+@pytest.mark.parametrize(
+    "copy_mode,expected",
+    [
+        (None, {"raw_data": None, "data": None, "model": None}),
+        ("assign", {"raw_data": "assign", "data": "assign", "model": "assign"}),
+        ("deepcopy", {"raw_data": "deepcopy", "data": "deepcopy", "model": "deepcopy"}),
+        ({"model": "assign"}, {"raw_data": None, "data": None, "model": "assign"}),
+    ],
+)
+def test_model_packaging_with_copy_mode(
+    tmp_path, pipeline_ml_obj, dummy_catalog, copy_mode, expected
+):
 
-    kedro_model = KedroPipelineModel(pipeline_ml=pipeline_ml_obj, catalog=catalog)
+    dummy_catalog._data_sets["model"].save(2)  # emulate model fitting
+
+    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog)
+
+    kedro_model = KedroPipelineModel(
+        pipeline_ml=pipeline_ml_obj, catalog=dummy_catalog, copy_mode=copy_mode
+    )
 
     mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
@@ -80,16 +97,31 @@ def test_model_packaging(tmp_path, pipeline_ml_obj):
         )
         run_id = mlflow.active_run().info.run_id
 
-    loaded_model = mlflow.pyfunc.load_model(
-        model_uri=(Path(r"runs:/") / run_id / "model").as_posix()
-    )
+    loaded_model = mlflow.pyfunc.load_model(model_uri=f"runs:/{run_id}/model")
+
+    # first assertion: prediction works
     assert loaded_model.predict(1) == 2
+
+    # second assertion: copy_mode works
+    actual_copy_mode = {
+        name: ds._copy_mode
+        for name, ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.items()
+    }
+
+    assert actual_copy_mode == expected
+
+
+def test_kedro_pipeline_ml_with_wrong_copy_mode_type(pipeline_ml_obj, dummy_catalog):
+    with pytest.raises(TypeError, match="'copy_mode' must be a 'str' or a 'dict'"):
+        KedroPipelineModel(
+            pipeline_ml=pipeline_ml_obj, catalog=dummy_catalog, copy_mode=1346
+        )
 
 
 # should very likely add tests to see what happens when the artifacts
 # are incorrect
 # incomplete
-# contains to input_name
+# contains no input_name
 # some memory datasets inside the catalog are persisted?
 
 

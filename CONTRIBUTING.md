@@ -2,11 +2,14 @@
 
 The current workflow is the following:
 
-1. Open an issue to describe your feature request or your bug fix with detailed explanation of what you want to achieve.
+1. Open an issue to describe your feature request or your bug fix with a detailed explanation of what you want to achieve.
 2. Fork the repo
 3. Develop locally:
     - Install the precommit file (`pip install pre-commit`, then `pre-commit install`)
     - Create a branch based on the develop branch (``git checkout -b <prefix-branchname> develop``)
+    - Create a conda environment (conda create -n <your-env-name> python==3.7)
+    - Activate this environment (`conda activate <your-env-name>`)
+    - Install the extra dependencies for tests (`pip install kedro-mlflow[tests]`)
     - Apply your changes
     - Run pre-commit (black linting, flake8 errors, isort with ``pre-commit run``)
 4. Submit your changes:
@@ -42,4 +45,4 @@ The current workflow is the following:
 4. Checkout the [publish workflow](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Apublish) to see if:
     - The package has been uploaded on PyPI sucessfully
     - The changes have been merged back to develop
-5. If the pipeline has failed, please raise an issue to correct the CI, and ensure merge on develop "by hand"".
+5. If the pipeline has failed, please raise an issue to correct the CI, and ensure merge on develop manually.

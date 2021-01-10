@@ -5,7 +5,6 @@ import yaml
 
 from kedro_mlflow.utils import (
     KEDRO_VERSION,
-    KedroContextError,
     _already_updated,
     _get_project_globals,
     _is_kedro_project,

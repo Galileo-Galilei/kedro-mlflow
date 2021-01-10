@@ -56,7 +56,7 @@ def commands():
 @commands.command(name="mlflow", cls=KedroClickGroup)
 def mlflow_commands():
     """Use mlflow-specific commands inside kedro project."""
-    pass
+    pass  # pragma: no cover
 
 
 @mlflow_commands.command()

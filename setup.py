@@ -43,7 +43,7 @@ setup(
             "sphinx_rtd_theme==0.5.1",
             "sphinx-markdown-tables==0.0.15",
             "pandas>=1.0.0, <1.3.0",  # avoid to make readthedocs load rc version
-            "numpy>=1.0.0, <1.19.0",  # bug on windows for numpy 1.19.0->1.19.4
+            "numpy>=1.0.0, <1.20.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
         "tests": [
             "pytest>=5.4.0, <7.0.0",

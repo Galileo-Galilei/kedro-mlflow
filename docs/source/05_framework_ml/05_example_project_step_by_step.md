@@ -10,7 +10,7 @@ This assumes the user is familiar with Kedro. We will refer to a `kedro>=0.16.5,
 
 **This is NOT a Kaggle competition. I will not try to create the best model (nor even a _good_ model)** to solve this problem. The goal of this tutorial is to demonstrate how the `pipeline_ml_factory` can help to maintain consistency between training and inference and prepare deployment.
 
-The associated code can be found on github, under [kedro-mlflow-imdb](https://github.com/Galileo-Galilei/kedro-mlflow-imdb) repo.
+The associated code can be found on github, under [kedro-mlflow-tutorial](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial) repo.
 
 ### Introducing the task and dataset
 
@@ -191,9 +191,11 @@ en_stopwords:
 
 Say that before training your model, you to split it between train and test (e.g. to early stop on test), and then calculate some metrics on this test data (note that it will never replace using a real validation dataset to estimate the real performance of your model).
 
-You can add some nodes which are completely unrelated to your inference pipeline in your training pipeline. What matters is that  
+You can add some nodes which are completely unrelated to your ``inference`` pipeline in your ``training`` pipeline.
 
-#### See the result
+#### Labels post processing
+
+#### Final result:
 
 ### The user_app
 

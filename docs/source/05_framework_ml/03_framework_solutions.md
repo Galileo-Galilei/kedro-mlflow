@@ -80,16 +80,16 @@ mlflow.pyfunc.log_model(
 )
 ```
 
-Note that you need to provide the log_model function a bunch of non trivial-to-retrieve informations (the conda environment, the "artifacts" i.e. the persisted data you need to reuse like tokenizers / ml models / encoders, the model signature i.e. the columns names and types...). The ``PipelineML`` object has methods like `extract_pipeline_artifacts` to help you, but it needs some work on your side.
+Note that you need to provide the ``log_model`` function a bunch of non trivial-to-retrieve informations (the conda environment, the "artifacts" i.e. the persisted data you need to reuse like tokenizers / ml models / encoders, the model signature i.e. the columns names and types...). The ``PipelineML`` object has methods like `extract_pipeline_artifacts` to help you, but it needs some work on your side.
 
-> Saving Kedro pipelines as Mlflow Model objects is convenient and enable pipeline serving serving. However, it does not does not solve the decorrelation between training and inference: each time one triggers a training pipeline, (s)he must think to save it immediately afterwards. Good news: triggering operations at some "execution moment" of a Kedro Pipeline (like after it finished runnning) is exactly what hooks are designed for!
+> Saving Kedro pipelines as Mlflow Model objects is convenient and enable pipeline serving serving. However, it does not does not solve the decorrelation between training and inference: each time one triggers a training pipeline, (s)he must think to save it immediately afterwards. Good news: triggering operations at some "execution moment" of a Kedro ``Pipeline`` (like after it finished runnning) is exactly what hooks are designed for!
 
 ### kedro-mlflow's magic: inference autologging
 
 When running the training pipeline, we have all the desired informations we want to pass to the ``KedroPipelineModel`` class and ``mlflow.pyfunc.log_model`` function:
 
 - the artifacts exist in the DataCatalog if they are persisted
-- the "instances" dataset is loaded at the beginning of training, thus e can infer its schema (columns names and types)
+- the "instances" dataset is loaded at the beginning of training, thus we can infer its schema (columns names and types)
 - the inference and training pipeline codes are retrieved at the same moments, so consistency checks can be performed
 
 Hence, ``kedro-mlflow`` provides a ``MlflowPipelineHook.after_pipeline_run`` hook which perfoms the following operations:

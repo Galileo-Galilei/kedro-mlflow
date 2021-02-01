@@ -17,13 +17,13 @@ The main differences between these apps are:
 - Each app development / deployment  is likely under the responsibility of different people / teams.
 - Each app has a different development lifecyle. It implies that development can be parallelized, and releasing one app to fix a bug does not imply to release the other ones. If your training pipeline is time /resources consuming, you do not want a bugfix in the *user_app* to trigger a retraining of your model, do you?
 - Each app has its own orchestration timeline. For instance, the data produced by the etl can be stored independently of whether the *user_app* and the *ml_app* consume them "on the fly" or not.
-- Each app do not communicate with the other apart from a clear interace: the data schema accepted as inputs/ output of each app.
+- Each app do not communicate with the other apart from a clear interface: the data schema accepted as inputs/ output of each app.
 
 ## Apps development lifecycle in a machine learning project
 
 ### The data scientist creates at least part of the 3 apps
 
-Note that there are **as many _etl_app_ and _user_app_** as needed for the different use of your model. Since **training the model is a specific use, the data scientist will need one to create its own _etl_app_ and _*_user_app_**. These apps will very likely be replaced later by the true business app dedicated to the model use.
+Note that there are **as many _etl_app_ and _user_app_** as needed for the different use of your model. Since **training the model is a specific use, the data scientist will need one to create its own _etl_app_ and _user_app_**. These apps will very likely be replaced later by the true business app dedicated to the model use.
 
 We saw that the data scientist has to create some code that will be replaced by other people code when deploying the model. As a consequence, the interactions between these apps must be very clearly defined at the beginning of the project. We claim that it is possible to cover most use case with the following schema:
 

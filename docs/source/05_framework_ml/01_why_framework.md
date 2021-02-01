@@ -71,7 +71,7 @@ This is a **cyclic** development process based on a **stochastic** behaviour of 
 
 > **Kedro is a very new tool and cannot be called "mature" at this stage but tries to solve this development lifecyle with a very fluent API to create and modify machine learning pipelines.**
 
-## Deployment issues addressed by `kedro-mlflow`
+## Deployment issues addressed by `kedro-mlflow` and their solutions
 
 ### Out of scope
 
@@ -89,7 +89,7 @@ The main reason which explains why training is hard to reproduce is the iterativ
 
 Note that there is also a lot of "innate" randomness in ML pipelines and if a seed is not set explictly as a parameter , the run will likely not be reproducible (separation train/test/validation, moving underlying data sources, random initialisation for optimizers, random split for bootstrap...).
 
-#### Issue 2: The data scientist and stakeholders focus on training
+### Issue 2: The data scientist and stakeholders focus on training
 
 While building the ML model, the inference pipeline is often completely ignored by the data scientist. The best example are Kaggle competitions where a very common workflow is the following:
 
@@ -105,7 +105,7 @@ The very important issue which arises with such a workflow is that **you complet
 
 > `kedro-mlflow` enables to log the inference pipeline as a Mlflow Model (through a `KedroPipelineModel` class) to ensure that you deploy the inference pipeline as a whole.
 
-#### Issue 3: Inference and training are entirely decoupled
+### Issue 3: Inference and training are entirely decoupled
 
 As stated previous paragraph, the inference pipeline is not a primary concern when experimenting and developing your model. This raises strong reproducibility issues. Assume that you have logged the model and all its parameters when training (which is a good point!), you will still need to retrieve the code used during training to create the inference pipeline. This is in my experience quite difficult:
 
@@ -114,7 +114,7 @@ As stated previous paragraph, the inference pipeline is not a primary concern wh
 
 > `kedro-mlflow` offers a `PipelineML` (and its helpers `pipeline_ml_factory`) class which binds the `training` and `inference` pipeline, and a hook which autolog such pipelines when they are run. This enables data scientists to ensure that each training model is logged with its associated inference pipeline, and is ready to use for any end user. This decreases a lot the necessary cognitive complexity to ensure coherence between training and inference.
 
-#### Issue 4: Data scientists do not handle business objects
+### Issue 4: Data scientists do not handle business objects
 
 It is often said that data scientists deliver machine learning *models*. This assumes that all the preprocessing will be recoded the end user of your model. This is a major cause of poor adoption of your model in an enterprise setup because it makes your model:
 
@@ -130,13 +130,12 @@ Your model must handle business objects (e.g. a mail, a movie review, a customer
 
 ### Overcoming these problems: support an organisational solution with an efficient tool
 
--> auto tracking
--> data scientists must deliver training pipelines which takes business objects as inputs
--> training and inference pipelines must be developped at the same time and not one after another
+``kedro-mlflow`` assume that we declare a clear contrat of what the output of the data science project is: it is an an inference pipeline. This defines a clear "definition of done" of the data science project: is it ready to deploy?
 
--> declare a clear contrat of what the output of the data science project is: an inference pipeline. This defines a clear "definition of done" of the data science project: is it ready to deploy?
+The downside of such an approach is that it increases data scientist's responsibilities,because s(he) is responsible for his code.
 
-Downside? -> it increases data scientist's responsibilities ->
-However, this adds rigidity to the data scientist work and this must not decreases the quality of the delivery: the data scientist should still benifts from the interactivy he needs to work => we want to leverage kedro which is very flexible and offers a convenient way to transition from notebooks to pipeline
+``kedro-mlflow`` offers a very convenient way (through the ``pipeline_ml_factory`` function) to make sure that each experiment will result in creating a compliant "output".
+
+This is very transparent for the data scientist who have no extra constraints (apart from developing in Kedro) to respect this contract. Hence, the data scientist still benefits from the interactivity he needs to work. This is why we want to leverage Kedro which is very flexible and offers a convenient way to transition from notebooks to pipeline, and leverage Mlflow for standardising the definiton of an "output" of a datscience project.
 
 > Enforcing these solutions with a tool: `kedro-mlflow` at the rescue

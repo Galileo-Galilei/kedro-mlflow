@@ -1,4 +1,4 @@
-# kedro-mlflow mlops solution
+# ``kedro-mlflow`` mlops solution
 
 ## Reminder
 

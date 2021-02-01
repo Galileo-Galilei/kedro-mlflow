@@ -33,7 +33,7 @@ Above implementations have the advantage of being very straightforward and *mlfl
   - it is **hard to modify** (if you want to remove / add / modify an mlflow action you have to find it in the code)
   - it **prevents reuse** (re-usable function must not contain mlflow specific code unrelated to their functional specificities, only their execution must be tracked).
 
-``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by kedro-mlflow and the location in Kedro template where the action should be performed.
+``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by ``kedro-mlflow`` and the location in Kedro template where the action should be performed.
 
 |Mlflow action                |Template file           |Python API                                        |
 |:----------------------------|:-----------------------|:------------------------------------------------------|

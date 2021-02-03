@@ -1,4 +1,5 @@
 # Versioning Kedro DataSets
+
 ## What is artifact tracking?
 
 Mlflow defines artifacts as "any data a user may want to track during code execution". This includes, but is not limited to:
@@ -13,7 +14,7 @@ Artifacts are a very flexible and convenient way to "bind" any data type to your
 
 ## How to version data in a kedro project?
 
-kedro-mlflow introduces a new ``AbstractDataSet`` called ``MlflowArtifactDataSet``. It is a wrapper for any ``AbstractDataSet`` which decorates the underlying dataset ``save`` method and logs the file automatically in mlflow as an artifact each time the ``save`` method is called.
+``kedro-mlflow`` introduces a new ``AbstractDataSet`` called ``MlflowArtifactDataSet``. It is a wrapper for any ``AbstractDataSet`` which decorates the underlying dataset ``save`` method and logs the file automatically in mlflow as an artifact each time the ``save`` method is called.
 
 Since it is an ``AbstractDataSet``, it can be used with the YAML API. Assume that you have the following entry in the ``catalog.yml``:
 

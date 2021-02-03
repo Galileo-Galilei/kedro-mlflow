@@ -4,7 +4,7 @@ This section assume that [you have installed `kedro-mlflow` in your virtual envi
 
 ## Create a kedro project
 
-This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_getting_started/03_new_project.html).
+This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/02_get_started/04_new_project.html).
 
 If you do not have a real-world project, you can use a kedro example and [follow the "Getting started" example](../03_getting_started/01_example_project.md) to make a demo of this plugin out of the box.
 
@@ -36,13 +36,13 @@ you should see the following message:
 
 ### Declaring kedro-mlflow hooks
 
-``kedro_mlflow`` hooks implementations must be registered with Kedro. There are three ways of registring [hooks](https://kedro.readthedocs.io/en/latest/07_extend_kedro/04_hooks.html?highlight=hooks).
+``kedro_mlflow`` hooks implementations must be registered with Kedro. There are three ways of registering [hooks](https://kedro.readthedocs.io/en/latest/07_extend_kedro/02_hooks.html).
 
 **Note that you must register the two hooks provided by kedro-mlflow** (``MlflowPipelineHook`` and ``MlflowNodeHook``) for the plugin to work.
 
 #### Declaring hooks through auto-discovery (for `kedro>=0.16.4`) [Default behaviour]
 
-If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/07_extend_kedro/04_hooks.html#disable-auto-registered-plugins-hooks) in your `.kedro.yml` or your `pyproject.toml` file.
+If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/07_extend_kedro/02_hooks.html#disable-auto-registered-plugins-hooks) in your `.kedro.yml` or your `pyproject.toml` file.
 
 #### Declaring hooks through code, in ``ProjectContext`` (for `kedro>=0.16.0, <=0.16.3`)
 

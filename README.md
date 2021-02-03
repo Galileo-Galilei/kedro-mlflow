@@ -18,7 +18,7 @@
 
 # What is kedro-mlflow?
 
-``kedro-mlflow`` is a [kedro-plugin](https://kedro.readthedocs.io/en/stable/04_user_guide/10_developing_plugins.html) for lightweight and portable integration of [mlflow](https://mlflow.org/docs/latest/index.html) capabilities inside [kedro](https://kedro.readthedocs.io/en/stable/index.html) projects. It enforces [``Kedro`` principles](https://kedro.readthedocs.io/en/stable/12_faq/01_faq.html?highlight=principles#what-is-the-philosophy-behind-kedro) to make mlflow usage as production ready as possible. Its core functionalities are :
+``kedro-mlflow`` is a [kedro-plugin](https://kedro.readthedocs.io/en/stable/07_extend_kedro/04_plugins.html) for lightweight and portable integration of [mlflow](https://mlflow.org/docs/latest/index.html) capabilities inside [kedro](https://kedro.readthedocs.io/en/stable/index.html) projects. It enforces [``Kedro`` principles](https://kedro.readthedocs.io/en/stable/12_faq/01_faq.html?highlight=principles#what-is-the-philosophy-behind-kedro) to make mlflow usage as production ready as possible. Its core functionalities are :
 
 - **versioning**: `kedro-mlflow` intends to enhance reproducibility for machine learning experimentation. With `kedro-mlflow` installed, you can effortlessly register your parameters or your datasets with minimal configuration in a kedro run. Later, you will be able to browse your runs in the mlflow UI, and retrieve the runs you want. This is directly linked to [Mlflow Tracking](https://www.mlflow.org/docs/latest/tracking.html).
 - **model packaging**: ``kedro-mlflow`` intends to be be an agnostic machine learning framework for people who want to write portable, production ready machine learning pipelines. It offers a convenient API to convert a Kedro pipeline to a ``model`` in the mlflow sense. Consequently, you can *API-fy* or serve your Kedro pipeline with one line of code, or share a model with without worrying of the preprocessing to be made for further use. This is directly linked to [Mlflow Models](https://www.mlflow.org/docs/latest/models.html).
@@ -39,19 +39,19 @@ If you want to use the ``develop`` version of the package which is the most up t
 pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git@develop
 ```
 
-I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/stable/02_getting_started/01_prerequisites.html).
+I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/02_get_started/02_install.html).
 
 # Getting started
 
 The documentation contains:
 
-- [A "hello world" example](https://kedro-mlflow.readthedocs.io/en/latest/source/02_hello_world_example/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
-- A more [detailed tutorial](https://kedro-mlflow.readthedocs.io/en/latest/source/03_tutorial/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
+- [A "hello world" example](https://kedro-mlflow.readthedocs.io/en/stable/source/03_getting_started/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
+- A more [detailed tutorial](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
 
 Some frequently asked questions on more advanced features:
 
-- You want to log additional metrics to the run? -> [Try ``MlflowMetricsDataSet``](https://kedro-mlflow.readthedocs.io/en/latest/source/03_tutorial/07_version_metrics.html) !
-- You want to log nice dataviz of your pipeline that you register with ``MatplotlibWriter``? -> [Try ``MlflowArtifactDataSet`` to log any local files (.png, .pkl, .csv...) *automagically*](https://kedro-mlflow.readthedocs.io/en/latest/source/02_hello_world_example/02_first_steps.html#artifacts)!
+- You want to log additional metrics to the run? -> [Try ``MlflowMetricsDataSet``](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/05_version_metrics.html) !
+- You want to log nice dataviz of your pipeline that you register with ``MatplotlibWriter``? -> [Try ``MlflowArtifactDataSet`` to log any local files (.png, .pkl, .csv...) *automagically*](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/03_version_datasets.html)!
 - You want to create easily an API to share your awesome model to anyone? -> [See if ``pipeline_ml_factory`` can fit your needs](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16)
 - You want to do something that is not straigthforward with current implementation? Open an issue, and let's see what happens!
 
@@ -65,7 +65,7 @@ This package is still in active development. We use [SemVer](https://semver.org/
 
 The user must be aware that we will not reach `1.0.0` milestone before Kedro does (mlflow has already reached `1.0.0`).
 
-If you want to see how to migrate from one version of `kedro-mlflow` to another, see the [migration guide](docs/source/03_tutorial/00_migration_guide.md).
+If you want to see how to migrate from one version of `kedro-mlflow` to another, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/stable/source/02_installation/03_migration_guide.html).
 
 # Can I contribute?
 

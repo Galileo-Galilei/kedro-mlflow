@@ -6,7 +6,7 @@
 
 I strongly recommend to use ``conda`` (a package manager) to create an environment in order to avoid version conflicts between packages.
 
-I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/stable/02_getting_started/01_prerequisites.html) to set up your Kedro project.
+I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/latest/02_get_started/02_install.html) to set up your Kedro project.
 
 ```console
 conda create -n <your-environment-name> python=<3.[6-8].X>

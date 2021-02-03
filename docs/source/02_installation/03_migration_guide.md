@@ -6,7 +6,7 @@ This page explains how to migrate an existing kedro project to a more up to date
 
 ### Catalog entries
 
-Replace the follwoing entries:
+Replace the following entries:
 
 |old                                    |new                                              |
 |:--------------------------------------|:------------------------------------------------|

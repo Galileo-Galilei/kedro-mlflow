@@ -31,7 +31,13 @@ kedro mlflow init
 you should see the following message:
 
 ```console
-'conf/base/mlflow.yml' successfully updated.
+'conf/local/mlflow.yml' successfully updated.
+```
+
+*Note: you can create the configuration file in another kedro environment with the `--env` argument:*
+
+```console
+kedro mlflow init --env=<other-environment>
 ```
 
 ### Declaring kedro-mlflow hooks

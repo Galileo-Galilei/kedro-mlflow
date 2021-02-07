@@ -5,14 +5,17 @@
 ### Added
 
 - A new `long_parameters_strategy` key is added in the `mlflow.yml` (under in the hook/node section). You can specify different strategies (`fail`, `truncate` or `tag`) to handle parameters over 250 characters which cause crashes for some mlflow backend. ([#69](https://github.com/Galileo-Galilei/kedro-mlflow/issues/69))
+- Add an `env` parameter to `kedro mlflow init` command to specify under which `conf/` subfolder the `mlflow.yml` should be created. ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
 
 ### Fixed
 
 - Pin the kedro version to force it to be **strictly** inferior to `0.17` which is not compatible with current `kedro-mlflow` version ([#143](https://github.com/Galileo-Galilei/kedro-mlflow/issues/143))
+- It is no longer assumed for the project to run that the `mlflow.yml` is located under `conf/base`. The project will run as soon as the configuration file is discovered by the registered ConfigLoader ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
 
 ### Changed
 
 - The `KedroPipelineModel.load_context()` method now loads all the `DataSets` in memory in the `DataCatalog`. It is also now possible to specify the `runner` to execute the model as well as the `copy_mode` when executing the inference pipeline (instead of deepcopying the datasets between each nodes which is kedro's default). This makes the API serving with `mlflow serve` command considerably faster (~20 times faster) for models which needs compiling (i.e. keras, tensorflow ...) ([#133](https://github.com/Galileo-Galilei/kedro-mlflow/issues/133))
+- The CLI projects commands are now always accessible even if you have not called `kedro mlflow init` yet to create a `mlflow.yml` configuration file ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
 
 ## [0.4.1] - 2020-12-03
 

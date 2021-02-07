@@ -11,10 +11,10 @@ kedro mlflow init
 You will see the following message:
 
 ```console
-'conf/base/mlflow.yml' successfully updated.
+'conf/local/mlflow.yml' successfully updated.
 ```
 
-The ``conf/base`` folder is updated and you can see the `mlflow.yml` file:
+The ``conf/local`` folder is updated and you can see the `mlflow.yml` file:
 
 ![initialized_project](../imgs/initialized_project.png)
 

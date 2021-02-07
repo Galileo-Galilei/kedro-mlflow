@@ -60,15 +60,6 @@ def _validate_project_path(project_path: Union[str, Path, None] = None) -> Path:
     return project_path
 
 
-def _already_updated(project_path: Union[str, Path, None] = None) -> bool:
-    project_path = _validate_project_path(project_path)
-    flag = False
-    # TODO : add a better check ...
-    if (project_path / "conf" / "base" / "mlflow.yml").is_file():
-        flag = True
-    return flag
-
-
 def _parse_requirements(path, encoding="utf-8"):
     with open(path, mode="r", encoding=encoding) as file_handler:
         requirements = [

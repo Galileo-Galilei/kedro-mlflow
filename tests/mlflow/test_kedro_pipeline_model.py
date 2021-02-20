@@ -1,4 +1,5 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 import mlflow
 import pandas as pd
@@ -11,6 +12,12 @@ from sklearn.linear_model import LinearRegression
 from kedro_mlflow.io.models import MlflowModelSaverDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import pipeline_ml_factory
+
+
+@pytest.fixture
+def tmp_folder():
+    tmp_folder = TemporaryDirectory()
+    return tmp_folder
 
 
 @pytest.fixture
@@ -75,12 +82,12 @@ def dummy_catalog(tmp_path):
     ],
 )
 def test_model_packaging_with_copy_mode(
-    tmp_path, pipeline_ml_obj, dummy_catalog, copy_mode, expected
+    tmp_path, tmp_folder, pipeline_ml_obj, dummy_catalog, copy_mode, expected
 ):
 
     dummy_catalog._data_sets["model"].save(2)  # emulate model fitting
 
-    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog)
+    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog, tmp_folder)
 
     kedro_model = KedroPipelineModel(
         pipeline_ml=pipeline_ml_obj, catalog=dummy_catalog, copy_mode=copy_mode
@@ -205,7 +212,7 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_ml_obj):
         )
 
 
-def test_kedro_pipeline_ml_loading_deepcoiable_catalog(tmp_path):
+def test_kedro_pipeline_ml_loading_deepcoiable_catalog(tmp_path, tmp_folder):
 
     # create pipelien and catalog. The training will not be triggered
     def fit_fun(data):
@@ -249,7 +256,7 @@ def test_kedro_pipeline_ml_loading_deepcoiable_catalog(tmp_path):
     catalog = DataCatalog({"data": MemoryDataSet(), "model": model_dataset})
 
     kedro_model = KedroPipelineModel(pipeline_ml=ml_pipeline, catalog=catalog)
-    artifacts = ml_pipeline.extract_pipeline_artifacts(catalog)
+    artifacts = ml_pipeline.extract_pipeline_artifacts(catalog, tmp_folder)
 
     mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)

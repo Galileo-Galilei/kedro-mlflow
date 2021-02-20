@@ -1,3 +1,5 @@
+from tempfile import TemporaryDirectory
+
 import mlflow
 import pandas as pd
 import pytest
@@ -15,6 +17,12 @@ from kedro_mlflow.pipeline import pipeline_ml_factory
 def linreg_model():
     linreg_model = LinearRegression()
     return linreg_model
+
+
+@pytest.fixture
+def tmp_folder():
+    tmp_folder = TemporaryDirectory()
+    return tmp_folder
 
 
 @pytest.fixture
@@ -134,10 +142,10 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
 
 
 def test_pyfunc_flavor_python_model_save_and_load(
-    tmp_path, pipeline_ml_obj, dummy_catalog, kedro_pipeline_model
+    tmp_path, tmp_folder, pipeline_ml_obj, dummy_catalog, kedro_pipeline_model
 ):
 
-    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog)
+    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog, tmp_folder)
 
     model_config = {
         "name": "kedro_pipeline_model",

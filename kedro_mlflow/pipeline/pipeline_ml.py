@@ -2,6 +2,7 @@ import logging
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 
+from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
@@ -171,6 +172,7 @@ class PipelineML(Pipeline):
     def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
 
         # check that the pipeline is consistent in case its attributes have been
+        # modified manually
         self._check_consistency()
 
         sub_catalog = DataCatalog()
@@ -183,7 +185,9 @@ class PipelineML(Pipeline):
             else:
                 try:
                     data_set = catalog._data_sets[data_set_name]
-                    if isinstance(data_set, MemoryDataSet):
+                    if isinstance(
+                        data_set, MemoryDataSet
+                    ) and not data_set_name.startswith("params:"):
                         raise KedroMlflowPipelineMLDatasetsError(
                             """
                                 The datasets of the training pipeline must be persisted locally
@@ -210,34 +214,55 @@ class PipelineML(Pipeline):
 
         return sub_catalog
 
-    def extract_pipeline_artifacts(self, catalog: DataCatalog):
+    def extract_pipeline_artifacts(self, catalog: DataCatalog, temp_folder: Path):
         pipeline_catalog = self._extract_pipeline_catalog(catalog)
-        artifacts = {
-            name: Path(dataset._filepath.as_posix())
-            .resolve()
-            .as_uri()  # weird bug when directly converting PurePosixPath to windows: it is considered as relative
-            for name, dataset in pipeline_catalog._data_sets.items()
-            if name != self.input_name
-        }
+
+        artifacts = {}
+        for name, dataset in pipeline_catalog._data_sets.items():
+            if name != self.input_name:
+                if name.startswith("params:"):
+                    # we need to persist it locally for mlflow access
+                    absolute_param_path = temp_folder / f"params_{name[7:]}.pkl"
+                    persisted_dataset = PickleDataSet(
+                        filepath=absolute_param_path.as_posix()
+                    )
+                    persisted_dataset.save(dataset.load())
+                    artifact_path = absolute_param_path.as_uri()
+                else:
+                    # In this second case, we know it cannot be a MemoryDataSet
+                    # weird bug when directly converting PurePosixPath to windows: it is considered as relative
+                    artifact_path = (
+                        Path(dataset._filepath.as_posix()).resolve().as_uri()
+                    )
+
+                artifacts[name] = artifact_path
+
         return artifacts
 
     def _check_consistency(self) -> None:
+
+        inference_parameters = {
+            input for input in self.inference.inputs() if input.startswith("params:")
+        }
+
         free_inputs_set = (
             self.inference.inputs()
             - {self.input_name}
             - self.all_outputs()
             - self.inputs()
+            - inference_parameters  # it is allowed to pass parameters: they will be automatically persisted by the hook
         )
+
         if len(free_inputs_set) > 0:
             input_set_txt = "\n     - ".join(free_inputs_set)
             raise KedroMlflowPipelineMLInputsError(
                 (
-                    "The following inputs are free for the inference pipeline:"
+                    "The following inputs are free for the inference pipeline:\n"
                     f"    - {input_set_txt}."
-                    " No free input is allowed."
+                    " \nNo free input is allowed."
                     " Please make sure that 'inference.inputs()' are all"
                     " in 'training.all_outputs() + training.inputs()'"
-                    "except 'input_name'."
+                    "except 'input_name' and parameters which starts with 'params:'."
                 )
             )
 

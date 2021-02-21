@@ -6,7 +6,7 @@
 
 I strongly recommend to use ``conda`` (a package manager) to create an environment in order to avoid version conflicts between packages.
 
-I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/stable/02_getting_started/01_prerequisites.html) to set up your Kedro project.
+I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/latest/02_get_started/02_install.html) to set up your Kedro project.
 
 ```console
 conda create -n <your-environment-name> python=<3.[6-8].X>
@@ -77,10 +77,10 @@ projects. It is developed as part of
 the Kedro initiative at QuantumBlack.
 
 Installed plugins:
-kedro_mlflow: 0.4.1 (hooks:global,project)
+kedro_mlflow: 0.5.0 (hooks:global,project)
 ```
 
-The version ``0.4.1`` of the plugin is installed and has both global and project commands.
+The version ``0.5.0`` of the plugin is installed and has both global and project commands.
 
 That's it! You are now ready to go!
 

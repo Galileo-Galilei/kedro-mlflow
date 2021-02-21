@@ -200,6 +200,60 @@ def dummy_catalog(tmp_path):
 
 
 @pytest.fixture
+def pipeline_ml_with_parameters():
+    def remove_stopwords(data, stopwords):
+        return data
+
+    def train_fun_hyperparam(data, hyperparam):
+        return 2
+
+    def predict_fun(model, data):
+        return data * model
+
+    def convert_probs_to_pred(data, threshold):
+        return (data > threshold) * 1
+
+    full_pipeline = Pipeline(
+        [
+            # almost the same that previsously but stopwords are parameters
+            # this is a shared parameter between inference and training22
+            node(
+                func=remove_stopwords,
+                inputs=dict(data="data", stopwords="params:stopwords"),
+                outputs="cleaned_data",
+                tags=["training", "inference"],
+            ),
+            # parameters in training pipeline, should not be persisted
+            node(
+                func=train_fun_hyperparam,
+                inputs=["cleaned_data", "params:penalty"],
+                outputs="model",
+                tags=["training"],
+            ),
+            node(
+                func=predict_fun,
+                inputs=["model", "cleaned_data"],
+                outputs="predicted_probs",
+                tags=["inference"],
+            ),
+            # this time, there is a parameter only for the inference pipeline
+            node(
+                func=convert_probs_to_pred,
+                inputs=["predicted_probs", "params:threshold"],
+                outputs="predictions",
+                tags=["inference"],
+            ),
+        ]
+    )
+    pipeline_ml_with_parameters = pipeline_ml_factory(
+        training=full_pipeline.only_nodes_with_tags("training"),
+        inference=full_pipeline.only_nodes_with_tags("inference"),
+        input_name="data",
+    )
+    return pipeline_ml_with_parameters
+
+
+@pytest.fixture
 def dummy_signature(dummy_catalog, dummy_pipeline_ml):
     input_data = dummy_catalog.load(dummy_pipeline_ml.input_name)
     dummy_signature = infer_signature(input_data)
@@ -317,12 +371,80 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         }
 
 
+@pytest.mark.parametrize(
+    "copy_mode,expected",
+    [
+        (None, {"raw_data": None, "data": None, "model": None}),
+        ("assign", {"raw_data": "assign", "data": "assign", "model": "assign"}),
+        ("deepcopy", {"raw_data": "deepcopy", "data": "deepcopy", "model": "deepcopy"}),
+        ({"model": "assign"}, {"raw_data": None, "data": None, "model": "assign"}),
+    ],
+)
+def test_mlflow_pipeline_hook_with_copy_mode(
+    mocker,
+    monkeypatch,
+    tmp_path,
+    config_dir,
+    dummy_pipeline_ml,
+    dummy_catalog,
+    dummy_run_params,
+    dummy_mlflow_conf,
+    copy_mode,
+    expected,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    mocker.patch("kedro_mlflow.utils._is_kedro_project", return_value=True)
+    monkeypatch.chdir(tmp_path)
+    pipeline_hook = MlflowPipelineHook()
+    runner = SequentialRunner()
+
+    pipeline_hook.after_catalog_created(
+        catalog=dummy_catalog,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
+
+    pipeline_to_run = pipeline_ml_factory(
+        training=dummy_pipeline_ml.training,
+        inference=dummy_pipeline_ml.inference,
+        input_name=dummy_pipeline_ml.input_name,
+        conda_env={},
+        model_name=dummy_pipeline_ml.model_name,
+        copy_mode=copy_mode,
+    )
+    pipeline_hook.before_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+    runner.run(pipeline_to_run, dummy_catalog)
+    run_id = mlflow.active_run().info.run_id
+    pipeline_hook.after_pipeline_run(
+        run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+    )
+
+    mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    loaded_model = mlflow.pyfunc.load_model(model_uri=f"runs:/{run_id}/model")
+
+    actual_copy_mode = {
+        name: ds._copy_mode
+        for name, ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.items()
+    }
+
+    assert actual_copy_mode == expected
+
+
 def test_mlflow_pipeline_hook_metrics_with_run_id(
     mocker,
     monkeypatch,
     tmp_path,
     config_dir,
-    env_from_dict,
     dummy_pipeline_ml,
     dummy_run_params,
     dummy_mlflow_conf,
@@ -393,6 +515,74 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
     assert all_runs_id == {current_run_id, existing_run_id}
     assert run_data.metrics["my_metrics.metric_key"] == 1.1
     assert run_data.metrics["foo.metric_key"] == 1.1
+
+
+def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
+    mocker,
+    monkeypatch,
+    config_dir,  # a fixture to be in a kedro project
+    dummy_mlflow_conf,  # a fixture to setup mlflow configuration
+    tmp_path,
+    pipeline_ml_with_parameters,
+    dummy_run_params,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    monkeypatch.chdir(tmp_path)
+
+    context = load_context(tmp_path)
+    mlflow_conf = get_mlflow_config(context)
+    mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
+
+    catalog_with_parameters = DataCatalog(
+        {
+            "data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
+            "cleaned_data": MemoryDataSet(),
+            "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
+            "params:penalty": MemoryDataSet(0.1),
+            "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "params:threshold": MemoryDataSet(0.5),
+        }
+    )
+
+    pipeline_hook = MlflowPipelineHook()
+
+    runner = SequentialRunner()
+    pipeline_hook.after_catalog_created(
+        catalog=catalog_with_parameters,
+        # `after_catalog_created` is not using any of arguments bellow,
+        # so we are setting them to empty values.
+        conf_catalog={},
+        conf_creds={},
+        feed_dict={},
+        save_version="",
+        load_versions="",
+        run_id=dummy_run_params["run_id"],
+    )
+    pipeline_hook.before_pipeline_run(
+        run_params=dummy_run_params,
+        pipeline=pipeline_ml_with_parameters,
+        catalog=catalog_with_parameters,
+    )
+    runner.run(pipeline_ml_with_parameters, catalog_with_parameters)
+
+    current_run_id = mlflow.active_run().info.run_id
+
+    # This is what we want to test: model must be saved and the parameters automatically persisted on disk
+    pipeline_hook.after_pipeline_run(
+        run_params=dummy_run_params,
+        pipeline=pipeline_ml_with_parameters,
+        catalog=catalog_with_parameters,
+    )
+
+    # the 2 parameters which are inputs of inference pipeline
+    # must have been persisted and logged inside the model's artifacts
+    model = mlflow.pyfunc.load_model(f"runs:/{current_run_id}/model")
+    assert set(
+        model.metadata.to_dict()["flavors"]["python_function"]["artifacts"].keys()
+    ) == {"model", "params:stopwords", "params:threshold"}
+
+    # the model should be loadable and predict() should work (this tests KedroPipelineModel)
+    assert model.predict(pd.DataFrame(data=[1], columns=["a"])).values[0][0] == 1
 
 
 @pytest.mark.parametrize(

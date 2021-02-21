@@ -30,6 +30,10 @@ def train_fun(data):
     return 2
 
 
+def train_fun_hyperparam(data, hyperparam):
+    return 2
+
+
 def predict_fun(model, data):
     return data * model
 
@@ -44,6 +48,10 @@ def predict_fun_return_nothing(model, data):
 
 def remove_stopwords(data, stopwords):
     return data
+
+
+def convert_probs_to_pred(data, threshold):
+    return data > threshold
 
 
 @pytest.fixture
@@ -152,6 +160,48 @@ def pipeline_ml_with_inputs_artifacts():
 
 
 @pytest.fixture
+def pipeline_ml_with_parameters():
+    full_pipeline = Pipeline(
+        [
+            # almost the same that previsously but stopwords are parameters
+            # this is a shared parameter between inference and training22
+            node(
+                func=remove_stopwords,
+                inputs=dict(data="data", stopwords="params:stopwords"),
+                outputs="cleaned_data",
+                tags=["training", "inference"],
+            ),
+            # parameters in training pipeline, should not be persisted
+            node(
+                func=train_fun_hyperparam,
+                inputs=["cleaned_data", "params:penalty"],
+                outputs="model",
+                tags=["training"],
+            ),
+            node(
+                func=predict_fun,
+                inputs=["model", "cleaned_data"],
+                outputs="predicted_probs",
+                tags=["inference"],
+            ),
+            # this time, there is a parameter only for the inference pipeline
+            node(
+                func=convert_probs_to_pred,
+                inputs=["predicted_probs", "params:threshold"],
+                outputs="predictions",
+                tags=["inference"],
+            ),
+        ]
+    )
+    pipeline_ml_with_parameters = pipeline_ml_factory(
+        training=full_pipeline.only_nodes_with_tags("training"),
+        inference=full_pipeline.only_nodes_with_tags("inference"),
+        input_name="data",
+    )
+    return pipeline_ml_with_parameters
+
+
+@pytest.fixture
 def dummy_context(tmp_path, config_dir, mocker):
     class DummyContext(KedroContext):
         project_name = "fake project"
@@ -204,6 +254,21 @@ def catalog_with_stopwords():
         }
     )
     return catalog_with_stopwords
+
+
+@pytest.fixture
+def catalog_with_parameters():
+    catalog_with_parameters = DataCatalog(
+        {
+            "data": MemoryDataSet(),
+            "cleaned_data": MemoryDataSet(),
+            "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
+            "params:penalty": MemoryDataSet(0.1),
+            "model": CSVDataSet("fake/path/to/model.csv"),
+            "params:threshold": MemoryDataSet(0.5),
+        }
+    )
+    return catalog_with_parameters
 
 
 @pytest.mark.parametrize(
@@ -332,6 +397,16 @@ def test_filtering_generate_invalid_pipeline_ml(
             pytest.lazy_fixture("pipeline_ml_with_inputs_artifacts"),
             pytest.lazy_fixture("catalog_with_stopwords"),
             {"model", "data", "stopwords_from_nltk"},
+        ),
+        (
+            pytest.lazy_fixture("pipeline_ml_with_parameters"),
+            pytest.lazy_fixture("catalog_with_parameters"),
+            {
+                "model",
+                "data",
+                "params:stopwords",
+                "params:threshold",
+            },
         ),
     ],
 )

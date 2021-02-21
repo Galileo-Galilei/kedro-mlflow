@@ -64,3 +64,15 @@ mlflow.pyfunc.log_model(
     model_signature=model_signature
 )
 ```
+
+It is also possible to pass arguments to `KedroPipelineModel` to specify the runner or the copy_mode of MemoryDataSet for the inference Pipeline. This may be faster especially for  compiled model (e.g keras, tensorflow), and more suitable for an API serving pattern.
+
+```python
+KedroPipelineModel(
+            pipeline_ml=pipeline_training,
+            catalog=catalog,
+            copy_mode="assign"
+        )
+```
+
+Available `copy_mode` are "assign", "copy" and "deepcopy". It is possible to pass a dictionary to specify different copy mode fo each dataset.

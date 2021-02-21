@@ -2,6 +2,25 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2021-02-21
+
+### Added
+
+-   A new `long_parameters_strategy` key is added in the `mlflow.yml` (under in the hook/node section). You can specify different strategies (`fail`, `truncate` or `tag`) to handle parameters over 250 characters which cause crashes for some mlflow backend. ([#69](https://github.com/Galileo-Galilei/kedro-mlflow/issues/69))
+-   Add an `env` parameter to `kedro mlflow init` command to specify under which `conf/` subfolder the `mlflow.yml` should be created. ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
+-   The input parameters of the `inference` pipeline of a `PipelineML` object are now automatically pickle-ised and converted as artifacts. ([#158](https://github.com/Galileo-Galilei/kedro-mlflow/issues/158))
+-   [Detailed documentation on how to use `pipeline_ml_factory`](https://kedro-mlflow.readthedocs.io/en/latest/source/05_framework_ml/index.html) function, and more generally on how to use `kedro-mlflow` as mlops framework. This comes from [an example repo `kedro-mlflow-tutorial`](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial). ([#16](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16))
+
+### Fixed
+
+-   Pin the kedro version to force it to be **strictly** inferior to `0.17` which is not compatible with current `kedro-mlflow` version ([#143](https://github.com/Galileo-Galilei/kedro-mlflow/issues/143))
+-   It is no longer assumed for the project to run that the `mlflow.yml` is located under `conf/base`. The project will run as soon as the configuration file is discovered by the registered ConfigLoader ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
+
+### Changed
+
+-   The `KedroPipelineModel.load_context()` method now loads all the `DataSets` in memory in the `DataCatalog`. It is also now possible to specify the `runner` to execute the model as well as the `copy_mode` when executing the inference pipeline (instead of deepcopying the datasets between each nodes which is kedro's default). This makes the API serving with `mlflow serve` command considerably faster (~20 times faster) for models which need compiling (e.g. keras, tensorflow ...) ([#133](https://github.com/Galileo-Galilei/kedro-mlflow/issues/133))
+-   The CLI projects commands are now always accessible even if you have not called `kedro mlflow init` yet to create a `mlflow.yml` configuration file ([#159](https://github.com/Galileo-Galilei/kedro-mlflow/issues/159))
+
 ## [0.4.1] - 2020-12-03
 
 ### Added
@@ -29,7 +48,7 @@
 -   `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` ([#71](https://github.com/Galileo-Galilei/kedro-mlflow/issues/71))
 -   `pipeline_ml_factory` now infer automatically the schema of the input dataset to validate data automatically at inference time. The output schema can be declared manually in `model_signature` argument ([#70](https://github.com/Galileo-Galilei/kedro-mlflow/issues/70))
 -   Add two DataSets for model logging and saving: `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
--   `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/07_extend_kedro/04_hooks.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
+-   `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/07_extend_kedro/02_hooks.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
 
 ### Fixed
 
@@ -49,7 +68,7 @@
 
 ### Removed
 
--   `kedro mlflow init` command is no longer declaring hooks in `run.py`. You must now [register your hooks manually](docs/source/03_tutorial/02_setup.md#declaring-kedro-mlflow-hooks) in the `run.py` if you use `kedro>=0.16.0, <0.16.3` ([#62](https://github.com/Galileo-Galilei/kedro-mlflow/issues/62)).
+-   `kedro mlflow init` command is no longer declaring hooks in `run.py`. You must now [register your hooks manually](https://kedro-mlflow.readthedocs.io/en/stable/source/02_installation/02_setup.html#declaring-kedro-mlflow-hooks) in the `run.py` if you use `kedro>=0.16.0, <0.16.3` ([#62](https://github.com/Galileo-Galilei/kedro-mlflow/issues/62)).
 -   Remove `pipeline_ml` function which was deprecated in 0.3.0. It is now replaced by `pipeline_ml_factory` ([#105](https://github.com/Galileo-Galilei/kedro-mlflow/issues/105))
 -   Remove `MlflowDataSet` dataset which was deprecated in 0.3.0. It is now replaced by `MlflowArtifactDataSet` ([#105](https://github.com/Galileo-Galilei/kedro-mlflow/issues/105))
 
@@ -152,7 +171,9 @@ Many documentation improvements:
 
 [0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.5.0...HEAD
+
+[0.5.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.1...0.5.0
 
 [0.4.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.0...0.4.1
 

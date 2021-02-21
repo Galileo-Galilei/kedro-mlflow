@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any, Dict, Union
 
 import mlflow
@@ -139,24 +140,31 @@ class MlflowPipelineHook:
         """
 
         if isinstance(pipeline, PipelineML):
-            pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
-            artifacts = pipeline.extract_pipeline_artifacts(pipeline_catalog)
+            with TemporaryDirectory() as tmp_dir:
+                # This will be removed at the end of the context manager,
+                # but we need to log in mlflow beforeremoving the folder
+                pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
+                artifacts = pipeline.extract_pipeline_artifacts(
+                    pipeline_catalog, temp_folder=Path(tmp_dir)
+                )
 
-            if pipeline.model_signature == "auto":
-                input_data = pipeline_catalog.load(pipeline.input_name)
-                model_signature = infer_signature(model_input=input_data)
-            else:
-                model_signature = pipeline.model_signature
+                if pipeline.model_signature == "auto":
+                    input_data = pipeline_catalog.load(pipeline.input_name)
+                    model_signature = infer_signature(model_input=input_data)
+                else:
+                    model_signature = pipeline.model_signature
 
-            mlflow.pyfunc.log_model(
-                artifact_path=pipeline.model_name,
-                python_model=KedroPipelineModel(
-                    pipeline_ml=pipeline, catalog=pipeline_catalog
-                ),
-                artifacts=artifacts,
-                conda_env=_format_conda_env(pipeline.conda_env),
-                signature=model_signature,
-            )
+                mlflow.pyfunc.log_model(
+                    artifact_path=pipeline.model_name,
+                    python_model=KedroPipelineModel(
+                        pipeline_ml=pipeline,
+                        catalog=pipeline_catalog,
+                        **pipeline.kwargs,
+                    ),
+                    artifacts=artifacts,
+                    conda_env=_format_conda_env(pipeline.conda_env),
+                    signature=model_signature,
+                )
         # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
         mlflow.end_run()
 

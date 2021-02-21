@@ -1,8 +1,7 @@
 import re
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Dict, Union
 
-import anyconfig
 import yaml
 from kedro import __version__ as KEDRO_VERSION
 from kedro.framework.context import load_context
@@ -59,15 +58,6 @@ def _validate_project_path(project_path: Union[str, Path, None] = None) -> Path:
     else:
         project_path = Path(project_path)
     return project_path
-
-
-def _already_updated(project_path: Union[str, Path, None] = None) -> bool:
-    project_path = _validate_project_path(project_path)
-    flag = False
-    # TODO : add a better check ...
-    if (project_path / "conf" / "base" / "mlflow.yml").is_file():
-        flag = True
-    return flag
 
 
 def _parse_requirements(path, encoding="utf-8"):

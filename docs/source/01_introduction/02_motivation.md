@@ -33,7 +33,7 @@ Above implementations have the advantage of being very straightforward and *mlfl
   - it is **hard to modify** (if you want to remove / add / modify an mlflow action you have to find it in the code)
   - it **prevents reuse** (re-usable function must not contain mlflow specific code unrelated to their functional specificities, only their execution must be tracked).
 
-``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by kedro-mlflow and the location in Kedro template where the action should be performed.
+``kedro-mlflow`` enforces these best practices while implementing a clear interface for each mlflow action in Kedro template. Below chart maps the mlflow action to perform with the Python API provided by ``kedro-mlflow`` and the location in Kedro template where the action should be performed.
 
 |Mlflow action                |Template file           |Python API                                        |
 |:----------------------------|:-----------------------|:------------------------------------------------------|
@@ -44,6 +44,6 @@ Above implementations have the advantage of being very straightforward and *mlfl
 |Logging metrics              |``catalog.yml``    |``MlflowMetricsDataSet``                          |
 |Logging Pipeline as model    |``hooks.py``    |``KedroPipelineModel`` and ``pipeline_ml_factory``|
 
-In the current version (``kedro_mlflow=0.4.1``), `kedro-mlflow` does not provide interface to set tags outside a Kedro ``Pipeline``. Some of above decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
+In the current version (``kedro_mlflow=0.5.0``), `kedro-mlflow` does not provide interface to set tags outside a Kedro ``Pipeline``. Some of above decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 
-_**Note:** the version ``0.4.1`` does not need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files._
+_**Note:** the version ``0.5.0`` does not need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files._

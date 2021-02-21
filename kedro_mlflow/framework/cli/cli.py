@@ -6,7 +6,7 @@ from kedro.framework.context import load_context
 
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 from kedro_mlflow.framework.context import get_mlflow_config
-from kedro_mlflow.utils import _already_updated, _is_kedro_project
+from kedro_mlflow.utils import _is_kedro_project
 
 try:
     from kedro.framework.context import get_static_project_data
@@ -26,20 +26,14 @@ class KedroClickGroup(click.Group):
         # add commands on the fly based on conditions
         if _is_kedro_project():
             self.add_command(init)
-            if _already_updated():
-                self.add_command(ui)
-                # self.add_command(run) # TODO : IMPLEMENT THIS FUNCTION
+            self.add_command(ui)
+            # self.add_command(run) # TODO : IMPLEMENT THIS FUNCTION
         else:
             self.add_command(new)
 
     def list_commands(self, ctx):
         self.reset_commands()
         commands_list = sorted(self.commands)
-        if commands_list == ["init"]:
-            click.secho(
-                """\n\nYou have not updated your template yet.\nThis is mandatory to use 'kedro-mlflow' plugin.\nPlease run the following command before you can access to other commands :\n\n$ kedro mlflow init""",
-                fg="yellow",
-            )
         return commands_list
 
     def get_command(self, ctx, cmd_name):
@@ -56,16 +50,22 @@ def commands():
 @commands.command(name="mlflow", cls=KedroClickGroup)
 def mlflow_commands():
     """Use mlflow-specific commands inside kedro project."""
-    pass
+    pass  # pragma: no cover
 
 
 @mlflow_commands.command()
+@click.option(
+    "--env",
+    "-e",
+    default="local",
+    help="The name of the kedro environment where the 'mlflow.yml' should be created. Default to 'local'",
+)
 @click.option(
     "--force",
     "-f",
     is_flag=True,
     default=False,
-    help="Update the template without any checks. The modifications you made in 'run.py' will be lost.",
+    help="Update the template without any checks. If a 'mlflow.yml' already eists, it will be overridden.",
 )
 @click.option(
     "--silent",
@@ -74,49 +74,56 @@ def mlflow_commands():
     default=False,
     help="Should message be logged when files are modified?",
 )
-def init(force, silent):
+def init(env, force, silent):
     """Updates the template of a kedro project.
-    Running this command is mandatory to use kedro-mlflow.
-    2 actions are performed :
-        1. Add "conf/base/mlflow.yml": This is a configuration file
-         used for run parametrization when calling "kedro run" command.
-         See INSERT_DOC_URL for further details.
-        2. Modify "src/YOUR_PACKAGE_NAME/run.py" to add mlflow hooks
-         to the ProjectContext. This will erase your current "run.py"
-         script and all your modifications will be lost.
-         If you do not want to erase "run.py", insert the hooks manually
+    Running this command is mandatory to use kedro-mlflow. This
+    adds a configuration file used for run parametrization when
+    calling "kedro run" command.
     """
 
     # get constants
+    mlflow_yml = "mlflow.yml"
     project_path = Path().cwd()
     project_globals = get_static_project_data(project_path)
     context = load_context(project_path)
-    conf_root = context.CONF_ROOT
+    mlflow_yml_path = project_path / context.CONF_ROOT / env / mlflow_yml
 
-    # mlflow.yml is just a static file,
-    # but the name of the experiment is set to be the same as the project
-    mlflow_yml = "mlflow.yml"
-    write_jinja_template(
-        src=TEMPLATE_FOLDER_PATH / mlflow_yml,
-        is_cookiecutter=False,
-        dst=project_path / conf_root / "base" / mlflow_yml,
-        python_package=project_globals["package_name"],
-    )
-    if not silent:
+    # mlflow.yml is just a static file
+    if mlflow_yml_path.is_file() and not force:
         click.secho(
             click.style(
-                f"'{conf_root}/base/mlflow.yml' successfully updated.", fg="green"
+                f"A 'mlflow.yml' already exists at '{mlflow_yml_path}' You can use the ``--force`` option to override it.",
+                fg="red",
             )
         )
+        return 1
+    else:
+        try:
+            write_jinja_template(
+                src=TEMPLATE_FOLDER_PATH / mlflow_yml,
+                is_cookiecutter=False,
+                dst=mlflow_yml_path,
+                python_package=project_globals["package_name"],
+            )
+        except FileNotFoundError:
+            click.secho(
+                click.style(
+                    f"No env '{env}' found. Please check this folder exists inside '{context.CONF_ROOT}' folder.",
+                    fg="red",
+                )
+            )
+            return 1
+        if not silent:
+            click.secho(
+                click.style(
+                    f"'{context.CONF_ROOT}/{env}/{mlflow_yml}' successfully updated.",
+                    fg="green",
+                )
+            )
+        return 0
 
 
 @mlflow_commands.command()
-@click.option(
-    "--project-path",
-    "-p",
-    required=False,
-    help="The environment within conf folder we want to retrieve.",
-)
 @click.option(
     "--env",
     "-e",
@@ -124,15 +131,14 @@ def init(force, silent):
     default="local",
     help="The environment within conf folder we want to retrieve.",
 )
-def ui(project_path, env):
+def ui(env):
     """Opens the mlflow user interface with the
     project-specific settings of mlflow.yml. This interface
     enables to browse and compares runs.
 
     """
 
-    if not project_path:
-        project_path = Path().cwd()
+    project_path = Path().cwd()
     context = load_context(project_path=project_path, env=env)
     # the context must contains the self.mlflow attribues with mlflow configuration
     mlflow_conf = get_mlflow_config(context)

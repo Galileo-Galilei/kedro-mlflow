@@ -25,7 +25,7 @@
 
 # How do I install kedro-mlflow?
 
-**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
+**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0`` and ``mlflow>=1.0.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
 ``kedro-mlflow`` is available on PyPI, so you can install it with ``pip``:
 

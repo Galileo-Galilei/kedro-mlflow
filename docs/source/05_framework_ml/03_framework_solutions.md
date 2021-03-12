@@ -2,7 +2,7 @@
 
 ## Reminder
 
-We assume that we want to solve the following challenges among those described in ["Why we need a mlops framework"](docs\source\05_framework_ml\01_why_framework.md) section:
+We assume that we want to solve the following challenges among those described in ["Why we need a mlops framework"](./01_why_framework.md) section:
 
 - serve pipelines (which handles business objects) instead of models
 - synchronize training and inference by packaging inference pipeline at training time
@@ -15,7 +15,7 @@ To solve the problem of desynchronization between training and inference, ``kedr
 
 This class implements several methods to compare the ``DataCatalog``s associated to each of the two binded pipelines and performs subsetting oparations. This makes it quite difficult to handle directly. Fortunately, ``kedro-mlflow`` provides a convenient API to create ``PipelineML`` objects: the ``pipeline_ml_factory`` function.
 
-The use of ``pipeline_ml_factory`` is very straightforward, especially if you have used the [project architecture described previously](docs\source\05_framework_ml\02_ml_project_components.md). The best place to create such an object is your `hooks.py` file which will look like this:
+The use of ``pipeline_ml_factory`` is very straightforward, especially if you have used the [project architecture described previously](./02_ml_project_components.md). The best place to create such an object is your `hooks.py` file which will look like this:
 
 ```python
 # hooks.py
@@ -62,7 +62,7 @@ catalog = load_context(".").io
 # artifacts are all the inputs of the inference pipelines that are persisted in the catalog
 artifacts = pipeline_training.extract_pipeline_artifacts(catalog)
 
-# (optiona) get the schema of the input dataset
+# (optional) get the schema of the input dataset
 input_data = catalog.load(pipeline_training.input_name)
 model_signature = infer_signature(model_input=input_data)
 

@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+### Added
+
+- ``kedro-mlflow`` now supports ``kedro==0.17.0`` ([#144](https://github.com/Galileo-Galilei/kedro-mlflow/issues/144)). Since the kedro core team made a breaking change in the patch release ``0.17.1``, it is not supported yet. They also [recommend to downgrade to 0.17.0 for stability](https://github.com/quantumblacklabs/kedro/issues/716#issuecomment-793983298).
+- Updated documentation
+
+### Fixed
+
+- The support of ``kedro==0.17.0`` automatically makes the CLI commands available when the configuration is declared in a ``pyproject.toml`` instead of a ``.kedro.yml``, which was not the case in previous version despite we claim it was ([157](https://github.com/Galileo-Galilei/kedro-mlflow/issues/157)).
+
+### Changed
+
+- Drop support for ``kedro==0.16.x``. All future plugin update will be only compatible with ``kedro>=0.17.0``.
+
 ## [0.5.0] - 2021-02-21
 
 ### Added

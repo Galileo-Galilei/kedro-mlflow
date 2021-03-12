@@ -2,7 +2,6 @@ import logging
 from typing import Any, Dict, Union
 
 import mlflow
-from kedro.framework.context import load_context
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -14,7 +13,6 @@ from kedro_mlflow.framework.context import get_mlflow_config
 
 class MlflowNodeHook:
     def __init__(self):
-        self.context = None
         self.flatten = False
         self.recursive = True
         self.sep = "."
@@ -51,12 +49,7 @@ class MlflowNodeHook:
             catalog: The ``DataCatalog`` to be used during the run.
         """
 
-        self.context = load_context(
-            project_path=run_params["project_path"],
-            env=run_params["env"],
-            extra_params=run_params["extra_params"],
-        )
-        config = get_mlflow_config(self.context)
+        config = get_mlflow_config()
 
         self.flatten = config.node_hook_opts["flatten_dict_params"]
         self.recursive = config.node_hook_opts["recursive"]

@@ -4,7 +4,7 @@
 
 If you don't want to read the entire explanations, here is a summary:
 
-1. install ``kedro-mlflow`` ``MlflowPipelineHook`` (this is done automatically if you have installed ``kedro-mlflow`` in a ``kedro>=0.16.5`` project)
+1. Install ``kedro-mlflow`` ``MlflowPipelineHook`` (this is done automatically if you have installed ``kedro-mlflow`` in a ``kedro>=0.16.5`` project)
 2. Turn your training pipeline in a ``PipelineML`` object  with ``pipeline_ml_factory`` function in your ``hooks.py``:
 
     ```python
@@ -40,7 +40,7 @@ If you don't want to read the entire explanations, here is a summary:
             }
     ```
 
-3. persist your artifacts locally in the ``catalog.yml``
+3. Persist your artifacts locally in the ``catalog.yml``
 
     ```yaml
     label_encoder:
@@ -54,9 +54,9 @@ If you don't want to read the entire explanations, here is a summary:
     kedro run --pipeline=training
     ```
 
-    **The inference pipeline will _automagically_ be logged as a mlflo model at the end!**
+    **The inference pipeline will _automagically_ be logged as a mlflow model at the end!**
 
-5. Go to the UI, retrieve the run id of your "inference pipeline" model and use it as you want, e.g. in the catalog.yml:
+5. Go to the UI, retrieve the run id of your "inference pipeline" model and use it as you want, e.g. in the `catalog.yml`:
 
     ```yaml
     # catalog.yml
@@ -68,7 +68,6 @@ If you don't want to read the entire explanations, here is a summary:
     artifact_path: kedro_mlflow_tutorial  # the name of your mlflow folder = the model_name in pipeline_ml_factory
     run_id: <your-run-id>  
     ```
-
 
 ## Complete step by step demo project with code
 

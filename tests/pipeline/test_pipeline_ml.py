@@ -202,7 +202,7 @@ def pipeline_ml_with_parameters():
 
 
 @pytest.fixture
-def dummy_context(tmp_path, config_dir, mocker):
+def dummy_context(tmp_path, kedro_project, mocker):
     class DummyContext(KedroContext):
         project_name = "fake project"
         package_name = "fake_project"
@@ -211,10 +211,7 @@ def dummy_context(tmp_path, config_dir, mocker):
         def _get_pipelines(self):
             return {"__default__": Pipeline([])}
 
-    # Disable logging.config.dictConfig in KedroContext._setup_logging as
-    # it changes logging.config and affects other unit tests
-    mocker.patch("logging.config.dictConfig")
-    dummy_context = DummyContext(tmp_path.as_posix())
+    dummy_context = DummyContext("fake_package", tmp_path.as_posix())
     return dummy_context
 
 

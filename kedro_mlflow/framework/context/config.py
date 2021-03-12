@@ -4,8 +4,8 @@ from pathlib import Path, PurePath
 from typing import Any, Dict, Optional, Union
 
 import mlflow
-
-from kedro_mlflow import utils as utils
+from kedro.framework.session.session import get_current_session
+from kedro.framework.startup import _is_project
 
 LOGGER = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ class KedroMlflowConfig:
     ):
 
         # declare attributes in __init__.py to avoid pylint complaining
-        if not utils._is_kedro_project(project_path):
+        if not _is_project(project_path):
             raise KedroMlflowConfigError(
                 (
                     f"'project_path' = '{project_path}' is not a valid path to a kedro project"
@@ -73,14 +73,14 @@ class KedroMlflowConfig:
         )
         self.from_dict(configuration)
 
-    def setup(self, context):
+    def setup(self):
         """Setup all the mlflow configuration"""
 
-        self._export_credentials(context)
+        session = get_current_session()
+        self._export_credentials(session.load_context())
 
-        # we set the congiguration now: it takes priority
+        # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
-
         mlflow.set_tracking_uri(self.mlflow_tracking_uri)
 
         self._get_or_create_experiment()

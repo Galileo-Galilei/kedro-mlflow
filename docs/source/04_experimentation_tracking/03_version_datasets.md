@@ -78,7 +78,7 @@ Setting the `mlflow_tracking_uri` key of `mlflow.yml` to the url of this server 
 
 You can refer to [this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/15) for further details.
 
-In ``kedro-mlflow==0.5.0`` you must configure these elements by yourself. Further releases will introduce helpers for configuration.
+In ``kedro-mlflow==0.6.0`` you must configure these elements by yourself. Further releases will introduce helpers for configuration.
 
 ### Can I log an artifact in a specific run?
 

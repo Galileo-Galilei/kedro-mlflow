@@ -4,35 +4,13 @@ import subprocess  # noqa: F401
 import pytest
 import yaml
 from click.testing import CliRunner
-from cookiecutter.main import cookiecutter
-from kedro import __version__ as kedro_version
-from kedro.framework.cli.cli import TEMPLATE_PATH, info
-from kedro.framework.context import load_context
+from kedro.framework.cli.cli import info
+from kedro.framework.session import KedroSession
 
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
 from kedro_mlflow.framework.cli.cli import ui as cli_ui
 from kedro_mlflow.framework.context import get_mlflow_config
-
-
-@pytest.fixture
-def kedro_project(tmp_path):
-    # TODO : this is also an integration test since this depends from the kedro version
-    config = {
-        "output_dir": tmp_path,
-        "kedro_version": kedro_version,
-        "project_name": "This is a fake project",
-        "repo_name": "fake-project",
-        "python_package": "fake_project",
-        "include_example": True,
-    }
-
-    cookiecutter(
-        str(TEMPLATE_PATH),
-        output_dir=config["output_dir"],
-        no_input=True,
-        extra_context=config,
-    )
 
 
 def extract_cmd_from_help(msg):
@@ -66,12 +44,8 @@ def test_mlflow_commands_outside_kedro_project(monkeypatch, tmp_path):
     assert {"new"} == set(extract_cmd_from_help(result.output))
 
 
-def test_mlflow_commands_inside_kedro_project(
-    monkeypatch,
-    tmp_path,
-    kedro_project,
-):
-    monkeypatch.chdir(tmp_path / "fake-project")
+def test_mlflow_commands_inside_kedro_project(monkeypatch, kedro_project):
+    monkeypatch.chdir(kedro_project)
     # launch the command to initialize the project
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_mlflow)
@@ -79,10 +53,9 @@ def test_mlflow_commands_inside_kedro_project(
     assert "You have not updated your template yet" not in result.output
 
 
-def test_cli_init(monkeypatch, tmp_path, kedro_project):
+def test_cli_init(monkeypatch, kedro_project):
     # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
+    monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_init)
 
@@ -92,57 +65,62 @@ def test_cli_init(monkeypatch, tmp_path, kedro_project):
 
     # check mlflow.yml file
     assert "'conf/local/mlflow.yml' successfully updated." in result.output
-    assert (project_path / "conf/local/mlflow.yml").is_file()
+    assert (kedro_project / "conf" / "local" / "mlflow.yml").is_file()
 
 
-def test_cli_init_existing_config(monkeypatch, tmp_path, kedro_project):
+def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
     # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
+    cli_runner = CliRunner()
+    monkeypatch.chdir(kedro_project_with_mlflow_conf)
+    with KedroSession.create(
+        "fake_project", project_path=kedro_project_with_mlflow_conf
+    ) as session:
+        context = session.load_context()
+        # emulate first call by writing a mlflow.yml file
+        yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
+        (
+            kedro_project_with_mlflow_conf / context.CONF_ROOT / "local" / "mlflow.yml"
+        ).write_text(yaml_str)
+
+        result = cli_runner.invoke(cli_init)
+
+        # check an error message is raised
+        assert "A 'mlflow.yml' already exists" in result.output
+
+        # check the file remains unmodified
+        assert get_mlflow_config().mlflow_tracking_uri.endswith("toto")
+
+
+def test_cli_init_existing_config_force_option(monkeypatch, kedro_project):
+    # "kedro_project" is a pytest.fixture declared in conftest
+    monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
 
-    project_context = load_context(project_path.as_posix())
-    # emulate first call by writing a mlflow.yml file
-    yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
-    (project_path / project_context.CONF_ROOT / "local/mlflow.yml").write_text(yaml_str)
+    with KedroSession.create("fake_project", project_path=kedro_project) as session:
+        context = session.load_context()
 
-    result = cli_runner.invoke(cli_init)
+        # emulate first call by writing a mlflow.yml file
+        yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
+        (kedro_project / context.CONF_ROOT / "local" / "mlflow.yml").write_text(
+            yaml_str
+        )
 
-    # check an error message is raised
-    assert "A 'mlflow.yml' already exists" in result.output
+        result = cli_runner.invoke(cli_init, args="--force")
 
-    # check the file remains unmodified
-    assert get_mlflow_config(project_context).mlflow_tracking_uri.endswith("toto")
+        # check an error message is raised
+        assert "successfully updated" in result.output
 
-
-def test_cli_init_existing_config_force_option(monkeypatch, tmp_path, kedro_project):
-    # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
-    cli_runner = CliRunner()
-
-    project_context = load_context(project_path.as_posix())
-    # emulate first call by writing a mlflow.yml file
-    yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
-    (project_path / project_context.CONF_ROOT / "local/mlflow.yml").write_text(yaml_str)
-
-    result = cli_runner.invoke(cli_init, args="--force")
-
-    # check an error message is raised
-    assert "successfully updated" in result.output
-
-    # check the file remains unmodified
-    assert get_mlflow_config(project_context).mlflow_tracking_uri.endswith("mlruns")
+        # check the file remains unmodified
+        assert get_mlflow_config().mlflow_tracking_uri.endswith("mlruns")
 
 
 @pytest.mark.parametrize(
     "env",
     ["base", "local"],
 )
-def test_cli_init_with_env(monkeypatch, tmp_path, kedro_project, env):
+def test_cli_init_with_env(monkeypatch, kedro_project, env):
     # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
+    monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_init, f"--env {env}")
 
@@ -152,17 +130,16 @@ def test_cli_init_with_env(monkeypatch, tmp_path, kedro_project, env):
 
     # check mlflow.yml file
     assert f"'conf/{env}/mlflow.yml' successfully updated." in result.output
-    assert (project_path / "conf" / env / "mlflow.yml").is_file()
+    assert (kedro_project / "conf" / env / "mlflow.yml").is_file()
 
 
 @pytest.mark.parametrize(
     "env",
     ["debug"],
 )
-def test_cli_init_with_wrong_env(monkeypatch, tmp_path, kedro_project, env):
+def test_cli_init_with_wrong_env(monkeypatch, kedro_project, env):
     # "kedro_project" is a pytest.fixture declared in conftest
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
+    monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_init, f"--env {env}")
 
@@ -173,11 +150,11 @@ def test_cli_init_with_wrong_env(monkeypatch, tmp_path, kedro_project, env):
 # TODO : This is a fake test. add a test to see if ui is properly up
 # I tried mimicking mlflow_cli with mock but did not achieve desired result
 # other solution is to use pytest-xprocess
-def test_ui_is_up(monkeypatch, mocker, tmp_path, kedro_project):
-    project_path = tmp_path / "fake-project"
-    monkeypatch.chdir(project_path)
+# TODO: create an initlaized_kedro_project fixture with a global scope
+def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
+
+    monkeypatch.chdir(kedro_project_with_mlflow_conf)
     cli_runner = CliRunner()
-    cli_runner.invoke(cli_init)  # intialize project
 
     # This does not test anything : the goal is to check whether it raises an error
     ui_mocker = mocker.patch(

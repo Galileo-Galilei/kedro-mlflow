@@ -5,7 +5,6 @@ from typing import Any, Dict, Union
 
 import mlflow
 import yaml
-from kedro.framework.context import load_context
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -70,14 +69,8 @@ class MlflowPipelineHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        self.context = load_context(
-            project_path=run_params["project_path"],
-            env=run_params["env"],
-            extra_params=run_params["extra_params"],
-        )
-
-        mlflow_conf = get_mlflow_config(self.context)
-        mlflow_conf.setup(self.context)
+        mlflow_conf = get_mlflow_config()
+        mlflow_conf.setup()
 
         run_name = (
             mlflow_conf.run_opts["name"]

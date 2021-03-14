@@ -13,7 +13,7 @@
 ----------------------------------------------------------
 | Branch | Tests | Coverage | Documentation | Deployment | Activity |
 |--------|-------|----------|---------------|------------|------------|
-| `develop`| [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Adevelop)| [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=latest)](https://kedro-mlflow.readthedocs.io/en/latest/)| [![create-release-candidate](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/create-release-candidate/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Adevelop+workflow%3Acreate-release-candidate)|[![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.5.0)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.5.0...develop)|
+| `develop`| [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Adevelop)| [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=latest)](https://kedro-mlflow.readthedocs.io/en/latest/)| [![create-release-candidate](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/create-release-candidate/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Adevelop+workflow%3Acreate-release-candidate)|[![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.6.0)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...develop)|
 | `master` | [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Amaster) | [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=stable)](https://kedro-mlflow.readthedocs.io/en/stable/)|[![publish](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/publish/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Amaster+workflow%3Apublish)||
 
 # What is kedro-mlflow?
@@ -25,7 +25,7 @@
 
 # How do I install kedro-mlflow?
 
-**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
+**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0`` and ``mlflow>=1.0.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
 ``kedro-mlflow`` is available on PyPI, so you can install it with ``pip``:
 

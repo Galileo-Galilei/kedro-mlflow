@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Added
+
+-   `kedro-mlflow` now supports `kedro>=0.17.1` ([#144](https://github.com/Galileo-Galilei/kedro-mlflow/issues/144)).
+### Changed
+
+-   Drop support for `kedro==0.17.0`, since the kedro core team [made a breaking change in `0.17.1`](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#breaking-changes-to-the-api). All future plugin updates will be only compatible with `kedro>=0.17.1`.
+
 ## [0.6.0] - 2021-03-14
 
 ### Added

@@ -3,6 +3,7 @@ from pathlib import Path
 
 import click
 from kedro.framework.cli.utils import _add_src_to_path
+from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _get_project_metadata, _is_project
 
@@ -80,6 +81,7 @@ def init(env, force, silent):
     project_path = Path().cwd()
     project_metadata = _get_project_metadata(project_path)
     _add_src_to_path(project_metadata.source_dir, project_path)
+    configure_project(project_metadata.package_name)
     session = KedroSession.create(
         project_metadata.package_name, project_path=project_path
     )
@@ -136,6 +138,7 @@ def ui(env):
     project_path = Path().cwd()
     project_metadata = _get_project_metadata(project_path)
     _add_src_to_path(project_metadata.source_dir, project_path)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=project_path,

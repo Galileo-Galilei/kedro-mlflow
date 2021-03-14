@@ -7,6 +7,7 @@ import yaml
 from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.framework.cli.utils import _add_src_to_path
 from kedro.framework.context import KedroContext
+from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _get_project_metadata
 from kedro.io import DataCatalog, MemoryDataSet
@@ -299,6 +300,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
 
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,
@@ -376,6 +378,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
     # config_with_base_mlflow_conf is a conftest fixture
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,
@@ -432,6 +435,7 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
 
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,
@@ -518,6 +522,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
     # config_with_base_mlflow_conf is a conftest fixture
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,
@@ -603,6 +608,7 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
     # config_with_base_mlflow_conf is a conftest fixture
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,
@@ -690,6 +696,7 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
 
     project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
     _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project_with_mlflow_conf,

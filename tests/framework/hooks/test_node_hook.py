@@ -5,6 +5,7 @@ import mlflow
 import pytest
 import yaml
 from kedro.framework.cli.utils import _add_src_to_path
+from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _get_project_metadata
 from kedro.io import DataCatalog, MemoryDataSet
@@ -123,6 +124,7 @@ def test_pipeline_run_hook_getting_configs(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,
@@ -187,6 +189,7 @@ def test_node_hook_logging(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,
@@ -237,6 +240,7 @@ def test_node_hook_logging_below_limit_all_strategy(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,
@@ -286,6 +290,7 @@ def test_node_hook_logging_above_limit_truncate_strategy(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,
@@ -337,6 +342,7 @@ def test_node_hook_logging_above_limit_fail_strategy(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,
@@ -392,6 +398,7 @@ def test_node_hook_logging_above_limit_tag_strategy(
 
     project_metadata = _get_project_metadata(kedro_project)
     _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         package_name=project_metadata.package_name,
         project_path=kedro_project,

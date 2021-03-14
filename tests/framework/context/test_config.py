@@ -3,7 +3,10 @@ import os
 import mlflow
 import pytest
 import yaml
+from kedro.framework.cli.utils import _add_src_to_path
+from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
+from kedro.framework.startup import _get_project_metadata
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.context.config import (
@@ -86,6 +89,9 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
         experiment_opts=dict(name="exp1"),
     )
 
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):
@@ -106,6 +112,10 @@ def test_kedro_mlflow_config_experiment_exists(mocker, kedro_project_with_mlflow
         mlflow_tracking_uri="mlruns",
         experiment_opts=dict(name="exp1"),
     )
+
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):
@@ -129,6 +139,10 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
         mlflow_tracking_uri="mlruns",
         experiment_opts=dict(name="exp1"),
     )
+
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):
@@ -148,6 +162,10 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
         mlflow_tracking_uri="awesome_tracking",
         experiment_opts=dict(name="exp1"),
     )
+
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):
@@ -166,6 +184,10 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf, credentials="my_mlflow_creds"
     )
+
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):
@@ -193,6 +215,10 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
         mlflow_tracking_uri="mlruns1",
         credentials="my_mlflow_creds",
     )
+
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ):

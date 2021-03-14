@@ -5,7 +5,10 @@ import pytest
 import yaml
 from click.testing import CliRunner
 from kedro.framework.cli.cli import info
+from kedro.framework.cli.utils import _add_src_to_path
+from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
+from kedro.framework.startup import _get_project_metadata
 
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
@@ -72,6 +75,9 @@ def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
     # "kedro_project" is a pytest.fixture declared in conftest
     cli_runner = CliRunner()
     monkeypatch.chdir(kedro_project_with_mlflow_conf)
+    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
+    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
+    configure_project(project_metadata.package_name)
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
     ) as session:
@@ -96,6 +102,9 @@ def test_cli_init_existing_config_force_option(monkeypatch, kedro_project):
     monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
 
+    project_metadata = _get_project_metadata(kedro_project)
+    _add_src_to_path(project_metadata.source_dir, kedro_project)
+    configure_project(project_metadata.package_name)
     with KedroSession.create("fake_project", project_path=kedro_project) as session:
         context = session.load_context()
 

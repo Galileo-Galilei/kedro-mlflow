@@ -6,10 +6,10 @@ What have you changed, and how has this been tested?
 
 ## Checklist
 
-- [ ] Read the [contributing](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CONTRIBUTING.md) guidelines
+- [ ] Read the [contributing](https://github.com/Galileo-Galilei/kedro-mlflow/blob/master/CONTRIBUTING.md) guidelines
 - [ ] Open this PR as a 'Draft Pull Request' if it is work-in-progress
 - [ ] Update the documentation to reflect the code changes
-- [ ] Add a description of this change and add your name to the list of supporting contributions in the [`CHANGELOG.md`](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CHANGELOG.md) file. Please respect [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) guidelines.
+- [ ] Add a description of this change and add your name to the list of supporting contributions in the [`CHANGELOG.md`](https://github.com/Galileo-Galilei/kedro-mlflow/blob/master/CHANGELOG.md) file. Please respect [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) guidelines.
 - [ ] Add tests to cover your changes
 
 ## Notice

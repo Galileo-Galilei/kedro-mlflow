@@ -8,9 +8,11 @@ assignees: ''
 ---
 
 ## Description
+
 Short description of the problem here.
 
 ## Context
+
 How has this bug affected you? What were you trying to accomplish?
 
 ## Steps to Reproduce
@@ -22,9 +24,11 @@ Please provide a detailed description. A Minimal Reproducible Example would real
 3. [And so on...]
 
 ## Expected Result
+
 Tell us what should happen.
 
 ## Actual Result
+
 Tell us what happens instead.
 
 ```
@@ -36,19 +40,21 @@ Tell us what happens instead.
 ```
 
 ## Your Environment
+
 Include as many relevant details about the environment in which you experienced the bug:
 
 * `kedro` and `kedro-mlflow` version used (`pip show kedro` and `pip show kedro-mlflow`):
 * Python version used (`python -V`):
 * Operating system and version:
 
-## Does the bug also happen with the last version on develop?
+## Does the bug also happen with the last version on master?
 
-The plugin is still in early development and known bugs are fixed as soon as we can. If you are lucky, your bug is already fixed on the `develop` branch which is the most up to date. This branch contains our more recent development unpublished on PyPI yet.
+The plugin is still in early development and known bugs are fixed as soon as we can. If you are lucky, your bug is already fixed on the `master` branch which is the most up to date. This branch contains our more recent development unpublished on PyPI yet.
 
 In your environment, please try:
 
 ```bash
-pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow@develop
+pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow
 ```
-And check if you can to reproduce the error. If you can't, just wait for the next release or use the develop branch at your own risk!
+
+And check if you can to reproduce the error. If you can't, just wait for the next release or use the master branch at your own risk!

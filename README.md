@@ -13,8 +13,7 @@
 ----------------------------------------------------------
 | Branch | Tests | Coverage | Documentation | Deployment | Activity |
 |--------|-------|----------|---------------|------------|------------|
-| `develop`| [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Adevelop)| [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/develop)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=latest)](https://kedro-mlflow.readthedocs.io/en/latest/)| [![create-release-candidate](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/create-release-candidate/badge.svg?branch=develop)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Adevelop+workflow%3Acreate-release-candidate)|[![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.6.0)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...develop)|
-| `master` | [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Amaster) | [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=stable)](https://kedro-mlflow.readthedocs.io/en/stable/)|[![publish](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/publish/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Amaster+workflow%3Apublish)||
+| `master` | [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Amaster) | [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=stable)](https://kedro-mlflow.readthedocs.io/en/stable/)|[![publish](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/publish/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Amaster+workflow%3Apublish)|[![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.6.0)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...master)|
 
 # What is kedro-mlflow?
 
@@ -33,10 +32,10 @@
 pip install kedro-mlflow
 ```
 
-If you want to use the ``develop`` version of the package which is the most up to date, you can install the package from github:
+If you want to use the most up to date version of the package which is under development and not released yet, you can install the package from github:
 
 ```console
-pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git@develop
+pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git
 ```
 
 I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/02_get_started/02_install.html).
@@ -58,7 +57,7 @@ Some frequently asked questions on more advanced features:
 
 # Release and roadmap
 
-The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CHANGELOG.md) centralizes packages improvements across time. The main features coming in next releases are [listed on github milestones](https://github.com/Galileo-Galilei/kedro-mlflow/milestones). Feel free to upvote/downvote and discuss prioritization in associated issues.
+The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/master/CHANGELOG.md) centralizes packages improvements across time. The main features coming in next releases are [listed on github milestones](https://github.com/Galileo-Galilei/kedro-mlflow/milestones). Feel free to upvote/downvote and discuss prioritization in associated issues.
 
 # Disclaimer
 
@@ -70,7 +69,7 @@ If you want to see how to migrate from one version of `kedro-mlflow` to another,
 
 # Can I contribute?
 
-We'd be happy to receive help to maintain and improve the package. Any PR will be considered (from typo in the docs to core features add-on) Please check the [contributing guidelines](https://github.com/Galileo-Galilei/kedro-mlflow/blob/develop/CONTRIBUTING.md).
+We'd be happy to receive help to maintain and improve the package. Any PR will be considered (from typo in the docs to core features add-on) Please check the [contributing guidelines](https://github.com/Galileo-Galilei/kedro-mlflow/blob/master/CONTRIBUTING.md).
 
 # Main contributors
 

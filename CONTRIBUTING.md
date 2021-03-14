@@ -6,7 +6,7 @@ The current workflow is the following:
 2. Fork the repo
 3. Develop locally:
     - Install the precommit file (`pip install pre-commit`, then `pre-commit install`)
-    - Create a branch based on the develop branch (``git checkout -b <prefix-branchname> develop``)
+    - Create a branch based on the master branch (``git checkout -b <prefix-branchname> master``)
     - Create a conda environment (conda create -n <your-env-name> python==3.7)
     - Activate this environment (`conda activate <your-env-name>`)
     - Install the extra dependencies for tests (`pip install kedro-mlflow[tests]`)
@@ -17,8 +17,8 @@ The current workflow is the following:
     - Update documentation accordingly
     - Update `CHANGELOG.md` according to ["Keep a Changelog" guidelines](https://keepachangelog.com/en/1.0.0/)
     - Squash all the changes within a single commit as much as possible, and ensure the commit message has the format "FIX ``#<issue-number>`` - Informative description"
-    - Rebase your branch on ``develop`` to ensure linear history
-    - Open a pull request against ``develop``
+    - Rebase your branch on ``master`` to ensure linear history
+    - Open a pull request against ``master``
 5. Ask for review:
     - Assign randomly the review to two of the contributors (one review will be enough most of the time, but reviewers may not be available).
     - Wait for review
@@ -44,5 +44,5 @@ The current workflow is the following:
     - Merge the PR to master
 4. Checkout the [publish workflow](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Apublish) to see if:
     - The package has been uploaded on PyPI sucessfully
-    - The changes have been merged back to develop
-5. If the pipeline has failed, please raise an issue to correct the CI, and ensure merge on develop manually.
+    - A Github release has been created
+5. If the pipeline has failed, please raise an issue to correct the CI, and ensure merge on master manually.

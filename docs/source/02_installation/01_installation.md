@@ -54,10 +54,10 @@ pip install --upgrade kedro-mlflow
 
 ### Install from sources
 
-You may want to install the develop branch which has unreleased features:
+You may want to install the master branch which has unreleased features:
 
 ```console
-pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git@develop
+pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git
 ```
 
 ## Check the installation

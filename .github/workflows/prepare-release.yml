@@ -42,6 +42,10 @@ jobs:
         git config user.email github-actions@github.com
         git checkout -b release-${{ steps.bump_version.outputs.package_version }}
         git push -u origin release-${{ steps.bump_version.outputs.package_version }}
+    - name: Commit the changes
+      run: |
+        git commit -am "FIX #${{ steps.open_pr.outputs.pull_request_number }}  - Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
+        git push
     - name: Open a PR to merge the release to master
       id: open_pr
       uses: vsoch/pull-request-action@1.0.12
@@ -52,7 +56,3 @@ jobs:
         PULL_REQUEST_TITLE: "Release ${{ steps.bump_version.outputs.package_version }}"
         PULL_REQUEST_BODY: "Bump version and CHANGELOG for next release."
         PULL_REQUEST_ASSIGNEES: "${{ github.repository_owner }}"
-    - name: Commit the changes
-      run: |
-        git commit -am "FIX #${{ steps.open_pr.outputs.pull_request_number }}  - Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
-        git push

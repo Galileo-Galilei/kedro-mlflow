@@ -25,7 +25,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version="0.6.0",  # this will be bumped automatically by bump2version
+    version="0.7.0",  # this will be bumped automatically by bump2version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
@@ -48,7 +48,7 @@ setup(
         "tests": [
             "pytest>=5.4.0, <7.0.0",
             "pytest-cov>=2.8.0, <3.0.0",
-            "pytest-lazy-fixture>=0.6.0, <1.0.0",
+            "pytest-lazy-fixture>=0.7.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <0.25.0",
             "flake8==3.8.4",  # ensure consistency with pre-commit

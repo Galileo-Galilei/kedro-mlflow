@@ -2,9 +2,12 @@
 
 ## [Unreleased]
 
+## [0.7.0] - 2021-03-17
+
 ### Added
 
 -   `kedro-mlflow` now supports `kedro>=0.17.1` ([#144](https://github.com/Galileo-Galilei/kedro-mlflow/issues/144)).
+
 ### Changed
 
 -   Drop support for `kedro==0.17.0`, since the kedro core team [made a breaking change in `0.17.1`](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#breaking-changes-to-the-api). All future plugin updates will be only compatible with `kedro>=0.17.1`.
@@ -185,7 +188,9 @@ Many documentation improvements:
 -   Add `MlflowDataSet` for artifacts autologging
 -   Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.0...HEAD
+
+[0.7.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...0.7.0
 
 [0.6.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.5.0...0.6.0
 

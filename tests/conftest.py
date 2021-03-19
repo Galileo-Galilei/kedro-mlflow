@@ -4,7 +4,7 @@ import mlflow
 import pytest
 from cookiecutter.main import cookiecutter
 from kedro import __version__ as kedro_version
-from kedro.framework.cli.cli import TEMPLATE_PATH
+from kedro.framework.cli.starters import TEMPLATE_PATH
 from kedro.framework.hooks.manager import get_hook_manager
 from kedro.framework.session.session import _deactivate_session
 

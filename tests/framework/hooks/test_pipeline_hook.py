@@ -713,18 +713,16 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
 
             hooks = (MlflowPipelineHook(),)
 
-            def _get_pipelines(self):
-                return {
-                    "__default__": Pipeline(
-                        [
-                            node(
-                                func=failing_node,
-                                inputs=None,
-                                outputs="fake_output",
-                            )
-                        ]
-                    )
-                }
+            def _get_pipeline(self, name: str = None) -> Pipeline:
+                return Pipeline(
+                    [
+                        node(
+                            func=failing_node,
+                            inputs=None,
+                            outputs="fake_output",
+                        )
+                    ]
+                )
 
         with pytest.raises(ValueError):
             failing_context = DummyContextWithHook(

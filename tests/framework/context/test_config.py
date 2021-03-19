@@ -59,6 +59,7 @@ def test_kedro_mlflow_config_init(kedro_project_with_mlflow_conf):
     assert config.to_dict() == dict(
         mlflow_tracking_uri=(kedro_project_with_mlflow_conf / "mlruns").as_uri(),
         credentials=None,
+        disable_tracking=KedroMlflowConfig.DISABLE_TRACKING_OPTS,
         experiments=KedroMlflowConfig.EXPERIMENT_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
         ui=KedroMlflowConfig.UI_OPTS,

@@ -30,9 +30,10 @@ def test_mlflow_yml_rendering(template_mlflowyml):
     expected_config = dict(
         mlflow_tracking_uri="mlruns",
         credentials=None,
+        disable_tracking=KedroMlflowConfig.DISABLE_TRACKING_OPTS,
+        experiment=KedroMlflowConfig.EXPERIMENT_OPTS,
         ui=KedroMlflowConfig.UI_OPTS,
         run=KedroMlflowConfig.RUN_OPTS,
-        experiment=KedroMlflowConfig.EXPERIMENT_OPTS,
         hooks=dict(node=KedroMlflowConfig.NODE_HOOK_OPTS),
     )
     expected_config["experiment"]["name"] = "fake_project"  # check for proper rendering

@@ -49,6 +49,20 @@ credentials: my_mlflow_credentials
 
 For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They wil be exported as environment variables *on the fly* when running the pipeline.
 
+### Deactivate tracking under conditions
+
+`kedro-mlflow` logs every run parameters in mlflow. You may want to avoid tracking some runs (for instance while debugging to avoid polluting your mlflow database, or because some pipelines are not ml related and it does not makes sense to log their parameters).
+
+You can specify the name of the pipelines you want to turn off:
+
+```yaml
+disable_tracking:
+  pipelines:
+    - <pipeline-name>
+```
+
+Notice that it will stop autologging parameters but also any `Mlflow<Artifact/Metrics/ModelLogger>Dataset` you may have in these deactivated pipelines.
+
 ### Configure mlflow experiment
 
 Mlflow enable the user to create "experiments" to organize his work. The different experiments will be visible on the left panel of the mlflow user interface. You can create an experiment through the `mlflow.yml` file witht the `experiment` key:

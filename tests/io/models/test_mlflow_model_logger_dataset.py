@@ -343,3 +343,39 @@ def test_pyfunc_flavor_wrong_pyfunc_workflow(
         match=r"PyFunc models require specifying `pyfunc_workflow` \(set to either `python_model` or `loader_module`\)",
     ):
         MlflowModelLoggerDataSet.from_config(**model_config)
+
+
+def test_mlflow_model_logger_logging_deactivation(tracking_uri, linreg_model):
+    mlflow_model_logger_dataset = MlflowModelLoggerDataSet(flavor="mlflow.sklearn")
+
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri)
+
+    mlflow_model_logger_dataset._logging_activated = False
+
+    all_runs_id_beginning = set(
+        [
+            run.run_id
+            for k in range(len(mlflow_client.list_experiments()))
+            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+        ]
+    )
+
+    mlflow_model_logger_dataset.save(linreg_model)
+
+    all_runs_id_end = set(
+        [
+            run.run_id
+            for k in range(len(mlflow_client.list_experiments()))
+            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+        ]
+    )
+
+    assert all_runs_id_beginning == all_runs_id_end
+
+
+def test_mlflow_model_logger_logging_deactivation_is_bool():
+    mlflow_model_logger_dataset = MlflowModelLoggerDataSet(flavor="mlflow.sklearn")
+
+    with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
+        mlflow_model_logger_dataset._logging_activated = "hello"

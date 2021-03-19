@@ -9,6 +9,7 @@ from kedro.pipeline.node import Node
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled
 
 
 class MlflowNodeHook:
@@ -17,6 +18,7 @@ class MlflowNodeHook:
         self.recursive = True
         self.sep = "."
         self.long_parameters_strategy = "fail"
+        self._is_mlflow_enabled = True
 
     @property
     def _logger(self) -> logging.Logger:
@@ -48,15 +50,17 @@ class MlflowNodeHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
+        self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
 
-        config = get_mlflow_config()
+        if self._is_mlflow_enabled:
+            config = get_mlflow_config()
 
-        self.flatten = config.node_hook_opts["flatten_dict_params"]
-        self.recursive = config.node_hook_opts["recursive"]
-        self.sep = config.node_hook_opts["sep"]
-        self.long_parameters_strategy = config.node_hook_opts[
-            "long_parameters_strategy"
-        ]
+            self.flatten = config.node_hook_opts["flatten_dict_params"]
+            self.recursive = config.node_hook_opts["recursive"]
+            self.sep = config.node_hook_opts["sep"]
+            self.long_parameters_strategy = config.node_hook_opts[
+                "long_parameters_strategy"
+            ]
 
     @hook_impl
     def before_node_run(
@@ -78,23 +82,24 @@ class MlflowNodeHook:
         """
 
         # only parameters will be logged. Artifacts must be declared manually in the catalog
-        params_inputs = {}
-        for k, v in inputs.items():
-            # detect parameters automatically based on kedro reserved names
-            if k.startswith("params:"):
-                params_inputs[k[7:]] = v
-            elif k == "parameters":
-                params_inputs[k] = v
+        if self._is_mlflow_enabled:
+            params_inputs = {}
+            for k, v in inputs.items():
+                # detect parameters automatically based on kedro reserved names
+                if k.startswith("params:"):
+                    params_inputs[k[7:]] = v
+                elif k == "parameters":
+                    params_inputs[k] = v
 
-        # dictionary parameters may be flattened for readibility
-        if self.flatten:
-            params_inputs = flatten_dict(
-                d=params_inputs, recursive=self.recursive, sep=self.sep
-            )
+            # dictionary parameters may be flattened for readibility
+            if self.flatten:
+                params_inputs = flatten_dict(
+                    d=params_inputs, recursive=self.recursive, sep=self.sep
+                )
 
-        # logging parameters based on defined strategy
-        for k, v in params_inputs.items():
-            self.log_param(k, v)
+            # logging parameters based on defined strategy
+            for k, v in params_inputs.items():
+                self.log_param(k, v)
 
     def log_param(self, name: str, value: Union[Dict, int, bool, str]) -> None:
         str_value = str(value)

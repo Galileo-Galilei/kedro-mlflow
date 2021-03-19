@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   It is now possible to deactivate tracking (for parameters and datasets) by specifying a key `disabled_tracking: pipelines: [<pipeline-name>]` in the `mlflow.yml` configuration file. ([#92](https://github.com/Galileo-Galilei/kedro-mlflow/issues/92))
+
 ## [0.7.0] - 2021-03-17
 
 ### Added

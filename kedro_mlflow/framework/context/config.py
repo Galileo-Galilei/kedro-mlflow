@@ -12,6 +12,8 @@ LOGGER = logging.getLogger(__name__)
 
 class KedroMlflowConfig:
 
+    DISABLE_TRACKING_OPTS = {"pipelines": []}
+
     EXPERIMENT_OPTS = {"name": "Default", "create": True}
 
     RUN_OPTS = {"id": None, "name": None, "nested": True}
@@ -32,6 +34,7 @@ class KedroMlflowConfig:
         project_path: Union[str, Path],
         mlflow_tracking_uri: str = "mlruns",
         credentials: Optional[Dict[str, str]] = None,
+        disable_tracking_opts: Optional[Dict[str, str]] = None,
         experiment_opts: Union[Dict[str, Any], None] = None,
         run_opts: Union[Dict[str, Any], None] = None,
         ui_opts: Union[Dict[str, Any], None] = None,
@@ -51,6 +54,7 @@ class KedroMlflowConfig:
         self.credentials = (
             credentials or {}
         )  # replace None by {} but o not default to empty dict which is mutable
+        self.disable_tracking_opts = None
         self.experiment_opts = None
         self.run_opts = None
         self.ui_opts = None
@@ -66,6 +70,7 @@ class KedroMlflowConfig:
         configuration = dict(
             mlflow_tracking_uri=mlflow_tracking_uri,
             credentials=credentials,
+            disable_tracking=disable_tracking_opts,
             experiment=experiment_opts,
             run=run_opts,
             ui=ui_opts,
@@ -76,8 +81,7 @@ class KedroMlflowConfig:
     def setup(self):
         """Setup all the mlflow configuration"""
 
-        session = get_current_session()
-        self._export_credentials(session.load_context())
+        self._export_credentials()
 
         # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
@@ -96,6 +100,10 @@ class KedroMlflowConfig:
             {
                 mlflow_tracking_uri: a valid string for mlflow tracking storage,
                 credentials: a valid string which exists in credentials.yml,
+                tracking:
+                    {
+                        pipelines {List[str]}: the name of pipeline which do not trigger tracking
+                    },
                 experiments:
                     {
                         name {str}: the name of the experiment
@@ -125,6 +133,7 @@ class KedroMlflowConfig:
 
         mlflow_tracking_uri = configuration.get("mlflow_tracking_uri")
         credentials = configuration.get("credentials")
+        disable_tracking_opts = configuration.get("disable_tracking")
         experiment_opts = configuration.get("experiment")
         run_opts = configuration.get("run")
         ui_opts = configuration.get("ui")
@@ -132,6 +141,9 @@ class KedroMlflowConfig:
 
         self.mlflow_tracking_uri = self._validate_uri(uri=mlflow_tracking_uri)
         self.credentials = credentials  # do not replace by value here for safety
+        self.disable_tracking_opts = _validate_opts(
+            opts=disable_tracking_opts, default=self.DISABLE_TRACKING_OPTS
+        )
         self.experiment_opts = _validate_opts(
             opts=experiment_opts, default=self.EXPERIMENT_OPTS
         )
@@ -183,6 +195,7 @@ class KedroMlflowConfig:
         info = {
             "mlflow_tracking_uri": self.mlflow_tracking_uri,
             "credentials": self.credentials,
+            "disable_tracking": self.disable_tracking_opts,
             "experiments": self.experiment_opts,
             "run": self.run_opts,
             "ui": self.ui_opts,
@@ -240,7 +253,7 @@ class KedroMlflowConfig:
             if parsed.scheme == "":
                 # if it is a local relative path, make it absolute
                 # .resolve() does not work well on windows
-                # .absolute is undocumented and have knwon bugs
+                # .absolute is undocumented and have known bugs
                 # Path.cwd() / uri is the recommend way by core developpers.
                 # See : https://discuss.python.org/t/pathlib-absolute-vs-resolve/2573/6
                 valid_uri = (self.project_path / uri).as_uri()
@@ -250,7 +263,9 @@ class KedroMlflowConfig:
 
         return valid_uri
 
-    def _export_credentials(self, context):
+    def _export_credentials(self):
+        session = get_current_session()
+        context = session.load_context()
         conf_creds = context._get_config_credentials()
         mlflow_creds = conf_creds.get(self.credentials, {})
         for key, value in mlflow_creds.items():

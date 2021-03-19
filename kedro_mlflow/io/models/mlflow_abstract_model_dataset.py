@@ -48,6 +48,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
 
         self._flavor = flavor
         self._pyfunc_workflow = pyfunc_workflow
+        self._logging_activated = True  # by default, it should be True!
 
         if flavor == "mlflow.pyfunc" and pyfunc_workflow not in (
             "python_model",
@@ -65,6 +66,19 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
             self._mlflow_model_module
         except ImportError as err:
             raise DataSetError(err)
+
+    # we want to be able to turn logging off for an entire pipeline run
+    # To avoid that a single call to a dataset in the catalog creates a new run automatically
+    # we want to be able to turn everything off
+    @property
+    def _logging_activated(self):
+        return self.__logging_activated
+
+    @_logging_activated.setter
+    def _logging_activated(self, flag):
+        if not isinstance(flag, bool):
+            raise ValueError(f"_logging_activated must be a boolean, got {type(flag)}")
+        self.__logging_activated = flag
 
     # IMPORTANT:  _mlflow_model_module is a property to avoid STORING
     # the module as an attribute but rather store a string and load on the fly

@@ -20,7 +20,7 @@ def render_jinja_template(
 
     template_loader = FileSystemLoader(searchpath=src.parent.as_posix())
     # the keep_trailing_new_line option is mandatory to
-    # make sure that black formatting wil be preserved
+    # make sure that black formatting will be preserved
     template_env = Environment(loader=template_loader, keep_trailing_newline=True)
     template = template_env.get_template(src.name)
     if is_cookiecutter:

@@ -709,7 +709,7 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
         class DummyContextWithHook(KedroContext):
             project_name = "fake project"
             package_name = "fake_project"
-            project_version = "0.16.0"
+            project_version = "0.16.5"
 
             hooks = (MlflowPipelineHook(),)
 

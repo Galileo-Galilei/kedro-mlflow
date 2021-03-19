@@ -27,6 +27,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
         """
         self._prefix = prefix
         self.run_id = run_id
+        self._logging_activated = True  # by default, logging is activated!
 
     @property
     def run_id(self):
@@ -49,6 +50,19 @@ class MlflowMetricsDataSet(AbstractDataSet):
     @run_id.setter
     def run_id(self, run_id):
         self._run_id = run_id
+
+    # we want to be able to turn logging off for an entire pipeline run
+    # To avoid that a single call to a dataset in the catalog creates a new run automatically
+    # we want to be able to turn everything off
+    @property
+    def _logging_activated(self):
+        return self.__logging_activated
+
+    @_logging_activated.setter
+    def _logging_activated(self, flag):
+        if not isinstance(flag, bool):
+            raise ValueError(f"_logging_activated must be a boolean, got {type(flag)}")
+        self.__logging_activated = flag
 
     def _load(self) -> MetricsDict:
         """Load MlflowMetricDataSet.
@@ -93,8 +107,10 @@ class MlflowMetricsDataSet(AbstractDataSet):
         metrics = (
             self._build_args_list_from_metric_item(k, v) for k, v in data.items()
         )
-        for k, v, i in chain.from_iterable(metrics):
-            log_metric(k, v, step=i)
+
+        if self._logging_activated:
+            for k, v, i in chain.from_iterable(metrics):
+                log_metric(k, v, step=i)
 
     def _exists(self) -> bool:
         """Check if MLflow metrics dataset exists.

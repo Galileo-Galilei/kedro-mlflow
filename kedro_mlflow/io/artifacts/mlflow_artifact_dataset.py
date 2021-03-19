@@ -31,6 +31,19 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                 super().__init__(**data_set_args)
                 self.run_id = run_id
                 self.artifact_path = artifact_path
+                self._logging_activated = True
+
+            @property
+            def _logging_activated(self):
+                return self.__logging_activated
+
+            @_logging_activated.setter
+            def _logging_activated(self, flag):
+                if not isinstance(flag, bool):
+                    raise ValueError(
+                        f"_logging_activated must be a boolean, got {type(flag)}"
+                    )
+                self.__logging_activated = flag
 
             def _save(self, data: Any):
                 # _get_save_path needs to be called before super, otherwise
@@ -45,17 +58,18 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                 local_path = local_path.as_posix()
 
                 super()._save(data)
-                if self.run_id:
-                    # if a run id is specified, we have to use mlflow client
-                    # to avoid potential conflicts with an already active run
-                    mlflow_client = MlflowClient()
-                    mlflow_client.log_artifact(
-                        run_id=self.run_id,
-                        local_path=local_path,
-                        artifact_path=self.artifact_path,
-                    )
-                else:
-                    mlflow.log_artifact(local_path, self.artifact_path)
+                if self._logging_activated:
+                    if self.run_id:
+                        # if a run id is specified, we have to use mlflow client
+                        # to avoid potential conflicts with an already active run
+                        mlflow_client = MlflowClient()
+                        mlflow_client.log_artifact(
+                            run_id=self.run_id,
+                            local_path=local_path,
+                            artifact_path=self.artifact_path,
+                        )
+                    else:
+                        mlflow.log_artifact(local_path, self.artifact_path)
 
         # rename the class
         parent_name = data_set.__name__

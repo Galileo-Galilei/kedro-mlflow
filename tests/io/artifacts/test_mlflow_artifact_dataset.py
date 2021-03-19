@@ -51,13 +51,13 @@ def test_mlflow_csv_data_set_save_reload(
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     filepath = (tmp_path / "data").with_suffix(extension)
 
-    mlflow_csv_dataset = MlflowArtifactDataSet(
+    mlflow_dataset = MlflowArtifactDataSet(
         artifact_path=artifact_path,
-        data_set=dict(type=CSVDataSet, filepath=filepath.as_posix()),
+        data_set=dict(type=dataset, filepath=filepath.as_posix()),
     )
 
     with mlflow.start_run():
-        mlflow_csv_dataset.save(data)
+        mlflow_dataset.save(data)
         run_id = mlflow.active_run().info.run_id
 
     # the artifact must be properly uploaded to "mlruns" and reloadable
@@ -71,7 +71,7 @@ def test_mlflow_csv_data_set_save_reload(
         else (Path(artifact_path) / filepath.name).as_posix()
     )
     assert remote_path in run_artifacts
-    assert data.equals(mlflow_csv_dataset.load())
+    assert data.equals(mlflow_dataset.load())
 
 
 @pytest.mark.parametrize(
@@ -165,3 +165,43 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
     assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
 
     mlflow.end_run()
+
+
+def test_mlflow_artifact_logging_deactivation(tmp_path, tracking_uri):
+    mlflow_pkl_dataset = MlflowArtifactDataSet(
+        data_set=dict(type=PickleDataSet, filepath=(tmp_path / "df1.csv").as_posix())
+    )
+
+    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+
+    mlflow_pkl_dataset._logging_activated = False
+
+    all_runs_id_beginning = set(
+        [
+            run.run_id
+            for k in range(len(mlflow_client.list_experiments()))
+            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+        ]
+    )
+
+    mlflow_pkl_dataset.save(2)
+
+    all_runs_id_end = set(
+        [
+            run.run_id
+            for k in range(len(mlflow_client.list_experiments()))
+            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+        ]
+    )
+
+    assert all_runs_id_beginning == all_runs_id_end
+
+
+def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
+    mlflow_csv_dataset = MlflowArtifactDataSet(
+        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix())
+    )
+
+    with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
+        mlflow_csv_dataset._logging_activated = "hello"

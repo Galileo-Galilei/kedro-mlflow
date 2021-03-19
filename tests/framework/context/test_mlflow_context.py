@@ -27,6 +27,7 @@ def test_get_mlflow_config(kedro_project):
         dict(
             mlflow_tracking_uri="mlruns",
             credentials=None,
+            disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
@@ -43,6 +44,7 @@ def test_get_mlflow_config(kedro_project):
     expected = {
         "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
         "credentials": None,
+        "disable_tracking": {"pipelines": ["my_disabled_pipeline"]},
         "experiments": {"name": "fake_package", "create": True},
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},
@@ -89,6 +91,7 @@ def test_mlflow_config_with_templated_config_loader(
         dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
             credentials=None,
+            disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
             experiment=dict(name="fake_package", create=True),
             run=dict(id="123456789", name="my_run", nested=True),
             ui=dict(port="5151", host="localhost"),
@@ -111,6 +114,7 @@ def test_mlflow_config_with_templated_config_loader(
     expected = {
         "mlflow_tracking_uri": (kedro_project_with_tcl / "dynamic_mlruns").as_uri(),
         "credentials": None,
+        "disable_tracking": {"pipelines": ["my_disabled_pipeline"]},
         "experiments": {"name": "fake_package", "create": True},
         "run": {"id": "123456789", "name": "my_run", "nested": True},
         "ui": {"port": "5151", "host": "localhost"},

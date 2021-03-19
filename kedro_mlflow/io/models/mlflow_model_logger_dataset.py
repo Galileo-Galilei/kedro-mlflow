@@ -129,13 +129,17 @@ class MlflowModelLoggerDataSet(MlflowAbstractModelDataSet):
             # workflow. We we assign the passed `model` object to one of those keys
             # depending on the chosen `pyfunc_workflow`.
             self._save_args[self._pyfunc_workflow] = model
-            self._mlflow_model_module.log_model(self._artifact_path, **self._save_args)
+            if self._logging_activated:
+                self._mlflow_model_module.log_model(
+                    self._artifact_path, **self._save_args
+                )
         else:
             # Otherwise we save using the common workflow where first argument is the
             # model object and second is the path.
-            self._mlflow_model_module.log_model(
-                model, self._artifact_path, **self._save_args
-            )
+            if self._logging_activated:
+                self._mlflow_model_module.log_model(
+                    model, self._artifact_path, **self._save_args
+                )
 
     def _describe(self) -> Dict[str, Any]:
         return dict(

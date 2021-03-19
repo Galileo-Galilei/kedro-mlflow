@@ -19,6 +19,12 @@ mlflow_tracking_uri: mlruns
 
 credentials: null  # must be a valid key in credentials.yml
 
+# You can specify a list of pipeline names for which tracing will be disabled
+# Running "kedro run --pipeline=<pipeline_name>" will not log parameters
+# in a new mlflow run
+disable_tracking:
+  pipelines: []
+
 # EXPERIMENT-RELATED PARAMETERS ----------
 
 # `name` is the name of the experiment (~subfolder

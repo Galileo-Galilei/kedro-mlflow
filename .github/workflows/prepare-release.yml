@@ -44,7 +44,7 @@ jobs:
         git push -u origin release-${{ steps.bump_version.outputs.package_version }}
     - name: Commit the changes
       run: |
-        git commit -am "FIX #${{ steps.open_pr.outputs.pull_request_number }}  - Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
+        git commit -am "Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
         git push
     - name: Open a PR to merge the release to master
       id: open_pr
@@ -56,3 +56,7 @@ jobs:
         PULL_REQUEST_TITLE: "Release ${{ steps.bump_version.outputs.package_version }}"
         PULL_REQUEST_BODY: "Bump version and CHANGELOG for next release."
         PULL_REQUEST_ASSIGNEES: "${{ github.repository_owner }}"
+    - name: Change the comit message to add PR number
+      run: |
+        git commit -a --amend -m "FIX #${{ steps.open_pr.outputs.pull_request_number }}  - Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }}"
+        git push -f

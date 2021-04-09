@@ -47,7 +47,7 @@ and your can supply the credentials key of the `mlflow.yml`:
 credentials: my_mlflow_credentials
 ```
 
-For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They wil be exported as environment variables *on the fly* when running the pipeline.
+For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They will be exported as environment variables *on the fly* when running the pipeline.
 
 ### Deactivate tracking under conditions
 

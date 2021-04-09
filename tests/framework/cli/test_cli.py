@@ -170,7 +170,18 @@ def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
         "subprocess.call"
     )  # make the test succeed, but no a real test
     cli_runner.invoke(cli_ui)
-    ui_mocker.assert_called_once()
+    ui_mocker.assert_called_once_with(
+        [
+            "mlflow",
+            "ui",
+            "--backend-store-uri",
+            (kedro_project_with_mlflow_conf / "mlruns").as_uri(),
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "5000",
+        ]
+    )
 
     # OTHER ATTEMPT:
     # try:
@@ -181,3 +192,29 @@ def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
     #     raise err
     # print(thread)
     # assert thread.is_alive()
+
+
+def test_ui_overwrite_conf_at_runtime(
+    monkeypatch, mocker, kedro_project_with_mlflow_conf
+):
+
+    monkeypatch.chdir(kedro_project_with_mlflow_conf)
+    cli_runner = CliRunner()
+
+    # This does not test anything : the goal is to check whether it raises an error
+    ui_mocker = mocker.patch(
+        "subprocess.call"
+    )  # make the test succeed, but no a real test
+    cli_runner.invoke(cli_ui, ["--host", "0.0.0.0", "--port", "5001"])
+    ui_mocker.assert_called_once_with(
+        [
+            "mlflow",
+            "ui",
+            "--backend-store-uri",
+            (kedro_project_with_mlflow_conf / "mlruns").as_uri(),
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "5001",
+        ]
+    )

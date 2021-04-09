@@ -129,7 +129,19 @@ def init(env, force, silent):
     default="local",
     help="The environment within conf folder we want to retrieve.",
 )
-def ui(env):
+@click.option(
+    "--port",
+    "-p",
+    required=False,
+    help="The port to listen on",
+)
+@click.option(
+    "--host",
+    "-h",
+    required=False,
+    help="The network address to listen on (default: 127.0.0.1). Use 0.0.0.0 to bind to all addresses if you want to access the tracking server from other machines.",
+)
+def ui(env, port, host):
     """Opens the mlflow user interface with the
     project-specific settings of mlflow.yml. This interface
     enables to browse and compares runs.
@@ -146,11 +158,22 @@ def ui(env):
     ):
 
         mlflow_conf = get_mlflow_config()
+        host = host or mlflow_conf.ui_opts.get("host")
+        port = port or mlflow_conf.ui_opts.get("port")
 
         # call mlflow ui with specific options
         # TODO : add more options for ui
         subprocess.call(
-            ["mlflow", "ui", "--backend-store-uri", mlflow_conf.mlflow_tracking_uri]
+            [
+                "mlflow",
+                "ui",
+                "--backend-store-uri",
+                mlflow_conf.mlflow_tracking_uri,
+                "--host",
+                host,
+                "--port",
+                port,
+            ]
         )
 
 

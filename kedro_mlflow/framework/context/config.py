@@ -18,7 +18,7 @@ class KedroMlflowConfig:
 
     RUN_OPTS = {"id": None, "name": None, "nested": True}
 
-    UI_OPTS = {"port": None, "host": None}
+    UI_OPTS = {"port": "5000", "host": "127.0.0.1"}
 
     NODE_HOOK_OPTS = {
         "flatten_dict_params": False,

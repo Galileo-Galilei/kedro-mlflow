@@ -6,6 +6,12 @@
 
 -   It is now possible to deactivate tracking (for parameters and datasets) by specifying a key `disabled_tracking: pipelines: [<pipeline-name>]` in the `mlflow.yml` configuration file. ([#92](https://github.com/Galileo-Galilei/kedro-mlflow/issues/92))
 
+- The `kedro mlflow ui` command `host` and `port` keys can be overwritten at runtime ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
+
+### Fixed
+
+- The `kedro mlflow ui` now reads properly the `ui:host` and `ui:port` keys from the `mlflow.yml` which were incorrectly ignored ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
+
 ## [0.7.0] - 2021-03-17
 
 ### Added

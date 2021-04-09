@@ -2,15 +2,17 @@
 
 ## [Unreleased]
 
+## [0.7.1] - 2021-04-09
+
 ### Added
 
 -   It is now possible to deactivate tracking (for parameters and datasets) by specifying a key `disabled_tracking: pipelines: [<pipeline-name>]` in the `mlflow.yml` configuration file. ([#92](https://github.com/Galileo-Galilei/kedro-mlflow/issues/92))
 
-- The `kedro mlflow ui` command `host` and `port` keys can be overwritten at runtime ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
+-   The `kedro mlflow ui` command `host` and `port` keys can be overwritten at runtime ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
 
 ### Fixed
 
-- The `kedro mlflow ui` now reads properly the `ui:host` and `ui:port` keys from the `mlflow.yml` which were incorrectly ignored ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
+-   The `kedro mlflow ui` now reads properly the `ui:host` and `ui:port` keys from the `mlflow.yml` which were incorrectly ignored ([#187](https://github.com/Galileo-Galilei/kedro-mlflow/issues/187))
 
 ## [0.7.0] - 2021-03-17
 
@@ -198,7 +200,9 @@ Many documentation improvements:
 -   Add `MlflowDataSet` for artifacts autologging
 -   Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.1...HEAD
+
+[0.7.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.0...0.7.1
 
 [0.7.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.6.0...0.7.0
 

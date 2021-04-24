@@ -76,6 +76,5 @@ We'd be happy to receive help to maintain and improve the package. Any PR will b
 The following people actively maintain, enhance and discuss design to make this package as good as possible. Many thanks to them!
 
 - [Yolan Honoré-Rougé](https://github.com/galileo-galilei)
-- [Kajetan Maurycy Olszewski](https://github.com/kaemo)
 - [Adrian Piotr Kruszewski](https://github.com/akruszewski)
 - [Takieddine Kadiri](https://github.com/takikadiri)

@@ -3,10 +3,8 @@ import os
 import mlflow
 import pytest
 import yaml
-from kedro.framework.cli.utils import _add_src_to_path
-from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _get_project_metadata
+from kedro.framework.startup import bootstrap_project
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.context.config import (
@@ -90,12 +88,8 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
         experiment_opts=dict(name="exp1"),
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
@@ -114,12 +108,8 @@ def test_kedro_mlflow_config_experiment_exists(mocker, kedro_project_with_mlflow
         experiment_opts=dict(name="exp1"),
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
@@ -141,12 +131,8 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
         experiment_opts=dict(name="exp1"),
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
@@ -164,12 +150,8 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
         experiment_opts=dict(name="exp1"),
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
     assert mlflow.get_tracking_uri() == mlflow_tracking_uri
@@ -186,12 +168,8 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
         project_path=kedro_project_with_mlflow_conf, credentials="my_mlflow_creds"
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
     assert os.environ["fake_mlflow_cred"] == "my_fake_cred"
@@ -217,12 +195,8 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
         credentials="my_mlflow_creds",
     )
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
     assert (

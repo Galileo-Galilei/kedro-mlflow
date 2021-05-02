@@ -2,10 +2,8 @@ import subprocess
 from pathlib import Path
 
 import click
-from kedro.framework.cli.utils import _add_src_to_path
-from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _get_project_metadata, _is_project
+from kedro.framework.startup import _is_project, bootstrap_project
 
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 from kedro_mlflow.framework.context import get_mlflow_config
@@ -79,12 +77,8 @@ def init(env, force, silent):
     # get constants
     mlflow_yml = "mlflow.yml"
     project_path = Path().cwd()
-    project_metadata = _get_project_metadata(project_path)
-    _add_src_to_path(project_metadata.source_dir, project_path)
-    configure_project(project_metadata.package_name)
-    session = KedroSession.create(
-        project_metadata.package_name, project_path=project_path
-    )
+    project_metadata = bootstrap_project(project_path)
+    session = KedroSession.create(project_path=project_path)
     context = session.load_context()
     mlflow_yml_path = project_path / context.CONF_ROOT / env / mlflow_yml
 
@@ -148,11 +142,8 @@ def ui(env, port, host):
     """
 
     project_path = Path().cwd()
-    project_metadata = _get_project_metadata(project_path)
-    _add_src_to_path(project_metadata.source_dir, project_path)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(project_path)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=project_path,
         env=env,
     ):

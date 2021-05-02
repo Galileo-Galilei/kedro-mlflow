@@ -4,10 +4,8 @@ from typing import Dict
 import mlflow
 import pytest
 import yaml
-from kedro.framework.cli.utils import _add_src_to_path
-from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _get_project_metadata
+from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
@@ -122,11 +120,8 @@ def test_pipeline_run_hook_getting_configs(
         ),
     ),
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         mlflow_node_hook = MlflowNodeHook()
@@ -187,11 +182,8 @@ def test_node_hook_logging(
 
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         mlflow.set_tracking_uri(mlflow_tracking_uri)
@@ -238,11 +230,8 @@ def test_node_hook_logging_below_limit_all_strategy(
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         with mlflow.start_run():
@@ -288,11 +277,8 @@ def test_node_hook_logging_above_limit_truncate_strategy(
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         with mlflow.start_run():
@@ -340,11 +326,8 @@ def test_node_hook_logging_above_limit_fail_strategy(
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         with mlflow.start_run():
@@ -396,11 +379,8 @@ def test_node_hook_logging_above_limit_tag_strategy(
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
+    bootstrap_project(kedro_project)
     with KedroSession.create(
-        package_name=project_metadata.package_name,
         project_path=kedro_project,
     ):
         with mlflow.start_run():

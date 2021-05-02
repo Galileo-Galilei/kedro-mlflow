@@ -1,9 +1,7 @@
 import pytest
 import yaml
-from kedro.framework.cli.utils import _add_src_to_path
-from kedro.framework.project import configure_project
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _get_project_metadata
+from kedro.framework.startup import bootstrap_project
 
 from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.framework.context.config import KedroMlflowConfigError
@@ -58,10 +56,8 @@ def test_get_mlflow_config(kedro_project):
         },
     }
 
-    project_metadata = _get_project_metadata(kedro_project)
-    _add_src_to_path(project_metadata.source_dir, kedro_project)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(project_metadata.package_name, project_path=kedro_project):
+    bootstrap_project(kedro_project)
+    with KedroSession.create(project_path=kedro_project):
         assert get_mlflow_config().to_dict() == expected
 
 
@@ -70,10 +66,8 @@ def test_get_mlflow_config_in_uninitialized_project(kedro_project):
     with pytest.raises(
         KedroMlflowConfigError, match="No 'mlflow.yml' config file found in environment"
     ):
-        project_metadata = _get_project_metadata(kedro_project)
-        _add_src_to_path(project_metadata.source_dir, kedro_project)
-        configure_project(project_metadata.package_name)
-        with KedroSession.create(project_metadata.package_name, kedro_project):
+        bootstrap_project(kedro_project)
+        with KedroSession.create(project_path=kedro_project):
             get_mlflow_config()
 
 
@@ -127,8 +121,6 @@ def test_mlflow_config_with_templated_config_loader(
             }
         },
     }
-    project_metadata = _get_project_metadata(kedro_project_with_tcl)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_tcl)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(project_metadata.package_name, kedro_project_with_tcl):
+    bootstrap_project(kedro_project_with_tcl)
+    with KedroSession.create(project_path=kedro_project_with_tcl):
         assert get_mlflow_config().to_dict() == expected

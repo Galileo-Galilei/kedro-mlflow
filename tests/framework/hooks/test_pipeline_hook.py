@@ -1,18 +1,20 @@
 import sys
+from typing import Any, Dict, Iterable, Optional
 
 import mlflow
 import pandas as pd
 import pytest
 import yaml
+from kedro.config import ConfigLoader
 from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.framework.cli.utils import _add_src_to_path
-from kedro.framework.context import KedroContext
-from kedro.framework.project import configure_project
+from kedro.framework.hooks import hook_impl
+from kedro.framework.project import Validator, _ProjectPipelines, _ProjectSettings
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _get_project_metadata
+from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
+from kedro.versioning import Journal
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
@@ -89,6 +91,87 @@ def env_from_environment(environment_path, env_from_dict):
     env_from_environment = env_from_dict
 
     return env_from_environment
+
+
+class DummyProjectHooks:
+    @hook_impl
+    def register_config_loader(self, conf_paths: Iterable[str]) -> ConfigLoader:
+        return ConfigLoader(conf_paths)
+
+    @hook_impl
+    def register_catalog(
+        self,
+        catalog: Optional[Dict[str, Dict[str, Any]]],
+        credentials: Dict[str, Dict[str, Any]],
+        load_versions: Dict[str, str],
+        save_version: str,
+        journal: Journal,
+    ) -> DataCatalog:
+        return DataCatalog.from_config(
+            catalog, credentials, load_versions, save_version, journal
+        )
+
+
+def _mock_imported_settings_paths(mocker, mock_settings):
+    for path in [
+        "kedro.framework.context.context.settings",
+        "kedro.framework.session.session.settings",
+        "kedro.framework.project.settings",
+    ]:
+        mocker.patch(path, mock_settings)
+    return mock_settings
+
+
+def _mock_settings_with_hooks(mocker, hooks):
+    class MockSettings(_ProjectSettings):
+        _HOOKS = Validator("HOOKS", default=hooks)
+
+    return _mock_imported_settings_paths(mocker, MockSettings())
+
+
+@pytest.fixture
+def mock_settings_with_mlflow_hooks(mocker):
+
+    return _mock_settings_with_hooks(
+        mocker,
+        hooks=(
+            DummyProjectHooks(),
+            MlflowPipelineHook(),
+            # MlflowNodeHook(),
+        ),
+    )
+
+
+@pytest.fixture(autouse=True)
+def mocked_logging(mocker):
+    # Disable logging.config.dictConfig in KedroSession._setup_logging as
+    # it changes logging.config and affects other unit tests
+    return mocker.patch("logging.config.dictConfig")
+
+
+@pytest.fixture
+def mock_failing_pipelines(mocker):
+    def failing_node():
+        mlflow.start_run(nested=True)
+        raise ValueError("Let's make this pipeline fail")
+
+    def mocked_register_pipelines():
+        failing_pipeline = Pipeline(
+            [
+                node(
+                    func=failing_node,
+                    inputs=None,
+                    outputs="fake_output",
+                )
+            ]
+        )
+        return {"__default__": failing_pipeline, "pipeline_off": failing_pipeline}
+
+    mocker.patch.object(
+        _ProjectPipelines,
+        "_get_pipelines_registry_callable",
+        return_value=mocked_register_pipelines,
+    )
 
 
 @pytest.mark.parametrize(
@@ -298,13 +381,8 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     dummy_run_params,
 ):
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         # config_with_base_mlflow_conf is a conftest fixture
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
@@ -376,13 +454,8 @@ def test_mlflow_pipeline_hook_with_copy_mode(
     expected,
 ):
     # config_with_base_mlflow_conf is a conftest fixture
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
 
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
@@ -433,13 +506,8 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
     kedro_project_with_mlflow_conf, dummy_pipeline_ml, dummy_run_params
 ):
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
 
         mlflow_conf = get_mlflow_config()
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
@@ -520,13 +588,8 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
     dummy_run_params,
 ):
     # config_with_base_mlflow_conf is a conftest fixture
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
 
         mlflow_conf = get_mlflow_config()
         mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
@@ -606,13 +669,8 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
     expected_signature,
 ):
     # config_with_base_mlflow_conf is a conftest fixture
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
 
@@ -690,45 +748,18 @@ def test_generate_default_kedro_commands(default_value):
     assert _generate_kedro_command(**record_data) == expected
 
 
-def test_on_pipeline_error(kedro_project_with_mlflow_conf):
+def test_on_pipeline_error(
+    kedro_project_with_mlflow_conf,
+    mock_settings_with_mlflow_hooks,
+    mock_failing_pipelines,
+):
 
     tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
 
-    project_metadata = _get_project_metadata(kedro_project_with_mlflow_conf)
-    _add_src_to_path(project_metadata.source_dir, kedro_project_with_mlflow_conf)
-    configure_project(project_metadata.package_name)
-    with KedroSession.create(
-        package_name=project_metadata.package_name,
-        project_path=kedro_project_with_mlflow_conf,
-    ):
-
-        def failing_node():
-            mlflow.start_run(nested=True)
-            raise ValueError("Let's make this pipeline fail")
-
-        class DummyContextWithHook(KedroContext):
-            project_name = "fake project"
-            package_name = "fake_project"
-            project_version = "0.16.5"
-
-            hooks = (MlflowPipelineHook(),)
-
-            def _get_pipeline(self, name: str = None) -> Pipeline:
-                return Pipeline(
-                    [
-                        node(
-                            func=failing_node,
-                            inputs=None,
-                            outputs="fake_output",
-                        )
-                    ]
-                )
-
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         with pytest.raises(ValueError):
-            failing_context = DummyContextWithHook(
-                "fake_package", kedro_project_with_mlflow_conf.as_posix()
-            )
-            failing_context.run()
+            session.run()
 
         # the run we want is the last one in Default experiment
         failing_run_info = MlflowClient(tracking_uri).list_run_infos("0")[0]

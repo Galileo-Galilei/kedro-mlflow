@@ -123,18 +123,20 @@ def clear_hook_manager():
 
 
 @pytest.fixture(autouse=True)
-def config_dir(kedro_project_path, catalog_config, mlflow_config_wo_tracking):
+def config_dir(
+    kedro_project_path, catalog_config, local_logging_config, mlflow_config_wo_tracking
+):
     catalog_yml = kedro_project_path / "conf" / "base" / "catalog.yml"
     parameters_yml = kedro_project_path / "conf" / "base" / "parameters.yml"
     credentials_yml = kedro_project_path / "conf" / "local" / "credentials.yml"
     mlflow_yml = kedro_project_path / "conf" / "local" / "mlflow.yml"
-    # logging = tmp_path / "conf" / "local" / "logging.yml"
+    logging_yml = kedro_project_path / "conf" / "local" / "logging.yml"
     pyproject_toml = kedro_project_path / "pyproject.toml"
     _write_yaml(catalog_yml, catalog_config)
     _write_yaml(parameters_yml, {"a": "my_param_a"})
     _write_yaml(mlflow_yml, mlflow_config_wo_tracking)
     _write_yaml(credentials_yml, {})
-    # _write_yaml(logging, local_logging_config)
+    _write_yaml(logging_yml, local_logging_config)
     payload = {
         "tool": {
             "kedro": {
@@ -187,7 +189,12 @@ def _mock_settings_with_hooks(mocker, hooks):
 def mock_settings_with_mlflow_hooks(mocker):
 
     return _mock_settings_with_hooks(
-        mocker, hooks=(DummyProjectHooks(), MlflowPipelineHook(), MlflowNodeHook())
+        mocker,
+        hooks=(
+            DummyProjectHooks(),
+            MlflowPipelineHook(),
+            MlflowNodeHook(),
+        ),
     )
 
 
@@ -198,8 +205,8 @@ def mocked_logging(mocker):
     return mocker.patch("logging.config.dictConfig")
 
 
-@pytest.fixture(autouse=True)
-def mock_pipelines(mocker):
+@pytest.fixture
+def dummy_pipeline():
     dummy_pipeline = Pipeline(
         [
             node(
@@ -209,44 +216,53 @@ def mock_pipelines(mocker):
             )
         ]
     )
+    return dummy_pipeline
 
-    class MockPipelines(_ProjectPipelines):
-        def _get_register_pipelines(self, pipelines_module: str):
-            return lambda: {
-                "__default__": dummy_pipeline,
-                "pipeline_off": dummy_pipeline,
-                "pipeline_on": dummy_pipeline,
-            }
 
-    dummy_pipelines = MockPipelines()
-    mocker.patch("kedro.framework.context.context.pipelines", dummy_pipelines)
-    return mocker.patch("kedro.framework.project.pipelines", dummy_pipelines)
+@pytest.fixture(autouse=True)
+def mock_pipelines(mocker, dummy_pipeline):
+    def mocked_register_pipelines():
+        return {
+            "__default__": dummy_pipeline,
+            "pipeline_off": dummy_pipeline,
+            "pipeline_on": dummy_pipeline,
+        }
+
+    mocker.patch.object(
+        _ProjectPipelines,
+        "_get_pipelines_registry_callable",
+        return_value=mocked_register_pipelines,
+    )
+
+    return mocked_register_pipelines()
 
 
 @pytest.fixture
-def patched_configure_project(mocker):
+def mock_session(
+    mocker, mock_settings_with_mlflow_hooks, kedro_project_path
+):  # pylint: disable=unused-argument
+
+    # see here why it is needed: https://github.com/quantumblacklabs/kedro/blob/956dbed2289397b69506a8d79cca831032e89163/tests/framework/session/conftest.py#L407
     mocker.patch("kedro.framework.project._validate_module")
-    # prevent registering the one of the plugins which are already installed
-    mocker.patch("kedro.framework.project._register_hooks_setuptools")
+    mocker.patch(
+        "kedro.framework.project._register_hooks_setuptools"
+    )  # prevent registering the one of the plugins which are already installed
     configure_project(MOCK_PACKAGE_NAME)
-    yield
+    return KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path)
 
 
 def test_deactivated_tracking_but_not_for_given_pipeline(
-    mock_settings_with_mlflow_hooks,
-    patched_configure_project,
-    mocker,
-    kedro_project_path,
+    mocker, config_dir, kedro_project_path, mock_session
 ):
 
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
-    with KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path) as session:
+    with mock_session:
 
         kedro_mlflow_config = get_mlflow_config()
         kedro_mlflow_config.setup()
 
-        mlflow_client = MlflowClient((kedro_project_path / "mlruns").as_uri())
+        mlflow_client = MlflowClient((Path(kedro_project_path) / "mlruns").as_uri())
 
         # 0 is default, 1 is "fake_exp"
         all_runs_id_beginning = set(
@@ -257,8 +273,10 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
             ]
         )
 
-        context = session.load_context()
-        context.run(pipeline_name="pipeline_on")  # this is a pipeline should be tracked
+        # context = session.load_context()
+        # context.run(pipeline_name="pipeline_on")  # this is a pipeline should be tracked
+
+        mock_session.run(pipeline_name="pipeline_on")
 
         all_runs_id_end = set(
             [
@@ -272,15 +290,12 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
 
 
 def test_deactivated_tracking_for_given_pipeline(
-    mock_settings_with_mlflow_hooks,
-    patched_configure_project,
-    mocker,
-    kedro_project_path,
+    mocker, config_dir, kedro_project_path, mock_session
 ):
 
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
-    with KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path) as session:
+    with mock_session:
 
         kedro_mlflow_config = get_mlflow_config()
         kedro_mlflow_config.setup()
@@ -296,8 +311,7 @@ def test_deactivated_tracking_for_given_pipeline(
             ]
         )
 
-        context = session.load_context()
-        context.run(pipeline_name="pipeline_off")
+        mock_session.run(pipeline_name="pipeline_off")
 
         all_runs_id_end = set(
             [

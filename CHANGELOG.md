@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.7.2] - 2021-05-02
+
 ### Fixed
 
-- Remove global CLI command `new` (which was not implemented yet) to make project CLI commands available. It is not possible to have 2 CLI groups (one at global level , one at project level) because of a bug in ``kedro==0.17.3`` ([#193](https://github.com/Galileo-Galilei/kedro-mlflow/issues/193))
+-   Remove global CLI command `new` (which was not implemented yet) to make project CLI commands available. It is not possible to have 2 CLI groups (one at global level , one at project level) because of a bug in `kedro==0.17.3` ([#193](https://github.com/Galileo-Galilei/kedro-mlflow/issues/193))
 
 ## [0.7.1] - 2021-04-09
 
@@ -204,7 +206,9 @@ Many documentation improvements:
 -   Add `MlflowDataSet` for artifacts autologging
 -   Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.2...HEAD
+
+[0.7.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.1...0.7.2
 
 [0.7.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.0...0.7.1
 

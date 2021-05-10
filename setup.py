@@ -51,7 +51,7 @@ setup(
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <0.25.0",
-            "flake8==3.8.4",  # ensure consistency with pre-commit
+            "flake8==3.9.2",  # ensure consistency with pre-commit
             "black==20.8b1",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.7.0",  # ensure consistency with pre-commit
         ],

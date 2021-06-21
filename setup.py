@@ -53,7 +53,7 @@ setup(
             "scikit-learn>=0.23.0, <0.25.0",
             "flake8==3.8.4",  # ensure consistency with pre-commit
             "black==20.8b1",  # pin black version because it is not compatible with a pip range (because of non semver version number)
-            "isort==5.7.0",  # ensure consistency with pre-commit
+            "isort==5.9.1",  # ensure consistency with pre-commit
         ],
     },
     author="Galileo-Galilei",

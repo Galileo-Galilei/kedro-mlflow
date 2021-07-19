@@ -47,7 +47,7 @@ We discuss hereafter how the two libraries compete on the different functionalit
 
 ### Versioning: Kedro 1 - 1 Mlflow
 
-The ``Kedro`` [``Journal`` aims at reproducibility](https://kedro.readthedocs.io/en/latest/kedro.versioning.Journal.html), but is not focused on machine learning. The `Journal` keeps track of two elements:
+The ``Kedro`` [``Journal`` aims at reproducibility](https://kedro.readthedocs.io/en/latest/kedro.versioning.journal.Journal.html), but is not focused on machine learning. The `Journal` keeps track of two elements:
 
 - the CLI arguments, including *on the fly* parameters. This makes the command used to run the pipeline fully reproducible.
 - the ``AbstractVersionedDataSet`` for which versioning is activated. It consists in copying the data whom ``versioned`` argument is ``True`` when the ``save`` method of the ``AbstractVersionedDataSet`` is called.

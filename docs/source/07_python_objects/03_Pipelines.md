@@ -60,7 +60,7 @@ mlflow.pyfunc.log_model(
             catalog=catalog
         ),
     artifacts=artifacts,
-    conda_env={"python": "3.7.0"},
+    conda_env={"python": "3.7.0", , "dependencies": ["kedro==0.16.5"]},
     model_signature=model_signature
 )
 ```

@@ -336,6 +336,7 @@ def pipeline_ml_with_parameters():
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
+        conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
     )
     return pipeline_ml_with_parameters
 
@@ -476,7 +477,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
             training=dummy_pipeline_ml.training,
             inference=dummy_pipeline_ml.inference,
             input_name=dummy_pipeline_ml.input_name,
-            conda_env={},
+            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
             model_name=dummy_pipeline_ml.model_name,
             copy_mode=copy_mode,
         )

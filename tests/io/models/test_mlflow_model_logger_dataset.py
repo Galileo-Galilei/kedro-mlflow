@@ -300,7 +300,10 @@ def test_pyfunc_flavor_python_model_save_and_load(
             "flavor": "mlflow.pyfunc",
             "pyfunc_workflow": "python_model",
             "artifact_path": "test_model",
-            "save_args": {"artifacts": artifacts, "conda_env": {"python": "3.7.0"}},
+            "save_args": {
+                "artifacts": artifacts,
+                "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+            },
         },
     }
 

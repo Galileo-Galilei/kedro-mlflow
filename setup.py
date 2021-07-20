@@ -38,12 +38,12 @@ setup(
     install_requires=base_requirements,
     extras_require={
         "docs": [
-            "sphinx==3.4.3",
+            "sphinx==4.1.1",
             "recommonmark==0.7.1",
-            "sphinx_rtd_theme==0.5.1",
+            "sphinx_rtd_theme==0.5.2",
             "sphinx-markdown-tables==0.0.15",
-            "pandas>=1.0.0, <1.3.0",  # avoid to make readthedocs load rc version
-            "numpy>=1.0.0, <1.21.0",  # bug on windows for numpy 1.19.0->1.19.4
+            "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
+            "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
         "tests": [
             "pytest>=5.4.0, <7.0.0",
@@ -51,9 +51,9 @@ setup(
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <0.25.0",
-            "flake8==3.8.4",  # ensure consistency with pre-commit
-            "black==20.8b1",  # pin black version because it is not compatible with a pip range (because of non semver version number)
-            "isort==5.7.0",  # ensure consistency with pre-commit
+            "flake8==3.9.2",  # ensure consistency with pre-commit
+            "black==21.7b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "isort==5.9.2",  # ensure consistency with pre-commit
         ],
     },
     author="Galileo-Galilei",

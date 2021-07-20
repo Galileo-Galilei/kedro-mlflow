@@ -100,7 +100,7 @@ def test_model_packaging_with_copy_mode(
             artifact_path="model",
             python_model=kedro_model,
             artifacts=artifacts,
-            conda_env={"python": "3.7.0"},
+            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
         )
         run_id = mlflow.active_run().info.run_id
 
@@ -167,7 +167,7 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_ml_obj):
             artifact_path="model",
             python_model=kedro_model,
             artifacts=artifacts,
-            conda_env={"python": "3.7.0"},
+            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
         )
         run_id = mlflow.active_run().info.run_id
 
@@ -200,7 +200,7 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_ml_obj):
             artifact_path="model",
             python_model=kedro_model,
             artifacts=None,  # no artifacts provided
-            conda_env={"python": "3.7.0"},
+            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
         )
         run_id = mlflow.active_run().info.run_id
 

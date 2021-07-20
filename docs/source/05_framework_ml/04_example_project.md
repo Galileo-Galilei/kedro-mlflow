@@ -27,7 +27,7 @@ If you don't want to read the entire explanations, here is a summary:
                 model_name="kedro_mlflow_tutorial",
                 conda_env={
                     "python": 3.7,
-                    "pip": [f"kedro_mlflow_tutorial=={PROJECT_VERSION}"],
+                    "dependencies": [f"kedro_mlflow_tutorial=={PROJECT_VERSION}"],
                 },
                 model_signature="auto",
             )

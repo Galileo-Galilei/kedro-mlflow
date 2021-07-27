@@ -9,7 +9,7 @@ The current workflow is the following:
     - Create a branch based on the master branch (``git checkout -b <prefix-branchname> master``)
     - Create a conda environment (conda create -n <your-env-name> python==3.7)
     - Activate this environment (`conda activate <your-env-name>`)
-    - Install the extra dependencies for tests (`pip install kedro-mlflow[tests]`)
+    - Install the extra dependencies for tests (`pip install kedro-mlflow[dev,test]`)
     - Apply your changes
     - Run pre-commit (black linting, flake8 errors, isort with ``pre-commit run``)
 4. Submit your changes:

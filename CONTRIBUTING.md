@@ -16,11 +16,11 @@ The current workflow is the following:
     - Ensure test coverage is still 100%
     - Update documentation accordingly
     - Update `CHANGELOG.md` according to ["Keep a Changelog" guidelines](https://keepachangelog.com/en/1.0.0/)
-    - Squash all the changes within a single commit as much as possible, and ensure the commit message has the format "FIX ``#<issue-number>`` - Informative description"
+    - Squash all the changes within a single commit as much as possible, and ensure the commit message has the format "[:gitmoji_icon:](https://gitmoji.dev/) Informative description (``#<issue-number>``)"
     - Rebase your branch on ``master`` to ensure linear history
     - Open a pull request against ``master``
 5. Ask for review:
-    - Assign randomly the review to two of the contributors (one review will be enough most of the time, but reviewers may not be available).
+    - Assign the review @Galileo-Galilei
     - Wait for review
     - Resolve all discussions (go back to step 3.)
 6. The PR will be merged as soon as possible

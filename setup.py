@@ -37,7 +37,7 @@ setup(
     include_package_data=True,
     install_requires=base_requirements,
     extras_require={
-        "docs": [
+        "doc": [
             "sphinx==4.1.1",
             "recommonmark==0.7.1",
             "sphinx_rtd_theme==0.5.2",
@@ -45,15 +45,19 @@ setup(
             "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
             "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
-        "tests": [
+        "test": [
             "pytest>=5.4.0, <7.0.0",
             "pytest-cov>=2.8.0, <3.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <0.25.0",
             "flake8==3.9.2",  # ensure consistency with pre-commit
+        ],
+        "dev": [
             "black==21.7b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.9.2",  # ensure consistency with pre-commit
+            "pre-commit>=2.0.0,<3.0.0",
+            "jupyter>=1.0.0,<2.0.0",
         ],
     },
     author="Galileo-Galilei",

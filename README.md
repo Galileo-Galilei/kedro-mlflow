@@ -73,8 +73,9 @@ We'd be happy to receive help to maintain and improve the package. Any PR will b
 
 # Main contributors
 
-The following people actively maintain, enhance and discuss design to make this package as good as possible. Many thanks to them!
+The following people actively maintain, enhance and discuss design to make this package as good as possible:
 
 - [Yolan Honoré-Rougé](https://github.com/galileo-galilei)
-- [Adrian Piotr Kruszewski](https://github.com/akruszewski)
 - [Takieddine Kadiri](https://github.com/takikadiri)
+
+Many thanks to [Adrian Piotr Kruszewski](https://github.com/akruszewski) for his past work on the repo.

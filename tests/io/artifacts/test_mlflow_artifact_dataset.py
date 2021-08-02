@@ -22,7 +22,7 @@ def df1():
 
 
 @pytest.fixture
-def dummy_df2():
+def df2():
     return pd.DataFrame({"col3": [7, 8, 9], "col4": ["a", "b", "c"]})
 
 
@@ -44,7 +44,7 @@ def dummy_df2():
         ),
     ],
 )
-def test_mlflow_csv_data_set_save_reload(
+def test_mlflow_csv_dataset_save_reload(
     tmp_path, tracking_uri, dataset, extension, data, artifact_path
 ):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
@@ -78,7 +78,7 @@ def test_mlflow_csv_data_set_save_reload(
     "exists_active_run",
     [(False), (True)],
 )
-def test_mlflow_data_set_save_with_run_id(
+def test_artifact_dataset_save_with_run_id(
     tmp_path, tracking_uri, df1, exists_active_run
 ):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
@@ -130,44 +130,38 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
     mlflow.set_tracking_uri(tracking_uri.as_uri())
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
-    mlflow.start_run()
+    with mlflow.start_run():
 
-    run_id = mlflow.active_run().info.run_id
-    active_run_id = mlflow.active_run().info.run_id
+        run_id = mlflow.active_run().info.run_id
 
-    mlflow_csv_dataset = MlflowArtifactDataSet(
-        data_set=dict(
-            type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix(), versioned=True
-        ),
-        run_id=run_id,
-    )
-    mlflow_csv_dataset.save(df1)
+        mlflow_csv_dataset = MlflowArtifactDataSet(
+            data_set=dict(
+                type=CSVDataSet,
+                filepath=(tmp_path / "df1.csv").as_posix(),
+                versioned=True,
+            ),
+            # run_id=run_id,
+        )
+        mlflow_csv_dataset.save(df1)
 
-    run_artifacts = [
-        fileinfo.path for fileinfo in mlflow_client.list_artifacts(run_id=run_id)
-    ]
+        run_artifacts = [
+            fileinfo.path for fileinfo in mlflow_client.list_artifacts(run_id=run_id)
+        ]
 
-    # Check if just one artifact was created in given run.
-    assert len(run_artifacts) == 1
+        # Check if just one artifact was created in given run.
+        assert len(run_artifacts) == 1
 
-    artifact_path = mlflow_client.download_artifacts(
-        run_id=run_id, path=run_artifacts[0]
-    )
+        artifact_path = mlflow_client.download_artifacts(
+            run_id=run_id, path=run_artifacts[0]
+        )
 
-    # Check if saved artifact is file and not folder where versioned datasets are stored.
-    assert Path(artifact_path).is_file()
+        # Check if saved artifact is file and not folder where versioned datasets are stored.
+        assert Path(artifact_path).is_file()
 
-    assert (
-        mlflow.active_run().info.run_id == active_run_id
-        if mlflow.active_run()
-        else True
-    )  # if a run was opened before saving, it must be reopened
-    assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
-
-    mlflow.end_run()
+        assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
 
 
-def test_mlflow_artifact_logging_deactivation(tmp_path, tracking_uri):
+def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
     mlflow_pkl_dataset = MlflowArtifactDataSet(
         data_set=dict(type=PickleDataSet, filepath=(tmp_path / "df1.csv").as_posix())
     )
@@ -205,3 +199,29 @@ def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
 
     with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
         mlflow_csv_dataset._logging_activated = "hello"
+
+
+def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
+
+    mlflow.set_tracking_uri(tracking_uri.as_uri())
+
+    # define the logger
+    mlflow_csv_dataset = MlflowArtifactDataSet(
+        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df.csv").as_posix())
+    )
+
+    # create a first run, save a first dataset
+    with mlflow.start_run():
+        run_id1 = mlflow.active_run().info.run_id
+        mlflow_csv_dataset.save(df1)
+
+    # saving a second time will erase local dataset
+    with mlflow.start_run():
+        mlflow_csv_dataset.save(df2)
+
+    # if we load the dataset, it will be equal to the seond one, using the local filepath
+    assert df2.equals(mlflow_csv_dataset.load())
+
+    # update the logger and reload outside of an mlflow run : it should load the dataset if the first run id
+    mlflow_csv_dataset.run_id = run_id1
+    assert df1.equals(mlflow_csv_dataset.load())

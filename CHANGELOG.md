@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Update the ``MlflowArtifactDataSet.load()`` method to download the data from the ``run_id`` if it is specified instead of using the local filepath. This can be used for instance to continue training from a pretrained model or to retrieve the best model from an hyperparameter search ([#95](https://github.com/Galileo-Galilei/kedro-mlflow/issues/95))
+
 ## [0.7.2] - 2021-05-02
 
 ### Fixed

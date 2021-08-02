@@ -71,6 +71,32 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                     else:
                         mlflow.log_artifact(local_path, self.artifact_path)
 
+            def _load(self) -> Any:  # pragma: no cover
+                if self.run_id:
+                    # if no run_id is specified, we take the artifact from the local path rather that the active run:
+                    # there are a lot of chances that it has not been saved yet!
+
+                    mlflow_client = MlflowClient()
+                    local_path = (
+                        self._get_load_path()
+                        if hasattr(self, "_version")
+                        else self._filepath
+                    )
+                    artifact_path = (
+                        (self.artifact_path / local_path.name).as_posix()
+                        if self.artifact_path
+                        else local_path.name
+                    )
+
+                    mlflow_client.download_artifacts(
+                        run_id=self.run_id,
+                        path=artifact_path,
+                        dst_path=local_path.parent.as_posix(),  # must be a **local** **directory**
+                    )
+
+                # finally, read locally
+                return super()._load()
+
         # rename the class
         parent_name = data_set.__name__
         MlflowArtifactDataSetChildren.__name__ = f"Mlflow{parent_name}"

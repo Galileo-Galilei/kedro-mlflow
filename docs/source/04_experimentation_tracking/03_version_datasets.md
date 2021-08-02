@@ -82,15 +82,30 @@ In ``kedro-mlflow==0.7.2`` you must configure these elements by yourself. Furthe
 
 ### Can I log an artifact in a specific run?
 
-The ``MlflowArtifactDataSet`` has an extra argument ``run_id`` which specifies the run in which the artifact will be logged. **Be cautious, because this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be logged in another run that all the other data of the run.
+The ``MlflowArtifactDataSet`` has an extra attribute ``run_id`` which specifies the run you will log the artifact in. **Be cautious, because this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be logged in another run that all the other data of the run.
 
 ```yaml
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
-        filepath: /path/to/a/local/destination/file.csv
+        filepath: /path/to/a/local/destination/file.csv  # must be a local filepath, no matter what is your actual mlflow storage (S3 or other)
     run_id: 13245678910111213  # a valid mlflow run to log in. If None, default to active run
+```
+
+### Can I reload an artifact from an existing run to use it in another run ?
+
+You may want to reuse th artifact of a previous run to reuse it in another one, e.g. to continue training from a pretrained model, or to select the best model among several runs created during an hyperparamter tuning. The ``MlflowArtifactDataSet`` has an extra attribute ``run_id`` you can use to specify from which run you will load the artifact from. **Be cautious**, because:
+- this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be loaded from another run that all the other data of the run
+- the artifact will be downloaded and erase the existing file at your local filepath
+
+```yaml
+my_dataset_to_reload:
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+    data_set:
+        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        filepath: /path/to/a/local/destination/file.csv # must be a local filepath, no matter what is your actual mlflow storage (S3 or other)
+    run_id: 13245678910111213  # a valid mlflow run with the existing artifact. It must be named "file.csv"
 ```
 
 ### Can I create a remote folder/subfolders architecture to organize the artifacts?

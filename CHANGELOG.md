@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.7.3] - 2021-08-16
+
 ### Added
 
-- :sparkles: Update the ``MlflowArtifactDataSet.load()`` method to download the data from the ``run_id`` if it is specified instead of using the local filepath. This can be used for instance to continue training from a pretrained model or to retrieve the best model from an hyperparameter search ([#95](https://github.com/Galileo-Galilei/kedro-mlflow/issues/95))
+-   :sparkles: Update the `MlflowArtifactDataSet.load()` method to download the data from the `run_id` if it is specified instead of using the local filepath. This can be used for instance to continue training from a pretrained model or to retrieve the best model from an hyperparameter search ([#95](https://github.com/Galileo-Galilei/kedro-mlflow/issues/95))
 
 ## [0.7.2] - 2021-05-02
 
@@ -210,7 +212,9 @@ Many documentation improvements:
 -   Add `MlflowDataSet` for artifacts autologging
 -   Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.2...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.3...HEAD
+
+[0.7.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.2...0.7.3
 
 [0.7.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.1...0.7.2
 

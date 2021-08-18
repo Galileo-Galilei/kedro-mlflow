@@ -20,8 +20,8 @@ class KedroClickGroup(click.Group):
             self.add_command(init)
             self.add_command(ui)
             # self.add_command(run) # TODO : IMPLEMENT THIS FUNCTION
-        else:
-            self.add_command(new)
+        # else:
+        #     self.add_command(new) # TODO : IMPLEMENT THIS FUNCTION
 
     def list_commands(self, ctx):
         self.reset_commands()

@@ -28,12 +28,13 @@ MOCK_PACKAGE_NAME = "mock_package_name"
 
 def fake_fun(input):
     artifact = input
-    metric = {
+    metrics = {
         "metric1": {"value": 1.1, "step": 1},
         "metric2": [{"value": 1.1, "step": 1}, {"value": 1.2, "step": 2}],
     }
+    metric = 1
     model = 3
-    return artifact, metric, model
+    return artifact, metrics, metric, metric, model
 
 
 @pytest.fixture
@@ -86,6 +87,9 @@ def catalog_config(kedro_project_path):
         },
         "metrics_data": {
             "type": "kedro_mlflow.io.metrics.MlflowMetricsDataSet",
+        },
+        "metric_data": {
+            "type": "kedro_mlflow.io.metrics.MlflowMetricDataSet",
         },
         "model": {
             "type": "kedro_mlflow.io.models.MlflowModelLoggerDataSet",
@@ -212,7 +216,13 @@ def dummy_pipeline():
             node(
                 func=fake_fun,
                 inputs=["params:a"],
-                outputs=["artifact_data", "metrics_data", "model"],
+                outputs=[
+                    "artifact_data",
+                    "metrics_data",
+                    "metric_data",
+                    "metric_data_with_run_id",
+                    "model",
+                ],
             )
         ]
     )
@@ -272,9 +282,6 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
                 for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
             ]
         )
-
-        # context = session.load_context()
-        # context.run(pipeline_name="pipeline_on")  # this is a pipeline should be tracked
 
         mock_session.run(pipeline_name="pipeline_on")
 

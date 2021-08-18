@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Create an ``MlflowMetricDataSet`` to simplify the existing metric API. It enables logging a single float as a metric, eventually automatically increasing the "step" if the metric is going to be updated during time ([#73](https://github.com/Galileo-Galilei/kedro-mlflow/issues/73))
+
 ### Fixed
 
 - :bug: Dictionnary parameters with integer keys are now properly logged in mlflow when ``flatten_dict_params`` is set to ``True`` in the ``mlflow.yml`` instead of raising a ``TypeError`` ([#224](https://github.com/Galileo-Galilei/kedro-mlflow/discussions/224))

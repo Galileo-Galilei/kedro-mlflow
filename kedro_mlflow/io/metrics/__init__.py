@@ -1,1 +1,2 @@
+from .mlflow_metric_dataset import MlflowMetricDataSet
 from .mlflow_metrics_dataset import MlflowMetricsDataSet

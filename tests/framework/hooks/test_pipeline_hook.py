@@ -25,7 +25,7 @@ from kedro_mlflow.framework.hooks.pipeline_hook import (
     _format_conda_env,
     _generate_kedro_command,
 )
-from kedro_mlflow.io.metrics import MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import MlflowMetricDataSet, MlflowMetricsDataSet
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
@@ -215,8 +215,11 @@ def dummy_pipeline():
     def train_fun(data, param):
         return 2
 
-    def metric_fun(data, model):
+    def metrics_fun(data, model):
         return {"metric_key": {"value": 1.1, "step": 0}}
+
+    def metric_fun(data, model):
+        return 1.1
 
     def predict_fun(model, data):
         return data * model
@@ -236,15 +239,27 @@ def dummy_pipeline():
                 tags=["training"],
             ),
             node(
-                func=metric_fun,
+                func=metrics_fun,
                 inputs=["model", "data"],
                 outputs="my_metrics",
                 tags=["training"],
             ),
             node(
-                func=metric_fun,
+                func=metrics_fun,
                 inputs=["model", "data"],
                 outputs="another_metrics",
+                tags=["training"],
+            ),
+            node(
+                func=metric_fun,
+                inputs=["model", "data"],
+                outputs="my_metric",
+                tags=["training"],
+            ),
+            node(
+                func=metric_fun,
+                inputs=["model", "data"],
+                outputs="another_metric",
                 tags=["training"],
             ),
             node(
@@ -281,6 +296,8 @@ def dummy_catalog(tmp_path):
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
             "my_metrics": MlflowMetricsDataSet(),
             "another_metrics": MlflowMetricsDataSet(prefix="foo"),
+            "my_metric": MlflowMetricDataSet(),
+            "another_metric": MlflowMetricDataSet(key="foo"),
         }
     )
     return dummy_catalog
@@ -428,6 +445,8 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         # for metric
         assert dummy_catalog._data_sets["my_metrics"]._prefix == "my_metrics"
         assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
+        assert dummy_catalog._data_sets["my_metric"].key == "my_metric"
+        assert dummy_catalog._data_sets["another_metric"].key == "foo"
 
         if isinstance(pipeline_to_run, PipelineML):
             trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
@@ -503,7 +522,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
         assert actual_copy_mode == expected
 
 
-def test_mlflow_pipeline_hook_metrics_with_run_id(
+def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
     kedro_project_with_mlflow_conf, dummy_pipeline_ml, dummy_run_params
 ):
 
@@ -527,6 +546,10 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
                 "my_metrics": MlflowMetricsDataSet(run_id=existing_run_id),
                 "another_metrics": MlflowMetricsDataSet(
                     run_id=existing_run_id, prefix="foo"
+                ),
+                "my_metric": MlflowMetricDataSet(run_id=existing_run_id),
+                "another_metric": MlflowMetricDataSet(
+                    run_id=existing_run_id, key="foo"
                 ),
             }
         )
@@ -578,8 +601,11 @@ def test_mlflow_pipeline_hook_metrics_with_run_id(
         # Check if metrics datasets have prefix with its names.
         # for metric
         assert all_runs_id == {current_run_id, existing_run_id}
+        print(run_data.metrics)
         assert run_data.metrics["my_metrics.metric_key"] == 1.1
         assert run_data.metrics["foo.metric_key"] == 1.1
+        assert run_data.metrics["my_metric"] == 1.1
+        assert run_data.metrics["foo"] == 1.1
 
 
 def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(

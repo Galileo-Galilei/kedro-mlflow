@@ -171,7 +171,7 @@ def test_mlflow_metrics_dataset_fails_with_invalid_metric(
         )  # key: value is not valid, you must specify {key: {value, step}}
 
 
-def test_mlflow_artifact_logging_deactivation(tracking_uri, metrics):
+def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
     mlflow_metrics_dataset = MlflowMetricsDataSet(prefix="hello")
 
     mlflow.set_tracking_uri(tracking_uri.as_uri())

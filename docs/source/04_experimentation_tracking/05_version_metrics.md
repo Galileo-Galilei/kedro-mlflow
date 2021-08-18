@@ -6,9 +6,67 @@ MLflow defines a metric as "a (key, value) pair, where the value is numeric". Ea
 
 ## How to version metrics in a kedro project?
 
-`kedro-mlflow` introduces a new ``AbstractDataSet`` called ``MlflowMetricsDataSet``. It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
+`kedro-mlflow` introduces 2 new ``AbstractDataSet``:
+- ``MlflowMetricDataSet`` which can log a float as a metric
+- ``MlflowMetricsDataSet``. The first one It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
 
-Since it is an ``AbstractDataSet``, it can be used with the YAML API. You can define it as:
+### Saving a single float as a metric with ``MlflowMetricDataSet``
+
+The ``MlflowMetricDataSet`` is an ``AbstractDataSet`` which enable to save or load a ``float`` as a mlflow metric. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
+
+- The most basic usage is to create the dataset and save a a value:
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricDataSet
+
+metric_ds=MlflowMetricDataSet(key="my_metric")
+with mlflow.start_run():
+    metric_ds.save(0.3) # create a "my_metric=0.3" value in the "metric" field in mlflow UI
+```
+
+**Beware: Unlike mlflow default behaviour, if there is no active run, no run is created.**
+
+- You can also specify a ``run_id`` instead of logging in the active run:
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricDataSet
+
+metric_ds=MlflowMetricDataSet(key="my_metric", run_id="123456789")
+with mlflow.start_run():
+    metric_ds.save(0.3) # create a "my_metric=0.3" value in the "metric" field of the run 123456789
+```
+
+It is also possible to pass ``load_args`` and ``save_args`` to control which step should be logged (in case you have logged several step for the same metric.) ``save_args`` accepts a ``mode`` key which can be set to ``overwrite`` (mlflow default) or ``append``. In append mode, if no step is specified, saving the metric will "bump" the last existing step to create a linear history. **This is very useful if you have a monitoring pipeline which calculates a metric frequently to check the performance of a deployed model.**
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricDataSet
+
+metric_ds=MlflowMetricDataSet(key="my_metric", load_args={"step": 1}, save_args={"mode": "append"})
+
+with mlflow.start_run():
+    metric_ds.save(0) # step 0 stored for "my_metric"
+    metric_ds.save(0.1) # step 1 stored for "my_metric"
+    metric_ds.save(0.2) # step 2 stored for "my_metric"
+
+    my_metric=metric_ds.load() # value=0.1 (step number 1)
+```
+
+Since it is an ``AbstractDataSet``, it can be used with the YAML API in your ``catalog.yml``, e.g. :
+
+```yaml
+my_model_metric:
+    type: kedro_mlflow.io.metrics.MlflowMetricDataSet
+    run_id: 123456 # OPTIONAL, you should likely let it empty to log in the current run
+    key: my_awesome_name # OPTIONAL: if not provided, the dataset name will be sued (here "my_model_metric")
+    load_args:
+        step: ... # OPTIONAL: likely not provided, unless you have a very good reason to do so
+    save_args:
+        step: ... # OPTIONAL: likely not provided, unless you have a very good reason to do so
+        mode: append #  OPTIONAL: likely better than the default "overwrite". Will be ignored if "step" is provided.
+```
+
+### Saving several metrics with their entire history with ``MlflowMetricDataSet``
+Since it is an ``AbstractDataSet``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
 
 ```yaml
 my_model_metrics:

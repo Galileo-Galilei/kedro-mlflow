@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: Dictionnary parameters with integer keys are now properly logged in mlflow when ``flatten_dict_params`` is set to ``True`` in the ``mlflow.yml`` instead of raising a ``TypeError`` ([#224](https://github.com/Galileo-Galilei/kedro-mlflow/discussions/224))
+
 ## [0.7.3] - 2021-08-16
 
 ### Added
@@ -224,14 +228,6 @@ Many documentation improvements:
 
 [0.6.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.5.0...0.6.0
 
-[0.2.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.0...0.2.1
-
-[0.2.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.1.0...0.2.0
-
-[0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0
-
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.5.0...HEAD
-
 [0.5.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.1...0.5.0
 
 [0.4.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.4.0...0.4.1
@@ -239,3 +235,9 @@ Many documentation improvements:
 [0.4.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.3.0...0.4.0
 
 [0.3.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.1...0.3.0
+
+[0.2.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.2.0...0.2.1
+
+[0.2.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.1.0...0.2.0
+
+[0.1.0]: https://github.com/Galileo-Galilei/kedro-mlflow/releases/tag/0.1.0

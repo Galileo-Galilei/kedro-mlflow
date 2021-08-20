@@ -50,6 +50,42 @@ def test_flatten_dict_nested_2_levels():
     }
 
 
+def test_flatten_dict_nested_3_levels():
+    d = dict(a=1, b=dict(c=1, d=dict(e=3, f=dict(g=4, h=5))))
+
+    assert flatten_dict(d=d, recursive=True, sep=".") == {
+        "a": 1,
+        "b.c": 1,
+        "b.d.e": 3,
+        "b.d.f.g": 4,
+        "b.d.f.h": 5,
+    }
+    assert flatten_dict(d=d, recursive=False, sep=".") == {
+        "a": 1,
+        "b.c": 1,
+        "b.d": {"e": 3, "f": {"g": 4, "h": 5}},
+    }
+
+
+def test_flatten_dict_with_float_keys():
+    d = {0: 1, 1: {3: 1, 4: {"e": 3, 6.7: 5}}}
+
+    assert flatten_dict(d=d, recursive=True, sep="_") == {
+        "0": 1,
+        "1_3": 1,
+        "1_4_e": 3,
+        "1_4_6.7": 5,
+    }
+    assert flatten_dict(d=d, recursive=False, sep="_") == {
+        "0": 1,
+        "1_3": 1,
+        "1_4": {
+            "e": 3,
+            6.7: 5,  # 6.7 is not converted to string, but when the entire dict will be logged mlflow will take care of the conversion
+        },
+    }
+
+
 @pytest.fixture
 def dummy_run_params(tmp_path):
     dummy_run_params = {

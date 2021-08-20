@@ -19,7 +19,11 @@ def _assert_mlflow_enabled(pipeline_name: str) -> bool:
 def _flatten_dict(d: Dict, recursive: bool = True, sep: str = ".") -> Dict:
     def expand(key, value):
         if isinstance(value, dict):
-            new_value = _flatten_dict(value) if recursive else value
+            new_value = (
+                _flatten_dict(value, recursive=recursive, sep=sep)
+                if recursive
+                else value
+            )
             return [(f"{key}{sep}{k}", v) for k, v in new_value.items()]
         else:
             return [(f"{key}", value)]

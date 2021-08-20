@@ -9,7 +9,7 @@ from kedro.pipeline.node import Node
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.framework.context import get_mlflow_config
-from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled
+from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled, _flatten_dict
 
 
 class MlflowNodeHook:
@@ -93,7 +93,7 @@ class MlflowNodeHook:
 
             # dictionary parameters may be flattened for readibility
             if self.flatten:
-                params_inputs = flatten_dict(
+                params_inputs = _flatten_dict(
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
 
@@ -128,16 +128,3 @@ class MlflowNodeHook:
 
 # this hooks instaitation is necessary for auto-registration
 mlflow_node_hook = MlflowNodeHook()
-
-
-def flatten_dict(d: Dict, recursive: bool = True, sep: str = ".") -> Dict:
-    def expand(key, value):
-        if isinstance(value, dict):
-            new_value = flatten_dict(value) if recursive else value
-            return [(f"{key}{sep}{k}", v) for k, v in new_value.items()]
-        else:
-            return [(f"{key}", value)]
-
-    items = [item for k, v in d.items() for item in expand(k, v)]
-
-    return dict(items)

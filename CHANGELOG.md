@@ -6,6 +6,11 @@
 
 - :bug: Dictionnary parameters with integer keys are now properly logged in mlflow when ``flatten_dict_params`` is set to ``True`` in the ``mlflow.yml`` instead of raising a ``TypeError`` ([#224](https://github.com/Galileo-Galilei/kedro-mlflow/discussions/224))
 
+### Changed
+
+- :recycle: Move ``flatten_dict`` function to ``hooks.utils`` folder and rename it ``_flatten_dict`` to make more explicit that it is not a user facing function which should not be used directly.
+
+
 ## [0.7.3] - 2021-08-16
 
 ### Added

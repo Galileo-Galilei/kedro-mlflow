@@ -64,3 +64,15 @@ def test_flatten_dict_with_float_keys():
             6.7: 5,  # 6.7 is not converted to string, but when the entire dict will be logged mlflow will take care of the conversion
         },
     }
+
+
+def test_flatten_dict_with_used_defined_sep():
+    d = dict(a=1, b=dict(c=1, d=dict(e=3, f=dict(g=4, h=5))))
+
+    assert _flatten_dict(d=d, recursive=True, sep="_") == {
+        "a": 1,
+        "b_c": 1,
+        "b_d_e": 3,
+        "b_d_f_g": 4,
+        "b_d_f_h": 5,
+    }

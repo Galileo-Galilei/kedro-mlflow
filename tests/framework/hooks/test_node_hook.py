@@ -12,78 +12,12 @@ from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.framework.hooks import MlflowNodeHook
-from kedro_mlflow.framework.hooks.node_hook import flatten_dict
 
 
 def _write_yaml(filepath: Path, config: Dict):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     yaml_str = yaml.dump(config)
     filepath.write_text(yaml_str)
-
-
-def test_flatten_dict_non_nested():
-    d = dict(a=1, b=2)
-    assert flatten_dict(d=d, recursive=True, sep=".") == d
-    assert flatten_dict(d=d, recursive=False, sep=".") == d
-
-
-def test_flatten_dict_nested_1_level():
-    d = dict(a=1, b=dict(c=3, d=4))
-    flattened = {"a": 1, "b.c": 3, "b.d": 4}
-    assert flatten_dict(d=d, recursive=True, sep=".") == flattened
-    assert flatten_dict(d=d, recursive=False, sep=".") == flattened
-
-
-def test_flatten_dict_nested_2_levels():
-    d = dict(a=1, b=dict(c=1, d=dict(e=3, f=5)))
-
-    assert flatten_dict(d=d, recursive=True, sep=".") == {
-        "a": 1,
-        "b.c": 1,
-        "b.d.e": 3,
-        "b.d.f": 5,
-    }
-    assert flatten_dict(d=d, recursive=False, sep=".") == {
-        "a": 1,
-        "b.c": 1,
-        "b.d": {"e": 3, "f": 5},
-    }
-
-
-def test_flatten_dict_nested_3_levels():
-    d = dict(a=1, b=dict(c=1, d=dict(e=3, f=dict(g=4, h=5))))
-
-    assert flatten_dict(d=d, recursive=True, sep=".") == {
-        "a": 1,
-        "b.c": 1,
-        "b.d.e": 3,
-        "b.d.f.g": 4,
-        "b.d.f.h": 5,
-    }
-    assert flatten_dict(d=d, recursive=False, sep=".") == {
-        "a": 1,
-        "b.c": 1,
-        "b.d": {"e": 3, "f": {"g": 4, "h": 5}},
-    }
-
-
-def test_flatten_dict_with_float_keys():
-    d = {0: 1, 1: {3: 1, 4: {"e": 3, 6.7: 5}}}
-
-    assert flatten_dict(d=d, recursive=True, sep="_") == {
-        "0": 1,
-        "1_3": 1,
-        "1_4_e": 3,
-        "1_4_6.7": 5,
-    }
-    assert flatten_dict(d=d, recursive=False, sep="_") == {
-        "0": 1,
-        "1_3": 1,
-        "1_4": {
-            "e": 3,
-            6.7: 5,  # 6.7 is not converted to string, but when the entire dict will be logged mlflow will take care of the conversion
-        },
-    }
 
 
 @pytest.fixture

@@ -130,13 +130,13 @@ class MlflowNodeHook:
 mlflow_node_hook = MlflowNodeHook()
 
 
-def flatten_dict(d, recursive: bool = True, sep="."):
+def flatten_dict(d: Dict, recursive: bool = True, sep: str = ".") -> Dict:
     def expand(key, value):
         if isinstance(value, dict):
             new_value = flatten_dict(value) if recursive else value
-            return [(key + sep + k, v) for k, v in new_value.items()]
+            return [(f"{key}{sep}{k}", v) for k, v in new_value.items()]
         else:
-            return [(key, value)]
+            return [(f"{key}", value)]
 
     items = [item for k, v in d.items() for item in expand(k, v)]
 

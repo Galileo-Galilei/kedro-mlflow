@@ -5,6 +5,7 @@
 ### Added
 
 - :sparkles: Create an ``MlflowMetricDataSet`` to simplify the existing metric API. It enables logging a single float as a metric, eventually automatically increasing the "step" if the metric is going to be updated during time ([#73](https://github.com/Galileo-Galilei/kedro-mlflow/issues/73))
+- :sparkles: Create an ``MlflowMetricHistoryDataSet`` to simplify the existing metric API. It enables logging the evolution of a given metric during training. ([#73](https://github.com/Galileo-Galilei/kedro-mlflow/issues/73))
 
 ### Fixed
 

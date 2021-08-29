@@ -25,7 +25,11 @@ from kedro_mlflow.framework.hooks.pipeline_hook import (
     _format_conda_env,
     _generate_kedro_command,
 )
-from kedro_mlflow.io.metrics import MlflowMetricDataSet, MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import (
+    MlflowMetricDataSet,
+    MlflowMetricHistoryDataSet,
+    MlflowMetricsDataSet,
+)
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
@@ -221,6 +225,9 @@ def dummy_pipeline():
     def metric_fun(data, model):
         return 1.1
 
+    def metric_history_fun(data, model):
+        return [0.1, 0.2]
+
     def predict_fun(model, data):
         return data * model
 
@@ -263,6 +270,18 @@ def dummy_pipeline():
                 tags=["training"],
             ),
             node(
+                func=metric_history_fun,
+                inputs=["model", "data"],
+                outputs="my_metric_history",
+                tags=["training"],
+            ),
+            node(
+                func=metric_history_fun,
+                inputs=["model", "data"],
+                outputs="another_metric_history",
+                tags=["training"],
+            ),
+            node(
                 func=predict_fun,
                 inputs=["model", "data"],
                 outputs="predictions",
@@ -298,6 +317,8 @@ def dummy_catalog(tmp_path):
             "another_metrics": MlflowMetricsDataSet(prefix="foo"),
             "my_metric": MlflowMetricDataSet(),
             "another_metric": MlflowMetricDataSet(key="foo"),
+            "my_metric_history": MlflowMetricHistoryDataSet(),
+            "another_metric_history": MlflowMetricHistoryDataSet(key="bar"),
         }
     )
     return dummy_catalog
@@ -551,6 +572,10 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
                 "another_metric": MlflowMetricDataSet(
                     run_id=existing_run_id, key="foo"
                 ),
+                "my_metric_history": MlflowMetricHistoryDataSet(run_id=existing_run_id),
+                "another_metric_history": MlflowMetricHistoryDataSet(
+                    run_id=existing_run_id, key="bar"
+                ),
             }
         )
 
@@ -601,11 +626,17 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
         # Check if metrics datasets have prefix with its names.
         # for metric
         assert all_runs_id == {current_run_id, existing_run_id}
-        print(run_data.metrics)
+
         assert run_data.metrics["my_metrics.metric_key"] == 1.1
         assert run_data.metrics["foo.metric_key"] == 1.1
         assert run_data.metrics["my_metric"] == 1.1
         assert run_data.metrics["foo"] == 1.1
+        assert (
+            run_data.metrics["my_metric_history"] == 0.2
+        )  # the list is tored, but only the last value is retrieved
+        assert (
+            run_data.metrics["bar"] == 0.2
+        )  # the list is tored, but only the last value is retrieved
 
 
 def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(

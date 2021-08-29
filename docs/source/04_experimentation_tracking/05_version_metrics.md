@@ -65,7 +65,74 @@ my_model_metric:
         mode: append #  OPTIONAL: likely better than the default "overwrite". Will be ignored if "step" is provided.
 ```
 
-### Saving several metrics with their entire history with ``MlflowMetricDataSet``
+# Saving the evolution of a metric during training with ``MlflowMetricHistoryDataSet``
+
+The ``MlflowMetricDataSet`` is an ``AbstractDataSet`` which enable to save or load the evolutionf of a metric with various formats. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
+
+It enables logging either:
+  - a list of int as a metric with incremental step, e.g ``[0.1,0.2,0.3]`` with ``mode=list`` for either ``save_args`` or ``load_args``
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricHistoryDataSet
+
+metric_history_ds=MlflowMetricDataSet(key="my_metric", save_args={"mode": "list"})
+
+with mlflow.start_run():
+    metric_history_ds.save([0.1,0.2,0.3]) # will be logged with incremental steps
+```
+  - a dict of {step: value} as a metric:
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricHistoryDataSet
+
+metric_history_ds=MlflowMetricDataSet(key="my_metric", save_args={"mode": "dict"})
+
+with mlflow.start_run():
+    metric_history_ds.save({0: 0.1, 1: 0.2, 2: 0.3}) # will be logged with incremental steps
+```
+
+  - a list of dict [{log_metric_arg: value}] as a metric, e.g:
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricHistoryDataSet
+
+metric_history_ds=MlflowMetricDataSet(key="my_metric", save_args={"mode": "history"})
+
+with mlflow.start_run():
+    metric_history_ds.save(
+        [
+            {"step": 0, "value": 0.1, "timestamp": 1345545},
+            {"step": 1, "value": 0.2, "timestamp": 1345546},
+            {"step": 2, "value": 0.3, "timestamp": 1345547},
+        ])
+```
+
+You can combine the different mode for save and load, e.g:
+
+```python
+from kedro_mlflow.io.metrics import MlflowMetricHistoryDataSet
+
+metric_history_ds=MlflowMetricDataSet(key="my_metric", save_args={"mode": "dict"}, save_args={"mode": "list"})
+
+with mlflow.start_run():
+    metric_history_ds.save({0: 0.1, 1: 0.2, 2: 0.3}) # will be logged with incremental steps
+metric_history_ds.load() # return [0.1,0.2,0.3]
+```
+
+As usual, since it is an ``AbstractDataSet``, it can be used with the YAML API in your ``catalog.yml``, and in this case, the ``key`` argument is optional:
+
+```yaml
+my_model_metric:
+    type: kedro_mlflow.io.metrics.MlflowMetricHistoryDataSet
+    run_id: 123456 # OPTIONAL, you should likely let it empty to log in the current run
+    key: my_awesome_name # OPTIONAL: if not provided, the dataset name will be used (here "my_model_metric")
+    load_args:
+        mode: ... # OPTIONAL: "list" by default, one of {"list", "dict", "history"}
+    save_args:
+        mode: ... # OPTIONAL: "list" by default, one of {"list", "dict", "history"}
+```
+
+### Saving several metrics with their entire history with ``MlflowMetricsDataSet``
 Since it is an ``AbstractDataSet``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
 
 ```yaml

@@ -33,8 +33,9 @@ def fake_fun(input):
         "metric2": [{"value": 1.1, "step": 1}, {"value": 1.2, "step": 2}],
     }
     metric = 1
+    metric_history = [0.1, 0.2, 0.3]
     model = 3
-    return artifact, metrics, metric, metric, model
+    return artifact, metrics, metric, metric_history, model
 
 
 @pytest.fixture
@@ -90,6 +91,9 @@ def catalog_config(kedro_project_path):
         },
         "metric_data": {
             "type": "kedro_mlflow.io.metrics.MlflowMetricDataSet",
+        },
+        "metric_history_data": {
+            "type": "kedro_mlflow.io.metrics.MlflowMetricHistoryDataSet",
         },
         "model": {
             "type": "kedro_mlflow.io.models.MlflowModelLoggerDataSet",
@@ -220,7 +224,7 @@ def dummy_pipeline():
                     "artifact_data",
                     "metrics_data",
                     "metric_data",
-                    "metric_data_with_run_id",
+                    "metric_history_data",
                     "model",
                 ],
             )

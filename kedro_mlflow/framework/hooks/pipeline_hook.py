@@ -16,7 +16,11 @@ from mlflow.models import infer_signature
 from kedro_mlflow.framework.context import get_mlflow_config
 from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled
 from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_logging
-from kedro_mlflow.io.metrics import MlflowMetricDataSet, MlflowMetricsDataSet
+from kedro_mlflow.io.metrics import (
+    MlflowMetricDataSet,
+    MlflowMetricHistoryDataSet,
+    MlflowMetricsDataSet,
+)
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 from kedro_mlflow.utils import _parse_requirements
@@ -39,6 +43,7 @@ class MlflowPipelineHook:
     ):
 
         for name, dataset in catalog._data_sets.items():
+
             if isinstance(dataset, MlflowMetricsDataSet) and dataset._prefix is None:
                 if dataset._run_id is not None:
                     catalog._data_sets[name] = MlflowMetricsDataSet(
@@ -57,6 +62,21 @@ class MlflowPipelineHook:
                     )
                 else:
                     catalog._data_sets[name] = MlflowMetricDataSet(
+                        key=name,
+                        load_args=dataset._load_args,
+                        save_args=dataset._save_args,
+                    )
+
+            if isinstance(dataset, MlflowMetricHistoryDataSet) and dataset.key is None:
+                if dataset._run_id is not None:
+                    catalog._data_sets[name] = MlflowMetricHistoryDataSet(
+                        run_id=dataset._run_id,
+                        key=name,
+                        load_args=dataset._load_args,
+                        save_args=dataset._save_args,
+                    )
+                else:
+                    catalog._data_sets[name] = MlflowMetricHistoryDataSet(
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,

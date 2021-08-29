@@ -65,7 +65,7 @@ my_model_metric:
         mode: append #  OPTIONAL: likely better than the default "overwrite". Will be ignored if "step" is provided.
 ```
 
-# Saving the evolution of a metric during training with ``MlflowMetricHistoryDataSet``
+### Saving the evolution of a metric during training with ``MlflowMetricHistoryDataSet``
 
 The ``MlflowMetricDataSet`` is an ``AbstractDataSet`` which enable to save or load the evolutionf of a metric with various formats. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
 
@@ -133,6 +133,12 @@ my_model_metric:
 ```
 
 ### Saving several metrics with their entire history with ``MlflowMetricsDataSet``
+
+```eval_rst
+.. warning:: This class is deprecated and will be removed soon. Use MlflowMetricDataSet or MlflowMetricHistoryDataSet instead.
+```
+
+
 Since it is an ``AbstractDataSet``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
 
 ```yaml

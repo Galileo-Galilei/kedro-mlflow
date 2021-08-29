@@ -15,7 +15,7 @@
 ### Changed
 
 - :recycle: Move ``flatten_dict`` function to ``hooks.utils`` folder and rename it ``_flatten_dict`` to make more explicit that it is not a user facing function which should not be used directly and comes with no guarantee. This is not considered as a breaking change since it is an undocumented function.
-
+- :wastebasket: Deprecate ``MlflowMetricsDataSet`` in favor of the 2 new datasets ``MlflowMetricDataSet`` and ``MlflowMetricHistoryDataSet`` newly added. It will be removed in ``kedro-mlflow==0.8.0``.
 
 ## [0.7.3] - 2021-08-16
 

@@ -6,9 +6,10 @@ MLflow defines a metric as "a (key, value) pair, where the value is numeric". Ea
 
 ## How to version metrics in a kedro project?
 
-`kedro-mlflow` introduces 2 new ``AbstractDataSet``:
+`kedro-mlflow` introduces 3 ``AbstractDataSet`` to manage metrics:
 - ``MlflowMetricDataSet`` which can log a float as a metric
-- ``MlflowMetricsDataSet``. The first one It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
+- ``MlflowMetricHistoryDataSet`` which can log the evolution over time of a given metric, e.g. a list or a dict of float.
+- ``MlflowMetricsDataSet`` (**DEPRECATED**). It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
 
 ### Saving a single float as a metric with ``MlflowMetricDataSet``
 
@@ -24,7 +25,9 @@ with mlflow.start_run():
     metric_ds.save(0.3) # create a "my_metric=0.3" value in the "metric" field in mlflow UI
 ```
 
-**Beware: Unlike mlflow default behaviour, if there is no active run, no run is created.**
+```eval_rst
+.. note:: Beware: Unlike mlflow default behaviour, if there is no active run, no run is created.
+```
 
 - You can also specify a ``run_id`` instead of logging in the active run:
 
@@ -135,7 +138,7 @@ my_model_metric:
 ### Saving several metrics with their entire history with ``MlflowMetricsDataSet``
 
 ```eval_rst
-.. warning:: This class is deprecated and will be removed soon. Use MlflowMetricDataSet or MlflowMetricHistoryDataSet instead.
+.. warning:: This class is deprecated and will be removed soon. Use ``MlflowMetricDataSet`` or ``MlflowMetricHistoryDataSet`` instead.
 ```
 
 

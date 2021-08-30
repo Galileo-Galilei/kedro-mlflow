@@ -47,10 +47,3 @@ jobs:
         file: ./coverage.xml
         env_vars: OS,PYTHON
         fail_ci_if_error: true
-  markdown-link-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - uses: gaurav-nelson/github-action-markdown-link-check@v1
-      with:
-        config-file: 'mlc_config.json'

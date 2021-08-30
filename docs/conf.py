@@ -15,6 +15,8 @@
 # sys.path.insert(0, os.path.abspath('.'))
 
 
+from recommonmark.transform import AutoStructify
+
 # -- Project information -----------------------------------------------------
 from kedro_mlflow import __version__ as km_version
 
@@ -66,3 +68,9 @@ html_static_path = ["_static"]
 # useful to create dropdown with the name of the directory as the section name
 # see https://stackoverflow.com/questions/36925871/toctree-nested-drop-down:
 html_theme_options = {"collapse_navigation": False}
+
+
+def setup(app):
+    # enable rendering RST tables in Markdown
+    app.add_config_value("recommonmark_config", {"enable_eval_rst": True}, True)
+    app.add_transform(AutoStructify)

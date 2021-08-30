@@ -1,0 +1,22 @@
+name: check-links
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - '*'
+  pull_request:
+    branches: [master]
+  schedule:
+    - cron:  '0 3 * * 1' # runs at 3 AM every monday
+
+jobs:
+  markdown-link-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        use-verbose-mode: 'yes'
+        config-file: 'mlc_config.json'

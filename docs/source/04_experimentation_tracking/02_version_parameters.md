@@ -2,7 +2,7 @@
 
 ## Automatic parameters versioning
 
-Parameters versioning is automatic when the ``MlflowNodeHook`` is added to [the hook list of the ``ProjectContext``](../02_installation/02_setup.html#declaring-kedro-mlflow-hooks). In ``kedro-mlflow==0.7.3``, the `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../07_python_objects/02_Hooks.md).
+Parameters versioning is automatic when the ``MlflowNodeHook`` is added to [the hook list of the ``ProjectContext``](../02_installation/02_setup.html#declaring-kedro-mlflow-hooks). In ``kedro-mlflow==0.7.4``, the `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../07_python_objects/02_Hooks.md).
 
 You **do not need any additional configuration** to benefit from parameters versioning.
 

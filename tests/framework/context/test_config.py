@@ -3,6 +3,7 @@ import os
 import mlflow
 import pytest
 import yaml
+from deprecation import fail_if_not_removed
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from mlflow.tracking import MlflowClient
@@ -14,6 +15,7 @@ from kedro_mlflow.framework.context.config import (
 )
 
 
+@fail_if_not_removed
 def test_validate_opts_invalid_option():
     d1 = dict(c=3)
     d2 = dict(a=1, b=2)
@@ -24,6 +26,7 @@ def test_validate_opts_invalid_option():
         _validate_opts(d1, d2)
 
 
+@fail_if_not_removed
 def test_validate_opts_missing_options():
     d1 = dict(a=4)
     d2 = dict(a=1, b=2)
@@ -33,6 +36,7 @@ def test_validate_opts_missing_options():
     assert d2 == dict(a=1, b=2)
 
 
+@fail_if_not_removed
 def test_validate_opts_no_options():
     d1 = None
     d2 = dict(a=1, b=2)
@@ -42,6 +46,7 @@ def test_validate_opts_no_options():
     assert d2 == dict(a=1, b=2)
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_init_wrong_path(tmp_path):
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
     with pytest.raises(
@@ -50,6 +55,7 @@ def test_kedro_mlflow_config_init_wrong_path(tmp_path):
         KedroMlflowConfig(project_path=tmp_path)
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_init(kedro_project_with_mlflow_conf):
     # kedro_project_with_mlflow_conf is a global fixture in conftest
 
@@ -65,6 +71,7 @@ def test_kedro_mlflow_config_init(kedro_project_with_mlflow_conf):
     )
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_bad_long_parameters_strategy(
     kedro_project_with_mlflow_conf,
 ):
@@ -78,6 +85,7 @@ def test_kedro_mlflow_config_bad_long_parameters_strategy(
         )
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_new_experiment_does_not_exists(
     kedro_project_with_mlflow_conf,
 ):
@@ -95,6 +103,7 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_experiment_exists(mocker, kedro_project_with_mlflow_conf):
 
     # create an experiment with the same name
@@ -114,6 +123,7 @@ def test_kedro_mlflow_config_experiment_exists(mocker, kedro_project_with_mlflow
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_conf):
 
     # create an experiment with the same name and then delete it
@@ -138,6 +148,7 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
     assert "exp1" in [exp.name for exp in config.mlflow_client.list_experiments()]
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_conf):
 
     # create an experiment with the same name and then delete it
@@ -157,6 +168,7 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
     assert mlflow.get_tracking_uri() == mlflow_tracking_uri
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_conf):
 
     (kedro_project_with_mlflow_conf / "conf/base/credentials.yml").write_text(
@@ -175,6 +187,7 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
     assert os.environ["fake_mlflow_cred"] == "my_fake_cred"
 
 
+@fail_if_not_removed
 def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_conf):
     """Test if the mlflow_tracking uri set is the one of mlflow.yml
     if it also eist in credentials.
@@ -205,6 +218,7 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
     )
 
 
+@fail_if_not_removed
 @pytest.mark.parametrize(
     "uri",
     [
@@ -226,6 +240,7 @@ def test_kedro_mlflow_config_validate_uri_local(
     assert config._validate_uri(uri=uri).startswith(r"file:///")  # relative
 
 
+@fail_if_not_removed
 def test_from_dict_to_dict_idempotent(mocker, kedro_project_with_mlflow_conf):
     mocker.patch("mlflow.tracking.MlflowClient", return_value=None)
     mocker.patch(

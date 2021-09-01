@@ -4,7 +4,9 @@
 
 ### Changed
 
--   :recycle: ``KedroMlflowConfig`` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function ``get_mlflow_config()`` and ``KedroMlflowConfig().setup()`` are not modified.
+- :recycle: ``KedroMlflowConfig`` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function ``get_mlflow_config()`` and ``KedroMlflowConfig().setup()`` are not modified.
+
+- :wastebasket: The ``kedro.framework.context`` folder is moved to ``kedro.config`` for consistency with the Kedro repo structure: ``get_mlflow_config`` import must change from `from kedro_mlflow.framework.context import get_mlflow_config` to `from kedro_mlflow.config import get_mlflow_config`.
 
 ## [0.7.4] - 2021-08-30
 

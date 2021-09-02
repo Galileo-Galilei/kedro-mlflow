@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :recycle: ``KedroMlflowConfig`` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function ``get_mlflow_config()`` and ``KedroMlflowConfig().setup()`` are not modified.
+
 ## [0.7.4] - 2021-08-30
 
 ### Added

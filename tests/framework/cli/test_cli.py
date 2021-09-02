@@ -8,10 +8,10 @@ from kedro.framework.cli.cli import info
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
 from kedro_mlflow.framework.cli.cli import ui as cli_ui
-from kedro_mlflow.framework.context import get_mlflow_config
 
 
 def extract_cmd_from_help(msg):

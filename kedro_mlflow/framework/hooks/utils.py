@@ -1,6 +1,6 @@
 from typing import Dict
 
-from kedro_mlflow.framework.context.mlflow_context import get_mlflow_config
+from kedro_mlflow.config.kedro_mlflow_config import get_mlflow_config
 
 
 def _assert_mlflow_enabled(pipeline_name: str) -> bool:
@@ -9,7 +9,7 @@ def _assert_mlflow_enabled(pipeline_name: str) -> bool:
     # TODO: we may want to enable to filter on tags
     # but we need to deal with the case when several tags are passed
     # what to do if 1 out of 2 is in the list?
-    disabled_pipelines = mlflow_config.disable_tracking_opts.get("pipelines") or []
+    disabled_pipelines = mlflow_config.disable_tracking.pipelines
     if pipeline_name in disabled_pipelines:
         return False
 

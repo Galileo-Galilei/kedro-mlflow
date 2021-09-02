@@ -13,7 +13,7 @@ from kedro.versioning.journal import _git_sha
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled
 from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_logging
 from kedro_mlflow.io.metrics import (
@@ -111,19 +111,16 @@ class MlflowPipelineHook:
         self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
 
         if self._is_mlflow_enabled:
-            mlflow_conf = get_mlflow_config()
-            mlflow_conf.setup()
+            mlflow_config = get_mlflow_config()
+            mlflow_config.setup()
 
-            run_name = (
-                mlflow_conf.run_opts["name"]
-                if mlflow_conf.run_opts["name"] is not None
-                else run_params["pipeline_name"]
-            )
+            run_name = mlflow_config.run.name or run_params["pipeline_name"]
+
             mlflow.start_run(
-                run_id=mlflow_conf.run_opts["id"],
-                experiment_id=mlflow_conf.experiment.experiment_id,
+                run_id=mlflow_config.run.id,
+                experiment_id=mlflow_config._experiment.experiment_id,
                 run_name=run_name,
-                nested=mlflow_conf.run_opts["nested"],
+                nested=mlflow_config.run.nested,
             )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})

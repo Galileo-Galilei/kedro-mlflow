@@ -19,7 +19,7 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
     _format_conda_env,

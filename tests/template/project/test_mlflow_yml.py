@@ -1,9 +1,9 @@
 import pytest
 import yaml
 
+from kedro_mlflow.config.kedro_mlflow_config import ExperimentOptions, KedroMlflowConfig
 from kedro_mlflow.framework.cli.cli import TEMPLATE_FOLDER_PATH
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
-from kedro_mlflow.framework.context.config import KedroMlflowConfig
 
 
 @pytest.fixture
@@ -24,17 +24,16 @@ def template_mlflowyml(tmp_path):
 
 
 def test_mlflow_yml_rendering(template_mlflowyml):
+
     # the mlflow yml file must be consistent with the default in KedroMlflowConfig for readibility
     with open(template_mlflowyml, "r") as file_handler:
         mlflow_config = yaml.load(file_handler)
-    expected_config = dict(
-        mlflow_tracking_uri="mlruns",
-        credentials=None,
-        disable_tracking=KedroMlflowConfig.DISABLE_TRACKING_OPTS,
-        experiment=KedroMlflowConfig.EXPERIMENT_OPTS,
-        ui=KedroMlflowConfig.UI_OPTS,
-        run=KedroMlflowConfig.RUN_OPTS,
-        hooks=dict(node=KedroMlflowConfig.NODE_HOOK_OPTS),
+
+    # note: Using Pydantic model Construct method skip all validations
+    # and here we do not want to check the path
+    expected_config = KedroMlflowConfig.construct(
+        project_path="fake/path",
+        experiment=ExperimentOptions(name="fake_project"),  # check for proper rendering
     )
-    expected_config["experiment"]["name"] = "fake_project"  # check for proper rendering
-    assert mlflow_config == expected_config
+
+    assert mlflow_config == expected_config.dict(exclude={"project_path"})

@@ -16,7 +16,7 @@ There are no breaking change in this patch release except if you retrieve the ml
 
 ```python
 from kedro.framework.context import load_context
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.config import get_mlflow_config
 
 context=load_context(".")
 mlflow_config=get_mlflow_config(context)

@@ -43,11 +43,11 @@ csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
 
 ### ``MlflowMetricDataSet``
 
-[The ``MlflowMetricDataSet`` is documented here](../04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
+[The ``MlflowMetricDataSet`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 ### ``MlflowMetricHistoryDataSet``
 
-[The ``MlflowMetricHistoryDataSet`` is documented here](../04_experimentation_tracking/05_version_metrics.html#saving-the-evolution-of-a-metric-during-training-with-mlflowmetrichistorydataset).
+[The ``MlflowMetricHistoryDataSet`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 
 ## Models `DataSets`

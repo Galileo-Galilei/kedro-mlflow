@@ -20,7 +20,7 @@ from kedro.pipeline import Pipeline, node
 from kedro.versioning import Journal
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
 
 MOCK_PACKAGE_NAME = "mock_package_name"

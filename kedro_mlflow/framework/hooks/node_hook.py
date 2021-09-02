@@ -8,7 +8,7 @@ from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
-from kedro_mlflow.framework.context import get_mlflow_config
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled, _flatten_dict
 
 
@@ -53,14 +53,14 @@ class MlflowNodeHook:
         self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
 
         if self._is_mlflow_enabled:
-            config = get_mlflow_config()
+            mlflow_config = get_mlflow_config()
 
-            self.flatten = config.node_hook_opts["flatten_dict_params"]
-            self.recursive = config.node_hook_opts["recursive"]
-            self.sep = config.node_hook_opts["sep"]
-            self.long_parameters_strategy = config.node_hook_opts[
-                "long_parameters_strategy"
-            ]
+            self.flatten = mlflow_config.hooks.node.flatten_dict_params
+            self.recursive = mlflow_config.hooks.node.recursive
+            self.sep = mlflow_config.hooks.node.sep
+            self.long_parameters_strategy = (
+                mlflow_config.hooks.node.long_parameters_strategy
+            )
 
     @hook_impl
     def before_node_run(

@@ -5,8 +5,8 @@ import click
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _is_project, bootstrap_project
 
+from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
-from kedro_mlflow.framework.context import get_mlflow_config
 
 TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
 
@@ -149,8 +149,8 @@ def ui(env, port, host):
     ):
 
         mlflow_conf = get_mlflow_config()
-        host = host or mlflow_conf.ui_opts.get("host")
-        port = port or mlflow_conf.ui_opts.get("port")
+        host = host or mlflow_conf.ui.host
+        port = port or mlflow_conf.ui.port
 
         # call mlflow ui with specific options
         # TODO : add more options for ui

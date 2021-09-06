@@ -9,4 +9,4 @@ Introduction
    Version datasets <03_version_datasets.md>
    Version models <04_version_models.md>
    Version metrics <05_version_metrics.md>
-   Opening the User Interface <06_mlflow_ui.md>
+   Open the User Interface <06_mlflow_ui.md>

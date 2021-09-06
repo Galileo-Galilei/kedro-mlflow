@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Add support for notebook use . When a notebook is opened via a kedro command (e.g. `kedro jupyter notebook`), you can call the `%reload_kedro_mlflow` line magic to setup mlflow configuration automatically. A ``mlflow_client`` to the database is also created available as a global variable ([#124](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124)).
+
 ### Changed
 
 - :recycle: ``KedroMlflowConfig`` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function ``get_mlflow_config()`` and ``KedroMlflowConfig().setup()`` are not modified.

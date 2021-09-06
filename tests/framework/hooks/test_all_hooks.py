@@ -256,8 +256,9 @@ def mock_session(
     mocker, mock_settings_with_mlflow_hooks, kedro_project_path
 ):  # pylint: disable=unused-argument
 
-    # see here why it is needed: https://github.com/quantumblacklabs/kedro/blob/956dbed2289397b69506a8d79cca831032e89163/tests/framework/session/conftest.py#L407
-    mocker.patch("kedro.framework.project._validate_module")
+    # we need to patch "kedro.framework.session.session.validate_settings" instead of
+    # "kedro.framework.project.validate_settings" because it is imported
+    mocker.patch("kedro.framework.session.session.validate_settings")
     mocker.patch(
         "kedro.framework.project._register_hooks_setuptools"
     )  # prevent registering the one of the plugins which are already installed

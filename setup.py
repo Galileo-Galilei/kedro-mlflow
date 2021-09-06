@@ -59,6 +59,7 @@ setup(
             "pre-commit>=2.0.0,<3.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],
+        "extras": ["notebook>=6.0.0"],
     },
     author="Galileo-Galilei",
     entry_points={
@@ -71,6 +72,9 @@ setup(
         "kedro.hooks": [
             "mlflow_pipeline_hook = kedro_mlflow.framework.hooks.pipeline_hook:mlflow_pipeline_hook",
             "mlflow_node_hooks = kedro_mlflow.framework.hooks.node_hook:mlflow_node_hook",
+        ],
+        "kedro.line_magic": [
+            "line_magic = kedro_mlflow.extras.extensions.ipython:reload_kedro_mlflow"
         ],
     },
     zip_safe=False,

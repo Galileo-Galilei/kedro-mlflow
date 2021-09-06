@@ -12,8 +12,9 @@ Welcome to kedro-mlflow's documentation!
    Introduction <source/01_introduction/index.rst>
    Installation <source/02_installation/index.rst>
    Getting Started <source/03_getting_started/index.rst>
-   Advanced machine learning versioning <source/04_experimentation_tracking/index.rst>
-   A mlops framework for efficient deployment <source/05_framework_ml/index.rst>
+   Experimentation tracking <source/04_experimentation_tracking/index.rst>
+   A mlops framework for continuous model serving <source/05_framework_ml/index.rst>
+   Interactive use <source/06_interactive_use/index.rst>
    Python objects <source/07_python_objects/index.rst>
 
 

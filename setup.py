@@ -38,7 +38,7 @@ setup(
     install_requires=base_requirements,
     extras_require={
         "doc": [
-            "sphinx==4.1.1",
+            "sphinx==4.2.0",
             "recommonmark==0.7.1",
             "sphinx_rtd_theme==0.5.2",
             "sphinx-markdown-tables==0.0.15",

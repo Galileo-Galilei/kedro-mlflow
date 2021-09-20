@@ -38,11 +38,12 @@ setup(
     install_requires=base_requirements,
     extras_require={
         "doc": [
-            "sphinx==4.1.1",
+            "sphinx==4.2.0",
             "recommonmark==0.7.1",
-            "sphinx_rtd_theme==0.5.2",
+            "sphinx_rtd_theme==1.0.0",
             "sphinx-markdown-tables==0.0.15",
             "sphinx-click==3.0.1",
+            "sphinx_copybutton==0.4.0",
             "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
             "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
@@ -55,8 +56,8 @@ setup(
             "flake8==3.9.2",  # ensure consistency with pre-commit
         ],
         "dev": [
-            "black==21.7b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
-            "isort==5.9.2",  # ensure consistency with pre-commit
+            "black==21.9b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "isort==5.9.3",  # ensure consistency with pre-commit
             "pre-commit>=2.0.0,<3.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],

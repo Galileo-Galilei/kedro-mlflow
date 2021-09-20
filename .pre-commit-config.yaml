@@ -1,12 +1,12 @@
 exclude: ^kedro_mlflow/template/project/run.py$
 repos:
     - repo: https://github.com/psf/black
-      rev: 21.7b0
+      rev: 21.9b0
       hooks:
           - id: black
             language_version: python3.7
     - repo: https://github.com/timothycrosley/isort
-      rev: 5.9.2
+      rev: 5.9.3
       hooks:
           - id: isort
     - repo: https://gitlab.com/pycqa/flake8

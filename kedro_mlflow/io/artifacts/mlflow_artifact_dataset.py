@@ -9,7 +9,6 @@ from mlflow.tracking import MlflowClient
 class MlflowArtifactDataSet(AbstractVersionedDataSet):
     """This class is a wrapper for any kedro AbstractDataSet.
     It decorates their ``save`` method to log the dataset in mlflow when ``save`` is called.
-
     """
 
     def __new__(

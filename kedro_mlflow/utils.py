@@ -8,7 +8,3 @@ def _parse_requirements(path: Union[str, Path], encoding="utf-8") -> List:
             x.strip() for x in file_handler if x.strip() and not x.startswith("-r")
         ]
     return requirements
-
-
-class KedroContextError(Exception):
-    """Error occurred when loading project and running context pipeline."""

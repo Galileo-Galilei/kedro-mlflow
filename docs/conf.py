@@ -33,7 +33,29 @@ release = km_version
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["recommonmark", "sphinx_markdown_tables"]
+extensions = [
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx_click",
+    # "sphinx_autodoc_typehints",
+    # "sphinx.ext.doctest",
+    # "sphinx.ext.todo",
+    # "sphinx.ext.coverage",
+    # "sphinx.ext.mathjax",
+    # "sphinx.ext.ifconfig",
+    # "sphinx.ext.viewcode",
+    # "nbsphinx",
+    "recommonmark",
+    "sphinx_copybutton",
+    "sphinx_markdown_tables",
+]
+
+# enable autosummary plugin (table of contents for modules/classes/class
+# methods)
+autosummary_generate = True
+autosummary_generate_overwrite = False
+napoleon_include_init_with_doc = True
 
 # enable documentation in markdown
 source_suffix = {

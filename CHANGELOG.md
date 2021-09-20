@@ -4,7 +4,8 @@
 
 ### Added
 
-- :sparkles: Add support for notebook use . When a notebook is opened via a kedro command (e.g. `kedro jupyter notebook`), you can call the `%reload_kedro_mlflow` line magic to setup mlflow configuration automatically. A ``mlflow_client`` to the database is also created available as a global variable ([#124](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124)).
+- :sparkles: Add support for notebook use. When a notebook is opened via a kedro command (e.g. `kedro jupyter notebook`), you can call the `%reload_kedro_mlflow` line magic to setup mlflow configuration automatically. A ``mlflow_client`` to the database is also created available as a global variable ([#124](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124)).
+- :memo: Add automatic API documentation through docstrings for better consistency between code and docs ([#110](https://github.com/Galileo-Galilei/kedro-mlflow/issues/110)). All docstrings are not updated yet and it will be a long term work.
 
 ### Changed
 

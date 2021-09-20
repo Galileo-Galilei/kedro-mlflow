@@ -7,7 +7,7 @@ Welcome to kedro-mlflow's documentation!
 ========================================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 6
 
    Introduction <source/01_introduction/index.rst>
    Installation <source/02_installation/index.rst>
@@ -17,6 +17,10 @@ Welcome to kedro-mlflow's documentation!
    Interactive use <source/06_interactive_use/index.rst>
    Python objects <source/07_python_objects/index.rst>
 
+.. toctree::
+   :maxdepth: 6
+
+   API documentation <source/08_API/kedro_mlflow.rst>
 
 Indices and tables
 ==================

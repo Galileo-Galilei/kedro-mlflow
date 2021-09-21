@@ -77,10 +77,10 @@ projects. It is developed as part of
 the Kedro initiative at QuantumBlack.
 
 Installed plugins:
-kedro_mlflow: 0.7.4 (hooks:global,project)
+kedro_mlflow: 0.7.5 (hooks:global,project)
 ```
 
-The version ``0.7.4`` of the plugin is installed and has both global and project commands.
+The version ``0.7.5`` of the plugin is installed and has both global and project commands.
 
 That's it! You are now ready to go!
 

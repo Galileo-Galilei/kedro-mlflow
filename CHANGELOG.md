@@ -2,16 +2,18 @@
 
 ## [Unreleased]
 
+## [0.7.5] - 2021-09-21
+
 ### Added
 
-- :sparkles: Add support for notebook use. When a notebook is opened via a kedro command (e.g. `kedro jupyter notebook`), you can call the `%reload_kedro_mlflow` line magic to setup mlflow configuration automatically. A ``mlflow_client`` to the database is also created available as a global variable ([#124](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124)).
-- :memo: Add automatic API documentation through docstrings for better consistency between code and docs ([#110](https://github.com/Galileo-Galilei/kedro-mlflow/issues/110)). All docstrings are not updated yet and it will be a long term work.
+-   :sparkles: Add support for notebook use. When a notebook is opened via a kedro command (e.g. `kedro jupyter notebook`), you can call the `%reload_kedro_mlflow` line magic to setup mlflow configuration automatically. A `mlflow_client` to the database is also created available as a global variable ([#124](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124)).
+-   :memo: Add automatic API documentation through docstrings for better consistency between code and docs ([#110](https://github.com/Galileo-Galilei/kedro-mlflow/issues/110)). All docstrings are not updated yet and it will be a long term work.
 
 ### Changed
 
-- :recycle: ``KedroMlflowConfig`` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function ``get_mlflow_config()`` and ``KedroMlflowConfig().setup()`` are not modified.
+-   :recycle: `KedroMlflowConfig` was refactored with pydantic for improved type checking when loading configuration, overall robustness and autocompletion. Its keys have changed, but it is not considered as a user facing changes since the public function `get_mlflow_config()` and `KedroMlflowConfig().setup()` are not modified.
 
-- :wastebasket: The ``kedro.framework.context`` folder is moved to ``kedro.config`` for consistency with the Kedro repo structure: ``get_mlflow_config`` import must change from `from kedro_mlflow.framework.context import get_mlflow_config` to `from kedro_mlflow.config import get_mlflow_config`.
+-   :wastebasket: The `kedro.framework.context` folder is moved to `kedro.config` for consistency with the Kedro repo structure: `get_mlflow_config` import must change from `from kedro_mlflow.framework.context import get_mlflow_config` to `from kedro_mlflow.config import get_mlflow_config`.
 
 ## [0.7.4] - 2021-08-30
 
@@ -240,7 +242,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.4...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.5...HEAD
+
+[0.7.5]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.4...0.7.5
 
 [0.7.4]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.3...0.7.4
 

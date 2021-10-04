@@ -49,7 +49,7 @@ setup(
         ],
         "test": [
             "pytest>=5.4.0, <7.0.0",
-            "pytest-cov>=2.8.0, <3.0.0",
+            "pytest-cov>=2.8.0, <4.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <0.25.0",

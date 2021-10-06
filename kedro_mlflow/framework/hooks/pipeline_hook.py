@@ -180,24 +180,25 @@ class MlflowPipelineHook:
                 with TemporaryDirectory() as tmp_dir:
                     # This will be removed at the end of the context manager,
                     # but we need to log in mlflow beforeremoving the folder
-                    pipeline_catalog = pipeline._extract_pipeline_catalog(catalog)
-                    artifacts = pipeline.extract_pipeline_artifacts(
-                        pipeline_catalog, temp_folder=Path(tmp_dir)
+                    kedro_pipeline_model = KedroPipelineModel(
+                        pipeline=pipeline.inference,
+                        catalog=catalog,
+                        input_name=pipeline.input_name,
+                        **pipeline.kwargs,
+                    )
+                    artifacts = kedro_pipeline_model.extract_pipeline_artifacts(
+                        parameters_saving_folder=Path(tmp_dir)
                     )
 
                     if pipeline.model_signature == "auto":
-                        input_data = pipeline_catalog.load(pipeline.input_name)
+                        input_data = catalog.load(pipeline.input_name)
                         model_signature = infer_signature(model_input=input_data)
                     else:
                         model_signature = pipeline.model_signature
 
                     mlflow.pyfunc.log_model(
                         artifact_path=pipeline.model_name,
-                        python_model=KedroPipelineModel(
-                            pipeline_ml=pipeline,
-                            catalog=pipeline_catalog,
-                            **pipeline.kwargs,
-                        ),
+                        python_model=kedro_pipeline_model,
                         artifacts=artifacts,
                         conda_env=_format_conda_env(pipeline.conda_env),
                         signature=model_signature,

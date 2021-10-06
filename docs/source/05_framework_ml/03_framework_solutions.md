@@ -67,7 +67,7 @@ input_data = catalog.load(pipeline_training.input_name)
 model_signature = infer_signature(model_input=input_data)
 
 kedro_model = KedroPipelineModel(
-    pipeline_ml=pipeline_training,
+    pipeline=pipeline_training,
     catalog=catalog
 )
 

@@ -5,13 +5,8 @@ from kedro.framework.context import KedroContext
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
-from kedro_mlflow.pipeline import (
-    KedroMlflowPipelineMLDatasetsError,
-    KedroMlflowPipelineMLInputsError,
-    KedroMlflowPipelineMLOutputsError,
-    pipeline_ml_factory,
-)
-from kedro_mlflow.pipeline.pipeline_ml import PipelineML
+from kedro_mlflow.pipeline import pipeline_ml_factory
+from kedro_mlflow.pipeline.pipeline_ml import KedroMlflowPipelineMLError, PipelineML
 
 
 def preprocess_fun(data):
@@ -357,7 +352,7 @@ def test_filtering_generate_invalid_pipeline_ml(
     """
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
     with pytest.raises(
-        KedroMlflowPipelineMLInputsError,
+        KedroMlflowPipelineMLError,
         match="No free input is allowed",
     ):
         dummy_context._filter_pipeline(
@@ -376,66 +371,9 @@ def test_filtering_generate_invalid_pipeline_ml(
 # def test_pipeline_ml_preserve_tags():
 #     pass
 
-# filtering that remove the degree of freedom constraints should fail
-@pytest.mark.parametrize(
-    "pipeline_ml_obj,catalog,result",
-    [
-        (
-            pytest.lazy_fixture("pipeline_ml_with_tag"),
-            pytest.lazy_fixture("dummy_catalog"),
-            {"model", "data"},
-        ),
-        (
-            pytest.lazy_fixture("pipeline_ml_with_intermediary_artifacts"),
-            pytest.lazy_fixture("catalog_with_encoder"),
-            {"model", "data", "encoder"},
-        ),
-        (
-            pytest.lazy_fixture("pipeline_ml_with_inputs_artifacts"),
-            pytest.lazy_fixture("catalog_with_stopwords"),
-            {"model", "data", "stopwords_from_nltk"},
-        ),
-        (
-            pytest.lazy_fixture("pipeline_ml_with_parameters"),
-            pytest.lazy_fixture("catalog_with_parameters"),
-            {
-                "model",
-                "data",
-                "params:stopwords",
-                "params:threshold",
-            },
-        ),
-    ],
-)
-def test_catalog_extraction(pipeline_ml_obj, catalog, result):
-    filtered_catalog = pipeline_ml_obj._extract_pipeline_catalog(catalog)
-    assert set(filtered_catalog.list()) == result
-
-
-def test_catalog_extraction_missing_inference_input(pipeline_ml_with_tag):
-    catalog = DataCatalog({"raw_data": MemoryDataSet(), "data": MemoryDataSet()})
-    with pytest.raises(
-        KedroMlflowPipelineMLDatasetsError,
-        match="since it is an input for inference pipeline",
-    ):
-        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
-
-
-def test_catalog_extraction_unpersisted_inference_input(pipeline_ml_with_tag):
-    catalog = DataCatalog(
-        {"raw_data": MemoryDataSet(), "data": MemoryDataSet(), "model": MemoryDataSet()}
-    )
-    with pytest.raises(
-        KedroMlflowPipelineMLDatasetsError,
-        match="The datasets of the training pipeline must be persisted locally",
-    ):
-        pipeline_ml_with_tag._extract_pipeline_catalog(catalog)
-
 
 def test_too_many_free_inputs():
-    with pytest.raises(
-        KedroMlflowPipelineMLInputsError, match="No free input is allowed"
-    ):
+    with pytest.raises(KedroMlflowPipelineMLError, match="No free input is allowed"):
         pipeline_ml_factory(
             training=Pipeline(
                 [
@@ -474,7 +412,7 @@ def test_decorate(pipeline_ml_with_tag):
 
 def test_invalid_input_name(pipeline_ml_with_tag):
     with pytest.raises(
-        KedroMlflowPipelineMLInputsError,
+        KedroMlflowPipelineMLError,
         match="input_name='whoops_bad_name' but it must be an input of 'inference'",
     ):
         pipeline_ml_with_tag.input_name = "whoops_bad_name"
@@ -482,7 +420,7 @@ def test_invalid_input_name(pipeline_ml_with_tag):
 
 def test_too_many_inference_outputs():
     with pytest.raises(
-        KedroMlflowPipelineMLOutputsError,
+        KedroMlflowPipelineMLError,
         match="The inference pipeline must have one and only one output",
     ):
         pipeline_ml_factory(
@@ -510,7 +448,7 @@ def test_too_many_inference_outputs():
 
 def test_not_enough_inference_outputs():
     with pytest.raises(
-        KedroMlflowPipelineMLOutputsError,
+        KedroMlflowPipelineMLError,
         match="The inference pipeline must have one and only one output",
     ):
         pipeline_ml_factory(

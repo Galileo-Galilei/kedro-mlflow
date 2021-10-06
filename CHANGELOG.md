@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: The reserved keyword "databricks" is no longer converted to a local filepath before setting the ``MLFLOW_TRACKING_URI`` to enable integration with databricks managed platform. ([#248](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124))
+
 ## [0.7.5] - 2021-09-21
 
 ### Added

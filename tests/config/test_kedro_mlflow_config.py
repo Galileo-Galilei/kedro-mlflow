@@ -182,6 +182,15 @@ def test_kedro_mlflow_config_validate_uri_local(kedro_project_with_mlflow_conf, 
     )  # relative
 
 
+def test_kedro_mlflow_config_validate_uri_databricks(kedro_project_with_mlflow_conf):
+    # databricks is a reseved keyword which should not be modified
+    config_uri = KedroMlflowConfig._validate_uri(
+        uri="databricks", values={"project_path": kedro_project_with_mlflow_conf}
+    )
+
+    assert config_uri == "databricks"
+
+
 def test_from_dict_to_dict_idempotent(kedro_project_with_mlflow_conf):
     config = KedroMlflowConfig(project_path=kedro_project_with_mlflow_conf)
     original_config_dict = config.dict()

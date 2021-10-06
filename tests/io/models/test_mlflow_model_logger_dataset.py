@@ -90,6 +90,11 @@ def pipeline_ml_obj():
 
 
 @pytest.fixture
+def pipeline_inference(pipeline_ml_obj):
+    return pipeline_ml_obj.inference
+
+
+@pytest.fixture
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
@@ -108,10 +113,12 @@ def dummy_catalog(tmp_path):
 
 
 @pytest.fixture
-def kedro_pipeline_model(tmp_path, pipeline_ml_obj, dummy_catalog):
+def kedro_pipeline_model(pipeline_ml_obj, dummy_catalog):
 
     kedro_pipeline_model = KedroPipelineModel(
-        pipeline_ml=pipeline_ml_obj, catalog=dummy_catalog
+        pipeline=pipeline_ml_obj,
+        catalog=dummy_catalog,
+        input_name=pipeline_ml_obj.input_name,
     )
 
     return kedro_pipeline_model
@@ -282,16 +289,26 @@ def test_load_without_run_id_nor_active_run():
         mlflow_model_ds.load()
 
 
+@pytest.mark.parametrize(
+    "pipeline",
+    [
+        (pytest.lazy_fixture("pipeline_ml_obj")),  # must work for PipelineML
+        (pytest.lazy_fixture("pipeline_inference")),  # must work for Pipeline
+    ],
+)
 def test_pyfunc_flavor_python_model_save_and_load(
-    tmp_path,
     tmp_folder,
     tracking_uri,
-    pipeline_ml_obj,
+    pipeline,
     dummy_catalog,
-    kedro_pipeline_model,
 ):
 
-    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog, tmp_folder)
+    kedro_pipeline_model = KedroPipelineModel(
+        pipeline=pipeline,
+        catalog=dummy_catalog,
+        input_name="raw_data",
+    )
+    artifacts = kedro_pipeline_model.extract_pipeline_artifacts(tmp_folder)
 
     model_config = {
         "name": "kedro_pipeline_model",
@@ -318,6 +335,8 @@ def test_pyfunc_flavor_python_model_save_and_load(
     model_config2 = model_config.copy()
     model_config2["config"]["run_id"] = current_run_id
     mlflow_model_ds2 = MlflowModelLoggerDataSet.from_config(**model_config2)
+    print(model_config)
+    print(artifacts)
     loaded_model = mlflow_model_ds2.load()
 
     loaded_model.predict(pd.DataFrame(data=[1], columns=["a"])) == pd.DataFrame(
@@ -328,9 +347,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
 # TODO: add a test for "pyfunc_workflow=loader_module"
 
 
-def test_pyfunc_flavor_wrong_pyfunc_workflow(
-    tmp_path, tracking_uri, pipeline_ml_obj, dummy_catalog, kedro_pipeline_model
-):
+def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
 
     model_config = {
         "name": "kedro_pipeline_model",

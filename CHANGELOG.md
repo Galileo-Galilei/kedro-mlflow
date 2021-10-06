@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the logging (#171).
+
 ## [0.7.6] - 2021-10-08
 
 ### Fixed

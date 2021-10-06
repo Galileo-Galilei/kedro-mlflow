@@ -70,6 +70,11 @@ def pipeline_ml_obj():
 
 
 @pytest.fixture
+def pipeline_inference(pipeline_ml_obj):
+    return pipeline_ml_obj.inference
+
+
+@pytest.fixture
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
@@ -91,7 +96,9 @@ def dummy_catalog(tmp_path):
 def kedro_pipeline_model(tmp_path, pipeline_ml_obj, dummy_catalog):
 
     kedro_pipeline_model = KedroPipelineModel(
-        pipeline_ml=pipeline_ml_obj, catalog=dummy_catalog
+        pipeline=pipeline_ml_obj,
+        catalog=dummy_catalog,
+        input_name=pipeline_ml_obj.input_name,
     )
 
     return kedro_pipeline_model
@@ -141,11 +148,23 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
     assert isinstance(linreg_model_loaded, LinearRegression)
 
 
+@pytest.mark.parametrize(
+    "pipeline",
+    [
+        (pytest.lazy_fixture("pipeline_ml_obj")),  # must work for PipelineML
+        (pytest.lazy_fixture("pipeline_inference")),  # must work for Pipeline
+    ],
+)
 def test_pyfunc_flavor_python_model_save_and_load(
-    tmp_path, tmp_folder, pipeline_ml_obj, dummy_catalog, kedro_pipeline_model
+    tmp_path, tmp_folder, pipeline, dummy_catalog
 ):
 
-    artifacts = pipeline_ml_obj.extract_pipeline_artifacts(dummy_catalog, tmp_folder)
+    kedro_pipeline_model = KedroPipelineModel(
+        pipeline=pipeline,
+        catalog=dummy_catalog,
+        input_name="raw_data",
+    )
+    artifacts = kedro_pipeline_model.extract_pipeline_artifacts(tmp_folder)
 
     model_config = {
         "name": "kedro_pipeline_model",

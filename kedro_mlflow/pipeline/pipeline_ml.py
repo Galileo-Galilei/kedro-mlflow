@@ -1,9 +1,6 @@
-import logging
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Union
 
-from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 from mlflow.models import ModelSignature
@@ -108,10 +105,6 @@ class PipelineML(Pipeline):
         self._check_consistency()
 
     @property
-    def _logger(self) -> logging.Logger:
-        return logging.getLogger(__name__)
-
-    @property
     def training(self) -> Pipeline:
         return Pipeline(self.nodes)
 
@@ -133,7 +126,7 @@ class PipelineML(Pipeline):
         allowed_names = self.inference.inputs()
         pp_allowed_names = "\n    - ".join(allowed_names)
         if name not in allowed_names:
-            raise KedroMlflowPipelineMLInputsError(
+            raise KedroMlflowPipelineMLError(
                 (
                     f"input_name='{name}' but it must be an input of 'inference'"
                     f", i.e. one of: \n    - {pp_allowed_names}"
@@ -159,7 +152,7 @@ class PipelineML(Pipeline):
         nb_outputs = len(inference.outputs())
         outputs_txt = "\n - ".join(inference.outputs())
         if len(inference.outputs()) != 1:
-            raise KedroMlflowPipelineMLOutputsError(
+            raise KedroMlflowPipelineMLError(
                 (
                     "The inference pipeline must have one"
                     " and only one output. You are trying"
@@ -168,76 +161,6 @@ class PipelineML(Pipeline):
                     " "
                 )
             )
-
-    def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
-
-        # check that the pipeline is consistent in case its attributes have been
-        # modified manually
-        self._check_consistency()
-
-        sub_catalog = DataCatalog()
-        for data_set_name in self.inference.inputs():
-            if data_set_name == self.input_name:
-                # there is no obligation that this dataset is persisted
-                # thus it is allowed to be an empty memory dataset
-                data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
-                sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
-            else:
-                try:
-                    data_set = catalog._data_sets[data_set_name]
-                    if isinstance(
-                        data_set, MemoryDataSet
-                    ) and not data_set_name.startswith("params:"):
-                        raise KedroMlflowPipelineMLDatasetsError(
-                            """
-                                The datasets of the training pipeline must be persisted locally
-                                to be used by the inference pipeline. You must enforce them as
-                                non 'MemoryDataSet' in the 'catalog.yml'.
-                                Dataset '{data_set_name}' is not persisted currently.
-                                """.format(
-                                data_set_name=data_set_name
-                            )
-                        )
-                    self._logger.info(
-                        f"The data_set '{data_set_name}' is added to the PipelineML catalog."
-                    )
-                    sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
-                except KeyError:
-                    raise KedroMlflowPipelineMLDatasetsError(
-                        """
-                                The provided catalog must contains '{data_set_name}' data_set
-                                since it is an input for inference pipeline.
-                                """.format(
-                            data_set_name=data_set_name
-                        )
-                    )
-
-        return sub_catalog
-
-    def extract_pipeline_artifacts(self, catalog: DataCatalog, temp_folder: Path):
-        pipeline_catalog = self._extract_pipeline_catalog(catalog)
-
-        artifacts = {}
-        for name, dataset in pipeline_catalog._data_sets.items():
-            if name != self.input_name:
-                if name.startswith("params:"):
-                    # we need to persist it locally for mlflow access
-                    absolute_param_path = temp_folder / f"params_{name[7:]}.pkl"
-                    persisted_dataset = PickleDataSet(
-                        filepath=absolute_param_path.as_posix()
-                    )
-                    persisted_dataset.save(dataset.load())
-                    artifact_path = absolute_param_path.as_uri()
-                else:
-                    # In this second case, we know it cannot be a MemoryDataSet
-                    # weird bug when directly converting PurePosixPath to windows: it is considered as relative
-                    artifact_path = (
-                        Path(dataset._filepath.as_posix()).resolve().as_uri()
-                    )
-
-                artifacts[name] = artifact_path
-
-        return artifacts
 
     def _check_consistency(self) -> None:
 
@@ -255,7 +178,7 @@ class PipelineML(Pipeline):
 
         if len(free_inputs_set) > 0:
             input_set_txt = "\n     - ".join(free_inputs_set)
-            raise KedroMlflowPipelineMLInputsError(
+            raise KedroMlflowPipelineMLError(
                 (
                     "The following inputs are free for the inference pipeline:\n"
                     f"    - {input_set_txt}."
@@ -332,13 +255,5 @@ class PipelineML(Pipeline):
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
 
-class KedroMlflowPipelineMLInputsError(Exception):
-    """Error raised when the inputs of KedroPipelineModel are invalid"""
-
-
-class KedroMlflowPipelineMLDatasetsError(Exception):
-    """Error raised when the inputs of KedroPipelineMoel are invalid"""
-
-
-class KedroMlflowPipelineMLOutputsError(Exception):
-    """Error raised when the outputs of KedroPipelineModel are invalid"""
+class KedroMlflowPipelineMLError(Exception):
+    """Error raised when the KedroPipelineModel construction fails"""

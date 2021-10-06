@@ -56,7 +56,7 @@ model_signature = infer_signature(model_input=input_data)
 mlflow.pyfunc.log_model(
     artifact_path="model",
     python_model=KedroPipelineModel(
-            pipeline_ml=pipeline_training,
+            pipeline=pipeline_training,
             catalog=catalog
         ),
     artifacts=artifacts,
@@ -69,7 +69,7 @@ It is also possible to pass arguments to `KedroPipelineModel` to specify the run
 
 ```python
 KedroPipelineModel(
-            pipeline_ml=pipeline_training,
+            pipeline=pipeline_training,
             catalog=catalog,
             copy_mode="assign"
         )

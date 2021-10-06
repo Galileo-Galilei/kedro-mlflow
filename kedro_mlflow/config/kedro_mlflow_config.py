@@ -156,6 +156,11 @@ class KedroMlflowConfig(BaseModel):
             str -- A valid mlflow_tracking_uri
         """
 
+        # this is a special reserved keyword for mlflow which should not be converted to a path
+        # se: https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
+        if uri == "databricks":
+            return uri
+
         # if no tracking uri is provided, we register the runs locally at the root of the project
         pathlib_uri = PurePath(uri)
 

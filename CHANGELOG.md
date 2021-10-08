@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.7.6] - 2021-10-08
+
 ### Fixed
 
-- :bug: The reserved keyword "databricks" is no longer converted to a local filepath before setting the ``MLFLOW_TRACKING_URI`` to enable integration with databricks managed platform. ([#248](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124))
+-   :bug: The reserved keyword "databricks" is no longer converted to a local filepath before setting the `MLFLOW_TRACKING_URI` to enable integration with databricks managed platform. ([#248](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124))
 
 ## [0.7.5] - 2021-09-21
 
@@ -246,7 +248,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.5...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...HEAD
+
+[0.7.6]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.5...0.7.6
 
 [0.7.5]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.4...0.7.5
 

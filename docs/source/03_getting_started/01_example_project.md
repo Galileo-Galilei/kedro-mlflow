@@ -7,7 +7,7 @@ Create a conda environment and install ``kedro-mlflow`` (this will automatically
 ```console
 conda create -n km_example python=3.6.8 --yes
 conda activate km_example
-pip install kedro-mlflow==0.7.5
+pip install kedro-mlflow==0.7.6
 ```
 
 ## Install the toy project

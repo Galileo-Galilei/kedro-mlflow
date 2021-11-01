@@ -56,7 +56,7 @@ setup(
             "flake8==3.9.2",  # ensure consistency with pre-commit
         ],
         "dev": [
-            "black==21.9b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "black==21.10b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.9.3",  # ensure consistency with pre-commit
             "pre-commit>=2.0.0,<3.0.0",
             "jupyter>=1.0.0,<2.0.0",

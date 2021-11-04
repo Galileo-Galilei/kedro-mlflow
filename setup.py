@@ -42,7 +42,7 @@ setup(
             "recommonmark==0.7.1",
             "sphinx_rtd_theme==1.0.0",
             "sphinx-markdown-tables==0.0.15",
-            "sphinx-click==3.0.1",
+            "sphinx-click==3.0.2",
             "sphinx_copybutton==0.4.0",
             "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
             "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4

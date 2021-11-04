@@ -42,22 +42,22 @@ setup(
             "recommonmark==0.7.1",
             "sphinx_rtd_theme==1.0.0",
             "sphinx-markdown-tables==0.0.15",
-            "sphinx-click==3.0.1",
+            "sphinx-click==3.0.2",
             "sphinx_copybutton==0.4.0",
             "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
             "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
         "test": [
             "pytest>=5.4.0, <7.0.0",
-            "pytest-cov>=2.8.0, <3.0.0",
+            "pytest-cov>=2.8.0, <4.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
-            "scikit-learn>=0.23.0, <0.25.0",
-            "flake8==3.9.2",  # ensure consistency with pre-commit
+            "scikit-learn>=0.23.0, <1.1.0",
+            "flake8==4.0.1",  # ensure consistency with pre-commit
+            "black==21.10b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "isort==5.10.0",  # ensure consistency with pre-commit
         ],
         "dev": [
-            "black==21.9b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
-            "isort==5.9.3",  # ensure consistency with pre-commit
             "pre-commit>=2.0.0,<3.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],

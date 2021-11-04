@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
-### Added
+### Changed
 
-- :sparkles: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the logging (#171).
+- :sparkles: :boom: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the model logging (#171). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
+- :memo: Format code blocks in documentation with ``blacken-docs``
+- :construction_worker: Enforce the use of ``black`` and ``isort`` in the CI to enforce style guidelines
 
 ## [0.7.6] - 2021-10-08
 

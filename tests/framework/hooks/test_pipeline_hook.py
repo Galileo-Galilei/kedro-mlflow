@@ -816,11 +816,16 @@ def test_on_pipeline_error(
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        kmc = get_mlflow_config()
         with pytest.raises(ValueError):
             session.run()
 
-        # the run we want is the last one in Default experiment
-        failing_run_info = MlflowClient(tracking_uri).list_run_infos("0")[0]
+        # the run we want is the last one in the configuration experiment
+        mlflow_client = MlflowClient(tracking_uri)
+        experiment = mlflow_client.get_experiment_by_name(kmc.experiment.name)
+        failing_run_info = MlflowClient(tracking_uri).list_run_infos(
+            experiment.experiment_id
+        )[0]
         assert mlflow.active_run() is None  # the run must have been closed
         assert failing_run_info.status == RunStatus.to_string(
             RunStatus.FAILED

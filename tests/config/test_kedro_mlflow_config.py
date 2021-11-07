@@ -58,7 +58,7 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
     assert "exp1" in [exp.name for exp in config._mlflow_client.list_experiments()]
 
 
-def test_kedro_mlflow_config_experiment_exists(mocker, kedro_project_with_mlflow_conf):
+def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
 
     # create an experiment with the same name
     mlflow_tracking_uri = (
@@ -101,12 +101,47 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
     assert "exp1" in [exp.name for exp in config._mlflow_client.list_experiments()]
 
 
-def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_conf):
+def test_kedro_mlflow_config_setup_set_experiment_globally(
+    kedro_project_with_mlflow_conf,
+):
 
-    # create an experiment with the same name and then delete it
-    mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "awesome_tracking").as_uri()
+    mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
 
     # the config must restore properly the experiment
+    config = KedroMlflowConfig(
+        project_path=kedro_project_with_mlflow_conf,
+        mlflow_tracking_uri="mlruns",
+        experiment=dict(name="incredible_exp"),
+    )
+
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+        config.setup()
+
+    mlflow_client = MlflowClient(mlflow_tracking_uri)
+    runs_list_before_interactive_run = mlflow_client.list_run_infos(
+        config._experiment.experiment_id
+    )
+
+    with mlflow.start_run():
+        mlflow.log_param("a", 1)
+        my_run_id = mlflow.active_run().info.run_id
+
+    runs_list_after_interactive_run = mlflow_client.list_run_infos(
+        config._experiment.experiment_id
+    )
+
+    assert (
+        len(runs_list_after_interactive_run) - len(runs_list_before_interactive_run)
+        == 1
+    )
+    assert runs_list_after_interactive_run[0].run_id == my_run_id
+
+
+def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_conf):
+
+    mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "awesome_tracking").as_uri()
+
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
         mlflow_tracking_uri="awesome_tracking",

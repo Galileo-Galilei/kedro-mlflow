@@ -2,7 +2,6 @@ from typing import Dict, List, Optional, Union
 
 import mlflow
 import pytest
-from deprecation import fail_if_not_removed
 from kedro.io import DataSetError
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
@@ -10,7 +9,6 @@ from pytest_lazyfixture import lazy_fixture
 from kedro_mlflow.io.metrics import MlflowMetricsDataSet
 
 
-@fail_if_not_removed
 def assert_are_metrics_logged(
     data: Dict[str, Union[float, List[float]]],
     client: MlflowClient,
@@ -71,7 +69,6 @@ def metrics3():
     return {"metric1": {"step": 0, "value": 1.1}}
 
 
-@fail_if_not_removed
 @pytest.mark.parametrize(
     "data, prefix",
     [
@@ -111,7 +108,6 @@ def test_mlflow_metrics_dataset_saved_and_logged(tmp_path, tracking_uri, data, p
         assert data[data_key] == catalog_metrics[k]
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_dataset_saved_without_run_id(tmp_path, tracking_uri, metrics3):
     """Check if MlflowMetricsDataSet can be saved in catalog when filepath is given,
     and if logged in mlflow.
@@ -129,7 +125,6 @@ def test_mlflow_metrics_dataset_saved_without_run_id(tmp_path, tracking_uri, met
     assert_are_metrics_logged(metrics3, mlflow_client, run_id, prefix)
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_dataset_exists(tmp_path, tracking_uri, metrics3):
     """Check if MlflowMetricsDataSet is well identified as
     existing if it has already been saved.
@@ -144,7 +139,6 @@ def test_mlflow_metrics_dataset_exists(tmp_path, tracking_uri, metrics3):
     assert mlflow_metrics_dataset.exists()
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_dataset_does_not_exist(tmp_path, tracking_uri, metrics3):
     """Check if MlflowMetricsDataSet is well identified as
     not existingif it has never been saved.
@@ -159,7 +153,6 @@ def test_mlflow_metrics_dataset_does_not_exist(tmp_path, tracking_uri, metrics3)
     assert not mlflow_metrics_dataset.exists()
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_dataset_fails_with_invalid_metric(
     tmp_path, tracking_uri, metrics3
 ):
@@ -178,7 +171,6 @@ def test_mlflow_metrics_dataset_fails_with_invalid_metric(
         )  # key: value is not valid, you must specify {key: {value, step}}
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
     mlflow_metrics_dataset = MlflowMetricsDataSet(prefix="hello")
 
@@ -208,7 +200,6 @@ def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
     assert all_runs_id_beginning == all_runs_id_end
 
 
-@fail_if_not_removed
 def test_mlflow_metrics_logging_deactivation_is_bool():
     mlflow_metrics_dataset = MlflowMetricsDataSet(prefix="hello")
 

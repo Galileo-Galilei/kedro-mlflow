@@ -3,11 +3,8 @@ from itertools import chain
 from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import mlflow
-from deprecation import deprecated
 from kedro.io import AbstractDataSet, DataSetError
 from mlflow.tracking import MlflowClient
-
-from kedro_mlflow import __version__
 
 MetricItem = Union[Dict[str, float], List[Dict[str, float]]]
 MetricTuple = Tuple[str, float, int]
@@ -17,12 +14,6 @@ MetricsDict = Dict[str, MetricItem]
 class MlflowMetricsDataSet(AbstractDataSet):
     """This class represent MLflow metrics dataset."""
 
-    @deprecated(
-        deprecated_in="0.7.3",
-        removed_in="0.8.0",
-        current_version=__version__,
-        details="Deprecated in favor of 'MlflowMetricDataSet' (for a single metric) or 'MlflowMetricHistoryDataSet '(for the metric evolution over time)",
-    )
     def __init__(
         self,
         run_id: str = None,

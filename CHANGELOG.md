@@ -2,15 +2,23 @@
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuraiton even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
+- :memo: Format code blocks in documentation with ``blacken-docs``
+- :construction_worker: Enforce the use of ``black`` and ``isort`` in the CI to enforce style guidelines for developers
 
 ### Changed
 
 - :sparkles: :boom: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the model logging ([#171](https://github.com/Galileo-Galilei/kedro-mlflow/issues/171)). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
-- :memo: Format code blocks in documentation with ``blacken-docs``
-- :construction_worker: Enforce the use of ``black`` and ``isort`` in the CI to enforce style guidelines
+- :wastebasket: `kedro_mlflow.io.metrics.MlflowMetricsDataSet` is no longer deprecated because there is no alternative for now to log many metrics at the same time.
+
+### Fixed
+
+- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuraiton even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
+
+### Removed
+
+- :fire: :boom: ``KedroMlflowConfig`` and `get_mlflow_config` were deprecated since ``0.7.3`` and are now removed from ``kedro_mlflow.framework.context``. Direct import must now use `kedro_mlflow.config`.
 
 ## [0.7.6] - 2021-10-08
 

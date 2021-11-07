@@ -18,6 +18,7 @@ def cleanup_mlflow_after_runs():
     yield
     while mlflow.active_run():
         mlflow.end_run()
+    mlflow.set_experiment("Default")
 
 
 @pytest.fixture(autouse=True)

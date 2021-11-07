@@ -2,9 +2,13 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuraiton even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
+
 ### Changed
 
-- :sparkles: :boom: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the model logging (#171). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
+- :sparkles: :boom: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the model logging ([#171](https://github.com/Galileo-Galilei/kedro-mlflow/issues/171)). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
 - :memo: Format code blocks in documentation with ``blacken-docs``
 - :construction_worker: Enforce the use of ``black`` and ``isort`` in the CI to enforce style guidelines
 
@@ -12,7 +16,7 @@
 
 ### Fixed
 
--   :bug: The reserved keyword "databricks" is no longer converted to a local filepath before setting the `MLFLOW_TRACKING_URI` to enable integration with databricks managed platform. ([#248](https://github.com/Galileo-Galilei/kedro-mlflow/issues/124))
+-   :bug: The reserved keyword "databricks" is no longer converted to a local filepath before setting the `MLFLOW_TRACKING_URI` to enable integration with databricks managed platform. ([#248](https://github.com/Galileo-Galilei/kedro-mlflow/issues/248))
 
 ## [0.7.5] - 2021-09-21
 

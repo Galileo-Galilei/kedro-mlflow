@@ -32,7 +32,7 @@ disable_tracking:
 # switch between different experiments
 experiment:
   name: {{ python_package }}
-  create: True  # if the specified `name` does not exists, should it be created?
+  restore_if_deleted: True  # if the specified `name` belongs to a previously deleted experiment, should we restore it?
 
 
 # RUN-RELATED PARAMETERS -----------------

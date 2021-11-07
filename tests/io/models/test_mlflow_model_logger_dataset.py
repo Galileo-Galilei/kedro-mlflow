@@ -264,7 +264,8 @@ def test_save_and_load_sklearn_flavor_without_run_id(
     )
 
 
-def test_load_without_run_id_nor_active_run():
+def test_load_without_run_id_nor_active_run(tracking_uri):
+
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():

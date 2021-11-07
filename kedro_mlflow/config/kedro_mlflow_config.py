@@ -1,6 +1,7 @@
 import os
 from pathlib import Path, PurePath
 from typing import List, Optional
+from urllib.parse import urlparse
 
 import mlflow
 from kedro.config import MissingConfigException
@@ -22,7 +23,7 @@ class DisableTrackingOptions(BaseModel):
 
 class ExperimentOptions(BaseModel):
     name: str = "Default"
-    create: StrictBool = True
+    restore_if_deleted: StrictBool = True
 
     class Config:
         extra = "forbid"
@@ -97,7 +98,7 @@ class KedroMlflowConfig(BaseModel):
         # if it has already be set in export_credentials
         mlflow.set_tracking_uri(self.mlflow_tracking_uri)
 
-        self._get_or_create_experiment()
+        self._set_experiment()
 
     def _export_credentials(self, session: KedroSession = None):
         session = session or get_current_session()
@@ -107,7 +108,7 @@ class KedroMlflowConfig(BaseModel):
         for key, value in mlflow_creds.items():
             os.environ[key] = value
 
-    def _get_or_create_experiment(self):
+    def _set_experiment(self):
         """Best effort to get the experiment associated
         to the configuration
 
@@ -115,24 +116,30 @@ class KedroMlflowConfig(BaseModel):
             mlflow.entities.Experiment -- [description]
         """
 
-        # retrieve the experiment
-        self._experiment = self._mlflow_client.get_experiment_by_name(
+        # we retrieve the experiment manually to check if it exsits
+        mlflow_experiment = self._mlflow_client.get_experiment_by_name(
             name=self.experiment.name
         )
 
         # Deal with two side case when retrieving the experiment
-        if self.experiment.create:
-            if self._experiment is None:
-                # case 1 : the experiment does not exist, it must be created manually
-                experiment_id = self._mlflow_client.create_experiment(
-                    name=self.experiment.name
-                )
-                self._experiment = self._mlflow_client.get_experiment(
-                    experiment_id=experiment_id
-                )
-            elif self._experiment.lifecycle_stage == "deleted":
-                # case 2: the experiment was created, then deleted : we have to restore it manually
-                self._mlflow_client.restore_experiment(self._experiment.experiment_id)
+        if mlflow_experiment is not None:
+            if (
+                self.experiment.restore_if_deleted
+                and mlflow_experiment.lifecycle_stage == "deleted"
+            ):
+                # the experiment was created, then deleted : we have to restore it manually before setting it as the active one
+                self._mlflow_client.restore_experiment(mlflow_experiment.experiment_id)
+
+        # this creates the experiment if it does not exists
+        # and creates a global variable with the experiment
+        # but returns nothing
+        mlflow.set_experiment(experiment_name=self.experiment.name)
+
+        # we do not use "experiment" variable directly but we fetch again from the database
+        # because if it did not exists at all, it was created by previous command
+        self._experiment = self._mlflow_client.get_experiment_by_name(
+            name=self.experiment.name
+        )
 
     @validator("project_path")
     def _is_kedro_project(cls, folder_path):
@@ -163,8 +170,6 @@ class KedroMlflowConfig(BaseModel):
 
         # if no tracking uri is provided, we register the runs locally at the root of the project
         pathlib_uri = PurePath(uri)
-
-        from urllib.parse import urlparse
 
         if pathlib_uri.is_absolute():
             valid_uri = pathlib_uri.as_uri()

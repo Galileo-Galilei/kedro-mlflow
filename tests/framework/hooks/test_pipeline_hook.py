@@ -22,7 +22,6 @@ from mlflow.tracking import MlflowClient
 from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.pipeline_hook import (
     MlflowPipelineHook,
-    _format_conda_env,
     _generate_kedro_command,
 )
 from kedro_mlflow.io.metrics import (
@@ -178,39 +177,6 @@ def mock_failing_pipelines(mocker):
     )
 
 
-@pytest.mark.parametrize(
-    "conda_env,expected",
-    (
-        [None, pytest.lazy_fixture("env_from_none")],
-        [pytest.lazy_fixture("env_from_dict"), pytest.lazy_fixture("env_from_dict")],
-        [
-            pytest.lazy_fixture("requirements_path"),
-            pytest.lazy_fixture("env_from_requirements"),
-        ],
-        [
-            pytest.lazy_fixture("requirements_path_str"),
-            pytest.lazy_fixture("env_from_requirements"),
-        ],
-        [
-            pytest.lazy_fixture("environment_path"),
-            pytest.lazy_fixture("env_from_environment"),
-        ],
-        [
-            pytest.lazy_fixture("environment_path_str"),
-            pytest.lazy_fixture("env_from_environment"),
-        ],
-    ),
-)
-def test_format_conda_env(conda_env, expected):
-    conda_env = _format_conda_env(conda_env)
-    assert conda_env == expected
-
-
-def test_format_conda_env_error():
-    with pytest.raises(ValueError, match="Invalid conda_env"):
-        _format_conda_env(["invalid_list"])
-
-
 @pytest.fixture
 def dummy_pipeline():
     def preprocess_fun(data):
@@ -299,8 +265,7 @@ def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",
-        conda_env=env_from_dict,
-        model_name="model",
+        log_model_kwargs={"conda_env": env_from_dict, "artifact_path": "model"},
     )
     return dummy_pipeline_ml
 
@@ -374,7 +339,9 @@ def pipeline_ml_with_parameters():
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
-        conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+        log_model_kwargs={
+            "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+        },
     )
     return pipeline_ml_with_parameters
 
@@ -517,9 +484,13 @@ def test_mlflow_pipeline_hook_with_copy_mode(
             training=dummy_pipeline_ml.training,
             inference=dummy_pipeline_ml.inference,
             input_name=dummy_pipeline_ml.input_name,
-            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
-            model_name=dummy_pipeline_ml.model_name,
-            copy_mode=copy_mode,
+            log_model_kwargs={
+                "artifact_path": dummy_pipeline_ml.log_model_kwargs["artifact_path"],
+                "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+            },
+            kpm_kwargs={
+                "copy_mode": copy_mode,
+            },
         )
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
@@ -736,9 +707,11 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
             training=dummy_pipeline.only_nodes_with_tags("training"),
             inference=dummy_pipeline.only_nodes_with_tags("inference"),
             input_name="raw_data",
-            conda_env=env_from_dict,
-            model_name="model",
-            model_signature=model_signature,
+            log_model_kwargs={
+                "conda_env": env_from_dict,
+                "artifact_path": "model",
+                "signature": model_signature,
+            },
         )
 
         pipeline_hook.after_catalog_created(

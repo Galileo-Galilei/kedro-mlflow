@@ -11,33 +11,33 @@ If you don't want to read the entire explanations, here is a summary:
     # hooks.py
     from kedro_mlflow_tutorial.pipelines.ml_app.pipeline import create_ml_pipeline
 
-    ...
+    do_something()
+
 
     class ProjectHooks:
         @hook_impl
         def register_pipelines(self) -> Dict[str, Pipeline]:
 
-            ...
+            do_something()
 
             ml_pipeline = create_ml_pipeline()
             training_pipeline_ml = pipeline_ml_factory(
                 training=ml_pipeline.only_nodes_with_tags("training"),
                 inference=ml_pipeline.only_nodes_with_tags("inference"),
                 input_name="instances",
-                model_name="kedro_mlflow_tutorial",
-                conda_env={
-                    "python": 3.7,
-                    "dependencies": [f"kedro_mlflow_tutorial=={PROJECT_VERSION}"],
-                },
-                model_signature="auto",
+                log_model_kwargs=dict(
+                    artifact_path="kedro_mlflow_tutorial",
+                    conda_env={
+                        "python": 3.7,
+                        "dependencies": [f"kedro_mlflow_tutorial=={PROJECT_VERSION}"],
+                    },
+                    signature="auto",
+                ),
             )
 
-            ...
+            do_something()
 
-            return {
-                "training": training_pipeline_ml,
-                ...
-            }
+            return {"training": training_pipeline_ml}
     ```
 
 3. Persist your artifacts locally in the ``catalog.yml``

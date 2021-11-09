@@ -13,17 +13,21 @@ Example within kedro template:
 
 from PYTHON_PACKAGE.pipelines import data_science as ds
 
+
 def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
     data_science_pipeline = ds.create_pipeline()
-    training_pipeline = pipeline_ml_factory(training=data_science_pipeline.only_nodes_with_tags("training"), # or whatever your logic is for filtering
-                                            inference=data_science_pipeline.only_nodes_with_tags("inference"))
+    training_pipeline = pipeline_ml_factory(
+        training=data_science_pipeline.only_nodes_with_tags(
+            "training"
+        ),  # or whatever your logic is for filtering
+        inference=data_science_pipeline.only_nodes_with_tags("inference"),
+    )
 
     return {
         "ds": data_science_pipeline,
         "training": training_pipeline,
         "__default__": data_engineering_pipeline + data_science_pipeline,
     }
-
 ```
 
 Now each time you will run ``kedro run --pipeline=training`` (provided you registered ``MlflowPipelineHook`` in you ``run.py``), the full inference pipeline will be registered as a mlflow model (with all the outputs produced by training as artifacts : the machine learning model, but also the *scaler*, *vectorizer*, *imputer*, or whatever object fitted on data you create in ``training`` and that is used in ``inference``).
@@ -55,24 +59,17 @@ model_signature = infer_signature(model_input=input_data)
 
 mlflow.pyfunc.log_model(
     artifact_path="model",
-    python_model=KedroPipelineModel(
-            pipeline=pipeline_training,
-            catalog=catalog
-        ),
+    python_model=KedroPipelineModel(pipeline=pipeline_training, catalog=catalog),
     artifacts=artifacts,
-    conda_env={"python": "3.7.0", , "dependencies": ["kedro==0.16.5"]},
-    model_signature=model_signature
+    conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+    signature=model_signature,
 )
 ```
 
 It is also possible to pass arguments to `KedroPipelineModel` to specify the runner or the copy_mode of MemoryDataSet for the inference Pipeline. This may be faster especially for  compiled model (e.g keras, tensorflow), and more suitable for an API serving pattern.
 
 ```python
-KedroPipelineModel(
-            pipeline=pipeline_training,
-            catalog=catalog,
-            copy_mode="assign"
-        )
+KedroPipelineModel(pipeline=pipeline_training, catalog=catalog, copy_mode="assign")
 ```
 
 Available `copy_mode` are "assign", "copy" and "deepcopy". It is possible to pass a dictionary to specify different copy mode fo each dataset.

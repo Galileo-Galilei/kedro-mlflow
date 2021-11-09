@@ -14,7 +14,7 @@ my_dataset_to_version:
 
 or with additional parameters:
 
-```python
+```yaml
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
     data_set:
@@ -34,9 +34,11 @@ or with the python API:
 ```python
 from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
-csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet,
-                                      "filepath": r"/path/to/a/local/destination/file.csv"})
-csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
+
+csv_dataset = MlflowArtifactDataSet(
+    data_set={"type": CSVDataSet, "filepath": r"/path/to/a/local/destination/file.csv"}
+)
+csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```
 
 ## Metrics `DataSets`
@@ -69,29 +71,33 @@ You can either only specify the flavor:
 from kedro_mlflow.io.models import MlflowModelLoggerDataSet
 from sklearn.linear_model import LinearRegression
 
-mlflow_model_logger=MlflowModelLoggerDataSet(flavor="mlflow.sklearn")
+mlflow_model_logger = MlflowModelLoggerDataSet(flavor="mlflow.sklearn")
 mlflow_model_logger.save(LinearRegression())
 ```
 
 Let assume that this first model has been saved once, and you xant to retrieve it (for prediction for instance):
 
 ```python
-mlflow_model_logger=MlflowModelLoggerDataSet(flavor="mlflow.sklearn", run_id=<the-model-run-id>)
-my_linear_regression=mlflow_model_logger.load()
-my_linear_regression.predict(<data>) # will obviously fail if you have not fitted your model object first :)
+mlflow_model_logger = MlflowModelLoggerDataSet(
+    flavor="mlflow.sklearn", run_id="<the-model-run-id>"
+)
+my_linear_regression = mlflow_model_logger.load()
+my_linear_regression.predict(
+    data
+)  # will obviously fail if you have not fitted your model object first :)
 ```
 
 You can also specify some [logging parameters](https://www.mlflow.org/docs/latest/python_api/mlflow.sklearn.html#mlflow.sklearn.log_model):
 
 ```python
-mlflow_model_logger=MlflowModelLoggerDataSet(
+mlflow_model_logger = MlflowModelLoggerDataSet(
     flavor="mlflow.sklearn",
-     run_id=<the-model-run-id>,
-     save_args={
-         "conda_env": {"python": "3.7.0", , "dependencies": ["kedro==0.16.5"]},
-          "input_example": data.iloc[0:5,:]
-          }
-    )
+    run_id="<the-model-run-id>",
+    save_args={
+        "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+        "input_example": data.iloc[0:5, :],
+    },
+)
 mlflow_model_logger.save(LinearRegression().fit(data))
 ```
 
@@ -126,18 +132,21 @@ The use is very similar to MlflowModelLoggerDataSet, but that you specify a file
 from kedro_mlflow.io.models import MlflowModelLoggerDataSet
 from sklearn.linear_model import LinearRegression
 
-mlflow_model_logger=MlflowModelSaverDataSet(flavor="mlflow.sklearn", filepath="path/to/where/you/want/model")
+mlflow_model_logger = MlflowModelSaverDataSet(
+    flavor="mlflow.sklearn", filepath="path/to/where/you/want/model"
+)
 mlflow_model_logger.save(LinearRegression().fit(data))
 ```
 
 The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataSet`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataSet.html)
 
 ```python
-mlflow_model_logger=MlflowModelSaverDataSet(
+mlflow_model_logger = MlflowModelSaverDataSet(
     flavor="mlflow.sklearn",
     filepath="path/to/where/you/want/model",
-    version="<valid-kedro-version>")
-my_model= mlflow_model_logger.load()
+    version="<valid-kedro-version>",
+)
+my_model = mlflow_model_logger.load()
 ```
 
 and with the YAML API in the `catalog.yml`:

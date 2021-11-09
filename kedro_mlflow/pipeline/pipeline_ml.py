@@ -1,9 +1,7 @@
-from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Optional, Union
+from typing import Callable, Dict, Iterable, Optional, Union
 
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
-from mlflow.models import ModelSignature
 
 MSG_NOT_IMPLEMENTED = (
     "This method is not implemented because it does"
@@ -33,6 +31,9 @@ class PipelineML(Pipeline):
 
     """
 
+    KPM_KWARGS_DEFAULT = {}
+    LOG_MODEL_KWARGS_DEFAULT = {"signature": "auto", "artifact_path": "model"}
+
     def __init__(
         self,
         nodes: Iterable[Union[Node, Pipeline]],
@@ -40,10 +41,8 @@ class PipelineML(Pipeline):
         tags: Optional[Union[str, Iterable[str]]] = None,
         inference: Pipeline,
         input_name: str,
-        conda_env: Optional[Union[str, Path, Dict[str, Any]]] = None,
-        model_name: Optional[str] = "model",
-        model_signature: Union[ModelSignature, str, None] = "auto",
-        **kwargs,
+        kpm_kwargs: Optional[Dict[str, str]] = None,
+        log_model_kwargs: Optional[Dict[str, str]] = None,
     ):
 
         """Store all necessary information for calling mlflow.log_model in the pipeline.
@@ -61,47 +60,36 @@ class PipelineML(Pipeline):
             input_name (str, optional): The name of the dataset in
                 the catalog.yml which the model's user must provide
                 for prediction (i.e. the data). Defaults to None.
-            conda_env (Union[str, Path, Dict[str, Any]], optional):
-                The minimal conda environment necessary for the
-                inference `Pipeline`. It can be either :
-                    - a path to a "requirements.txt": In this case
-                        the packages are parsed and a conda env with
-                        your current python_version and these
-                        dependencies is returned.
-                    - a path to an "environment.yml" : the file is
-                        uploaded "as is".
-                    - a Dict : used as the environment
-                    - None: a base conda environment with your
-                        current python version and your project
-                        version at training time.
-                Defaults to None.
-            model_name (Union[str, None], optional): The name of
-                the folder where the model will be stored in
-                remote mlflow. Defaults to "model".
-            model_signature (Union[ModelSignature, bool]): The mlflow
-             signature of the input dataframe common to training
-             and inference.
-                   - If 'auto', it is infered automatically
-                   - If None, no signature is used
-                   - if a `ModelSignature` instance, passed
-                   to the underlying dataframe
-            kwargs:
+            kpm_kwargs:
                 extra arguments to be passed to `KedroPipelineModel`
                 when the PipelineML object is automatically saved at the end of a run.
                 This includes:
                     - `copy_mode`: the copy_mode to be used for underlying dataset
                     when loaded in memory
                     - `runner`: the kedro runner to run the model with
+            log_model_kwargs:
+                extra arguments to be passed to `mlflow.pyfunc.log_model`
+                - "signature" accepts an extra "auto" which automatically infer the signature
+                based on "input_name" dataset
+
         """
 
         super().__init__(nodes, *args, tags=tags)
 
         self.inference = inference
-        self.conda_env = conda_env
-        self.model_name = model_name
         self.input_name = input_name
-        self.model_signature = model_signature
-        self.kwargs = kwargs  # its purpose is to be eventually reused when saving the model within a hook
+        # they will be passed to KedroPipelineModel to enable flexibility
+
+        kpm_kwargs_with_default = self.KPM_KWARGS_DEFAULT.copy()
+        kpm_kwargs = kpm_kwargs or {}
+        kpm_kwargs_with_default.update(kpm_kwargs)
+        self.kpm_kwargs = kpm_kwargs_with_default
+
+        log_model_kwargs_with_default = self.LOG_MODEL_KWARGS_DEFAULT.copy()
+        log_model_kwargs = log_model_kwargs or {}
+        log_model_kwargs_with_default.update(log_model_kwargs)
+        self.log_model_kwargs = log_model_kwargs_with_default
+
         self._check_consistency()
 
     @property
@@ -133,20 +121,6 @@ class PipelineML(Pipeline):
                 )
             )
         self._input_name = name
-
-    @property
-    def model_signature(self) -> str:
-        return self._model_signature
-
-    @model_signature.setter
-    def model_signature(self, model_signature: ModelSignature) -> None:
-        if model_signature is not None:
-            if not isinstance(model_signature, ModelSignature):
-                if model_signature != "auto":
-                    raise ValueError(
-                        f"model_signature must be one of 'None', 'auto', or a 'ModelSignature' Object, got '{type(model_signature)}'"
-                    )
-        self._model_signature = model_signature
 
     def _check_inference(self, inference: Pipeline) -> None:
         nb_outputs = len(inference.outputs())

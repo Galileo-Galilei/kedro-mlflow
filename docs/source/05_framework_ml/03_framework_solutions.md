@@ -21,6 +21,7 @@ The use of ``pipeline_ml_factory`` is very straightforward, especially if you ha
 # hooks.py
 from kedro_mlflow_tutorial.pipelines.ml_app.pipeline import create_ml_pipeline
 
+
 class ProjectHooks:
     @hook_impl
     def register_pipelines(self) -> Dict[str, Pipeline]:
@@ -31,13 +32,10 @@ class ProjectHooks:
         training_pipeline_ml = pipeline_ml_factory(
             training=ml_pipeline.only_nodes_with_tags("training"),
             inference=ml_pipeline.only_nodes_with_tags("inference"),
-            input_name="instances"
+            input_name="instances",
         )
 
-        return {
-            "__default__": training_pipeline_ml
-        }
-
+        return {"__default__": training_pipeline_ml}
 ```
 
 > So, what? We have created a link between our two pipelines, but the gain is not obvious at first glance. The 2 following sections demonstrates that such a construction enables to package and serve automatically the inference pipeline when executing the training one.
@@ -66,17 +64,14 @@ artifacts = pipeline_training.extract_pipeline_artifacts(catalog)
 input_data = catalog.load(pipeline_training.input_name)
 model_signature = infer_signature(model_input=input_data)
 
-kedro_model = KedroPipelineModel(
-    pipeline=pipeline_training,
-    catalog=catalog
-)
+kedro_model = KedroPipelineModel(pipeline=pipeline_training, catalog=catalog)
 
 mlflow.pyfunc.log_model(
     artifact_path="model",
     python_model=kedro_model,
     artifacts=artifacts,
     conda_env={"python": "3.7.0", dependencies: ["kedro==0.16.5"]},
-    model_signature=model_signature
+    signature=model_signature,
 )
 ```
 

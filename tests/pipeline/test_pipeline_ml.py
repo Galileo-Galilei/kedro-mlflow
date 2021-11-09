@@ -472,24 +472,3 @@ def test_not_enough_inference_outputs():
             ),
             input_name="data",
         )
-
-
-def test_wrong_pipeline_ml_signature_type(pipeline_with_tag):
-    with pytest.raises(
-        ValueError,
-        match="model_signature must be one of 'None', 'auto', or a 'ModelSignature'",
-    ):
-        pipeline_ml_factory(
-            training=pipeline_with_tag,
-            inference=Pipeline(
-                [
-                    node(
-                        func=predict_fun,
-                        inputs=["model", "data"],
-                        outputs="predictions",
-                    )
-                ]
-            ),
-            input_name="data",
-            model_signature="wrong_type",
-        )

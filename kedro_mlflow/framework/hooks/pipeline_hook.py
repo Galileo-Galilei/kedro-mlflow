@@ -1,11 +1,9 @@
 import logging
-import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Union
+from typing import Any, Dict
 
 import mlflow
-import yaml
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -23,7 +21,6 @@ from kedro_mlflow.io.metrics import (
 )
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
-from kedro_mlflow.utils import _parse_requirements
 
 
 class MlflowPipelineHook:
@@ -179,29 +176,29 @@ class MlflowPipelineHook:
             if isinstance(pipeline, PipelineML):
                 with TemporaryDirectory() as tmp_dir:
                     # This will be removed at the end of the context manager,
-                    # but we need to log in mlflow beforeremoving the folder
+                    # but we need to log in mlflow before moving the folder
                     kedro_pipeline_model = KedroPipelineModel(
                         pipeline=pipeline.inference,
                         catalog=catalog,
                         input_name=pipeline.input_name,
-                        **pipeline.kwargs,
+                        **pipeline.kpm_kwargs,
                     )
                     artifacts = kedro_pipeline_model.extract_pipeline_artifacts(
                         parameters_saving_folder=Path(tmp_dir)
                     )
 
-                    if pipeline.model_signature == "auto":
-                        input_data = catalog.load(pipeline.input_name)
-                        model_signature = infer_signature(model_input=input_data)
-                    else:
-                        model_signature = pipeline.model_signature
+                    log_model_kwargs = pipeline.log_model_kwargs.copy()
+                    model_signature = log_model_kwargs.pop("signature", None)
+                    if isinstance(model_signature, str):
+                        if model_signature == "auto":
+                            input_data = catalog.load(pipeline.input_name)
+                            model_signature = infer_signature(model_input=input_data)
 
                     mlflow.pyfunc.log_model(
-                        artifact_path=pipeline.model_name,
                         python_model=kedro_pipeline_model,
                         artifacts=artifacts,
-                        conda_env=_format_conda_env(pipeline.conda_env),
                         signature=model_signature,
+                        **log_model_kwargs,
                     )
             # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
             mlflow.end_run()
@@ -278,59 +275,3 @@ def _generate_kedro_command(
 
     kedro_cmd = " ".join(cmd_list)
     return kedro_cmd
-
-
-def _format_conda_env(
-    conda_env: Union[str, Path, Dict[str, Any]] = None
-) -> Dict[str, Any]:
-    """Best effort to get dependecies of the project.
-
-    Keyword Arguments:
-        conda_env {Union[str, Path, Dict[str, Any]]} -- It can be either :
-            - a path to a "requirements.txt": In this case
-            the packages are parsed and a conda env with
-            your current python_version and these dependencies is returned
-            - a path to an "environment.yml" : data is loaded and used as they are
-            - a Dict : used as the environment
-            - None: a base conda environment with your current python version and your project version at training time.
-            Defaults to None.
-
-    Returns:
-        Dict[str, Any] -- A dictionary which contains all informations to dump it to a conda environment.yml file.
-    """
-    python_version = ".".join(
-        [
-            str(sys.version_info.major),
-            str(sys.version_info.minor),
-            str(sys.version_info.micro),
-        ]
-    )
-    if isinstance(conda_env, str):
-        conda_env = Path(conda_env)
-
-    if isinstance(conda_env, Path):
-        if conda_env.suffix in (".yml", ".yaml"):
-            with open(conda_env, mode="r") as file_handler:
-                conda_env = yaml.safe_load(file_handler)
-        elif conda_env.suffix in (".txt"):
-            conda_env = {
-                "python": python_version,
-                "dependencies": _parse_requirements(conda_env),
-            }
-    elif conda_env is None:
-        conda_env = {"python": python_version}
-    elif isinstance(conda_env, dict):
-        return conda_env
-    else:
-        raise ValueError(
-            """Invalid conda_env. It can be either :
-            - a Dict : used as the environment without control
-            - None (default: {None}) : Only the python vresion will be stored.
-            - a path to a "requirements.txt": In this case
-            the packages are parsed and a conda env with
-            your current python_version and these dependencies is returned
-            - a path to an "environment.yml" : data is loaded and used as they are
-            """
-        )
-
-    return conda_env

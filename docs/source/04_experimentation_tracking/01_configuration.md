@@ -26,7 +26,8 @@ The ``mlflow.yml`` file contains all configuration you can pass either to kedro 
 Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically.
 
 ```yaml
-mlflow_tracking_uri: mlruns
+server:
+  mlflow_tracking_uri: mlruns
 ```
 
 This is the **only mandatory key in the `mlflow.yml` file**, but there are many others described hereafter that provide fine-grained control on your mlflow setup.
@@ -44,7 +45,8 @@ my_mlflow_credentials:
 and your can supply the credentials key of the `mlflow.yml`:
 
 ```yaml
-credentials: my_mlflow_credentials
+server:
+  credentials: my_mlflow_credentials
 ```
 
 For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They will be exported as environment variables *on the fly* when running the pipeline.
@@ -56,21 +58,23 @@ For safety reasons, the credentials will not be accessible within `KedroMlflowCo
 You can specify the name of the pipelines you want to turn off:
 
 ```yaml
-disable_tracking:
-  pipelines:
-    - <pipeline-name>
+tracking:
+  disable_tracking:
+    pipelines:
+      - <pipeline-name>
 ```
 
 Notice that it will stop autologging parameters but also any `Mlflow<Artifact/Metrics/ModelLogger>Dataset` you may have in these deactivated pipelines.
 
 ### Configure mlflow experiment
 
-Mlflow enable the user to create "experiments" to organize his work. The different experiments will be visible on the left panel of the mlflow user interface. You can create an experiment through the `mlflow.yml` file witht the `experiment` key:
+Mlflow enable the user to create "experiments" to organize his work. The different experiments will be visible on the left panel of the mlflow user interface. You can create an experiment through the `mlflow.yml` file with the `experiment` key:
 
 ```yaml
-experiment:
-  name: <your-experiment-name>  # by default, the name of your python package in your kedro project
-  create: True  # if the specified `name` does not exists, should it be created?
+tracking:
+  experiment:
+    name: <your-experiment-name>  # by default, the name of your python package in your kedro project
+    restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
 ```
 
 Note that by default, mlflow crashes if you try to start a run while you have not created the experiment first. `kedro-mlflow` has a `create` key (`True` by default) which forces the creation of the experiment if it does not exist. Set it to `False` to match mlflow default value.
@@ -82,31 +86,33 @@ When you launch a new `kedro` run, `kedro-mlflow` instantiates an underlying `ml
 The `mlflow.yml` accepts the following keys:
 
 ```yaml
-run:
-  id: null # if `id` is None, a new run will be created
-  name: null # if `name` is None, pipeline name will be used for the run name
-  nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
+tracking:
+  run:
+    id: null # if `id` is None, a new run will be created
+    name: null # if `name` is None, pipeline name will be used for the run name
+    nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
 ```
 
 - If you want to continue to log in an existing mlflow run, write its id in the `id` key.
 - If you want to enable the creation of sub runs inside your nodes (for instance, for model comparison or hyperparameter tuning), set the `nested` key to `True`
 
-### Configure the hooks
+### Extra tracking configuration
 
 You may sometimes encounter an mlflow failure "parameters too long". Mlflow has indeed an upper limit on the length of the parameters you can store in it. This is a very common pattern when you log a full dictionary in mlflow (e.g. the reserved keyword `parameters` in kedro, or a dictionnary conaining all the hyperparameters you want to tune for a given model). You can configure the `kedro-mlflow` hooks to overcome this limitation by "flattening" automatically dictionaries in a kedro run.
 
 The `mlflow.yml` accepts the following keys:
 
 ```yaml
-hooks:
-  node:
-    flatten_dict_params: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
-    recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
-    sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}}will be logged as hyperaparam1.p1 and hyperaparam1.p2 oin mlflow.
-    long_parameters_strategy: fail  # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should ``kedro-mlflow`` do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
+tracking:
+  params:
+    dict_params:
+      flatten: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
+      recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
+      sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}} will be logged as hyperaparam1.p1 and hyperaparam1.p2 in mlflow.
+    long_params_strategy: fail # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should kedro-mlflow do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
 ```
 
-If you set `flatten_dict_params` to `True`, each key of the dictionary will be logged as a mlflow parameters, instead of a single parameter for the whole dictionary. Note that it is recommended to facilitate run comparison.
+If you set `flatten` to `True`, each key of the dictionary will be logged as a mlflow parameters, instead of a single parameter for the whole dictionary. Note that it is recommended to facilitate run comparison.
 
 The `long_parameters_strategy` key enable to define different way to handle parameters over the mlflow limit (currently 250 characters):
 

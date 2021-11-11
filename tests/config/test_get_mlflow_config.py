@@ -17,44 +17,33 @@ def _write_yaml(filepath, config):
 # and the first import wins
 
 
-def test_get_mlflow_config(kedro_project):
+def test_get_mlflow_config_default(kedro_project):
     # kedro_project is a pytest.fixture in conftest
-
-    _write_yaml(
-        kedro_project / "conf" / "local" / "mlflow.yml",
-        dict(
+    dict_config = dict(
+        server=dict(
             mlflow_tracking_uri="mlruns",
+            stores_environment_variables={},
             credentials=None,
+        ),
+        tracking=dict(
             disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
             experiment=dict(name="fake_package", restore_if_deleted=True),
             run=dict(id="123456789", name="my_run", nested=True),
-            ui=dict(port="5151", host="localhost"),
-            hooks=dict(
-                node=dict(
-                    flatten_dict_params=True,
+            params=dict(
+                dict_params=dict(
+                    flatten=True,
                     recursive=False,
                     sep="-",
-                    long_parameters_strategy="truncate",
-                )
+                ),
+                long_params_strategy="truncate",
             ),
         ),
+        ui=dict(port="5151", host="localhost"),
     )
-    expected = {
-        "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
-        "credentials": None,
-        "disable_tracking": {"pipelines": ["my_disabled_pipeline"]},
-        "experiment": {"name": "fake_package", "restore_if_deleted": True},
-        "run": {"id": "123456789", "name": "my_run", "nested": True},
-        "ui": {"port": "5151", "host": "localhost"},
-        "hooks": {
-            "node": {
-                "flatten_dict_params": True,
-                "recursive": False,
-                "sep": "-",
-                "long_parameters_strategy": "truncate",
-            }
-        },
-    }
+
+    _write_yaml(kedro_project / "conf" / "local" / "mlflow.yml", dict_config)
+    expected = dict_config.copy()
+    expected["server"]["mlflow_tracking_uri"] = (kedro_project / "mlruns").as_uri()
 
     bootstrap_project(kedro_project)
     with KedroSession.create(project_path=kedro_project):
@@ -79,48 +68,39 @@ def test_get_mlflow_config_in_uninitialized_project(kedro_project):
 def test_mlflow_config_with_templated_config_loader(
     kedro_project_with_tcl,
 ):
-
-    _write_yaml(
-        kedro_project_with_tcl / "conf" / "local" / "mlflow.yml",
-        dict(
+    dict_config = dict(
+        server=dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
+            stores_environment_variables={},
             credentials=None,
+        ),
+        tracking=dict(
             disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
             experiment=dict(name="fake_package", restore_if_deleted=True),
             run=dict(id="123456789", name="my_run", nested=True),
-            ui=dict(port="5151", host="localhost"),
-            hooks=dict(
-                node=dict(
-                    flatten_dict_params=True,
+            params=dict(
+                dict_params=dict(
+                    flatten=True,
                     recursive=False,
                     sep="-",
-                    long_parameters_strategy="truncate",
-                )
+                ),
+                long_params_strategy="truncate",
             ),
         ),
+        ui=dict(port="5151", host="localhost"),
     )
+
+    _write_yaml(kedro_project_with_tcl / "conf" / "local" / "mlflow.yml", dict_config)
 
     _write_yaml(
         kedro_project_with_tcl / "conf" / "local" / "globals.yml",
         dict(mlflow_tracking_uri="dynamic_mlruns"),
     )
 
-    expected = {
-        "mlflow_tracking_uri": (kedro_project_with_tcl / "dynamic_mlruns").as_uri(),
-        "credentials": None,
-        "disable_tracking": {"pipelines": ["my_disabled_pipeline"]},
-        "experiment": {"name": "fake_package", "restore_if_deleted": True},
-        "run": {"id": "123456789", "name": "my_run", "nested": True},
-        "ui": {"port": "5151", "host": "localhost"},
-        "hooks": {
-            "node": {
-                "flatten_dict_params": True,
-                "recursive": False,
-                "sep": "-",
-                "long_parameters_strategy": "truncate",
-            }
-        },
-    }
+    expected = dict_config.copy()
+    expected["server"]["mlflow_tracking_uri"] = (
+        kedro_project_with_tcl / "dynamic_mlruns"
+    ).as_uri()
     bootstrap_project(kedro_project_with_tcl)
     with KedroSession.create(project_path=kedro_project_with_tcl):
         assert get_mlflow_config().dict(exclude={"project_path"}) == expected

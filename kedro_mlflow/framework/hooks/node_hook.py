@@ -55,11 +55,11 @@ class MlflowNodeHook:
         if self._is_mlflow_enabled:
             mlflow_config = get_mlflow_config()
 
-            self.flatten = mlflow_config.hooks.node.flatten_dict_params
-            self.recursive = mlflow_config.hooks.node.recursive
-            self.sep = mlflow_config.hooks.node.sep
-            self.long_parameters_strategy = (
-                mlflow_config.hooks.node.long_parameters_strategy
+            self.flatten = mlflow_config.tracking.params.dict_params.flatten
+            self.recursive = mlflow_config.tracking.params.dict_params.recursive
+            self.sep = mlflow_config.tracking.params.dict_params.sep
+            self.long_params_strategy = (
+                mlflow_config.tracking.params.long_params_strategy
             )
 
     @hook_impl
@@ -107,19 +107,19 @@ class MlflowNodeHook:
         if str_value_length <= MAX_PARAM_VAL_LENGTH:
             return mlflow.log_param(name, value)
         else:
-            if self.long_parameters_strategy == "fail":
+            if self.long_params_strategy == "fail":
                 raise ValueError(
                     f"Parameter '{name}' length is {str_value_length}, "
                     f"while mlflow forces it to be lower than '{MAX_PARAM_VAL_LENGTH}'. "
-                    "If you want to bypass it, try to change 'long_parameters_strategy' to"
+                    "If you want to bypass it, try to change 'long_params_strategy' to"
                     " 'tag' or 'truncate' in the 'mlflow.yml'configuration file."
                 )
-            elif self.long_parameters_strategy == "tag":
+            elif self.long_params_strategy == "tag":
                 self._logger.warning(
                     f"Parameter '{name}' (value length {str_value_length}) is set as a tag."
                 )
                 mlflow.set_tag(name, value)
-            elif self.long_parameters_strategy == "truncate":
+            elif self.long_params_strategy == "truncate":
                 self._logger.warning(
                     f"Parameter '{name}' (value length {str_value_length}) is truncated to its {MAX_PARAM_VAL_LENGTH} first characters."
                 )

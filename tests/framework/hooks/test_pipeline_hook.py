@@ -413,7 +413,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         )
         # test : parameters should have been logged
         mlflow_conf = get_mlflow_config()
-        mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
+        mlflow_client = MlflowClient(mlflow_conf.server.mlflow_tracking_uri)
         run_data = mlflow_client.get_run(run_id).data
 
         # all run_params are recorded as tags
@@ -522,7 +522,7 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
 
         mlflow_conf = get_mlflow_config()
-        mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
+        mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
 
         with mlflow.start_run():
             existing_run_id = mlflow.active_run().info.run_id
@@ -579,7 +579,7 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
             catalog=dummy_catalog_with_run_id,
         )
 
-        mlflow_client = MlflowClient(mlflow_conf.mlflow_tracking_uri)
+        mlflow_client = MlflowClient(mlflow_conf.server.mlflow_tracking_uri)
         # the first run is created in Default (id 0),
         # but the one initialised in before_pipeline_run
         # is create  in kedro_project experiment (id 1)
@@ -621,7 +621,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
 
         mlflow_conf = get_mlflow_config()
-        mlflow.set_tracking_uri(mlflow_conf.mlflow_tracking_uri)
+        mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
 
         catalog_with_parameters = DataCatalog(
             {
@@ -795,7 +795,7 @@ def test_on_pipeline_error(
 
         # the run we want is the last one in the configuration experiment
         mlflow_client = MlflowClient(tracking_uri)
-        experiment = mlflow_client.get_experiment_by_name(kmc.experiment.name)
+        experiment = mlflow_client.get_experiment_by_name(kmc.tracking.experiment.name)
         failing_run_info = MlflowClient(tracking_uri).list_run_infos(
             experiment.experiment_id
         )[0]

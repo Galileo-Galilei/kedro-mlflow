@@ -159,7 +159,7 @@ def ui(env, port, host):
                 "mlflow",
                 "ui",
                 "--backend-store-uri",
-                mlflow_conf.mlflow_tracking_uri,
+                mlflow_conf.server.mlflow_tracking_uri,
                 "--host",
                 host,
                 "--port",

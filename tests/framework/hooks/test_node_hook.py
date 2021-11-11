@@ -86,9 +86,11 @@ def test_pipeline_run_hook_getting_configs(
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
-            hooks=dict(node=dict(flatten_dict_params=True, recursive=False, sep="-")),
+            tracking=dict(
+                params=dict(dict_params=dict(flatten=True, recursive=False, sep="-")),
+            ),
         ),
-    ),
+    )
 
     bootstrap_project(kedro_project)
     with KedroSession.create(
@@ -107,7 +109,7 @@ def test_pipeline_run_hook_getting_configs(
 
 
 @pytest.mark.parametrize(
-    "flatten_dict_params,expected",
+    "flatten,expected",
     [
         (True, {"param1": "1", "parameters-param1": "1", "parameters-param2": "2"}),
         (False, {"param1": "1", "parameters": "{'param1': 1, 'param2': 2}"}),
@@ -119,7 +121,7 @@ def test_node_hook_logging(
     dummy_catalog,
     dummy_pipeline,
     dummy_node,
-    flatten_dict_params,
+    flatten,
     expected,
 ):
 
@@ -136,13 +138,11 @@ def test_node_hook_logging(
     _write_yaml(
         kedro_project / "conf" / "base" / "mlflow.yml",
         dict(
-            hooks=dict(
-                node=dict(
-                    flatten_dict_params=flatten_dict_params, recursive=False, sep="-"
-                )
-            ),
+            tracking=dict(
+                params=dict(dict_params=dict(flatten=flatten, recursive=False, sep="-"))
+            )
         ),
-    ),
+    )
 
     mlflow_node_hook = MlflowNodeHook()
 
@@ -188,7 +188,7 @@ def test_node_hook_logging_below_limit_all_strategy(
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
-            hooks=dict(node=dict(long_parameters_strategy=strategy)),
+            tracking=dict(params=dict(long_params_strategy=strategy)),
         ),
     )
 
@@ -235,7 +235,7 @@ def test_node_hook_logging_above_limit_truncate_strategy(
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
-            hooks=dict(node=dict(long_parameters_strategy="truncate")),
+            tracking=dict(params=dict(long_params_strategy="truncate")),
         ),
     )
 
@@ -284,7 +284,9 @@ def test_node_hook_logging_above_limit_fail_strategy(
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
-            hooks=dict(node=dict(long_parameters_strategy="fail")),
+            tracking=dict(
+                params=dict(long_params_strategy="fail"),
+            ),
         ),
     )
 
@@ -337,7 +339,7 @@ def test_node_hook_logging_above_limit_tag_strategy(
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
-            hooks=dict(node=dict(long_parameters_strategy="tag")),
+            tracking=dict(params=dict(long_params_strategy="tag")),
         ),
     )
 

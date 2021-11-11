@@ -81,7 +81,7 @@ def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
     ) as session:
         context = session.load_context()
         # emulate first call by writing a mlflow.yml file
-        yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
+        yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
             kedro_project_with_mlflow_conf / context.CONF_ROOT / "local" / "mlflow.yml"
         ).write_text(yaml_str)
@@ -92,7 +92,7 @@ def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
         assert "A 'mlflow.yml' already exists" in result.output
 
         # check the file remains unmodified
-        assert get_mlflow_config().mlflow_tracking_uri.endswith("toto")
+        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("toto")
 
 
 def test_cli_init_existing_config_force_option(monkeypatch, kedro_project):
@@ -116,7 +116,7 @@ def test_cli_init_existing_config_force_option(monkeypatch, kedro_project):
         assert "successfully updated" in result.output
 
         # check the file remains unmodified
-        assert get_mlflow_config().mlflow_tracking_uri.endswith("mlruns")
+        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("mlruns")
 
 
 @pytest.mark.parametrize(

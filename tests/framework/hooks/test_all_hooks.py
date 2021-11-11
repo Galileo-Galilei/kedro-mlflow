@@ -105,10 +105,10 @@ def catalog_config(kedro_project_path):
 @pytest.fixture
 def mlflow_config_wo_tracking():
     # this is the default configuration except that oine pipeline is deactivated
-    return {
+    return dict(
         # "mlflow_tracking_uri": "mlruns",
         # "credentials": None,
-        "disable_tracking": {"pipelines": ["pipeline_off"]},
+        tracking=dict(disable_tracking=dict(pipelines=["pipeline_off"]))
         # "experiments": MOCK_PACKAGE_NAME,
         # "run": {"id": None, "name": None, "nested": True},
         # "ui": {"port": None, "host": None},
@@ -118,7 +118,7 @@ def mlflow_config_wo_tracking():
         #     "sep": ".",
         #     "long_parameters_strategy": "fail",
         # },
-    }
+    )
 
 
 @pytest.fixture(autouse=True)

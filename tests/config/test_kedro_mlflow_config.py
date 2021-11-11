@@ -8,13 +8,8 @@ from kedro.framework.startup import bootstrap_project
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.config.kedro_mlflow_config import (
-    DisableTrackingOptions,
-    ExperimentOptions,
-    HookOptions,
     KedroMlflowConfig,
     KedroMlflowConfigError,
-    RunOptions,
-    UiOptions,
 )
 
 
@@ -31,13 +26,25 @@ def test_kedro_mlflow_config_init(kedro_project_with_mlflow_conf):
 
     config = KedroMlflowConfig(project_path=kedro_project_with_mlflow_conf)
     assert config.dict(exclude={"project_path"}) == dict(
-        mlflow_tracking_uri=(kedro_project_with_mlflow_conf / "mlruns").as_uri(),
-        credentials=None,
-        disable_tracking=DisableTrackingOptions().dict(),
-        experiment=ExperimentOptions().dict(),
-        run=RunOptions().dict(),
-        ui=UiOptions().dict(),
-        hooks=HookOptions().dict(),
+        server=dict(
+            mlflow_tracking_uri=(kedro_project_with_mlflow_conf / "mlruns").as_uri(),
+            stores_environment_variables={},
+            credentials=None,
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="Default", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(
+                    flatten=False,
+                    recursive=True,
+                    sep=".",
+                ),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
     )
 
 
@@ -47,15 +54,17 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
 
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="mlruns",
-        experiment=dict(name="exp1"),
+        server=dict(mlflow_tracking_uri="mlruns"),
+        tracking=dict(experiment=dict(name="exp1")),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
-    assert "exp1" in [exp.name for exp in config._mlflow_client.list_experiments()]
+    assert "exp1" in [
+        exp.name for exp in config.server._mlflow_client.list_experiments()
+    ]
 
 
 def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
@@ -67,14 +76,16 @@ def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
     MlflowClient(mlflow_tracking_uri).create_experiment("exp1")
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="mlruns",
-        experiment=dict(name="exp1"),
+        server=dict(mlflow_tracking_uri="mlruns"),
+        tracking=dict(experiment=dict(name="exp1")),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
-    assert "exp1" in [exp.name for exp in config._mlflow_client.list_experiments()]
+    assert "exp1" in [
+        exp.name for exp in config.server._mlflow_client.list_experiments()
+    ]
 
 
 def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_conf):
@@ -90,15 +101,17 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
     # the config must restore properly the experiment
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="mlruns",
-        experiment=dict(name="exp1"),
+        server=dict(mlflow_tracking_uri="mlruns"),
+        tracking=dict(experiment=dict(name="exp1")),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
         config.setup()
 
-    assert "exp1" in [exp.name for exp in config._mlflow_client.list_experiments()]
+    assert "exp1" in [
+        exp.name for exp in config.server._mlflow_client.list_experiments()
+    ]
 
 
 def test_kedro_mlflow_config_setup_set_experiment_globally(
@@ -110,8 +123,8 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
     # the config must restore properly the experiment
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="mlruns",
-        experiment=dict(name="incredible_exp"),
+        server=dict(mlflow_tracking_uri="mlruns"),
+        tracking=dict(experiment=dict(name="incredible_exp")),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
@@ -120,7 +133,7 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
 
     mlflow_client = MlflowClient(mlflow_tracking_uri)
     runs_list_before_interactive_run = mlflow_client.list_run_infos(
-        config._experiment.experiment_id
+        config.tracking.experiment._experiment.experiment_id
     )
 
     with mlflow.start_run():
@@ -128,7 +141,7 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
         my_run_id = mlflow.active_run().info.run_id
 
     runs_list_after_interactive_run = mlflow_client.list_run_infos(
-        config._experiment.experiment_id
+        config.tracking.experiment._experiment.experiment_id
     )
 
     assert (
@@ -144,8 +157,8 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
 
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="awesome_tracking",
-        experiment=dict(name="exp1"),
+        server=dict(mlflow_tracking_uri="awesome_tracking"),
+        tracking=dict(experiment=dict(name="exp1")),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
@@ -163,7 +176,8 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
 
     # the config must restore properly the experiment
     config = KedroMlflowConfig(
-        project_path=kedro_project_with_mlflow_conf, credentials="my_mlflow_creds"
+        project_path=kedro_project_with_mlflow_conf,
+        server=dict(credentials="my_mlflow_creds"),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
@@ -186,8 +200,10 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
 
     config = KedroMlflowConfig(
         project_path=kedro_project_with_mlflow_conf,
-        mlflow_tracking_uri="mlruns1",
-        credentials="my_mlflow_creds",
+        server=dict(
+            mlflow_tracking_uri="mlruns1",
+            credentials="my_mlflow_creds",
+        ),
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
@@ -210,18 +226,14 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
 )
 def test_kedro_mlflow_config_validate_uri_local(kedro_project_with_mlflow_conf, uri):
 
-    assert KedroMlflowConfig._validate_uri(
-        uri=uri, values={"project_path": kedro_project_with_mlflow_conf}
-    ).startswith(
-        r"file:///"
-    )  # relative
+    kmc = KedroMlflowConfig(project_path=kedro_project_with_mlflow_conf)
+    assert kmc._validate_uri(uri=uri).startswith(r"file:///")  # relative
 
 
 def test_kedro_mlflow_config_validate_uri_databricks(kedro_project_with_mlflow_conf):
     # databricks is a reseved keyword which should not be modified
-    config_uri = KedroMlflowConfig._validate_uri(
-        uri="databricks", values={"project_path": kedro_project_with_mlflow_conf}
-    )
+    kmc = KedroMlflowConfig(project_path=kedro_project_with_mlflow_conf)
+    config_uri = kmc._validate_uri(uri="databricks")
 
     assert config_uri == "databricks"
 

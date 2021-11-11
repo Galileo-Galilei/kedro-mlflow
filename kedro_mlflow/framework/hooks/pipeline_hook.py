@@ -111,13 +111,13 @@ class MlflowPipelineHook:
             mlflow_config = get_mlflow_config()
             mlflow_config.setup()
 
-            run_name = mlflow_config.run.name or run_params["pipeline_name"]
+            run_name = mlflow_config.tracking.run.name or run_params["pipeline_name"]
 
             mlflow.start_run(
-                run_id=mlflow_config.run.id,
-                experiment_id=mlflow_config._experiment.experiment_id,
+                run_id=mlflow_config.tracking.run.id,
+                experiment_id=mlflow_config.tracking.experiment._experiment.experiment_id,
                 run_name=run_name,
-                nested=mlflow_config.run.nested,
+                nested=mlflow_config.tracking.run.nested,
             )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})

@@ -4,16 +4,16 @@
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
 
 ----------------------------------------------------------
-| Software repository | Latest release | Total downloads |
-|---------------------|----------------|-----------------|
-| Pypi | [![PyPI version](https://badge.fury.io/py/kedro-mlflow.svg)](https://pypi.org/project/kedro-mlflow/) | [![Downloads](https://pepy.tech/badge/kedro-mlflow)](https://pepy.tech/project/kedro-mlflow) |
+| Software repository | Latest release                                                                                       | Total downloads                                                                              |
+| ------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Pypi                | [![PyPI version](https://badge.fury.io/py/kedro-mlflow.svg)](https://pypi.org/project/kedro-mlflow/) | [![Downloads](https://pepy.tech/badge/kedro-mlflow)](https://pepy.tech/project/kedro-mlflow) |
 
 **Code health**
 
 ----------------------------------------------------------
-| Branch | Tests | Coverage | Links | Documentation | Deployment | Activity |
-|--------|-------|----------|-------|---------------|------------|----------|
-| `master` | [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Amaster) | [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master)|[![links](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/check-links/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Acheck-links+branch%3Amaster)|[![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=stable)](https://kedro-mlflow.readthedocs.io/en/stable/)|[![publish](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/publish/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Amaster+workflow%3Apublish)|[![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.7.6)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...master)|
+| Branch   | Tests                                                                                                                                                                                            | Coverage                                                                                                                                                         | Links                                                                                                                                                                                                           | Documentation                                                                                                                           | Deployment                                                                                                                                                                                                | Activity                                                                                                                                                            |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `master` | [![test](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/test/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Atest+branch%3Amaster) | [![codecov](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master/graph/badge.svg)](https://codecov.io/gh/Galileo-Galilei/kedro-mlflow/branch/master) | [![links](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/check-links/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=workflow%3Acheck-links+branch%3Amaster) | [![Documentation](https://readthedocs.org/projects/kedro-mlflow/badge/?version=stable)](https://kedro-mlflow.readthedocs.io/en/stable/) | [![publish](https://github.com/Galileo-Galilei/kedro-mlflow/workflows/publish/badge.svg?branch=master)](https://github.com/Galileo-Galilei/kedro-mlflow/actions?query=branch%3Amaster+workflow%3Apublish) | [![commit](https://img.shields.io/github/commits-since/Galileo-Galilei/kedro-mlflow/0.7.6)](https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...master) |
 
 # What is kedro-mlflow?
 
@@ -63,9 +63,10 @@ The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/maste
 
 This package is still in active development. We use [SemVer](https://semver.org/) principles to version our releases. Until we reach `1.0.0` milestone, breaking changes will lead to `<minor>` version number increment, while releases which do not introduce breaking changes in the API will lead to `<patch>` version number increment.
 
-The user must be aware that we will not reach `1.0.0` milestone before Kedro does (mlflow has already reached `1.0.0`).
+The user must be aware that we will not reach `1.0.0` milestone before Kedro does (mlflow has already reached `1.0.0`). **That said, the API is considered as stable from 0.8.0 version and user can reliably consider that no consequent breaking change will happen unless absolutely necessary for Kedro compatibility.**
 
-If you want to see how to migrate from one version of `kedro-mlflow` to another, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/stable/source/02_installation/03_migration_guide.html).
+If you want to migrate from an older version of `kedro-mlflow` to most recent ones, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/stable/source/02_installation/03_migration_guide.html).
+
 
 # Can I contribute?
 

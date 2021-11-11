@@ -1,6 +1,6 @@
 import os
 from pathlib import Path, PurePath
-from typing import List, Optional
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 import mlflow
@@ -11,6 +11,17 @@ from mlflow.entities import Experiment
 from mlflow.tracking.client import MlflowClient
 from pydantic import BaseModel, PrivateAttr, StrictBool, validator
 from typing_extensions import Literal
+
+
+class MlflowServerOptions(BaseModel):
+    # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
+    mlflow_tracking_uri: str = "mlruns"
+    stores_environment_variables: Dict[str, str] = {}
+    credentials: Optional[str] = None
+    _mlflow_client: MlflowClient = PrivateAttr()
+
+    class Config:
+        extra = "forbid"
 
 
 class DisableTrackingOptions(BaseModel):
@@ -24,21 +35,54 @@ class DisableTrackingOptions(BaseModel):
 class ExperimentOptions(BaseModel):
     name: str = "Default"
     restore_if_deleted: StrictBool = True
+    _experiment: Experiment = PrivateAttr()
+    # do not create _experiment immediately to avoid creating
+    # a database connection when creating the object
+    # it will be instantiated on setup() call
 
     class Config:
         extra = "forbid"
 
 
 class RunOptions(BaseModel):
-    id: Optional[str]
-    name: Optional[str]
+    id: Optional[str] = None
+    name: Optional[str] = None
     nested: StrictBool = True
 
     class Config:
         extra = "forbid"
 
 
+class DictParamsOptions(BaseModel):
+    flatten: StrictBool = False
+    recursive: StrictBool = True
+    sep: str = "."
+
+    class Config:
+        extra = "forbid"
+
+
+class MlflowParamsOptions(BaseModel):
+    dict_params: DictParamsOptions = DictParamsOptions()
+    long_params_strategy: Literal["fail", "truncate", "tag"] = "fail"
+
+    class Config:
+        extra = "forbid"
+
+
+class MlflowTrackingOptions(BaseModel):
+    # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
+    disable_tracking: DisableTrackingOptions = DisableTrackingOptions()
+    experiment: ExperimentOptions = ExperimentOptions()
+    run: RunOptions = RunOptions()
+    params: MlflowParamsOptions = MlflowParamsOptions()
+
+    class Config:
+        extra = "forbid"
+
+
 class UiOptions(BaseModel):
+
     port: str = "5000"
     host: str = "127.0.0.1"
 
@@ -46,37 +90,11 @@ class UiOptions(BaseModel):
         extra = "forbid"
 
 
-class NodeHookOptions(BaseModel):
-    flatten_dict_params: StrictBool = False
-    recursive: StrictBool = True
-    sep: str = "."
-    long_parameters_strategy: Literal["fail", "truncate", "tag"] = "fail"
-
-    class Config:
-        extra = "forbid"
-
-
-class HookOptions(BaseModel):
-    node: NodeHookOptions = NodeHookOptions()
-
-    class Config:
-        extra = "forbid"
-
-
 class KedroMlflowConfig(BaseModel):
     project_path: Path  # if str, will be converted
-    mlflow_tracking_uri: str = "mlruns"
-    credentials: Optional[str]
-    disable_tracking: DisableTrackingOptions = DisableTrackingOptions()
-    experiment: ExperimentOptions = ExperimentOptions()
-    run: RunOptions = RunOptions()
+    server: MlflowServerOptions = MlflowServerOptions()
+    tracking: MlflowTrackingOptions = MlflowTrackingOptions()
     ui: UiOptions = UiOptions()
-    hooks: HookOptions = HookOptions()
-    _mlflow_client: MlflowClient = PrivateAttr()
-    _experiment: Experiment = PrivateAttr()
-    # do not create _experiment immediately to avoid creating
-    # a database connection when creating the object
-    # it will be instantiated on setup() call
 
     class Config:
         # force triggering type control when setting value instead of init
@@ -86,8 +104,13 @@ class KedroMlflowConfig(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.server.mlflow_tracking_uri = self._validate_uri(
+            self.server.mlflow_tracking_uri
+        )
         # init after validating the uri, else mlflow creates a mlruns folder at the root
-        self._mlflow_client = MlflowClient(tracking_uri=self.mlflow_tracking_uri)
+        self.server._mlflow_client = MlflowClient(
+            tracking_uri=self.server.mlflow_tracking_uri
+        )
 
     def setup(self, session: KedroSession = None):
         """Setup all the mlflow configuration"""
@@ -96,7 +119,7 @@ class KedroMlflowConfig(BaseModel):
 
         # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
-        mlflow.set_tracking_uri(self.mlflow_tracking_uri)
+        mlflow.set_tracking_uri(self.server.mlflow_tracking_uri)
 
         self._set_experiment()
 
@@ -104,7 +127,7 @@ class KedroMlflowConfig(BaseModel):
         session = session or get_current_session()
         context = session.load_context()
         conf_creds = context._get_config_credentials()
-        mlflow_creds = conf_creds.get(self.credentials, {})
+        mlflow_creds = conf_creds.get(self.server.credentials, {})
         for key, value in mlflow_creds.items():
             os.environ[key] = value
 
@@ -117,43 +140,34 @@ class KedroMlflowConfig(BaseModel):
         """
 
         # we retrieve the experiment manually to check if it exsits
-        mlflow_experiment = self._mlflow_client.get_experiment_by_name(
-            name=self.experiment.name
+        mlflow_experiment = self.server._mlflow_client.get_experiment_by_name(
+            name=self.tracking.experiment.name
         )
-
         # Deal with two side case when retrieving the experiment
         if mlflow_experiment is not None:
             if (
-                self.experiment.restore_if_deleted
+                self.tracking.experiment.restore_if_deleted
                 and mlflow_experiment.lifecycle_stage == "deleted"
             ):
                 # the experiment was created, then deleted : we have to restore it manually before setting it as the active one
-                self._mlflow_client.restore_experiment(mlflow_experiment.experiment_id)
+                self.server._mlflow_client.restore_experiment(
+                    mlflow_experiment.experiment_id
+                )
 
         # this creates the experiment if it does not exists
         # and creates a global variable with the experiment
         # but returns nothing
-        mlflow.set_experiment(experiment_name=self.experiment.name)
+        mlflow.set_experiment(experiment_name=self.tracking.experiment.name)
 
         # we do not use "experiment" variable directly but we fetch again from the database
         # because if it did not exists at all, it was created by previous command
-        self._experiment = self._mlflow_client.get_experiment_by_name(
-            name=self.experiment.name
+        self.tracking.experiment._experiment = (
+            self.server._mlflow_client.get_experiment_by_name(
+                name=self.tracking.experiment.name
+            )
         )
 
-    @validator("project_path")
-    def _is_kedro_project(cls, folder_path):
-        if not _is_project(folder_path):
-            raise KedroMlflowConfigError(
-                f"'project_path' = '{folder_path}' is not the root of kedro project"
-            )
-        return folder_path
-
-    # pre=make a conversion before it is set
-    # always=even for default value
-    # values enable access to the other field, see https://pydantic-docs.helpmanual.io/usage/validators/
-    @validator("mlflow_tracking_uri", pre=True, always=True)
-    def _validate_uri(cls, uri, values):
+    def _validate_uri(self, uri):
         """Format the uri provided to match mlflow expectations.
 
         Arguments:
@@ -181,12 +195,20 @@ class KedroMlflowConfig(BaseModel):
                 # .absolute is undocumented and have known bugs
                 # Path.cwd() / uri is the recommend way by core developpers.
                 # See : https://discuss.python.org/t/pathlib-absolute-vs-resolve/2573/6
-                valid_uri = (values["project_path"] / uri).as_uri()
+                valid_uri = (self.project_path / uri).as_uri()
             else:
                 # else assume it is an uri
                 valid_uri = uri
 
         return valid_uri
+
+    @validator("project_path")
+    def _is_kedro_project(cls, folder_path):
+        if not _is_project(folder_path):
+            raise KedroMlflowConfigError(
+                f"'project_path' = '{folder_path}' is not the root of kedro project"
+            )
+        return folder_path
 
 
 class KedroMlflowConfigError(Exception):

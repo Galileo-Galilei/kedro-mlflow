@@ -595,7 +595,6 @@ def test_kedro_pipeline_model_save_and_load(
 
     data = pd.DataFrame([1, 2, 3])
 
-    print(loaded_model.predict(data))
     assert (loaded_model.predict(data) == result).all(axis=None)
 
 

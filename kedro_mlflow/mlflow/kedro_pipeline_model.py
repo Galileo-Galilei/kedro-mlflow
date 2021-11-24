@@ -1,5 +1,4 @@
 import logging
-from copy import deepcopy
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -69,7 +68,6 @@ class KedroPipelineModel(PythonModel):
                 for name, copy_mode in self.copy_mode.items()
             }
         )
-        print(self.loaded_catalog)
 
     @property
     def _logger(self) -> logging.Logger:
@@ -201,7 +199,7 @@ class KedroPipelineModel(PythonModel):
                 )
             )
 
-        updated_catalog = deepcopy(self.initial_catalog)
+        updated_catalog = self.initial_catalog.shallow_copy()
         for name, uri in context.artifacts.items():
             updated_catalog._data_sets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))

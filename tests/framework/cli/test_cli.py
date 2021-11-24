@@ -18,9 +18,12 @@ def extract_cmd_from_help(msg):
     # [\s\S] is used instead of "." to match any character including new lines
     cmd_txt = re.search((r"(?<=Commands:)([\s\S]+)$"), msg).group(1)
     cmd_list_detailed = cmd_txt.split("\n")
-    cmd_list = [
-        cmd.strip().split(" ")[0] for cmd in cmd_list_detailed if cmd.strip() != ""
-    ]
+
+    cmd_list = []
+    for cmd_detailed in cmd_list_detailed:
+        cmd_match = re.search(r"\w+(?=  )", string=cmd_detailed)
+        if cmd_match is not None:
+            cmd_list.append(cmd_match.group(0))
     return cmd_list
 
 
@@ -51,7 +54,7 @@ def test_mlflow_commands_inside_kedro_project(monkeypatch, kedro_project):
     # launch the command to initialize the project
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_mlflow)
-    assert {"init", "ui"} == set(extract_cmd_from_help(result.output))
+    assert {"init", "ui", "modelify"} == set(extract_cmd_from_help(result.output))
     assert "You have not updated your template yet" not in result.output
 
 

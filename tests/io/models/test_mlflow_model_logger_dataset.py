@@ -337,7 +337,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
     model_config2["config"]["run_id"] = current_run_id
     mlflow_model_ds2 = MlflowModelLoggerDataSet.from_config(**model_config2)
     print(model_config)
-    print(artifacts)
+
     loaded_model = mlflow_model_ds2.load()
 
     loaded_model.predict(pd.DataFrame(data=[1], columns=["a"])) == pd.DataFrame(

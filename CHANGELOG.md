@@ -17,7 +17,7 @@
 
 ### Fixed
 
-- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuraiton even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
+- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuration even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
 
 ### Removed
 

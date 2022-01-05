@@ -2,26 +2,28 @@
 
 ## [Unreleased]
 
+## [0.8.0] - 2022-01-05
+
 ### Added
 
-- :sparkles: Add a ``kedro mlflow modelify`` command to export a pipeline as a mlflow model ([#261](https://github.com/Galileo-Galilei/kedro-mlflow/issues/261))
-- :memo: Format code blocks in documentation with ``blacken-docs``
-- :construction_worker: Enforce the use of ``black`` and ``isort`` in the CI to enforce style guidelines for developers
+-   :sparkles: Add a `kedro mlflow modelify` command to export a pipeline as a mlflow model ([#261](https://github.com/Galileo-Galilei/kedro-mlflow/issues/261))
+-   :memo: Format code blocks in documentation with `blacken-docs`
+-   :construction_worker: Enforce the use of `black` and `isort` in the CI to enforce style guidelines for developers
 
 ### Changed
 
-- :sparkles: :boom: The ``pipeline_ml_factory`` accepts 2 new arguments ``log_model_kwargs`` (which will be passed *as is* to ``mlflow.pyfunc.log_model``) and ``kpm_kwargs`` (which will be passed *as is* to ``KedroPipelineModel``). This ensures perfect consistency with mlflow API and offers new possibility like saving the project source code alongside the model ([#67](https://github.com/Galileo-Galilei/kedro-mlflow/issues/67)). Note that ``model_signature``, ``conda_env`` and ``model_name`` arguments are removed, and replace respectively by ``log_model_kwargs["signature"]``, ``log_model_kwargs["conda_env"]`` and ``log_model_kwargs["artifact_path"]``.
-- :sparkles: :boom: The ``KedroPipelineModel`` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only ``PipelineML`` objects. This simplifies the API for user who want to customise the model logging ([#171](https://github.com/Galileo-Galilei/kedro-mlflow/issues/171)). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
-- :wastebasket: `kedro_mlflow.io.metrics.MlflowMetricsDataSet` is no longer deprecated because there is no alternative for now to log many metrics at the same time.
-- :boom: Refactor ``mlflow.yml`` to match mlflow's API ([#77](https://github.com/Galileo-Galilei/kedro-mlflow/issues/77)). To migrate projects with ``kedro<0.8.0``, please update their ``mlflow.yml`` with `kedro mlflow init --force` command.
+-   :sparkles: :boom: The `pipeline_ml_factory` accepts 2 new arguments `log_model_kwargs` (which will be passed _as is_ to `mlflow.pyfunc.log_model`) and `kpm_kwargs` (which will be passed _as is_ to `KedroPipelineModel`). This ensures perfect consistency with mlflow API and offers new possibility like saving the project source code alongside the model ([#67](https://github.com/Galileo-Galilei/kedro-mlflow/issues/67)). Note that `model_signature`, `conda_env` and `model_name` arguments are removed, and replace respectively by `log_model_kwargs["signature"]`, `log_model_kwargs["conda_env"]` and `log_model_kwargs["artifact_path"]`.
+-   :sparkles: :boom: The `KedroPipelineModel` custom mlflow model now accepts any kedro `Pipeline` as input (provided they have a single DataFrame input and a single output because this is an mlflow limitation) instead of only `PipelineML` objects. This simplifies the API for user who want to customise the model logging ([#171](https://github.com/Galileo-Galilei/kedro-mlflow/issues/171)). `KedroPipelineModel.__init__` argument `pipeline_ml` is renamed `pipeline` to reflect this change.
+-   :wastebasket: `kedro_mlflow.io.metrics.MlflowMetricsDataSet` is no longer deprecated because there is no alternative for now to log many metrics at the same time.
+-   :boom: Refactor `mlflow.yml` to match mlflow's API ([#77](https://github.com/Galileo-Galilei/kedro-mlflow/issues/77)). To migrate projects with `kedro<0.8.0`, please update their `mlflow.yml` with `kedro mlflow init --force` command.
 
 ### Fixed
 
-- :bug: ``KedroMlflowConfig.setup()`` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuration even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
+-   :bug: `KedroMlflowConfig.setup()` methods now sets the experiment globally to ensure all runs are launched under the experiment specified in the configuration even in interactive mode ([#256](https://github.com/Galileo-Galilei/kedro-mlflow/issues/256)).
 
 ### Removed
 
-- :fire: :boom: ``KedroMlflowConfig`` and `get_mlflow_config` were deprecated since ``0.7.3`` and are now removed from ``kedro_mlflow.framework.context``. Direct import must now use `kedro_mlflow.config`.
+-   :fire: :boom: `KedroMlflowConfig` and `get_mlflow_config` were deprecated since `0.7.3` and are now removed from `kedro_mlflow.framework.context`. Direct import must now use `kedro_mlflow.config`.
 
 ## [0.7.6] - 2021-10-08
 
@@ -269,7 +271,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.0...HEAD
+
+[0.8.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...0.8.0
 
 [0.7.6]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.5...0.7.6
 

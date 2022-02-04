@@ -48,7 +48,7 @@ setup(
             "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
         ],
         "test": [
-            "pytest>=5.4.0, <7.0.0",
+            "pytest>=5.4.0, <8.0.0",
             "pytest-cov>=2.8.0, <4.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",

@@ -1,4 +1,5 @@
 import subprocess
+import webbrowser
 from logging import getLogger
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -160,20 +161,23 @@ def ui(env: str, port: str, host: str):
         host = host or mlflow_conf.ui.host
         port = port or mlflow_conf.ui.port
 
-        # call mlflow ui with specific options
-        # TODO : add more options for ui
-        subprocess.call(
-            [
-                "mlflow",
-                "ui",
-                "--backend-store-uri",
-                mlflow_conf.server.mlflow_tracking_uri,
-                "--host",
-                host,
-                "--port",
-                port,
-            ]
-        )
+        if mlflow_conf.server.mlflow_tracking_uri.startswith("http"):
+            webbrowser.open(mlflow_conf.server.mlflow_tracking_uri)
+        else:
+            # call mlflow ui with specific options
+            # TODO : add more options for ui
+            subprocess.call(
+                [
+                    "mlflow",
+                    "ui",
+                    "--backend-store-uri",
+                    mlflow_conf.server.mlflow_tracking_uri,
+                    "--host",
+                    host,
+                    "--port",
+                    port,
+                ]
+            )
 
 
 @mlflow_commands.command()

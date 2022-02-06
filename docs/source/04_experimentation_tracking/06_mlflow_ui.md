@@ -16,4 +16,4 @@ kedro mlflow ui
 
 which is a wrapper for  ``kedro ui`` command with the tracking uri (as well as the port and host) specified the ``mlflow.yml`` file.
 
-Opens ``http://localhost:5000`` in your browser to see the UI after calling previous command.
+Opens ``http://localhost:5000`` in your browser to see the UI after calling previous command. If your ``mlflow_tracking_uri`` is a ``http[s]`` URL, the command will automatically open it.

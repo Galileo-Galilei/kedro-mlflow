@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: Open the UI in the default browser when the ``mlflow_tracking_uri`` in ``mlflow.yml`` is a http address instead of launching the ui server. ([#275](https://github.com/Galileo-Galilei/kedro-mlflow/issues/275))
+
+
 ## [0.8.0] - 2022-01-05
 
 ### Added

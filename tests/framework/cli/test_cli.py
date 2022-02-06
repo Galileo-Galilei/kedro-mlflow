@@ -1,14 +1,19 @@
 import re
+import shutil
 import subprocess  # noqa: F401
 
 import pytest
 import yaml
 from click.testing import CliRunner
+from cookiecutter.main import cookiecutter
+from kedro import __version__ as kedro_version
 from kedro.framework.cli.cli import info
+from kedro.framework.cli.starters import TEMPLATE_PATH
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
 from kedro_mlflow.config import get_mlflow_config
+from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
 from kedro_mlflow.framework.cli.cli import ui as cli_ui
@@ -217,3 +222,45 @@ def test_ui_overwrite_conf_at_runtime(
             "5001",
         ]
     )
+
+
+def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
+
+    config = {
+        "output_dir": tmp_path,
+        "kedro_version": kedro_version,
+        "project_name": "This is a fake project",
+        "repo_name": "fake-project-with-http-uri",
+        "python_package": "fake_project_with_http_uri",
+        "include_example": True,
+    }
+
+    cookiecutter(
+        str(TEMPLATE_PATH),
+        output_dir=config["output_dir"],
+        no_input=True,
+        extra_context=config,
+    )
+
+    project_path = tmp_path / config["repo_name"]
+    shutil.rmtree(project_path / "src" / "tests")  # avoid conflicts with pytest
+
+    kmc = KedroMlflowConfig(project_path=project_path.as_posix())
+    kmc.server.mlflow_tracking_uri = "http://google.com"
+
+    with open(
+        (kmc.project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
+    ) as fhandler:
+        yaml.dump(
+            kmc.dict(exclude={"project_path"}), fhandler, default_flow_style=False
+        )
+
+    monkeypatch.chdir(project_path.as_posix())
+    cli_runner = CliRunner()
+
+    # This does not test anything : the goal is to check whether it raises an error
+    ui_mocker = mocker.patch(
+        "webbrowser.open"
+    )  # make the test succeed, but no a real test
+    cli_runner.invoke(cli_ui)
+    ui_mocker.assert_called_once()

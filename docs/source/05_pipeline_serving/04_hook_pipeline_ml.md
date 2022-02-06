@@ -73,4 +73,4 @@ You have also other resources to understand the rationale:
 
 ### Motivation
 
-You can find more about the motivations in <../source/05_framework_ml/index.rst>.
+You can find more about the motivations in <https://kedro-mlflow.readthedocs.io/en/stable/source/05_framework_ml/index.html>.

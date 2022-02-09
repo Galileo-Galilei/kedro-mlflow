@@ -2,6 +2,7 @@ import subprocess
 import webbrowser
 from logging import getLogger
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Dict, Optional, Union
 
 import click
@@ -333,39 +334,40 @@ def modelify(
                 0:1, :
             ]  # 0:1 forces a dataframe, iloc returns a Series which raises a mlflow error
 
-        # you can optionnally pass other arguments, like the "copy_mode" to be used for each dataset
-        kedro_pipeline_model = KedroPipelineModel(
-            pipeline=pipeline,
-            catalog=catalog,
-            input_name=input_name,
-            copy_mode=copy_mode,
-            # add runner option
-        )
+        with TemporaryDirectory() as tmp_dir:
+            # you can optionnally pass other arguments, like the "copy_mode" to be used for each dataset
+            kedro_pipeline_model = KedroPipelineModel(
+                pipeline=pipeline,
+                catalog=catalog,
+                input_name=input_name,
+                copy_mode=copy_mode,
+                # add runner option
+            )
 
-        artifacts = kedro_pipeline_model.extract_pipeline_artifacts()
+            artifacts = kedro_pipeline_model.extract_pipeline_artifacts(Path(tmp_dir))
 
-        if conda_env is None:
-            conda_env = {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]}
+            if conda_env is None:
+                conda_env = {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]}
 
-        log_model_kwargs = dict(
-            artifact_path=artifact_path,
-            python_model=kedro_pipeline_model,
-            artifacts=artifacts,
-            code_path=code_path,
-            conda_env=conda_env,
-            signature=model_signature,
-            input_example=input_example,
-            registered_model_name=registered_model_name,
-            await_registration_for=await_registration_for,
-        )
-        if version.parse(f"{mlflow.__version__}") >= version.parse("1.20.0"):
-            log_model_kwargs["pip_requirements"] = pip_requirements
-            log_model_kwargs["extra_pip_requirements"] = extra_pip_requirements
+            log_model_kwargs = dict(
+                artifact_path=artifact_path,
+                python_model=kedro_pipeline_model,
+                artifacts=artifacts,
+                code_path=code_path,
+                conda_env=conda_env,
+                signature=model_signature,
+                input_example=input_example,
+                registered_model_name=registered_model_name,
+                await_registration_for=await_registration_for,
+            )
+            if version.parse(f"{mlflow.__version__}") >= version.parse("1.20.0"):
+                log_model_kwargs["pip_requirements"] = pip_requirements
+                log_model_kwargs["extra_pip_requirements"] = extra_pip_requirements
 
-        with mlflow.start_run(run_id=run_id):
-            mlflow.pyfunc.log_model(**log_model_kwargs)
-            run_id = mlflow.active_run().info.run_id
-            LOGGER.info(f"Model successfully logged in run '{run_id}'")
+            with mlflow.start_run(run_id=run_id):
+                mlflow.pyfunc.log_model(**log_model_kwargs)
+                run_id = mlflow.active_run().info.run_id
+                LOGGER.info(f"Model successfully logged in run '{run_id}'")
 
 
 class KedroMlflowCliError(Exception):

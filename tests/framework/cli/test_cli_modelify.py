@@ -124,8 +124,110 @@ def kp_for_modelify_persistent_input(kp_for_modelify):
     return kp_for_modelify
 
 
-def test_modelify_logs_in_mlflow(monkeypatch, kp_for_modelify):
-    monkeypatch.chdir(kp_for_modelify)
+@pytest.fixture
+def kp_for_modelify_with_parameters(tmp_path):
+    # TODO: find a better way to inject dynamically
+    # the templated config loader without modifying the template
+
+    config = {
+        "output_dir": tmp_path,
+        "kedro_version": kedro_version,
+        "project_name": "A kedro project with a pipeline for modelify command",
+        "repo_name": "kp-for-modelify-params",  # "kp" for "kedro_project"
+        "python_package": "kp_for_modelify_params",
+    }
+
+    cookiecutter(
+        str(TEMPLATE_PATH),
+        output_dir=config["output_dir"],
+        no_input=True,
+        extra_context=config,
+    )
+
+    shutil.rmtree(
+        tmp_path / config["repo_name"] / "src" / "tests"
+    )  # avoid conflicts with pytest
+
+    pipeline_registry_py = """
+from kedro.pipeline import Pipeline, node
+
+def predict_on_new_data(model, fixed_param, data):
+    return data
+
+def register_pipelines():
+    inference_pipeline = Pipeline(
+        [
+        node(
+            func=predict_on_new_data,
+            inputs=dict(
+                model="trained_model",
+                fixed_param="params:my_param",
+                data="my_input_data"
+                ),
+            outputs="predictions"
+            )
+        ]
+    )
+
+    return {
+        "inference": inference_pipeline,
+        "__default__": inference_pipeline,
+    }
+"""
+
+    model_filepath = (
+        config["output_dir"] / config["repo_name"] / "data" / "my_model.pkl"
+    ).as_posix()
+
+    catalog_yml = f"""
+    trained_model:
+        type: pickle.PickleDataSet
+        filepath: {model_filepath}
+    """
+
+    parameters_yml = """
+    my_param: 1
+    """
+
+    mlflow_yml = """
+    server:
+        mlflow_tracking_uri: mlruns
+    """
+
+    kp_for_modelify = tmp_path / config["repo_name"]
+
+    _write_file(
+        kp_for_modelify / "src" / config["python_package"] / "pipeline_registry.py",
+        pipeline_registry_py,
+    )
+    _write_file(
+        kp_for_modelify / "conf" / "base" / "catalog.yml",
+        catalog_yml,
+    )
+    _write_file(
+        kp_for_modelify / "conf" / "base" / "parameters.yml",
+        parameters_yml,
+    )
+    _write_file(
+        kp_for_modelify / "conf" / "base" / "mlflow.yml",
+        mlflow_yml,
+    )
+
+    return kp_for_modelify
+
+
+@pytest.mark.parametrize(
+    "example_repo,artifacts_list",
+    [
+        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"]),
+        (
+            pytest.lazy_fixture("kp_for_modelify_with_parameters"),
+            ["trained_model", "params:my_param"],
+        ),
+    ],
+)
+def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
+    monkeypatch.chdir(example_repo)
 
     bootstrap_project(Path().cwd())
     with KedroSession.create(project_path=Path().cwd()) as session:
@@ -151,12 +253,13 @@ def test_modelify_logs_in_mlflow(monkeypatch, kp_for_modelify):
     )
 
     assert result.exit_code == 0
-    assert (
-        "The data_set 'trained_model' is added to the Pipeline catalog" in result.output
-    )
+    for artifact in artifacts_list:
+        assert (
+            f"The data_set '{artifact}' is added to the Pipeline catalog"
+            in result.output
+        )
     assert "Model successfully logged" in result.output
     assert len(runs_list_after_cmd) - len(runs_list_before_cmd) == 1
-    # TODO: check a new mlflow run was created
 
 
 def test_modelify_informative_error_on_invalid_input_name(monkeypatch, kp_for_modelify):

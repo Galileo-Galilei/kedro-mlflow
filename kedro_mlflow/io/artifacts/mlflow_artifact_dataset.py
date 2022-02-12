@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
@@ -45,18 +46,25 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                 self.__logging_activated = flag
 
             def _save(self, data: Any):
+
                 # _get_save_path needs to be called before super, otherwise
                 # it will throw exception that file under path already exist.
-                local_path = (
-                    self._get_save_path()
-                    if hasattr(self, "_version")
-                    else self._filepath
-                )
+                if hasattr(self, "_version"):
+                    # all kedro datasets inherits from AbstractVersionedDataSet
+                    local_path = self._get_save_path()
+                elif hasattr(self, "_filepath"):
+                    # in case custom datasets inherits from AbstractDataSet without versioning
+                    local_path = self._filepath  # pragma: no cover
+                elif hasattr(self, "_path"):
+                    # special datasets with a folder instead of a specifi files like PartitionedDataSet
+                    local_path = Path(self._path)
+
                 # it must be converted to a string with as_posix()
                 # for logging on remote storage like Azure S3
                 local_path = local_path.as_posix()
 
                 super()._save(data)
+
                 if self._logging_activated:
                     if self.run_id:
                         # if a run id is specified, we have to use mlflow client
@@ -76,11 +84,17 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                     # there are a lot of chances that it has not been saved yet!
 
                     mlflow_client = MlflowClient()
-                    local_path = (
-                        self._get_load_path()
-                        if hasattr(self, "_version")
-                        else self._filepath
-                    )
+
+                    if hasattr(self, "_version"):
+                        # all kedro datasets inherits from AbstractVersionedDataSet
+                        local_path = self._get_load_path()
+                    elif hasattr(self, "_filepath"):
+                        # in case custom datasets inherits from AbstractDataSet without versioning
+                        local_path = self._filepath  # pragma: no cover
+                    elif hasattr(self, "_path"):
+                        # special datasets with a folder instead of a specifi files like PartitionedDataSet
+                        local_path = Path(self._path)
+
                     artifact_path = (
                         (self.artifact_path / local_path.name).as_posix()
                         if self.artifact_path

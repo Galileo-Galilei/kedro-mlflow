@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 from kedro.extras.datasets.pandas import CSVDataSet
 from kedro.extras.datasets.pickle import PickleDataSet
+from kedro.io import PartitionedDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
@@ -44,7 +45,7 @@ def df2():
         ),
     ],
 )
-def test_mlflow_csv_dataset_save_reload(
+def test_mlflow_csv_pkl_dataset_save_reload(
     tmp_path, tracking_uri, dataset, extension, data, artifact_path
 ):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
@@ -225,3 +226,51 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
     # update the logger and reload outside of an mlflow run : it should load the dataset if the first run id
     mlflow_csv_dataset.run_id = run_id1
     assert df1.equals(mlflow_csv_dataset.load())
+
+
+@pytest.mark.parametrize("artifact_path", [None, "partitioned_data"])
+def test_partitioned_dataset_save_and_reload(
+    tmp_path, tracking_uri, artifact_path, df1, df2
+):
+
+    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+
+    mlflow_dataset = MlflowArtifactDataSet(
+        artifact_path=artifact_path,
+        data_set=dict(
+            type=PartitionedDataSet,
+            path=(tmp_path / "df_dir").as_posix(),
+            dataset="pandas.CSVDataSet",
+            filename_suffix=".csv",
+        ),
+    )
+
+    data = dict(df1=df1, df2=df2)
+
+    with mlflow.start_run():
+        mlflow_dataset.save(data)
+        run_id = mlflow.active_run().info.run_id
+
+    # the artifact must be properly uploaded to "mlruns" and reloadable
+    artifact_path_df_dir = f"{artifact_path}/df_dir" if artifact_path else "df_dir"
+    run_artifacts = [
+        fileinfo.path
+        for fileinfo in mlflow_client.list_artifacts(
+            run_id=run_id,
+            path=artifact_path_df_dir,
+        )
+    ]
+    for df_name in data.keys():
+        remote_path = (
+            f"df_dir/{df_name}.csv"
+            if artifact_path is None
+            else (Path(artifact_path) / "df_dir" / df_name)
+            .with_suffix(".csv")
+            .as_posix()
+        )
+        assert remote_path in run_artifacts
+
+    reloaded_data = {k: loader() for k, loader in mlflow_dataset.load().items()}
+    for k, df in data.items():
+        pd.testing.assert_frame_equal(df, reloaded_data[k])

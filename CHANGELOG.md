@@ -2,16 +2,17 @@
 
 ## [Unreleased]
 
+## [0.8.1] - 2022-02-13
+
 ### Added
 
--   :sparkles: Open the UI in the default browser when the ``mlflow_tracking_uri`` in ``mlflow.yml`` is a http address instead of launching the ui server. ([#275](https://github.com/Galileo-Galilei/kedro-mlflow/issues/275))
+-   :sparkles: Open the UI in the default browser when the `mlflow_tracking_uri` in `mlflow.yml` is a http address instead of launching the ui server. ([#275](https://github.com/Galileo-Galilei/kedro-mlflow/issues/275))
 
 ### Fixed
 
-- :bug: Force the input dataset in ``KedroPipelineModel`` to be a ``MemoryDataSet`` to remove unnecessary dependency to the underlying Kedro ``AbstractDataSet`` used during training ([#273](https://github.com/Galileo-Galilei/kedro-mlflow/issues/273))
--   :bug: Make ``MlflowArtifactDataset`` correctly log in mlflow Kedro DataSets without a ``_path`` attribute like ``kedro.io.PartitionedDataSet``  ([#258](https://github.com/Galileo-Galilei/kedro-mlflow/issues/258)).
--   :bug: Automatically persist pipeline parameters when calling the ``kedro mlflow modelify`` command for consistency with how ``PipelineML`` objects are handled and for ease of use ([#282](https://github.com/Galileo-Galilei/kedro-mlflow/issues/282)).
-
+-   :bug: Force the input dataset in `KedroPipelineModel` to be a `MemoryDataSet` to remove unnecessary dependency to the underlying Kedro `AbstractDataSet` used during training ([#273](https://github.com/Galileo-Galilei/kedro-mlflow/issues/273))
+-   :bug: Make `MlflowArtifactDataset` correctly log in mlflow Kedro DataSets without a `_path` attribute like `kedro.io.PartitionedDataSet`  ([#258](https://github.com/Galileo-Galilei/kedro-mlflow/issues/258)).
+-   :bug: Automatically persist pipeline parameters when calling the `kedro mlflow modelify` command for consistency with how `PipelineML` objects are handled and for ease of use ([#282](https://github.com/Galileo-Galilei/kedro-mlflow/issues/282)).
 
 ## [0.8.0] - 2022-01-05
 
@@ -282,7 +283,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.1...HEAD
+
+[0.8.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.0...0.8.1
 
 [0.8.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.7.6...0.8.0
 

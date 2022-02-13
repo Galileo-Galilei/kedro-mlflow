@@ -28,7 +28,7 @@ with mlflow.start_run():
 ```
 
 ```eval_rst
-.. note:: Beware: Unlike mlflow default behaviour, if there is no active run, no run is created.
+.. important Unlike mlflow default behaviour, if there is no active run, no run is created.
 ```
 
 - You can also specify a ``run_id`` instead of logging in the active run:

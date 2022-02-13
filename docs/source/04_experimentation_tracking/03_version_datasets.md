@@ -62,9 +62,14 @@ Like all Kedro ``AbstractDataSet``, ``MlflowArtifactDataSet`` is callable in the
 ```python
 from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
 from kedro.extras.datasets.pandas import CSVDataSet
-csv_dataset = MlflowArtifactDataSet(data_set={"type": CSVDataSet, # either a string "pandas.CSVDataSet" or the class
-                                      "filepath": r"/path/to/a/local/destination/file.csv"})
-csv_dataset.save(data=pd.DataFrame({"a":[1,2], "b": [3,4]}))
+
+csv_dataset = MlflowArtifactDataSet(
+    data_set={
+        "type": CSVDataSet,  # either a string "pandas.CSVDataSet" or the class
+        "filepath": r"/path/to/a/local/destination/file.csv",
+    }
+)
+csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```
 
 ### How do I upload an artifact to a non local destination (e.g. an S3 or blog storage)?
@@ -77,8 +82,6 @@ The location where artifact will be stored does not depends of the logging funct
 Setting the `mlflow_tracking_uri` key of `mlflow.yml` to the url of this server is the only additional configuration you need to send your datasets to this remote server. Note that you still need to specify a **local** path for the underlying dataset, mlflow will take care of the upload to the server by itself.
 
 You can refer to [this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/15) for further details.
-
-In ``kedro-mlflow==0.8.0`` you must configure these elements by yourself. Further releases will introduce helpers for configuration.
 
 ### Can I log an artifact in a specific run?
 

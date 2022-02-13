@@ -2,7 +2,7 @@
 
 ## Automatic parameters versioning
 
-Parameters versioning is automatic when the ``MlflowNodeHook`` is added to [the hook list of the ``ProjectContext``](https://kedro-mlflow.readthedocs.io/en/latest/source/02_installation/02_setup.html#declaring-kedro-mlflow-hooks). In ``kedro-mlflow==0.8.0``, the `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../07_python_objects/02_Hooks.md).
+Parameters versioning is automatic when the ``MlflowNodeHook`` is added to [the hook list of the ``ProjectContext``](https://kedro-mlflow.readthedocs.io/en/latest/source/02_installation/02_setup.html#declaring-kedro-mlflow-hooks). The `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../07_python_objects/02_Hooks.md).
 
 You **do not need any additional configuration** to benefit from parameters versioning.
 
@@ -32,13 +32,14 @@ If you [use a ``TemplatedConfigLoader``](https://kedro.readthedocs.io/en/latest/
 from kedro.config import TemplatedConfigLoader  # new import
 from datetime import date
 
+
 class ProjectContext(KedroContext):
     def _create_config_loader(self, conf_paths: Iterable[str]) -> TemplatedConfigLoader:
         return TemplatedConfigLoader(
             conf_paths,
             globals_pattern="*globals.yml",  # read the globals dictionary from project config
             globals_dict={  # extra keys to add to the globals dictionary, take precedence over globals_pattern
-            execution_date: date.today()
+                execution_date: date.today()
             },
         )
 ```

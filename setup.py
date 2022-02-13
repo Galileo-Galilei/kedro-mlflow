@@ -63,7 +63,7 @@ setup(
         ],
         "extras": ["notebook>=6.0.0"],
     },
-    author="Galileo-Galilei",
+    author="Yolan Honoré-Rougé",
     entry_points={
         "kedro.project_commands": [
             "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"

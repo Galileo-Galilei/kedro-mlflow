@@ -109,9 +109,11 @@ class KedroPipelineModel(PythonModel):
         for data_set_name in self.pipeline.inputs():
             if data_set_name == self.input_name:
                 # there is no obligation that this dataset is persisted
-                # thus it is allowed to be an empty memory dataset
-                data_set = catalog._data_sets.get(data_set_name) or MemoryDataSet()
-                sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
+                # and even if it is, we keep only an ampty memory dataset to avoid
+                # extra uneccessary dependencies: this dataset will be replaced at
+                # inference time and we do not need to know the original type, see
+                # https://github.com/Galileo-Galilei/kedro-mlflow/issues/273
+                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataSet())
             else:
                 try:
                     data_set = catalog._data_sets[data_set_name]

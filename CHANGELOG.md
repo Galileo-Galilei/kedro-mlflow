@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- :bug: Force the input dataset in ``KedroPipelineModel`` to be a ``MemoryDataSet`` to remove unnecessary dependency to the underlying Kedro ``AbstractDataSet`` used during training ([#273](https://github.com/Galileo-Galilei/kedro-mlflow/issues/273))
 -   :bug: Make ``MlflowArtifactDataset`` correctly log in mlflow Kedro DataSets without a ``_path`` attribute like ``kedro.io.PartitionedDataSet``  ([#258](https://github.com/Galileo-Galilei/kedro-mlflow/issues/258)).
 -   :bug: Automatically persist pipeline parameters when calling the ``kedro mlflow modelify`` command for consistency with how ``PipelineML`` objects are handled and for ease of use ([#282](https://github.com/Galileo-Galilei/kedro-mlflow/issues/282)).
 

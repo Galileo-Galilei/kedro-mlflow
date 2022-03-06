@@ -7,7 +7,7 @@ from typing import Dict, Optional, Union
 
 import click
 import mlflow
-from kedro.framework.project import pipelines
+from kedro.framework.project import pipelines, settings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _is_project, bootstrap_project
 from mlflow.models import infer_signature
@@ -88,9 +88,7 @@ def init(env: str, force: bool, silent: bool):
     mlflow_yml = "mlflow.yml"
     project_path = Path().cwd()
     project_metadata = bootstrap_project(project_path)
-    session = KedroSession.create(project_path=project_path)
-    context = session.load_context()
-    mlflow_yml_path = project_path / context.CONF_ROOT / env / mlflow_yml
+    mlflow_yml_path = project_path / settings.CONF_SOURCE / env / mlflow_yml
 
     # mlflow.yml is just a static file,
     # but the name of the experiment is set to be the same as the project
@@ -112,14 +110,14 @@ def init(env: str, force: bool, silent: bool):
         except FileNotFoundError:
             click.secho(
                 click.style(
-                    f"No env '{env}' found. Please check this folder exists inside '{context.CONF_ROOT}' folder.",
+                    f"No env '{env}' found. Please check this folder exists inside '{settings.CONF_SOURCE}' folder.",
                     fg="red",
                 )
             )
         if not silent:
             click.secho(
                 click.style(
-                    f"'{context.CONF_ROOT}/{env}/{mlflow_yml}' successfully updated.",
+                    f"'{settings.CONF_SOURCE}/{env}/{mlflow_yml}' successfully updated.",
                     fg="green",
                 )
             )

@@ -22,10 +22,10 @@ Open your notebook / ipython session with the Kedro CLI:
 kedro jupyter notebook
 ```
 
-Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/latest/11_tools_integration/02_ipython.html#kedro-and-jupyter), including a `session` which are automatically accessible. It also registers some line_magic from plugins, including `%=reload_kedro_mlflow` from `kedro-mlflow`.
+Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/latest/tools_integration/ipython.html#kedro-and-jupyter), including a `session` which are automatically accessible. It also registers some line_magic from plugins, including `%=reload_kedro_mlflow` from `kedro-mlflow`.
 
 In your first cell, launch:
-```python
+```
 %reload_kedro_mlflow
 ```
 
@@ -42,11 +42,11 @@ If you change your ``mlflow.yml``, re-execute this cell for the changes to take 
 - The `hooks` which setup configuration are only accessible if you run the session interactive, e.g.:
 ```python
 session.run(
-    pipeline_name = "my_ml_pipeline",
-    tags = "training",
-    from_inputs = "data_2",
-    to_outputs = "data_7"
-    )
+    pipeline_name="my_ml_pipeline",
+    tags="training",
+    from_inputs="data_2",
+    to_outputs="data_7",
+)
 ```
 but it is not very likely in a notebook.
 
@@ -59,12 +59,12 @@ I suggest to :
 - **transition quickly to kedro pipelines**. For instance, when you preprocessing is roughly defined, try to put it in kedro pipelines. You can then use notebooks to experiment / perfom hyperparameter tuning while keeping preprocessing "fixed" to enhance reproducibility. You can run this pipeline interactively with :
 
 ```python
-res=session.run(
-    pipeline_name = "my_preprocessing_pipeline",
-    tags = "training",
-    from_inputs = "data_2",
-    to_outputs = "data_7"
-    )
+res = session.run(
+    pipeline_name="my_preprocessing_pipeline",
+    tags="training",
+    from_inputs="data_2",
+    to_outputs="data_7",
+)
 ```
 
 ``res`` is a python dict with the outputs of your pipeline (e.g. a "preprocessed_data" ``pandas.DataFrame``), and you can use it interactively in your notebook.

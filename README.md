@@ -1,6 +1,6 @@
 **General informations**
 
-[![Python Version](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8-blue.svg)](https://pypi.org/project/kedro-mlflow/) [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
+[![Python Version](https://img.shields.io/pypi/pyversions/kedro-mlflow)](https://pypi.org/project/kedro-mlflow/) [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) [![Code Style: Black](https://img.shields.io/badge/code%20style-black-black.svg)](https://github.com/ambv/black)
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
 
 ----------------------------------------------------------
@@ -18,7 +18,7 @@
 
 # What is kedro-mlflow?
 
-``kedro-mlflow`` is a [kedro-plugin](https://kedro.readthedocs.io/en/stable/07_extend_kedro/04_plugins.html) for lightweight and portable integration of [mlflow](https://mlflow.org/docs/latest/index.html) capabilities inside [kedro](https://kedro.readthedocs.io/en/stable/index.html) projects. It enforces [``Kedro`` principles](https://kedro.readthedocs.io/en/stable/12_faq/01_faq.html?highlight=principles#what-is-the-philosophy-behind-kedro) to make mlflow usage as production ready as possible. Its core functionalities are :
+``kedro-mlflow`` is a [kedro-plugin](https://kedro.readthedocs.io/en/stable/extend_kedro/plugins.html) for lightweight and portable integration of [mlflow](https://mlflow.org/docs/latest/index.html) capabilities inside [kedro](https://kedro.readthedocs.io/en/stable/index.html) projects. It enforces [``Kedro`` principles](https://kedro.readthedocs.io/en/stable/12_faq/01_faq.html?highlight=principles#what-is-the-philosophy-behind-kedro) to make mlflow usage as production ready as possible. Its core functionalities are :
 
 - **versioning**: `kedro-mlflow` intends to enhance reproducibility for machine learning experimentation. With `kedro-mlflow` installed, you can effortlessly register your parameters or your datasets with minimal configuration in a kedro run. Later, you will be able to browse your runs in the mlflow UI, and retrieve the runs you want. This is directly linked to [Mlflow Tracking](https://www.mlflow.org/docs/latest/tracking.html).
 - **model packaging**: ``kedro-mlflow`` intends to be be an agnostic machine learning framework for people who want to write portable, production ready machine learning pipelines. It offers a convenient API to convert a Kedro pipeline to a ``model`` in the mlflow sense. Consequently, you can *API-fy* or serve your Kedro pipeline with one line of code, or share a model with without worrying of the preprocessing to be made for further use. This is directly linked to [Mlflow Models](https://www.mlflow.org/docs/latest/models.html).
@@ -39,7 +39,7 @@ If you want to use the most up to date version of the package which is under dev
 pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git
 ```
 
-I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/02_get_started/02_install.html).
+I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html).
 
 # Getting started
 

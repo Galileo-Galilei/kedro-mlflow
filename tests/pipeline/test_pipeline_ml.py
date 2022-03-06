@@ -1,7 +1,5 @@
 import pytest
-from kedro import __version__ as KEDRO_VERSION
 from kedro.extras.datasets.pandas import CSVDataSet
-from kedro.framework.context import KedroContext
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 
@@ -86,7 +84,7 @@ def pipeline_ml_with_intermediary_artifacts():
                 func=preprocess_fun,
                 inputs="raw_data",
                 outputs="data",
-                tags=["training"],
+                tags=["training", "preprocessing"],
             ),
             node(
                 func=fit_encoder_fun,
@@ -197,20 +195,6 @@ def pipeline_ml_with_parameters():
 
 
 @pytest.fixture
-def dummy_context(tmp_path, kedro_project, mocker):
-    class DummyContext(KedroContext):
-        project_name = "fake project"
-        package_name = "fake_project"
-        project_version = KEDRO_VERSION
-
-        def _get_pipelines(self):
-            return {"__default__": Pipeline([])}
-
-    dummy_context = DummyContext("fake_package", tmp_path.as_posix())
-    return dummy_context
-
-
-@pytest.fixture
 def dummy_catalog():
     dummy_catalog = DataCatalog(
         {
@@ -277,7 +261,6 @@ def catalog_with_parameters():
 )
 def test_filtering_pipeline_ml(
     mocker,
-    dummy_context,
     pipeline_with_tag,
     pipeline_ml_with_tag,
     tags,
@@ -292,11 +275,10 @@ def test_filtering_pipeline_ml(
     modify the filters.
     """
 
-    # dummy_context, pipeline_with_tag, pipeline_ml_with_tag are fixture in conftest
+    # pipeline_with_tag, pipeline_ml_with_tag are fixture in conftest
 
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
-    filtered_pipeline = dummy_context._filter_pipeline(
-        pipeline=pipeline_with_tag,
+    filtered_pipeline = pipeline_with_tag.filter(
         tags=tags,
         from_nodes=from_nodes,
         to_nodes=to_nodes,
@@ -304,8 +286,7 @@ def test_filtering_pipeline_ml(
         from_inputs=from_inputs,
     )
 
-    filtered_pipeline_ml = dummy_context._filter_pipeline(
-        pipeline=pipeline_ml_with_tag,
+    filtered_pipeline_ml = pipeline_ml_with_tag.filter(
         tags=tags,
         from_nodes=from_nodes,
         to_nodes=to_nodes,
@@ -338,7 +319,6 @@ def test_filtering_pipeline_ml(
 )
 def test_filtering_generate_invalid_pipeline_ml(
     mocker,
-    dummy_context,
     pipeline_ml_obj,
     tags,
     from_nodes,
@@ -355,8 +335,7 @@ def test_filtering_generate_invalid_pipeline_ml(
         KedroMlflowPipelineMLError,
         match="No free input is allowed",
     ):
-        dummy_context._filter_pipeline(
-            pipeline=pipeline_ml_obj,
+        pipeline_ml_obj.filter(
             tags=tags,
             from_nodes=from_nodes,
             to_nodes=to_nodes,
@@ -364,9 +343,6 @@ def test_filtering_generate_invalid_pipeline_ml(
             from_inputs=from_inputs,
         )
 
-
-# add a test to check number of inputs of dummy_context._filter_pipeline
-# if they add new filters, Pipeline Ml must be modified accordingly
 
 # def test_pipeline_ml_preserve_tags():
 #     pass
@@ -400,14 +376,6 @@ def test_too_many_free_inputs():
 def test_tagging(pipeline_ml_with_tag):
     new_pl = pipeline_ml_with_tag.tag(["hello"])
     assert all(["hello" in node.tags for node in new_pl.nodes])
-
-
-def test_decorate(pipeline_ml_with_tag):
-    def fake_dec(x):
-        return x
-
-    new_pl = pipeline_ml_with_tag.decorate(fake_dec)
-    assert all([fake_dec in node._decorators for node in new_pl.nodes])
 
 
 def test_invalid_input_name(pipeline_ml_with_tag):

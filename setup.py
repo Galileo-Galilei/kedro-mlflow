@@ -31,14 +31,14 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/Galileo-Galilei/kedro-mlflow",
-    python_requires=">=3.6, <3.9",
+    python_requires=">=3.7, <3.11",
     packages=find_packages(exclude=["docs*", "tests*"]),
     setup_requires=["setuptools_scm"],
     include_package_data=True,
     install_requires=base_requirements,
     extras_require={
         "doc": [
-            "sphinx==4.4.0",
+            "sphinx>=4.5.0,<5.0.0",
             "recommonmark==0.7.1",
             "sphinx_rtd_theme==1.0.0",
             "sphinx-markdown-tables==0.0.15",
@@ -54,7 +54,7 @@ setup(
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <1.1.0",
             "flake8==4.0.1",  # ensure consistency with pre-commit
-            "black==21.10b0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "black==22.3",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.10.1",  # ensure consistency with pre-commit
         ],
         "dev": [
@@ -83,9 +83,10 @@ setup(
     keywords="kedro-plugin, mlflow, model versioning, model packaging, pipelines, machine learning, data pipelines, data science, data engineering",
     classifiers=[
         "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Framework :: Kedro",
         "Environment :: Plugins",
         "Framework :: Kedro",

@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Iterable, Optional, Union
+from typing import Dict, Iterable, Optional, Union
 
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
@@ -170,10 +170,18 @@ class PipelineML(Pipeline):
             nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
         )
 
+    def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover
+        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+
+    def only_nodes_with_namespace(
+        self, node_namespace: str
+    ) -> "Pipeline":  # pragma: no cover
+        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":  # pragma: no cover
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
-    def from_inputs(self, *inputs: str) -> "PipelineML":
+    def from_inputs(self, *inputs: str) -> "PipelineML":  # pragma: no cover
         # exceptionnally, we don't call super() because it raises
         # a self._check_degrees_of_freedom() error even if valid cases
         # this is because the pipeline is reconstructed node by node
@@ -189,29 +197,49 @@ class PipelineML(Pipeline):
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
     def to_outputs(self, *outputs: str) -> "PipelineML":  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+        # see from_inputs for an explanation of why we don't call super()
+        pipeline = self.training.from_nodes(*outputs)
+        return self._turn_pipeline_to_ml(pipeline)
 
-    def from_nodes(self, *node_names: str) -> "PipelineML":
+    def from_nodes(self, *node_names: str) -> "PipelineML":  # pragma: no cover
         # see from_inputs for an explanation of why we don't call super()
         pipeline = self.training.from_nodes(*node_names)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def to_nodes(self, *node_names: str) -> "PipelineML":
+    def to_nodes(self, *node_names: str) -> "PipelineML":  # pragma: no cover
         # see from_inputs for an explanation of why we don't call super()
         pipeline = self.training.to_nodes(*node_names)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def only_nodes_with_tags(self, *tags: str) -> "PipelineML":
+    def only_nodes_with_tags(self, *tags: str) -> "PipelineML":  # pragma: no cover
         # see from_inputs for an explanation of why we don't call super()
         pipeline = self.training.only_nodes_with_tags(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def decorate(self, *decorators: Callable) -> "PipelineML":
-        pipeline = super().decorate(*decorators)
-        return self._turn_pipeline_to_ml(pipeline)
-
     def tag(self, tags: Union[str, Iterable[str]]) -> "PipelineML":
         pipeline = super().tag(*tags)
+        return self._turn_pipeline_to_ml(pipeline)
+
+    def filter(
+        self,
+        tags: Iterable[str] = None,
+        from_nodes: Iterable[str] = None,
+        to_nodes: Iterable[str] = None,
+        node_names: Iterable[str] = None,
+        from_inputs: Iterable[str] = None,
+        to_outputs: Iterable[str] = None,
+        node_namespace: str = None,
+    ) -> "Pipeline":
+        # see from_inputs for an explanation of why we don't call super()
+        pipeline = self.training.filter(
+            tags=tags,
+            from_nodes=from_nodes,
+            to_nodes=to_nodes,
+            node_names=node_names,
+            from_inputs=from_inputs,
+            to_outputs=to_outputs,
+            node_namespace=node_namespace,
+        )
         return self._turn_pipeline_to_ml(pipeline)
 
     def __add__(self, other):  # pragma: no cover
@@ -220,7 +248,7 @@ class PipelineML(Pipeline):
     def __sub__(self, other):  # pragma: no cover
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
-    def __and__(self, other):
+    def __and__(self, other):  # pragma: no cover
         # kept for compatibility with KedroContext _filter_pipelinefunction
         new_pipeline = super().__and__(other)
         return self._turn_pipeline_to_ml(new_pipeline)

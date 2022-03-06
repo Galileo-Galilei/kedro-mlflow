@@ -34,7 +34,6 @@ class MlflowNodeHook:
                 Should be identical to the data logged by Journal.
                 # @fixme: this needs to be modelled explicitly as code, instead of comment
                 Schema: {
-                    "run_id": str,
                     "project_path": str,
                     "env": str,
                     "kedro_version": str,
@@ -64,12 +63,7 @@ class MlflowNodeHook:
 
     @hook_impl
     def before_node_run(
-        self,
-        node: Node,
-        catalog: DataCatalog,
-        inputs: Dict[str, Any],
-        is_async: bool,
-        run_id: str,
+        self, node: Node, catalog: DataCatalog, inputs: Dict[str, Any], is_async: bool
     ) -> None:
         """Hook to be invoked before a node runs.
         This hook logs all the parameters of the nodes in mlflow.
@@ -78,7 +72,6 @@ class MlflowNodeHook:
             catalog: A ``DataCatalog`` containing the node's inputs and outputs.
             inputs: The dictionary of inputs dataset.
             is_async: Whether the node was run in ``async`` mode.
-            run_id: The id of the run.
         """
 
         # only parameters will be logged. Artifacts must be declared manually in the catalog

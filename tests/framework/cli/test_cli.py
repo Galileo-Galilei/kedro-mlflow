@@ -9,6 +9,7 @@ from cookiecutter.main import cookiecutter
 from kedro import __version__ as kedro_version
 from kedro.framework.cli.cli import info
 from kedro.framework.cli.starters import TEMPLATE_PATH
+from kedro.framework.project import _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
@@ -30,6 +31,28 @@ def extract_cmd_from_help(msg):
         if cmd_match is not None:
             cmd_list.append(cmd_match.group(0))
     return cmd_list
+
+
+@pytest.fixture(autouse=True)
+def mock_validate_settings(mocker):
+    # KedroSession eagerly validates that a project's settings.py is correct by
+    # importing it. settings.py does not actually exists as part of this test suite
+    # since we are testing session in isolation, so the validation is patched.
+    mocker.patch("kedro.framework.session.session.validate_settings")
+
+
+def _mock_imported_settings_paths(mocker, mock_settings):
+    for path in [
+        "kedro.framework.project.settings",
+        "kedro.framework.session.session.settings",
+    ]:
+        mocker.patch(path, mock_settings)
+    return mock_settings
+
+
+@pytest.fixture
+def mock_settings_fake_project(mocker):
+    return _mock_imported_settings_paths(mocker, _ProjectSettings())
 
 
 def test_cli_global_discovered(monkeypatch, tmp_path):
@@ -78,7 +101,9 @@ def test_cli_init(monkeypatch, kedro_project):
     assert (kedro_project / "conf" / "local" / "mlflow.yml").is_file()
 
 
-def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
+def test_cli_init_existing_config(
+    monkeypatch, kedro_project_with_mlflow_conf, mock_settings_fake_project
+):
     # "kedro_project" is a pytest.fixture declared in conftest
     cli_runner = CliRunner()
     monkeypatch.chdir(kedro_project_with_mlflow_conf)
@@ -86,12 +111,14 @@ def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
 
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
-    ) as session:
-        context = session.load_context()
+    ):
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
-            kedro_project_with_mlflow_conf / context.CONF_ROOT / "local" / "mlflow.yml"
+            kedro_project_with_mlflow_conf
+            / mock_settings_fake_project.CONF_SOURCE
+            / "local"
+            / "mlflow.yml"
         ).write_text(yaml_str)
 
         result = cli_runner.invoke(cli_init)
@@ -103,20 +130,24 @@ def test_cli_init_existing_config(monkeypatch, kedro_project_with_mlflow_conf):
         assert get_mlflow_config().server.mlflow_tracking_uri.endswith("toto")
 
 
-def test_cli_init_existing_config_force_option(monkeypatch, kedro_project):
+def test_cli_init_existing_config_force_option(
+    monkeypatch, kedro_project, mock_settings_fake_project
+):
     # "kedro_project" is a pytest.fixture declared in conftest
     monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
 
     bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project) as session:
-        context = session.load_context()
+    with KedroSession.create(project_path=kedro_project):
 
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
-        (kedro_project / context.CONF_ROOT / "local" / "mlflow.yml").write_text(
-            yaml_str
-        )
+        (
+            kedro_project
+            / mock_settings_fake_project.CONF_SOURCE
+            / "local"
+            / "mlflow.yml"
+        ).write_text(yaml_str)
 
         result = cli_runner.invoke(cli_init, args="--force")
 

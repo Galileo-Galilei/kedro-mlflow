@@ -7,7 +7,6 @@ import mlflow
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
-from kedro.versioning.journal import _git_sha
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 
@@ -36,7 +35,6 @@ class MlflowPipelineHook:
         feed_dict: Dict[str, Any],
         save_version: str,
         load_versions: str,
-        run_id: str,
     ):
 
         for name, dataset in catalog._data_sets.items():
@@ -89,7 +87,6 @@ class MlflowPipelineHook:
                 Should be identical to the data logged by Journal.
                 # @fixme: this needs to be modelled explicitly as code, instead of comment
                 Schema: {
-                    "run_id": str,
                     "project_path": str,
                     "env": str,
                     "kedro_version": str,
@@ -124,7 +121,7 @@ class MlflowPipelineHook:
             # add manually git sha for consistency with the journal
             # TODO : this does not take into account not committed files, so it
             # does not ensure reproducibility. Define what to do.
-            mlflow.set_tag("git_sha", _git_sha(run_params["project_path"]))
+
             mlflow.set_tag(
                 "kedro_command",
                 _generate_kedro_command(
@@ -156,7 +153,6 @@ class MlflowPipelineHook:
                 Should be identical to the data logged by Journal.
                 # @fixme: this needs to be modelled explicitly as code, instead of comment
                 Schema: {
-                    "run_id": str,
                     "project_path": str,
                     "env": str,
                     "kedro_version": str,
@@ -222,7 +218,6 @@ class MlflowPipelineHook:
                 Should be identical to the data logged by Journal with the following schema::
 
                    {
-                     "run_id": str
                      "project_path": str,
                      "env": str,
                      "kedro_version": str,

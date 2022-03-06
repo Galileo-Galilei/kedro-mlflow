@@ -1,10 +1,21 @@
+import json
+from pathlib import Path
+
 import pytest
+import toml
 import yaml
+from dynaconf.validator import Validator
+from kedro import __version__ as kedro_version
+from kedro.config import TemplatedConfigLoader
+from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
 from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfigError
+from kedro_mlflow.config.kedro_mlflow_config import (
+    KedroMlflowConfigError,
+    _get_current_session,
+)
 
 
 def _write_yaml(filepath, config):
@@ -60,14 +71,92 @@ def test_get_mlflow_config_in_uninitialized_project(kedro_project):
             get_mlflow_config()
 
 
-# TODO : reenable this test which is currently failing beacause kedro "import settings"
-# is completetly messing up beacause we have several projects
-# and the first import wins
+@pytest.fixture(autouse=True)
+def mock_validate_settings(mocker):
+    # KedroSession eagerly validates that a project's settings.py is correct by
+    # importing it. settings.py does not actually exists as part of this test suite
+    # since we are testing session in isolation, so the validation is patched.
+    mocker.patch("kedro.framework.session.session.validate_settings")
 
 
-def test_mlflow_config_with_templated_config_loader(
-    kedro_project_with_tcl,
-):
+def _mock_imported_settings_paths(mocker, mock_settings):
+    for path in [
+        "kedro.framework.project.settings",
+        "kedro.framework.session.session.settings",
+    ]:
+        mocker.patch(path, mock_settings)
+    return mock_settings
+
+
+@pytest.fixture
+def mock_settings_templated_config_loader_class(mocker):
+    class MockSettings(_ProjectSettings):
+        _CONFIG_LOADER_CLASS = _IsSubclassValidator(
+            "CONFIG_LOADER_CLASS", default=lambda *_: TemplatedConfigLoader
+        )
+
+        _CONFIG_LOADER_ARGS = Validator(
+            "CONFIG_LOADER_ARGS", default=dict(globals_pattern="*globals.yml")
+        )
+
+    return _mock_imported_settings_paths(mocker, MockSettings())
+
+
+@pytest.fixture
+def local_logging_config():
+    return {
+        "version": 1,
+        "formatters": {
+            "simple": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"}
+        },
+        "root": {"level": "INFO", "handlers": ["console"]},
+        "loggers": {
+            "kedro": {"level": "INFO", "handlers": ["console"], "propagate": False}
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "level": "INFO",
+                "formatter": "simple",
+                "stream": "ext://sys.stdout",
+            }
+        },
+        "info_file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "level": "INFO",
+            "formatter": "simple",
+            "filename": "logs/info.log",
+        },
+    }
+
+
+@pytest.fixture
+def fake_project(tmp_path, local_logging_config):
+    fake_project_dir = Path(tmp_path) / "fake_project"
+    (fake_project_dir / "src").mkdir(parents=True)
+
+    pyproject_toml_path = fake_project_dir / "pyproject.toml"
+    payload = {
+        "tool": {
+            "kedro": {
+                "project_version": kedro_version,
+                "project_name": "fake_project",
+                "package_name": "fake_package",
+            }
+        }
+    }
+    toml_str = toml.dumps(payload)
+    pyproject_toml_path.write_text(toml_str, encoding="utf-8")
+
+    env_logging = fake_project_dir / "conf" / "base" / "logging.yml"
+    env_logging.parent.mkdir(parents=True)
+    env_logging.write_text(json.dumps(local_logging_config), encoding="utf-8")
+    (fake_project_dir / "conf" / "local").mkdir()
+    return fake_project_dir
+
+
+@pytest.mark.usefixtures("mock_settings_templated_config_loader_class")
+def test_mlflow_config_with_templated_config_loader(fake_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
@@ -90,17 +179,23 @@ def test_mlflow_config_with_templated_config_loader(
         ui=dict(port="5151", host="localhost"),
     )
 
-    _write_yaml(kedro_project_with_tcl / "conf" / "local" / "mlflow.yml", dict_config)
+    _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
 
     _write_yaml(
-        kedro_project_with_tcl / "conf" / "local" / "globals.yml",
+        fake_project / "conf" / "local" / "globals.yml",
         dict(mlflow_tracking_uri="dynamic_mlruns"),
     )
 
     expected = dict_config.copy()
     expected["server"]["mlflow_tracking_uri"] = (
-        kedro_project_with_tcl / "dynamic_mlruns"
+        fake_project / "dynamic_mlruns"
     ).as_uri()
-    bootstrap_project(kedro_project_with_tcl)
-    with KedroSession.create(project_path=kedro_project_with_tcl):
+
+    bootstrap_project(fake_project)
+    with KedroSession.create("fake_package", fake_project):
         assert get_mlflow_config().dict(exclude={"project_path"}) == expected
+
+
+def test_get_current_session_fails_if_no_activation():
+    with pytest.raises(RuntimeError):
+        _get_current_session(silent=False)

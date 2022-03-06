@@ -7,7 +7,8 @@ import yaml
 from kedro import __version__ as kedro_version
 from kedro.config import ConfigLoader
 from kedro.framework.hooks import hook_impl
-from kedro.framework.hooks.manager import get_hook_manager
+
+# from kedro.framework.hooks.manager import get_hook_manager
 from kedro.framework.project import (
     Validator,
     _ProjectPipelines,
@@ -17,7 +18,6 @@ from kedro.framework.project import (
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline, node
-from kedro.versioning import Journal
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.config import get_mlflow_config
@@ -121,13 +121,13 @@ def mlflow_config_wo_tracking():
     )
 
 
-@pytest.fixture(autouse=True)
-def clear_hook_manager():
-    yield
-    hook_manager = get_hook_manager()
-    plugins = hook_manager.get_plugins()
-    for plugin in plugins:
-        hook_manager.unregister(plugin)
+# @pytest.fixture(autouse=True)
+# def clear_hook_manager():
+#     yield
+#     hook_manager = get_hook_manager()
+#     plugins = hook_manager.get_plugins()
+#     for plugin in plugins:
+#         hook_manager.unregister(plugin)
 
 
 @pytest.fixture(autouse=True)
@@ -169,10 +169,9 @@ class DummyProjectHooks:
         credentials: Dict[str, Dict[str, Any]],
         load_versions: Dict[str, str],
         save_version: str,
-        journal: Journal,
     ) -> DataCatalog:
         return DataCatalog.from_config(
-            catalog, credentials, load_versions, save_version, journal
+            catalog, credentials, load_versions, save_version
         )
 
 
@@ -259,8 +258,11 @@ def mock_session(
     # we need to patch "kedro.framework.session.session.validate_settings" instead of
     # "kedro.framework.project.validate_settings" because it is imported
     mocker.patch("kedro.framework.session.session.validate_settings")
+    # idem, we patch we need to patch "kedro.framework.session.session._register_hooks_setuptools" instead of
+    # "kedro.framework.hooks.manager._register_hooks_setuptools" because it is imported
+
     mocker.patch(
-        "kedro.framework.project._register_hooks_setuptools"
+        "kedro.framework.session.session._register_hooks_setuptools"
     )  # prevent registering the one of the plugins which are already installed
     configure_project(MOCK_PACKAGE_NAME)
     return KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path)

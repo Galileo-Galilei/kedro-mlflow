@@ -168,7 +168,6 @@ def test_node_hook_logging(
                 catalog=dummy_catalog,
                 inputs=node_inputs,
                 is_async=False,
-                run_id="132",
             )
             run_id = mlflow.active_run().info.run_id
 
@@ -215,7 +214,6 @@ def test_node_hook_logging_below_limit_all_strategy(
                 catalog=DataCatalog(),  # can be empty
                 inputs=node_inputs,
                 is_async=False,
-                run_id="132",
             )
             run_id = mlflow.active_run().info.run_id
 
@@ -262,7 +260,6 @@ def test_node_hook_logging_above_limit_truncate_strategy(
                 catalog=DataCatalog(),  # can be empty
                 inputs=node_inputs,
                 is_async=False,
-                run_id="132",
             )
             run_id = mlflow.active_run().info.run_id
 
@@ -324,7 +321,6 @@ def test_node_hook_logging_above_limit_fail_strategy(
                     catalog=DataCatalog(),  # can be empty
                     inputs=node_inputs,
                     is_async=False,
-                    run_id="132",
                 )
 
 
@@ -374,7 +370,6 @@ def test_node_hook_logging_above_limit_tag_strategy(
                 catalog=DataCatalog(),  # can be empty
                 inputs=node_inputs,
                 is_async=False,
-                run_id="132",
             )
             run_id = mlflow.active_run().info.run_id
 

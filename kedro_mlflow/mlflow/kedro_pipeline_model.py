@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 from kedro.extras.datasets.pickle import PickleDataSet
+from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
@@ -210,13 +211,19 @@ class KedroPipelineModel(PythonModel):
         # TODO : checkout out how to pass extra args in predict
         # for instance, to enable parallelization
 
+        # we create an empty hook manager but do NOT register hooks
+        # because we want this model be executable outside of a kedro project
+        hook_manager = _create_hook_manager()
+
         self.loaded_catalog.save(
             name=self.input_name,
             data=model_input,
         )
 
         run_output = self.runner.run(
-            pipeline=self.pipeline, catalog=self.loaded_catalog
+            pipeline=self.pipeline,
+            catalog=self.loaded_catalog,
+            hook_manager=hook_manager,
         )
 
         # unpack the result to avoid messing the json

@@ -14,7 +14,6 @@ from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
-from kedro.versioning import Journal
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
@@ -108,10 +107,9 @@ class DummyProjectHooks:
         credentials: Dict[str, Dict[str, Any]],
         load_versions: Dict[str, str],
         save_version: str,
-        journal: Journal,
     ) -> DataCatalog:
         return DataCatalog.from_config(
-            catalog, credentials, load_versions, save_version, journal
+            catalog, credentials, load_versions, save_version
         )
 
 
@@ -356,7 +354,6 @@ def dummy_signature(dummy_catalog, dummy_pipeline_ml):
 @pytest.fixture
 def dummy_run_params(tmp_path):
     dummy_run_params = {
-        "run_id": "abcdef",
         "project_path": tmp_path.as_posix(),
         "env": "local",
         "kedro_version": "0.16.0",
@@ -388,7 +385,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
 ):
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         # config_with_base_mlflow_conf is a conftest fixture
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
@@ -401,12 +398,11 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
             feed_dict={},
             save_version="",
             load_versions="",
-            run_id=dummy_run_params["run_id"],
         )
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog)
+        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
         pipeline_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
@@ -463,7 +459,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
 ):
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
@@ -477,7 +473,6 @@ def test_mlflow_pipeline_hook_with_copy_mode(
             feed_dict={},
             save_version="",
             load_versions="",
-            run_id=dummy_run_params["run_id"],
         )
 
         pipeline_to_run = pipeline_ml_factory(
@@ -495,7 +490,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog)
+        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
         pipeline_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
@@ -519,7 +514,7 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
 ):
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
         mlflow_conf = get_mlflow_config()
         mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
@@ -562,14 +557,13 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
             feed_dict={},
             save_version="",
             load_versions="",
-            run_id=dummy_run_params["run_id"],
         )
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params,
             pipeline=dummy_pipeline_ml,
             catalog=dummy_catalog_with_run_id,
         )
-        runner.run(dummy_pipeline_ml, dummy_catalog_with_run_id)
+        runner.run(dummy_pipeline_ml, dummy_catalog_with_run_id, session._hook_manager)
 
         current_run_id = mlflow.active_run().info.run_id
 
@@ -618,7 +612,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
 ):
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
         mlflow_conf = get_mlflow_config()
         mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
@@ -648,14 +642,15 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
             feed_dict={},
             save_version="",
             load_versions="",
-            run_id=dummy_run_params["run_id"],
         )
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params,
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
         )
-        runner.run(pipeline_ml_with_parameters, catalog_with_parameters)
+        runner.run(
+            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
+        )
 
         current_run_id = mlflow.active_run().info.run_id
 
@@ -699,7 +694,7 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
 ):
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         pipeline_hook = MlflowPipelineHook()
         runner = SequentialRunner()
 
@@ -723,12 +718,11 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
             feed_dict={},
             save_version="",
             load_versions="",
-            run_id=dummy_run_params["run_id"],
         )
         pipeline_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog)
+        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
         pipeline_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog

@@ -21,17 +21,17 @@ For more details, see [Mlflow's official documentation](https://www.mlflow.org/d
 
 While ``Kedro`` and ``Mlflow`` do not compete in the same field, they provide some overlapping functionalities. ``Mlflow`` is specifically dedicated to machine learning and its lifecycle management, while ``Kedro`` focusing on data pipeline development. Below chart compare the different functionalities:
 
-|Functionality |Kedro          |Mlflow         |
-|:-------------|:--------------|:--------------|
-|I/O abstraction | various ``AbstractDataSet`` | N/A |
-|I/O configuration files |- ``catalog.yml`` <br> - ``parameters.yml``          |``MLproject``|
-|Compute abstraction|- ``Pipeline`` <br> - ``Node``| N/A |
-|Compute configuration files|- ``hooks.py`` <br> - ``run.py``| `MLproject` |
-|Parameters and data versioning| - ``Journal`` <br> - ``AbstractVersionedDataSet`` |- ``log_metric``<br> - ``log_artifact``<br> - ``log_param``|
-|Cli execution|command ``kedro run``|command ``mlflow run``|
-|Code packaging|command ``kedro package``|N/A|
-|Model packaging|N/A|- ``Mlflow Models`` (``mlflow.XXX.log_model`` functions) <br> - ``Mlflow Flavours``|
-|Model service|N/A |commands ``mlflow models {serve/predict/deploy}``|
+| Functionality                  | Kedro                                             | Mlflow                                                                              |
+| :----------------------------- | :------------------------------------------------ | :---------------------------------------------------------------------------------- |
+| I/O abstraction                | various ``AbstractDataSet``                       | N/A                                                                                 |
+| I/O configuration files        | - ``catalog.yml`` <br> - ``parameters.yml``       | ``MLproject``                                                                       |
+| Compute abstraction            | - ``Pipeline`` <br> - ``Node``                    | N/A                                                                                 |
+| Compute configuration files    | - ``hooks.py`` <br> - ``run.py``                  | `MLproject`                                                                         |
+| Parameters and data versioning | - ``Journal`` <br> - ``AbstractVersionedDataSet`` | - ``log_metric``<br> - ``log_artifact``<br> - ``log_param``                         |
+| Cli execution                  | command ``kedro run``                             | command ``mlflow run``                                                              |
+| Code packaging                 | command ``kedro package``                         | N/A                                                                                 |
+| Model packaging                | N/A                                               | - ``Mlflow Models`` (``mlflow.XXX.log_model`` functions) <br> - ``Mlflow Flavours`` |
+| Model service                  | N/A                                               | commands ``mlflow models {serve/predict/deploy}``                                   |
 
 We discuss hereafter how the two libraries compete on the different functionalities and eventually complete each others.
 
@@ -47,7 +47,9 @@ We discuss hereafter how the two libraries compete on the different functionalit
 
 ### Versioning: Kedro 1 - 1 Mlflow
 
-The ``Kedro`` [``Journal`` aims at reproducibility](https://kedro.readthedocs.io/en/latest/kedro.versioning.journal.Journal.html), but is not focused on machine learning. The `Journal` keeps track of two elements:
+** This section will be updated soon with the brand new experiment tracking functionality of kedro**
+
+The ``Kedro`` ``Journal`` aimed at reproducibility (it was removed in ``kedro==0.18``), but is not focused on machine learning. The `Journal` keeps track of two elements:
 
 - the CLI arguments, including *on the fly* parameters. This makes the command used to run the pipeline fully reproducible.
 - the ``AbstractVersionedDataSet`` for which versioning is activated. It consists in copying the data whom ``versioned`` argument is ``True`` when the ``save`` method of the ``AbstractVersionedDataSet`` is called.

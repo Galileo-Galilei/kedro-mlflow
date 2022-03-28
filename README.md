@@ -4,9 +4,10 @@
 [![SemVer](https://img.shields.io/badge/semver-2.0.0-green)](https://semver.org/)
 
 ----------------------------------------------------------
-| Software repository | Latest release                                                                                       | Total downloads                                                                              |
-| ------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Pypi                | [![PyPI version](https://badge.fury.io/py/kedro-mlflow.svg)](https://pypi.org/project/kedro-mlflow/) | [![Downloads](https://pepy.tech/badge/kedro-mlflow)](https://pepy.tech/project/kedro-mlflow) |
+| Package manager | Software repository | Latest release                                                                                                                                | Total downloads                                                                                                                 |
+| --------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| ``pip``         | PyPI                | [![PyPI version](https://badge.fury.io/py/kedro-mlflow.svg)](https://pypi.org/project/kedro-mlflow/)                                          | [![Downloads](https://pepy.tech/badge/kedro-mlflow)](https://pepy.tech/project/kedro-mlflow)                                    |
+| ``conda``       | conda-forge         | [![conda version](https://img.shields.io/conda/vn/conda-forge/kedro-mlflow?color=bright%20green)](https://anaconda.org/search?q=kedro+mlflow) | [![Downloads](https://img.shields.io/conda/dn/conda-forge/kedro-mlflow?color=blue)](https://anaconda.org/search?q=kedro+mlflow) |
 
 **Code health**
 

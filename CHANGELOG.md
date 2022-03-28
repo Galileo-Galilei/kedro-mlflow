@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: ``kedro-mlflow`` is now available on ``conda-forge`` and can be installed with ``conda install kedro-mlflow``. This is retroactive to ``kedro-mlflow==0.8.1`` ([#118](https://github.com/Galileo-Galilei/kedro-mlflow/issues/118))
+
+
 ## [0.8.1] - 2022-02-13
 
 ### Added

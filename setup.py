@@ -25,7 +25,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version="0.8.1",  # this will be bumped automatically by bump2version
+    version="0.9.0",  # this will be bumped automatically by bump2version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,

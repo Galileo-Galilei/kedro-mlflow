@@ -2,15 +2,16 @@
 
 ## [Unreleased]
 
+## [0.9.0] - 2022-04-01
+
 ### Added
 
--   :sparkles: Add support for ``kedro=0.18.X``
--   :sparkles: ``kedro-mlflow`` is now available on ``conda-forge`` and can be installed with ``conda install kedro-mlflow``. This is retroactive to ``kedro-mlflow==0.8.1`` ([#118](https://github.com/Galileo-Galilei/kedro-mlflow/issues/118))
+-   :sparkles: Add support for `kedro=0.18.X`
+-   :sparkles: `kedro-mlflow` is now available on `conda-forge` and can be installed with `conda install kedro-mlflow`. This is retroactive to `kedro-mlflow==0.8.1` ([#118](https://github.com/Galileo-Galilei/kedro-mlflow/issues/118))
 
 ### Removed
 
--   :boom: :wastebasket: Drop support for ``kedro=0.17.X``
-
+-   :boom: :wastebasket: Drop support for `kedro=0.17.X`
 
 ## [0.8.1] - 2022-02-13
 
@@ -293,7 +294,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.9.0...HEAD
+
+[0.9.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.1...0.9.0
 
 [0.8.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.0...0.8.1
 

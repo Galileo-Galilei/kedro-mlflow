@@ -2,16 +2,20 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :memo: Fix typo in documentation ([#302](https://github.com/Galileo-Galilei/kedro-mlflow/issues/302))
+
 ## [0.9.0] - 2022-04-01
 
 ### Added
 
--   :sparkles: Add support for `kedro=0.18.X`
+-   :sparkles: Add support for `kedro=0.18.X` ([#290](https://github.com/Galileo-Galilei/kedro-mlflow/issues/290))
 -   :sparkles: `kedro-mlflow` is now available on `conda-forge` and can be installed with `conda install kedro-mlflow`. This is retroactive to `kedro-mlflow==0.8.1` ([#118](https://github.com/Galileo-Galilei/kedro-mlflow/issues/118))
 
 ### Removed
 
--   :boom: :wastebasket: Drop support for `kedro=0.17.X`
+-   :boom: :wastebasket: Drop support for `kedro=0.17.X` ([#290](https://github.com/Galileo-Galilei/kedro-mlflow/issues/290))
 
 ## [0.8.1] - 2022-02-13
 

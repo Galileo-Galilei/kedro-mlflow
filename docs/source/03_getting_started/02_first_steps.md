@@ -99,7 +99,7 @@ kedro viz
 
 Open your browser at the following adress:
 
-```browser
+```{browser}
 http://localhost:4141/
 ```
 

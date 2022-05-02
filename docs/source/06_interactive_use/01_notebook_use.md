@@ -1,7 +1,7 @@
 # How to use `kedro-mlflow` in a notebook
 
-```eval_rst
-.. important:: You need to call ``pip install kedro_mlflow[extras]`` to access notebook functionalities.
+```{important}
+You need to call ``pip install kedro_mlflow[extras]`` to access notebook functionalities.
 ```
 
 ## Reminder on mlflow's limitations with interactive use

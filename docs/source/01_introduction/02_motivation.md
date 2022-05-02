@@ -46,6 +46,6 @@ Above implementations have the advantage of being very straightforward and *mlfl
 
 `kedro-mlflow` does not currently provide interface to set tags outside a Kedro ``Pipeline``. Some of above decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 
-```eval_rst
-.. note:: You do **not** need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files.
+```{note}
+You do **not** need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files.
 ```

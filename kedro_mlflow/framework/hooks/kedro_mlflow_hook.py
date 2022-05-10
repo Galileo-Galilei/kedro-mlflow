@@ -135,7 +135,9 @@ class KedroMlflowHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
+        self._is_mlflow_enabled = _assert_mlflow_enabled(
+            self.mlflow_config, run_params["pipeline_name"]
+        )
 
         if self._is_mlflow_enabled:
 

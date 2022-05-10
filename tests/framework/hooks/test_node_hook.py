@@ -11,7 +11,7 @@ from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
-from kedro_mlflow.framework.hooks import MlflowNodeHook
+from kedro_mlflow.framework.hooks import KedroMlflowHook
 
 
 def _write_yaml(filepath: Path, config: Dict):
@@ -96,7 +96,7 @@ def test_pipeline_run_hook_getting_configs(
     with KedroSession.create(
         project_path=kedro_project,
     ):
-        mlflow_node_hook = MlflowNodeHook()
+        mlflow_node_hook = KedroMlflowHook()
         mlflow_node_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
         )
@@ -144,7 +144,7 @@ def test_node_hook_logging(
         ),
     )
 
-    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook = KedroMlflowHook()
 
     node_inputs = {
         v: dummy_catalog._data_sets.get(v) for k, v in dummy_node._inputs.items()
@@ -194,7 +194,7 @@ def test_node_hook_logging_below_limit_all_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook = KedroMlflowHook()
 
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
@@ -240,7 +240,7 @@ def test_node_hook_logging_above_limit_truncate_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook = KedroMlflowHook()
 
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
@@ -290,7 +290,7 @@ def test_node_hook_logging_above_limit_fail_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook = KedroMlflowHook()
 
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
@@ -342,7 +342,7 @@ def test_node_hook_logging_above_limit_tag_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
+    mlflow_node_hook = KedroMlflowHook()
 
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}

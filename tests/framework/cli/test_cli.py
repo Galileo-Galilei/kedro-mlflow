@@ -13,7 +13,6 @@ from kedro.framework.project import _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
@@ -111,7 +110,7 @@ def test_cli_init_existing_config(
 
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    ) as session:
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
@@ -127,7 +126,8 @@ def test_cli_init_existing_config(
         assert "A 'mlflow.yml' already exists" in result.output
 
         # check the file remains unmodified
-        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("toto")
+        mlflow_config = session.load_context().mlflow_config
+        assert mlflow_config.server.mlflow_tracking_uri.endswith("toto")
 
 
 def test_cli_init_existing_config_force_option(
@@ -138,7 +138,7 @@ def test_cli_init_existing_config_force_option(
     cli_runner = CliRunner()
 
     bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project):
+    with KedroSession.create(project_path=kedro_project) as session:
 
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
@@ -155,7 +155,8 @@ def test_cli_init_existing_config_force_option(
         assert "successfully updated" in result.output
 
         # check the file remains unmodified
-        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("mlruns")
+        mlflow_config = session.load_context().mlflow_config
+        assert mlflow_config.server.mlflow_tracking_uri.endswith("mlruns")
 
 
 @pytest.mark.parametrize(

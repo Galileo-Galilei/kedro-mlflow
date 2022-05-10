@@ -11,11 +11,7 @@ from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.config.kedro_mlflow_config import (
-    KedroMlflowConfigError,
-    _get_current_session,
-)
+from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfigError
 
 
 def _write_yaml(filepath, config):
@@ -28,7 +24,7 @@ def _write_yaml(filepath, config):
 # and the first import wins
 
 
-def test_get_mlflow_config_default(kedro_project):
+def test_mlflow_config_default(kedro_project):
     # kedro_project is a pytest.fixture in conftest
     dict_config = dict(
         server=dict(
@@ -57,8 +53,11 @@ def test_get_mlflow_config_default(kedro_project):
     expected["server"]["mlflow_tracking_uri"] = (kedro_project / "mlruns").as_uri()
 
     bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project):
-        assert get_mlflow_config().dict(exclude={"project_path"}) == expected
+    with KedroSession.create(project_path=kedro_project) as session:
+        assert (
+            session.load_context().mlflow_config.dict(exclude={"project_path"})
+            == expected
+        )
 
 
 def test_get_mlflow_config_in_uninitialized_project(kedro_project):
@@ -67,8 +66,8 @@ def test_get_mlflow_config_in_uninitialized_project(kedro_project):
         KedroMlflowConfigError, match="No 'mlflow.yml' config file found in environment"
     ):
         bootstrap_project(kedro_project)
-        with KedroSession.create(project_path=kedro_project):
-            get_mlflow_config()
+        with KedroSession.create(project_path=kedro_project) as session:
+            session.load_context()  # fails while loading the config
 
 
 @pytest.fixture(autouse=True)
@@ -192,10 +191,8 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
     ).as_uri()
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project):
-        assert get_mlflow_config().dict(exclude={"project_path"}) == expected
-
-
-def test_get_current_session_fails_if_no_activation():
-    with pytest.raises(RuntimeError):
-        _get_current_session(silent=False)
+    with KedroSession.create("fake_package", fake_project) as session:
+        assert (
+            session.load_context().mlflow_config.dict(exclude={"project_path"})
+            == expected
+        )

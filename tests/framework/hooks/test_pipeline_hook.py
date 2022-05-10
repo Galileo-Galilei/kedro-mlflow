@@ -18,9 +18,8 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.framework.hooks.pipeline_hook import (
-    MlflowPipelineHook,
+from kedro_mlflow.framework.hooks.kedro_mlflow_hook import (
+    KedroMlflowHook,
     _generate_kedro_command,
 )
 from kedro_mlflow.io.metrics import (
@@ -137,8 +136,8 @@ def mock_settings_with_mlflow_hooks(mocker):
         mocker,
         hooks=(
             DummyProjectHooks(),
-            MlflowPipelineHook(),
-            # MlflowNodeHook(),
+            KedroMlflowHook(),
+            # KedroMlflowHook(),
         ),
     )
 
@@ -387,7 +386,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         # config_with_base_mlflow_conf is a conftest fixture
-        pipeline_hook = MlflowPipelineHook()
+        pipeline_hook = KedroMlflowHook()
         runner = SequentialRunner()
         pipeline_hook.after_catalog_created(
             catalog=dummy_catalog,
@@ -408,8 +407,8 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         # test : parameters should have been logged
-        mlflow_conf = get_mlflow_config()
-        mlflow_client = MlflowClient(mlflow_conf.server.mlflow_tracking_uri)
+        mlflow_config = session.load_context().mlflow_config
+        mlflow_client = MlflowClient(mlflow_config.server.mlflow_tracking_uri)
         run_data = mlflow_client.get_run(run_id).data
 
         # all run_params are recorded as tags
@@ -461,7 +460,7 @@ def test_mlflow_pipeline_hook_with_copy_mode(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
-        pipeline_hook = MlflowPipelineHook()
+        pipeline_hook = KedroMlflowHook()
         runner = SequentialRunner()
 
         pipeline_hook.after_catalog_created(
@@ -516,8 +515,8 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
-        mlflow_conf = get_mlflow_config()
-        mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
+        mlflow_config = session.load_context().mlflow_config
+        mlflow.set_tracking_uri(mlflow_config.server.mlflow_tracking_uri)
 
         with mlflow.start_run():
             existing_run_id = mlflow.active_run().info.run_id
@@ -545,7 +544,7 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
             }
         )
 
-        pipeline_hook = MlflowPipelineHook()
+        pipeline_hook = KedroMlflowHook()
 
         runner = SequentialRunner()
         pipeline_hook.after_catalog_created(
@@ -573,7 +572,7 @@ def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
             catalog=dummy_catalog_with_run_id,
         )
 
-        mlflow_client = MlflowClient(mlflow_conf.server.mlflow_tracking_uri)
+        mlflow_client = MlflowClient(mlflow_config.server.mlflow_tracking_uri)
         # the first run is created in Default (id 0),
         # but the one initialised in before_pipeline_run
         # is create  in kedro_project experiment (id 1)
@@ -614,8 +613,8 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
-        mlflow_conf = get_mlflow_config()
-        mlflow.set_tracking_uri(mlflow_conf.server.mlflow_tracking_uri)
+        mlflow_config = session.load_context().mlflow_config
+        mlflow.set_tracking_uri(mlflow_config.server.mlflow_tracking_uri)
 
         catalog_with_parameters = DataCatalog(
             {
@@ -630,7 +629,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
             }
         )
 
-        pipeline_hook = MlflowPipelineHook()
+        pipeline_hook = KedroMlflowHook()
 
         runner = SequentialRunner()
         pipeline_hook.after_catalog_created(
@@ -695,7 +694,7 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        pipeline_hook = MlflowPipelineHook()
+        pipeline_hook = KedroMlflowHook()
         runner = SequentialRunner()
 
         pipeline_to_run = pipeline_ml_factory(
@@ -783,13 +782,15 @@ def test_on_pipeline_error(
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        kmc = get_mlflow_config()
+        mlflow_config = session.load_context().mlflow_config
         with pytest.raises(ValueError):
             session.run()
 
         # the run we want is the last one in the configuration experiment
         mlflow_client = MlflowClient(tracking_uri)
-        experiment = mlflow_client.get_experiment_by_name(kmc.tracking.experiment.name)
+        experiment = mlflow_client.get_experiment_by_name(
+            mlflow_config.tracking.experiment.name
+        )
         failing_run_info = MlflowClient(tracking_uri).list_run_infos(
             experiment.experiment_id
         )[0]

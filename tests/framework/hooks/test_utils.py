@@ -1,4 +1,4 @@
-from kedro_mlflow.framework.hooks.utils import _flatten_dict
+from kedro_mlflow.framework.hooks.kedro_mlflow_hook import _flatten_dict
 
 
 def test_flatten_dict_non_nested():

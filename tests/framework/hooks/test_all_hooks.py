@@ -20,8 +20,7 @@ from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
+from kedro_mlflow.framework.hooks import KedroMlflowHook
 
 MOCK_PACKAGE_NAME = "mock_package_name"
 
@@ -197,11 +196,7 @@ def mock_settings_with_mlflow_hooks(mocker):
 
     return _mock_settings_with_hooks(
         mocker,
-        hooks=(
-            DummyProjectHooks(),
-            MlflowPipelineHook(),
-            MlflowNodeHook(),
-        ),
+        hooks=(DummyProjectHooks(), KedroMlflowHook()),
     )
 
 
@@ -276,9 +271,6 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
 
     with mock_session:
 
-        kedro_mlflow_config = get_mlflow_config()
-        kedro_mlflow_config.setup()
-
         mlflow_client = MlflowClient((Path(kedro_project_path) / "mlruns").as_uri())
 
         # 0 is default, 1 is "fake_exp"
@@ -310,9 +302,6 @@ def test_deactivated_tracking_for_given_pipeline(
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
     with mock_session:
-
-        kedro_mlflow_config = get_mlflow_config()
-        kedro_mlflow_config.setup()
 
         mlflow_client = MlflowClient((kedro_project_path / "mlruns").as_uri())
 

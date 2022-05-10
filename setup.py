@@ -70,8 +70,7 @@ setup(
         #     "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
         # ],
         "kedro.hooks": [
-            "mlflow_pipeline_hook = kedro_mlflow.framework.hooks.pipeline_hook:mlflow_pipeline_hook",
-            "mlflow_node_hooks = kedro_mlflow.framework.hooks.node_hook:mlflow_node_hook",
+            "kedro_mlflow_hook = kedro_mlflow.framework.hooks.kedro_mlflow_hook:kedro_mlflow_hook"
         ],
         "kedro.line_magic": [
             "line_magic = kedro_mlflow.extras.extensions.ipython:reload_kedro_mlflow"

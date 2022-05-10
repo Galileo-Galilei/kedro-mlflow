@@ -1,5 +1,5 @@
 import pytest
-from kedro.framework.session.session import KedroSession, _deactivate_session
+from kedro.framework.session.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
 from kedro_mlflow.extras.extensions.ipython import reload_kedro_mlflow
@@ -10,12 +10,6 @@ def mocked_logging(mocker):
     # Disable logging.config.dictConfig in KedroSession._setup_logging as
     # it changes logging.config and affects other unit tests
     return mocker.patch("logging.config.dictConfig")
-
-
-@pytest.fixture(autouse=True)
-def cleanup_session():
-    yield
-    _deactivate_session()
 
 
 def test_load_global_variables_in_ipython(mocker, kedro_project_with_mlflow_conf):

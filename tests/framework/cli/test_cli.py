@@ -290,7 +290,10 @@ def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
     monkeypatch.chdir(project_path.as_posix())
     cli_runner = CliRunner()
 
-    # This does not test anything : the goal is to check whether it raises an error
+    # # This does not test anything : the goal is to check whether it raises an error
+    ui_mocker = mocker.patch(
+        "kedro.framework.session.session.KedroSession.load_context"
+    )
     ui_mocker = mocker.patch(
         "webbrowser.open"
     )  # make the test succeed, but no a real test

@@ -11,6 +11,7 @@ from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
+from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.hooks import KedroMlflowHook
 
 
@@ -76,6 +77,22 @@ def dummy_catalog():
     return catalog
 
 
+def test_after_context_created_create_mlflow_config(kedro_project):
+
+    _write_yaml(kedro_project / "conf" / "local" / "mlflow.yml", {})  # empty config
+
+    bootstrap_project(kedro_project)
+    with KedroSession.create(
+        project_path=kedro_project,
+    ) as session:
+
+        context = session.load_context()
+        mlflow_node_hook = KedroMlflowHook()
+        mlflow_node_hook.after_context_created(context)
+
+        assert hasattr(mlflow_node_hook, "mlflow_config")
+
+
 def test_pipeline_run_hook_getting_configs(
     kedro_project,
     dummy_run_params,
@@ -96,11 +113,30 @@ def test_pipeline_run_hook_getting_configs(
     with KedroSession.create(
         project_path=kedro_project,
     ):
+
         mlflow_node_hook = KedroMlflowHook()
+
+        # emulate after_context_created
+        mlflow_node_hook.mlflow_config = KedroMlflowConfig(
+            project_path=kedro_project,
+            tracking=dict(
+                params=dict(dict_params=dict(flatten=True, recursive=False, sep="-"))
+            ),
+        )
+
+        class DummyContext:
+            def _get_config_credentials(self):
+                return {}
+
+        mlflow_node_hook.mlflow_config.setup(
+            DummyContext()
+        )  # in real workflow, it is done in after_context_created before this hook
+
         mlflow_node_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
         )
 
+        assert hasattr(mlflow_node_hook, "mlflow_config")
         assert (
             mlflow_node_hook.flatten,
             mlflow_node_hook.recursive,

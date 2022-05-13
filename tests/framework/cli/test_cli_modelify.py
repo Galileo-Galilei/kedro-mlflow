@@ -231,9 +231,11 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
 
     bootstrap_project(Path().cwd())
     with KedroSession.create(project_path=Path().cwd()) as session:
-        mlflow_config = get_mlflow_config()
-        mlflow_config.setup()
         context = session.load_context()
+        mlflow_config = get_mlflow_config(context)
+        mlflow_config.setup(
+            context
+        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
@@ -288,9 +290,11 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
 
     bootstrap_project(Path().cwd())
     with KedroSession.create() as session:
-        mlflow_config = get_mlflow_config()
-        mlflow_config.setup()
         context = session.load_context()
+        mlflow_config = get_mlflow_config(context)
+        mlflow_config.setup(
+            context
+        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
@@ -346,9 +350,11 @@ def test_modelify_with_infer_signature_arg(
     bootstrap_project(Path().cwd())
     my_input_data = pd.DataFrame({"col_int": [1, 2, 3], "col_str": ["a", "b", "c"]})
     with KedroSession.create() as session:
-        mlflow_config = get_mlflow_config()
-        mlflow_config.setup()
         context = session.load_context()
+        mlflow_config = get_mlflow_config(context)
+        mlflow_config.setup(
+            context
+        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)
@@ -410,9 +416,11 @@ def test_modelify_with_infer_input_example(
     bootstrap_project(Path().cwd())
     my_input_data = pd.DataFrame({"col_int": [1, 2, 3], "col_str": ["a", "b", "c"]})
     with KedroSession.create() as session:
-        mlflow_config = get_mlflow_config()
-        mlflow_config.setup()
         context = session.load_context()
+        mlflow_config = get_mlflow_config(context)
+        mlflow_config.setup(
+            context
+        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)

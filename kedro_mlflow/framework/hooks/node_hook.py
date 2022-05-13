@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict, Union
 
 import mlflow
+from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -23,6 +24,19 @@ class MlflowNodeHook:
     @property
     def _logger(self) -> logging.Logger:
         return logging.getLogger(__name__)
+
+    @hook_impl
+    def after_context_created(
+        self,
+        context: KedroContext,
+    ) -> None:
+        """Hooks to be invoked after a `KedroContext` is created. This is the earliest
+        hook triggered within a Kedro run. The `KedroContext` stores useful information
+        such as `credentials`, `config_loader` and `env`.
+        Args:
+            context: The context that was created.
+        """
+        self.mlflow_config = get_mlflow_config(context)
 
     @hook_impl
     def before_pipeline_run(
@@ -49,16 +63,16 @@ class MlflowNodeHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
+        self._is_mlflow_enabled = _assert_mlflow_enabled(
+            run_params["pipeline_name"], self.mlflow_config
+        )
 
         if self._is_mlflow_enabled:
-            mlflow_config = get_mlflow_config()
-
-            self.flatten = mlflow_config.tracking.params.dict_params.flatten
-            self.recursive = mlflow_config.tracking.params.dict_params.recursive
-            self.sep = mlflow_config.tracking.params.dict_params.sep
+            self.flatten = self.mlflow_config.tracking.params.dict_params.flatten
+            self.recursive = self.mlflow_config.tracking.params.dict_params.recursive
+            self.sep = self.mlflow_config.tracking.params.dict_params.sep
             self.long_params_strategy = (
-                mlflow_config.tracking.params.long_params_strategy
+                self.mlflow_config.tracking.params.long_params_strategy
             )
 
     @hook_impl

@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict
 
 import mlflow
+from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
@@ -25,6 +26,21 @@ from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 class MlflowPipelineHook:
     def __init__(self):
         self._is_mlflow_enabled = True
+
+    @hook_impl
+    def after_context_created(
+        self,
+        context: KedroContext,
+    ) -> None:
+        """Hooks to be invoked after a `KedroContext` is created. This is the earliest
+        hook triggered within a Kedro run. The `KedroContext` stores useful information
+        such as `credentials`, `config_loader` and `env`.
+        Args:
+            context: The context that was created.
+        """
+        mlflow_config = get_mlflow_config(context)
+        mlflow_config.setup(context)  # setup global mlflow configuration
+        self.mlflow_config = mlflow_config  # store for further reuse
 
     @hook_impl
     def after_catalog_created(
@@ -102,19 +118,21 @@ class MlflowPipelineHook:
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
-        self._is_mlflow_enabled = _assert_mlflow_enabled(run_params["pipeline_name"])
+        self._is_mlflow_enabled = _assert_mlflow_enabled(
+            run_params["pipeline_name"], self.mlflow_config
+        )
 
         if self._is_mlflow_enabled:
-            mlflow_config = get_mlflow_config()
-            mlflow_config.setup()
 
-            run_name = mlflow_config.tracking.run.name or run_params["pipeline_name"]
+            run_name = (
+                self.mlflow_config.tracking.run.name or run_params["pipeline_name"]
+            )
 
             mlflow.start_run(
-                run_id=mlflow_config.tracking.run.id,
-                experiment_id=mlflow_config.tracking.experiment._experiment.experiment_id,
+                run_id=self.mlflow_config.tracking.run.id,
+                experiment_id=self.mlflow_config.tracking.experiment._experiment.experiment_id,
                 run_name=run_name,
-                nested=mlflow_config.tracking.run.nested,
+                nested=self.mlflow_config.tracking.run.nested,
             )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})

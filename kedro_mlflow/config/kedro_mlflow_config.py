@@ -3,10 +3,9 @@ from pathlib import Path, PurePath
 from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
-import kedro.framework.session.session as kfss  # necessary to access the global variable _active_session of the namespace
 import mlflow
 from kedro.config import MissingConfigException
-from kedro.framework.session import KedroSession  # , get_current_session
+from kedro.framework.context import KedroContext
 from kedro.framework.startup import _is_project
 from mlflow.entities import Experiment
 from mlflow.tracking.client import MlflowClient
@@ -113,10 +112,10 @@ class KedroMlflowConfig(BaseModel):
             tracking_uri=self.server.mlflow_tracking_uri
         )
 
-    def setup(self, session: KedroSession = None):
+    def setup(self, context):
         """Setup all the mlflow configuration"""
 
-        self._export_credentials(session)
+        self._export_credentials(context)
 
         # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
@@ -124,9 +123,7 @@ class KedroMlflowConfig(BaseModel):
 
         self._set_experiment()
 
-    def _export_credentials(self, session: KedroSession = None):
-        session = session or _get_current_session()
-        context = session.load_context()
+    def _export_credentials(self, context: KedroContext):
         conf_creds = context._get_config_credentials()
         mlflow_creds = conf_creds.get(self.server.credentials, {})
         for key, value in mlflow_creds.items():
@@ -216,11 +213,9 @@ class KedroMlflowConfigError(Exception):
     """Error occurred when loading the configuration"""
 
 
-def get_mlflow_config(session: Optional[KedroSession] = None):
-    session = session or _get_current_session()
-    context = session.load_context()
+def get_mlflow_config(context: KedroContext):
     try:
-        conf_mlflow_yml = context._config_loader.get("mlflow*", "mlflow*/**")
+        conf_mlflow_yml = context.config_loader.get("mlflow*", "mlflow*/**")
     except MissingConfigException:
         raise KedroMlflowConfigError(
             "No 'mlflow.yml' config file found in environment. Use ``kedro mlflow init`` command in CLI to create a default config file."
@@ -228,20 +223,3 @@ def get_mlflow_config(session: Optional[KedroSession] = None):
     conf_mlflow_yml["project_path"] = context.project_path
     mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
     return mlflow_config
-
-
-def _get_current_session(silent: bool = False) -> Optional["KedroSession"]:
-    """Fetch the active ``KedroSession`` instance.
-    Args:
-        silent: Indicates to suppress the error if no active session was found.
-    Raises:
-        RuntimeError: If no active session was found and `silent` is False.
-    Returns:
-        KedroSession instance.
-    """
-
-    # _active_session is a global variable from kedro itself
-    if not kfss._active_session and not silent:
-        raise RuntimeError("There is no active Kedro session.")
-
-    return kfss._active_session

@@ -111,7 +111,7 @@ def test_cli_init_existing_config(
 
     with KedroSession.create(
         "fake_project", project_path=kedro_project_with_mlflow_conf
-    ):
+    ) as session:
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
@@ -126,8 +126,9 @@ def test_cli_init_existing_config(
         # check an error message is raised
         assert "A 'mlflow.yml' already exists" in result.output
 
+        context = session.load_context()
         # check the file remains unmodified
-        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("toto")
+        assert get_mlflow_config(context).server.mlflow_tracking_uri.endswith("toto")
 
 
 def test_cli_init_existing_config_force_option(
@@ -138,7 +139,7 @@ def test_cli_init_existing_config_force_option(
     cli_runner = CliRunner()
 
     bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project):
+    with KedroSession.create(project_path=kedro_project) as session:
 
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
@@ -155,7 +156,8 @@ def test_cli_init_existing_config_force_option(
         assert "successfully updated" in result.output
 
         # check the file remains unmodified
-        assert get_mlflow_config().server.mlflow_tracking_uri.endswith("mlruns")
+        context = session.load_context()
+        assert get_mlflow_config(context).server.mlflow_tracking_uri.endswith("mlruns")
 
 
 @pytest.mark.parametrize(
@@ -276,22 +278,31 @@ def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
     project_path = tmp_path / config["repo_name"]
     shutil.rmtree(project_path / "src" / "tests")  # avoid conflicts with pytest
 
-    kmc = KedroMlflowConfig(project_path=project_path.as_posix())
-    kmc.server.mlflow_tracking_uri = "http://google.com"
+    mlflow_config = KedroMlflowConfig(project_path=project_path.as_posix())
+    mlflow_config.server.mlflow_tracking_uri = "http://google.com"
 
     with open(
-        (kmc.project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
+        (mlflow_config.project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
     ) as fhandler:
         yaml.dump(
-            kmc.dict(exclude={"project_path"}), fhandler, default_flow_style=False
+            mlflow_config.dict(exclude={"project_path"}),
+            fhandler,
+            default_flow_style=False,
         )
 
     monkeypatch.chdir(project_path.as_posix())
     cli_runner = CliRunner()
 
     # This does not test anything : the goal is to check whether it raises an error
-    ui_mocker = mocker.patch(
+    # context_mocker = mocker.patch(
+    #     "kedro.framework.session.session.KedroSession.load_context"
+    # )
+    mocker.patch("kedro_mlflow.config.kedro_mlflow_config.KedroMlflowConfig.setup")
+    open_mocker = mocker.patch(
         "webbrowser.open"
     )  # make the test succeed, but no a real test
-    cli_runner.invoke(cli_ui)
-    ui_mocker.assert_called_once()
+    cli_runner.invoke(
+        cli_ui
+    )  # result=cli_runner.invoke(cli_ui); print(result.exception) to debug
+
+    open_mocker.assert_called_once()

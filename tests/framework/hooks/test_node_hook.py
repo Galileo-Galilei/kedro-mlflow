@@ -95,8 +95,11 @@ def test_pipeline_run_hook_getting_configs(
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+
         mlflow_node_hook = MlflowNodeHook()
+        mlflow_node_hook.after_context_created(context)
         mlflow_node_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
         )
@@ -144,8 +147,6 @@ def test_node_hook_logging(
         ),
     )
 
-    mlflow_node_hook = MlflowNodeHook()
-
     node_inputs = {
         v: dummy_catalog._data_sets.get(v) for k, v in dummy_node._inputs.items()
     }
@@ -155,7 +156,10 @@ def test_node_hook_logging(
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook = MlflowNodeHook()
+        mlflow_node_hook.after_context_created(context)  # setup mlflow_config
         mlflow.set_tracking_uri(mlflow_tracking_uri)
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
@@ -194,15 +198,17 @@ def test_node_hook_logging_below_limit_all_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
-
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook = MlflowNodeHook()
+        mlflow_node_hook.after_context_created(context)  # setup mlflow_config
+
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
                 run_params=dummy_run_params,
@@ -240,15 +246,16 @@ def test_node_hook_logging_above_limit_truncate_strategy(
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
 
-    mlflow_node_hook = MlflowNodeHook()
-
     param_value = param_length * "a"
     node_inputs = {"params:my_param": param_value}
 
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook = MlflowNodeHook()
+        mlflow_node_hook.after_context_created(context)
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
                 run_params=dummy_run_params,
@@ -298,7 +305,10 @@ def test_node_hook_logging_above_limit_fail_strategy(
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook.after_context_created(context)
+
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
                 run_params=dummy_run_params,
@@ -350,7 +360,9 @@ def test_node_hook_logging_above_limit_tag_strategy(
     bootstrap_project(kedro_project)
     with KedroSession.create(
         project_path=kedro_project,
-    ):
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook.after_context_created(context)
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
                 run_params=dummy_run_params,

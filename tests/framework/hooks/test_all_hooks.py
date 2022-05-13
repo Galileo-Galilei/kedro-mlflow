@@ -276,8 +276,9 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
 
     with mock_session:
 
-        kedro_mlflow_config = get_mlflow_config()
-        kedro_mlflow_config.setup()
+        context = mock_session.load_context()
+        kedro_mlflow_config = get_mlflow_config(context)
+        kedro_mlflow_config.setup(context)
 
         mlflow_client = MlflowClient((Path(kedro_project_path) / "mlruns").as_uri())
 
@@ -310,10 +311,6 @@ def test_deactivated_tracking_for_given_pipeline(
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
     with mock_session:
-
-        kedro_mlflow_config = get_mlflow_config()
-        kedro_mlflow_config.setup()
-
         mlflow_client = MlflowClient((kedro_project_path / "mlruns").as_uri())
 
         # 0 is default, 1 is "fake_exp"

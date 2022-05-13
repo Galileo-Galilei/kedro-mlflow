@@ -2,6 +2,23 @@
 
 This page explains how to migrate an existing kedro project to a more up to date `kedro-mlflow` versions with breaking changes.
 
+## Migration from 0.8.x to 0.9.x
+
+There are no breaking change in this patch release except if you retrieve the mlflow configuration manually (e.g. in a script or a jupyter notebok). The ``setup()`` method needs to be called with ``context``:
+
+```python
+from kedro.framework.context import load_context
+from kedro_mlflow.config import get_mlflow_config
+
+context = load_context(".")
+
+# the new best practice is just to remove these lines
+mlflow_config = get_mlflow_config(context)  # pass context instead of session
+mlflow_config.setup(context)  # pass context instead of session
+```
+
+This is not necessary: the mlflow config is automatically set up when the context is loaded, so unless you need to access the config manually you can get rid of these 2 lines
+
 ## Migration from 0.7.x to 0.8.x
 
 - Update the ``mlflow.yml`` configuration file with ``kedro mlflow init --force`` command

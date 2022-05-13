@@ -59,8 +59,9 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
 
     assert "exp1" in [
         exp.name for exp in config.server._mlflow_client.list_experiments()
@@ -81,8 +82,10 @@ def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
+
     assert "exp1" in [
         exp.name for exp in config.server._mlflow_client.list_experiments()
     ]
@@ -106,8 +109,9 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
 
     assert "exp1" in [
         exp.name for exp in config.server._mlflow_client.list_experiments()
@@ -128,8 +132,9 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
 
     mlflow_client = MlflowClient(mlflow_tracking_uri)
     runs_list_before_interactive_run = mlflow_client.list_run_infos(
@@ -162,8 +167,9 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
 
     assert mlflow.get_tracking_uri() == mlflow_tracking_uri
 
@@ -181,8 +187,9 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
 
     assert os.environ["fake_mlflow_cred"] == "my_fake_cred"
 
@@ -207,8 +214,9 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
     )
 
     bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf):
-        config.setup()
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()
+        config.setup(context)
 
     assert (
         mlflow.get_tracking_uri()

@@ -2,9 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+
+- :arrow_up: Add support for ``kedro==0.18.1`` which was broken due to kedro's removal of ``_active_session`` private global variable ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+
 ### Fixed
 
 -   :memo: Fix typo in documentation ([#302](https://github.com/Galileo-Galilei/kedro-mlflow/issues/302))
+
+### Changed
+- :refactor: :boom: Refactor the `get_mlflow_config` function which now takes ``context`` instead of ``session`` as input ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309))
+
+### Removed
+
+-   :boom: :arrow_down: Drop support for `kedro=0.18.0`. ``kedro-mlflow`` now supports only ``kedro>=0.18.1, kedro<0.19.0`` ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
 
 ## [0.9.0] - 2022-04-01
 

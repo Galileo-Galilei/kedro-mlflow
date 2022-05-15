@@ -50,7 +50,7 @@ setup(
             "pytest-cov>=2.8.0, <4.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
-            "scikit-learn>=0.23.0, <1.1.0",
+            "scikit-learn>=0.23.0, <1.2.0",
             "flake8==4.0.1",  # ensure consistency with pre-commit
             "black==22.3",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.10.1",  # ensure consistency with pre-commit

@@ -42,52 +42,21 @@ kedro mlflow init --env=<other-environment>
 
 ### Declaring ``kedro-mlflow`` hooks
 
-``kedro_mlflow`` hooks implementations must be registered with Kedro. There are three ways of registering [hooks](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html).
+``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html).
 
-**Note that you must register the two hooks provided by kedro-mlflow** (``MlflowPipelineHook`` and ``MlflowNodeHook``) for the plugin to work.
+**Note that you must register the hook provided by kedro-mlflow** (``MlflowHook``) to make the plugin work.
 
 #### Declaring hooks through auto-discovery (for `kedro>=0.16.4`) [Default behaviour]
 
-If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#disable-auto-registered-plugins-hooks) in your `.kedro.yml` or your `pyproject.toml` file.
+If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
 
-#### Declaring hooks through code, in ``ProjectContext`` (for `kedro>=0.16.0, <=0.16.3`)
+#### Declaring hooks statically in settings.py
 
-By declaring `mlflow_pipeline_hook` and `mlflow_node_hook` in ``(src/package_name/run.py) ProjectContext``:
+If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#registering-your-hook-implementations-with-kedro):
 
 ```python
-from kedro_mlflow.framework.hooks import mlflow_pipeline_hook, mlflow_node_hook
+# <your_project>/src/<your_project>/settings.py
+from kedro_mlflow.framework.hooks import MlflowHook
 
-
-class ProjectContext(KedroContext):
-    """Users can override the remaining methods from the parent class here,
-    or create new ones (e.g. as required by plugins)
-    """
-
-    project_name = "<project-name>"
-    project_version = "0.16.X"  # must be >=0.16.0
-    hooks = (mlflow_pipeline_hook, mlflow_node_hook)
-```
-
-#### Declaring hooks through static configuration in `.kedro.yml` or `pyproject.toml` **[Only for kedro >= 0.16.5 if you have disabled auto-registration]**
-
-In case you have disabled hooks for plugin, you can add them manually by declaring `mlflow_pipeline_hook` and `mlflow_node_hook` in ``.kedro.yml`` :
-
-```yaml
-context_path: km_example.run.ProjectContext
-project_name: "km_example"
-project_version: "0.16.5"
-package_name: "km_example"
-hooks:
-  - <your-project>.hooks.project_hooks
-  - kedro_mlflow.framework.hooks.mlflow_pipeline_hook
-  - kedro_mlflow.framework.hooks.mlflow_node_hook
-```
-
-Or by declaring `mlflow_pipeline_hook` and `mlflow_node_hook` in ``pyproject.toml`` :
-
-```yaml
-# <your-project>/pyproject.toml
-[tool.kedro]
-hooks=["kedro_mlflow.framework.hooks.mlflow_pipeline_hook",
-       "kedro_mlflow.framework.hooks.mlflow_node_hook"]
+HOOKS = (MlflowHook,)
 ```

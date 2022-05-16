@@ -87,7 +87,7 @@ When running the training pipeline, we have all the desired informations we want
 - the "instances" dataset is loaded at the beginning of training, thus we can infer its schema (columns names and types)
 - the inference and training pipeline codes are retrieved at the same moments, so consistency checks can be performed
 
-Hence, ``kedro-mlflow`` provides a ``MlflowPipelineHook.after_pipeline_run`` hook which perfoms the following operations:
+Hence, ``kedro-mlflow`` provides a ``MlflowHook.after_pipeline_run`` hook which perfoms the following operations:
 
 - check if the pipeline that have ust been run is a ``PipelineML`` object
 - in case it is, create the ``KedroPipelineModel`` like above and log it to mlflow

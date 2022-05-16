@@ -40,7 +40,7 @@ def pipeline_ml_factory(
 
     Returns:
         PipelineML: A `PipelineML` which is automatically
-            discovered by the `MlflowPipelineHook` and
+            discovered by the `MlflowHook` and
             contains all the information for logging the
             inference pipeline as a Mlflow Model.
     """

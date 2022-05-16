@@ -21,7 +21,7 @@ from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.framework.hooks import MlflowNodeHook, MlflowPipelineHook
+from kedro_mlflow.framework.hooks import MlflowHook
 
 MOCK_PACKAGE_NAME = "mock_package_name"
 
@@ -199,8 +199,7 @@ def mock_settings_with_mlflow_hooks(mocker):
         mocker,
         hooks=(
             DummyProjectHooks(),
-            MlflowPipelineHook(),
-            MlflowNodeHook(),
+            MlflowHook(),
         ),
     )
 

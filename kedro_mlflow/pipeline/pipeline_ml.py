@@ -4,9 +4,9 @@ from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 
 MSG_NOT_IMPLEMENTED = (
-    "This method is not implemented because it does"
-    "not make sense for 'PipelineML'."
-    "Manipulate directly the training pipeline and"
+    "This method is not implemented because it does "
+    "not make sense for 'PipelineML'. "
+    "Manipulate directly the training pipeline and "
     "recreate the 'PipelineML' with 'pipeline_ml_factory' factory."
 )
 
@@ -26,7 +26,7 @@ class PipelineML(Pipeline):
      are the outputs of the "training" pipeline, except for one of them (the new data to predict).
 
      This class enables to "link" a training pipeline and an inference pipeline in order to package them
-     in mlflow easily. The goal is to call the ``MLflowPipelineHook`` hook after a PipelineMl is called
+     in mlflow easily. The goal is to call the ``MlflowHook`` hook after a PipelineMl is called
      in order to trigger mlflow packaging.
 
     """

@@ -31,9 +31,9 @@ You are now able to use ``my_sklearn_model`` in your nodes. Since this model is 
 
 **For ``MlflowModelLoggerDataSet``**
 
-During save, a model object from node output is logged to mlflow using ``log_model`` function of the specified ``flavor``. It is logged in the `run_id` run if specified and if there is no active run, else in the currently active mlflow run. If the `run_id` is specified and there is an active run, the saving operation will fail. Consequently it will **never be possible to save in a specific mlflow run_id** if you launch a pipeline with the `kedro run` command because the `MlflowPipelineHook` creates a new run before each pipeline run.
+During save, a model object from node output is logged to mlflow using ``log_model`` function of the specified ``flavor``. It is logged in the `run_id` run if specified and if there is no active run, else in the currently active mlflow run. If the `run_id` is specified and there is an active run, the saving operation will fail. Consequently it will **never be possible to save in a specific mlflow run_id** if you launch a pipeline with the `kedro run` command because the `MlflowHook` creates a new run before each pipeline run.
 
-During load, the model is retrieved from the ``run_id`` if specified, else it is retrieved from the mlflow active run. If there is no mlflow active run, the loading fails. This will never happen if you are using the `kedro run` command, because the `MlflowPipelineHook` creates a new run before each pipeline run.
+During load, the model is retrieved from the ``run_id`` if specified, else it is retrieved from the mlflow active run. If there is no mlflow active run, the loading fails. This will never happen if you are using the `kedro run` command, because the `MlflowHook` creates a new run before each pipeline run.
 
 **For ``MlflowModelSaverDataSet``**
 

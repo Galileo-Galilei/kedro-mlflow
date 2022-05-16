@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :recycle: :boom: Unify the `MlflowPipelineHook` and `MlflowNodeHook` in a single `MlflowHook` to ensure consistency in registration order ([#315](https://github.com/Galileo-Galilei/kedro-mlflow/issues/315))
+
 ## [0.10.0] - 2022-05-15
 
 ### Added
 
--   :arrow_up: Add support for `kedro==0.18.1` which was broken due to kedro's removal of `_active_session` private global variable ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+-   :arrow_up: Add support for `kedro==0.18.1` which was broken due to kedro's removal of `_active_session` private global variable ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
 
 ### Fixed
 
@@ -14,11 +18,11 @@
 
 ### Changed
 
--   :refactor: :boom: Refactor the `get_mlflow_config` function which now takes `context` instead of `session` as input ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309))
+-   :recycle: :boom: Refactor the `get_mlflow_config` function which now takes `context` instead of `session` as input ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309))
 
 ### Removed
 
--   :boom: :arrow_down: Drop support for `kedro=0.18.0`. `kedro-mlflow` now supports only `kedro>=0.18.1, kedro<0.19.0` ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+-   :boom: :arrow_down: Drop support for `kedro=0.18.0`. `kedro-mlflow` now supports only `kedro>=0.18.1, kedro<0.19.0` ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
 
 ## [0.9.0] - 2022-04-01
 

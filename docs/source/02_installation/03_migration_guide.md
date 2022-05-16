@@ -2,6 +2,35 @@
 
 This page explains how to migrate an existing kedro project to a more up to date `kedro-mlflow` versions with breaking changes.
 
+## Migration from 0.10.x to 0.11.x
+
+- If you are registering your ``kedro_mlflow`` hooks manually (instead of using automatic registeringfrom plugin, which is the default), change your ``settings.py``
+
+from this
+
+```python
+# <your_project>/src/<your_project>/settings.py
+from kedro_mlflow.framework.hooks import MlflowHook
+
+HOOKS = (MlflowPipelineHook(), MlflowNodeHook)
+```
+
+to this:
+```python
+# <your_project>/src/<your_project>/settings.py
+from kedro_mlflow.framework.hooks import MlflowHook
+
+HOOKS = (MlflowHook,)
+```
+
+
+
+
+
+## Migration from 0.9.x to 0.10.x
+
+You must upgrade your kedro version to ``kedro==0.18.1`` to use ``kedro_mlflow>=0.10``.
+
 ## Migration from 0.8.x to 0.9.x
 
 There are no breaking change in this patch release except if you retrieve the mlflow configuration manually (e.g. in a script or a jupyter notebok). The ``setup()`` method needs to be called with ``context``:

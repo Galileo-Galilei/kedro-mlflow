@@ -1,18 +1,24 @@
 import logging
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import mlflow
 from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
+from kedro.pipeline.node import Node
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
+from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.framework.hooks.utils import _assert_mlflow_enabled
+from kedro_mlflow.framework.hooks.utils import (
+    _assert_mlflow_enabled,
+    _flatten_dict,
+    _generate_kedro_command,
+)
 from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_logging
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataSet,
@@ -23,9 +29,17 @@ from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
-class MlflowPipelineHook:
+class MlflowHook:
     def __init__(self):
         self._is_mlflow_enabled = True
+        self.flatten = False
+        self.recursive = True
+        self.sep = "."
+        self.long_parameters_strategy = "fail"
+
+    @property
+    def _logger(self) -> logging.Logger:
+        return logging.getLogger(__name__)
 
     @hook_impl
     def after_context_created(
@@ -52,7 +66,8 @@ class MlflowPipelineHook:
         save_version: str,
         load_versions: str,
     ):
-
+        # we use this hooks to modif "MlflowmetricsDataset" to ensure consistency
+        # of the metric name with the catalog name
         for name, dataset in catalog._data_sets.items():
 
             if isinstance(dataset, MlflowMetricsDataSet) and dataset._prefix is None:
@@ -124,6 +139,14 @@ class MlflowPipelineHook:
 
         if self._is_mlflow_enabled:
 
+            # params for further for node logging
+            self.flatten = self.mlflow_config.tracking.params.dict_params.flatten
+            self.recursive = self.mlflow_config.tracking.params.dict_params.recursive
+            self.sep = self.mlflow_config.tracking.params.dict_params.sep
+            self.long_params_strategy = (
+                self.mlflow_config.tracking.params.long_params_strategy
+            )
+
             run_name = (
                 self.mlflow_config.tracking.run.name or run_params["pipeline_name"]
             )
@@ -157,6 +180,63 @@ class MlflowPipelineHook:
                 "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes DataSets and parameters."
             )
             switch_catalog_logging(catalog, False)
+
+    @hook_impl
+    def before_node_run(
+        self, node: Node, catalog: DataCatalog, inputs: Dict[str, Any], is_async: bool
+    ) -> None:
+        """Hook to be invoked before a node runs.
+        This hook logs all the parameters of the nodes in mlflow.
+        Args:
+            node: The ``Node`` to run.
+            catalog: A ``DataCatalog`` containing the node's inputs and outputs.
+            inputs: The dictionary of inputs dataset.
+            is_async: Whether the node was run in ``async`` mode.
+        """
+
+        # only parameters will be logged. Artifacts must be declared manually in the catalog
+        if self._is_mlflow_enabled:
+            params_inputs = {}
+            for k, v in inputs.items():
+                # detect parameters automatically based on kedro reserved names
+                if k.startswith("params:"):
+                    params_inputs[k[7:]] = v
+                elif k == "parameters":
+                    params_inputs[k] = v
+
+            # dictionary parameters may be flattened for readibility
+            if self.flatten:
+                params_inputs = _flatten_dict(
+                    d=params_inputs, recursive=self.recursive, sep=self.sep
+                )
+
+            # logging parameters based on defined strategy
+            for k, v in params_inputs.items():
+                self._log_param(k, v)
+
+    def _log_param(self, name: str, value: Union[Dict, int, bool, str]) -> None:
+        str_value = str(value)
+        str_value_length = len(str_value)
+        if str_value_length <= MAX_PARAM_VAL_LENGTH:
+            return mlflow.log_param(name, value)
+        else:
+            if self.long_params_strategy == "fail":
+                raise ValueError(
+                    f"Parameter '{name}' length is {str_value_length}, "
+                    f"while mlflow forces it to be lower than '{MAX_PARAM_VAL_LENGTH}'. "
+                    "If you want to bypass it, try to change 'long_params_strategy' to"
+                    " 'tag' or 'truncate' in the 'mlflow.yml'configuration file."
+                )
+            elif self.long_params_strategy == "tag":
+                self._logger.warning(
+                    f"Parameter '{name}' (value length {str_value_length}) is set as a tag."
+                )
+                mlflow.set_tag(name, value)
+            elif self.long_params_strategy == "truncate":
+                self._logger.warning(
+                    f"Parameter '{name}' (value length {str_value_length}) is truncated to its {MAX_PARAM_VAL_LENGTH} first characters."
+                )
+                mlflow.log_param(name, str_value[0:MAX_PARAM_VAL_LENGTH])
 
     @hook_impl
     def after_pipeline_run(
@@ -260,31 +340,4 @@ class MlflowPipelineHook:
             switch_catalog_logging(catalog, True)
 
 
-mlflow_pipeline_hook = MlflowPipelineHook()
-
-
-def _generate_kedro_command(
-    tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_name
-):
-    cmd_list = ["kedro", "run"]
-    SEP = "="
-    if from_inputs:
-        cmd_list.append("--from-inputs" + SEP + ",".join(from_inputs))
-    if from_nodes:
-        cmd_list.append("--from-nodes" + SEP + ",".join(from_nodes))
-    if to_nodes:
-        cmd_list.append("--to-nodes" + SEP + ",".join(to_nodes))
-    if node_names:
-        cmd_list.append("--node" + SEP + ",".join(node_names))
-    if pipeline_name:
-        cmd_list.append("--pipeline" + SEP + pipeline_name)
-    if tags:
-        # "tag" is the name of the command, "tags" the value in run_params
-        cmd_list.append("--tag" + SEP + ",".join(tags))
-    if load_versions:
-        # "load_version" is the name of the command, "load_versions" the value in run_params
-        formatted_versions = [f"{k}:{v}" for k, v in load_versions.items()]
-        cmd_list.append("--load-version" + SEP + ",".join(formatted_versions))
-
-    kedro_cmd = " ".join(cmd_list)
-    return kedro_cmd
+mlflow_hook = MlflowHook()

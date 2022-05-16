@@ -37,8 +37,8 @@ Above implementations have the advantage of being very straightforward and *mlfl
 
 | Mlflow action             | Template file   | Python API                                               |
 | :------------------------ | :-------------- | :------------------------------------------------------- |
-| Set up configuration      | ``mlflow.yml``  | ``MlflowPipelineHook``                                   |
-| Logging parameters        | ``mlflow.yml``  | ``MlflowNodeHook``                                       |
+| Set up configuration      | ``mlflow.yml``  | ``MlflowHook``                                           |
+| Logging parameters        | ``mlflow.yml``  | ``MlflowHook``                                           |
 | Logging artifacts         | ``catalog.yml`` | ``MlflowArtifactDataSet``                                |
 | Logging models            | ``catalog.yml`` | `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet` |
 | Logging metrics           | ``catalog.yml`` | ``MlflowMetricsDataSet``                                 |

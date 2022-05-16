@@ -157,7 +157,7 @@ my_model_metrics:
     type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 ```
 
-You can provide a prefix key, which is useful in situations like when you have multiple nodes producing metrics with the same names which you want to distinguish. If you are using the ``MlflowPipelineHook``, it will handle that automatically for you by giving as prefix metrics data set name. In the example above the prefix would be ``my_model_metrics``.
+You can provide a prefix key, which is useful in situations like when you have multiple nodes producing metrics with the same names which you want to distinguish. If you are using the ``v``, it will handle that automatically for you by giving as prefix metrics data set name. In the example above the prefix would be ``my_model_metrics``.
 
 Let's look at an example with custom prefix:
 
@@ -191,7 +191,7 @@ my_model_metrics:
     type: kedro_mlflow.io.metrics.MlflowMetricsDataSet
 ```
 
-Within a kedro run, the ``MlflowPipelineHook`` will automatically prefix the metrics datasets with their name in the catalog. In our example, the metrics will be stored in Mlflow with the following keys: ``my_model_metrics.metric1``, ``my_model_metrics.metric2``.
+Within a kedro run, the ``MlflowHook`` will automatically prefix the metrics datasets with their name in the catalog. In our example, the metrics will be stored in Mlflow with the following keys: ``my_model_metrics.metric1``, ``my_model_metrics.metric2``.
 
 It is also prossible to provide a prefix manually:
 

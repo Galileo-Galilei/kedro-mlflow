@@ -1,39 +1,25 @@
 import sys
-from typing import Any, Dict, Iterable, Optional
 
 import mlflow
 import pandas as pd
 import pytest
-import yaml
-from kedro.config import ConfigLoader
 from kedro.extras.datasets.pickle import PickleDataSet
-from kedro.framework.hooks import hook_impl
-from kedro.framework.project import Validator, _ProjectPipelines, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
-from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.config import get_mlflow_config
-from kedro_mlflow.framework.hooks.pipeline_hook import (
-    MlflowPipelineHook,
-    _generate_kedro_command,
-)
-from kedro_mlflow.io.metrics import (
-    MlflowMetricDataSet,
-    MlflowMetricHistoryDataSet,
-    MlflowMetricsDataSet,
-)
+from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
 @pytest.fixture
-def python_version():
+def env_from_dict():
     python_version = ".".join(
         [
             str(sys.version_info.major),
@@ -41,106 +27,8 @@ def python_version():
             str(sys.version_info.micro),
         ]
     )
-    return python_version
-
-
-@pytest.fixture
-def requirements_path(tmp_path):
-    return tmp_path / "requirements.txt"
-
-
-@pytest.fixture
-def requirements_path_str(requirements_path):
-    return requirements_path.as_posix()
-
-
-@pytest.fixture
-def environment_path(tmp_path):
-    return tmp_path / "environment.yml"
-
-
-@pytest.fixture
-def environment_path_str(environment_path):
-    return environment_path.as_posix()
-
-
-@pytest.fixture
-def env_from_none(python_version):
-    return dict(python=python_version)
-
-
-@pytest.fixture
-def env_from_requirements(requirements_path, python_version):
-    requirements_data = ["pandas>=1.0.0,<2.0.0", "kedro==0.15.9"]
-    with open(requirements_path, mode="w") as file_handler:
-        for item in requirements_data:
-            file_handler.write(f"{item}\n")
-    return dict(python=python_version, dependencies=requirements_data)
-
-
-@pytest.fixture
-def env_from_dict(python_version):
     env_from_dict = dict(python=python_version, dependencies=["pandas>=1.0.0,<2.0.0"])
     return env_from_dict
-
-
-@pytest.fixture
-def env_from_environment(environment_path, env_from_dict):
-
-    with open(environment_path, mode="w") as file_handler:
-        yaml.dump(env_from_dict, file_handler)
-
-    env_from_environment = env_from_dict
-
-    return env_from_environment
-
-
-class DummyProjectHooks:
-    @hook_impl
-    def register_config_loader(self, conf_paths: Iterable[str]) -> ConfigLoader:
-        return ConfigLoader(conf_paths)
-
-    @hook_impl
-    def register_catalog(
-        self,
-        catalog: Optional[Dict[str, Dict[str, Any]]],
-        credentials: Dict[str, Dict[str, Any]],
-        load_versions: Dict[str, str],
-        save_version: str,
-    ) -> DataCatalog:
-        return DataCatalog.from_config(
-            catalog, credentials, load_versions, save_version
-        )
-
-
-def _mock_imported_settings_paths(mocker, mock_settings):
-    for path in [
-        "kedro.framework.context.context.settings",
-        "kedro.framework.session.session.settings",
-        "kedro.framework.project.settings",
-    ]:
-        mocker.patch(path, mock_settings)
-    return mock_settings
-
-
-def _mock_settings_with_hooks(mocker, hooks):
-    class MockSettings(_ProjectSettings):
-        _HOOKS = Validator("HOOKS", default=hooks)
-
-    return _mock_imported_settings_paths(mocker, MockSettings())
-
-
-@pytest.fixture
-def mock_settings_with_mlflow_hooks(mocker):
-
-    return _mock_settings_with_hooks(
-        mocker,
-        hooks=(
-            DummyProjectHooks(),
-            MlflowPipelineHook(),
-            # MlflowNodeHook(),
-        ),
-    )
 
 
 @pytest.fixture(autouse=True)
@@ -151,46 +39,12 @@ def mocked_logging(mocker):
 
 
 @pytest.fixture
-def mock_failing_pipelines(mocker):
-    def failing_node():
-        mlflow.start_run(nested=True)
-        raise ValueError("Let's make this pipeline fail")
-
-    def mocked_register_pipelines():
-        failing_pipeline = Pipeline(
-            [
-                node(
-                    func=failing_node,
-                    inputs=None,
-                    outputs="fake_output",
-                )
-            ]
-        )
-        return {"__default__": failing_pipeline, "pipeline_off": failing_pipeline}
-
-    mocker.patch.object(
-        _ProjectPipelines,
-        "_get_pipelines_registry_callable",
-        return_value=mocked_register_pipelines,
-    )
-
-
-@pytest.fixture
 def dummy_pipeline():
     def preprocess_fun(data):
         return data
 
     def train_fun(data, param):
         return 2
-
-    def metrics_fun(data, model):
-        return {"metric_key": {"value": 1.1, "step": 0}}
-
-    def metric_fun(data, model):
-        return 1.1
-
-    def metric_history_fun(data, model):
-        return [0.1, 0.2]
 
     def predict_fun(model, data):
         return data * model
@@ -207,42 +61,6 @@ def dummy_pipeline():
                 func=train_fun,
                 inputs=["data", "params:unused_param"],
                 outputs="model",
-                tags=["training"],
-            ),
-            node(
-                func=metrics_fun,
-                inputs=["model", "data"],
-                outputs="my_metrics",
-                tags=["training"],
-            ),
-            node(
-                func=metrics_fun,
-                inputs=["model", "data"],
-                outputs="another_metrics",
-                tags=["training"],
-            ),
-            node(
-                func=metric_fun,
-                inputs=["model", "data"],
-                outputs="my_metric",
-                tags=["training"],
-            ),
-            node(
-                func=metric_fun,
-                inputs=["model", "data"],
-                outputs="another_metric",
-                tags=["training"],
-            ),
-            node(
-                func=metric_history_fun,
-                inputs=["model", "data"],
-                outputs="my_metric_history",
-                tags=["training"],
-            ),
-            node(
-                func=metric_history_fun,
-                inputs=["model", "data"],
-                outputs="another_metric_history",
                 tags=["training"],
             ),
             node(
@@ -276,12 +94,6 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
-            "my_metrics": MlflowMetricsDataSet(),
-            "another_metrics": MlflowMetricsDataSet(prefix="foo"),
-            "my_metric": MlflowMetricDataSet(),
-            "another_metric": MlflowMetricDataSet(key="foo"),
-            "my_metric_history": MlflowMetricHistoryDataSet(),
-            "another_metric_history": MlflowMetricHistoryDataSet(key="bar"),
         }
     )
     return dummy_catalog
@@ -376,9 +188,8 @@ def dummy_run_params(tmp_path):
         (pytest.lazy_fixture("dummy_pipeline_ml")),
     ],
 )
-def test_mlflow_pipeline_hook_with_different_pipeline_types(
+def test_mlflow_hook_save_pipeline_ml(
     kedro_project_with_mlflow_conf,
-    env_from_dict,
     pipeline_to_run,
     dummy_catalog,
     dummy_run_params,
@@ -389,10 +200,10 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         context = session.load_context()  # triggers conf setup
 
         # config_with_base_mlflow_conf is a conftest fixture
-        pipeline_hook = MlflowPipelineHook()
-        pipeline_hook.after_context_created(context)  # setup mlflow config
+        mlflow_hook = MlflowHook()
+        mlflow_hook.after_context_created(context)  # setup mlflow config
         runner = SequentialRunner()
-        pipeline_hook.after_catalog_created(
+        mlflow_hook.after_catalog_created(
             catalog=dummy_catalog,
             # `after_catalog_created` is not using any of below arguments,
             # so we are setting them to empty values.
@@ -402,12 +213,12 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
             save_version="",
             load_versions="",
         )
-        pipeline_hook.before_pipeline_run(
+        mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
-        pipeline_hook.after_pipeline_run(
+        mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         # test : parameters should have been logged
@@ -420,20 +231,13 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
             if v:
                 assert run_data.tags[k] == str(v)
 
-        # params are not recorded because we don't have MlflowNodeHook here
+        # params are not recorded because we don't have MlflowHook here
         # and the model should not be logged when it is not a PipelineML
         nb_artifacts = len(mlflow_client.list_artifacts(run_id))
         if isinstance(pipeline_to_run, PipelineML):
             assert nb_artifacts == 1
         else:
             assert nb_artifacts == 0
-
-        # Check if metrics datasets have prefix with its names.
-        # for metric
-        assert dummy_catalog._data_sets["my_metrics"]._prefix == "my_metrics"
-        assert dummy_catalog._data_sets["another_metrics"]._prefix == "foo"
-        assert dummy_catalog._data_sets["my_metric"].key == "my_metric"
-        assert dummy_catalog._data_sets["another_metric"].key == "foo"
 
         if isinstance(pipeline_to_run, PipelineML):
             trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
@@ -452,7 +256,7 @@ def test_mlflow_pipeline_hook_with_different_pipeline_types(
         ({"model": "assign"}, {"raw_data": None, "data": None, "model": "assign"}),
     ],
 )
-def test_mlflow_pipeline_hook_with_copy_mode(
+def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
     kedro_project_with_mlflow_conf,
     dummy_pipeline_ml,
     dummy_catalog,
@@ -464,10 +268,10 @@ def test_mlflow_pipeline_hook_with_copy_mode(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-        pipeline_hook = MlflowPipelineHook()
+        mlflow_hook = MlflowHook()
         runner = SequentialRunner()
-        pipeline_hook.after_context_created(context)
-        pipeline_hook.after_catalog_created(
+        mlflow_hook.after_context_created(context)
+        mlflow_hook.after_catalog_created(
             catalog=dummy_catalog,
             # `after_catalog_created` is not using any of arguments bellow,
             # so we are setting them to empty values.
@@ -490,12 +294,12 @@ def test_mlflow_pipeline_hook_with_copy_mode(
                 "copy_mode": copy_mode,
             },
         )
-        pipeline_hook.before_pipeline_run(
+        mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
-        pipeline_hook.after_pipeline_run(
+        mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
 
@@ -512,105 +316,8 @@ def test_mlflow_pipeline_hook_with_copy_mode(
         assert actual_copy_mode == expected
 
 
-def test_mlflow_pipeline_hook_metric_metrics_with_run_id(
-    kedro_project_with_mlflow_conf, dummy_pipeline_ml, dummy_run_params
-):
-
-    bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow.set_tracking_uri(mlflow_config.server.mlflow_tracking_uri)
-
-        with mlflow.start_run():
-            existing_run_id = mlflow.active_run().info.run_id
-
-        dummy_catalog_with_run_id = DataCatalog(
-            {
-                "raw_data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
-                "params:unused_param": MemoryDataSet("blah"),
-                "data": MemoryDataSet(),
-                "model": PickleDataSet(
-                    (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
-                ),
-                "my_metrics": MlflowMetricsDataSet(run_id=existing_run_id),
-                "another_metrics": MlflowMetricsDataSet(
-                    run_id=existing_run_id, prefix="foo"
-                ),
-                "my_metric": MlflowMetricDataSet(run_id=existing_run_id),
-                "another_metric": MlflowMetricDataSet(
-                    run_id=existing_run_id, key="foo"
-                ),
-                "my_metric_history": MlflowMetricHistoryDataSet(run_id=existing_run_id),
-                "another_metric_history": MlflowMetricHistoryDataSet(
-                    run_id=existing_run_id, key="bar"
-                ),
-            }
-        )
-
-        pipeline_hook = MlflowPipelineHook()
-        runner = SequentialRunner()
-
-        pipeline_hook.after_context_created(context)
-        pipeline_hook.after_catalog_created(
-            catalog=dummy_catalog_with_run_id,
-            # `after_catalog_created` is not using any of arguments bellow,
-            # so we are setting them to empty values.
-            conf_catalog={},
-            conf_creds={},
-            feed_dict={},
-            save_version="",
-            load_versions="",
-        )
-        pipeline_hook.before_pipeline_run(
-            run_params=dummy_run_params,
-            pipeline=dummy_pipeline_ml,
-            catalog=dummy_catalog_with_run_id,
-        )
-        runner.run(dummy_pipeline_ml, dummy_catalog_with_run_id, session._hook_manager)
-
-        current_run_id = mlflow.active_run().info.run_id
-
-        pipeline_hook.after_pipeline_run(
-            run_params=dummy_run_params,
-            pipeline=dummy_pipeline_ml,
-            catalog=dummy_catalog_with_run_id,
-        )
-
-        mlflow_client = MlflowClient(mlflow_config.server.mlflow_tracking_uri)
-        # the first run is created in Default (id 0),
-        # but the one initialised in before_pipeline_run
-        # is create  in kedro_project experiment (id 1)
-        all_runs_id = set(
-            [
-                run.run_id
-                for k in range(2)
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
-
-        # the metrics are supposed to have been logged inside existing_run_id
-        run_data = mlflow_client.get_run(existing_run_id).data
-
-        # Check if metrics datasets have prefix with its names.
-        # for metric
-        assert all_runs_id == {current_run_id, existing_run_id}
-
-        assert run_data.metrics["my_metrics.metric_key"] == 1.1
-        assert run_data.metrics["foo.metric_key"] == 1.1
-        assert run_data.metrics["my_metric"] == 1.1
-        assert run_data.metrics["foo"] == 1.1
-        assert (
-            run_data.metrics["my_metric_history"] == 0.2
-        )  # the list is stored, but only the last value is retrieved
-        assert (
-            run_data.metrics["bar"] == 0.2
-        )  # the list is stored, but only the last value is retrieved
-
-
-def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
+def test_mlflow_hook_save_pipeline_ml_with_parameters(
     kedro_project_with_mlflow_conf,  # a fixture to be in a kedro project
-    tmp_path,
     pipeline_ml_with_parameters,
     dummy_run_params,
 ):
@@ -635,11 +342,11 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
             }
         )
 
-        pipeline_hook = MlflowPipelineHook()
-        pipeline_hook.after_context_created(context)
+        mlflow_hook = MlflowHook()
+        mlflow_hook.after_context_created(context)
 
         runner = SequentialRunner()
-        pipeline_hook.after_catalog_created(
+        mlflow_hook.after_catalog_created(
             catalog=catalog_with_parameters,
             # `after_catalog_created` is not using any of arguments bellow,
             # so we are setting them to empty values.
@@ -649,7 +356,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
             save_version="",
             load_versions="",
         )
-        pipeline_hook.before_pipeline_run(
+        mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params,
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
@@ -661,7 +368,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
         current_run_id = mlflow.active_run().info.run_id
 
         # This is what we want to test: model must be saved and the parameters automatically persisted on disk
-        pipeline_hook.after_pipeline_run(
+        mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params,
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
@@ -689,7 +396,7 @@ def test_mlflow_pipeline_hook_save_pipeline_ml_with_parameters(
         ],
     ),
 )
-def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
+def test_mlflow_hook_save_pipeline_ml_with_signature(
     kedro_project_with_mlflow_conf,
     env_from_dict,
     dummy_pipeline,
@@ -701,7 +408,7 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        pipeline_hook = MlflowPipelineHook()
+        mlflow_hook = MlflowHook()
         runner = SequentialRunner()
 
         pipeline_to_run = pipeline_ml_factory(
@@ -716,8 +423,8 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
         )
 
         context = session.load_context()
-        pipeline_hook.after_context_created(context)
-        pipeline_hook.after_catalog_created(
+        mlflow_hook.after_context_created(context)
+        mlflow_hook.after_catalog_created(
             catalog=dummy_catalog,
             # `after_catalog_created` is not using any of arguments bellow,
             # so we are setting them to empty values.
@@ -727,84 +434,15 @@ def test_mlflow_pipeline_hook_with_pipeline_ml_signature(
             save_version="",
             load_versions="",
         )
-        pipeline_hook.before_pipeline_run(
+        mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
-        pipeline_hook.after_pipeline_run(
+        mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
 
         # test : parameters should have been logged
         trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
         assert trained_model.metadata.signature == expected_signature
-
-
-def test_generate_kedro_commands():
-    # TODO : add a better test because the formatting of record_data is subject to change
-    # We could check that the command is recored and then rerun properly
-    record_data = {
-        "tags": ["tag1", "tag2"],
-        "from_nodes": ["node1"],
-        "to_nodes": ["node3"],
-        "node_names": ["node1", "node2", "node1"],
-        "from_inputs": ["data_in"],
-        "load_versions": {"data_inter": "01:23:45"},
-        "pipeline_name": "fake_pl",
-    }
-
-    expected = "kedro run --from-inputs=data_in --from-nodes=node1 --to-nodes=node3 --node=node1,node2,node1 --pipeline=fake_pl --tag=tag1,tag2 --load-version=data_inter:01:23:45"
-    assert _generate_kedro_command(**record_data) == expected
-
-
-@pytest.mark.parametrize("default_value", [None, []])
-def test_generate_default_kedro_commands(default_value):
-    """This test ensures that the _generate_kedro_comands accepts both
-     `None` and empty `list` as default value, because CLI and interactive
-     `Journal` do not use the same default.
-
-    Args:
-        default_value ([type]): [description]
-    """
-    record_data = {
-        "tags": default_value,
-        "from_nodes": default_value,
-        "to_nodes": default_value,
-        "node_names": default_value,
-        "from_inputs": default_value,
-        "load_versions": default_value,
-        "pipeline_name": "fake_pl",
-    }
-
-    expected = "kedro run --pipeline=fake_pl"
-    assert _generate_kedro_command(**record_data) == expected
-
-
-def test_on_pipeline_error(
-    kedro_project_with_mlflow_conf,
-    mock_settings_with_mlflow_hooks,
-    mock_failing_pipelines,
-):
-
-    tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
-
-    bootstrap_project(kedro_project_with_mlflow_conf)
-    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        with pytest.raises(ValueError):
-            session.run()
-
-        # the run we want is the last one in the configuration experiment
-        mlflow_client = MlflowClient(tracking_uri)
-        experiment = mlflow_client.get_experiment_by_name(
-            mlflow_config.tracking.experiment.name
-        )
-        failing_run_info = MlflowClient(tracking_uri).list_run_infos(
-            experiment.experiment_id
-        )[0]
-        assert mlflow.active_run() is None  # the run must have been closed
-        assert failing_run_info.status == RunStatus.to_string(
-            RunStatus.FAILED
-        )  # it must be marked as failed

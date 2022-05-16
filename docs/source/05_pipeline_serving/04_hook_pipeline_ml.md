@@ -4,7 +4,7 @@ For consistency, you may want to log an inference pipeline (including some data 
 
 ### Getting started
 
-1. Install ``kedro-mlflow`` ``MlflowPipelineHook`` (this is done automatically if you have installed ``kedro-mlflow`` in a ``kedro>=0.16.5`` project)
+1. Install ``kedro-mlflow`` ``MlflowHook`` (this is done automatically if you have installed ``kedro-mlflow`` in a ``kedro>=0.16.5`` project)
 2. Turn your training pipeline in a ``PipelineML`` object  with ``pipeline_ml_factory`` function in your ``pipeline_registry.py``:
 
     ```python

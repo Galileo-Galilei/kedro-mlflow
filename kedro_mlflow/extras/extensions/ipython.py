@@ -11,13 +11,15 @@ def reload_kedro_mlflow(line=None, local_ns=None):
     metadata = bootstrap_project(
         local_ns["project_path"]
     )  # project_path is a global variable defined by init_kedro
-    mlflow_config = get_mlflow_config()  # can only be called if a session exist
+    mlflow_config = get_mlflow_config(
+        context=local_ns["context"]
+    )  # can only be called if a session exist
 
     mlflow_client = MlflowClient(tracking_uri=mlflow_config.server.mlflow_tracking_uri)
     global_variables = {"mlflow_client": mlflow_client}
     get_ipython().push(variables=global_variables)
     get_ipython().run_cell("import mlflow", "", "")
-    get_ipython().run_cell("mlflow_config.setup()")
+    get_ipython().run_cell("mlflow_config.setup(context)")
 
     global_variables_names = "\n- ".join(
         [f"'{key}'" for key in global_variables.keys()]

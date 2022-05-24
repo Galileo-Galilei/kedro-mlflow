@@ -6,9 +6,6 @@ from cookiecutter.main import cookiecutter
 from kedro import __version__ as kedro_version
 from kedro.framework.cli.starters import TEMPLATE_PATH
 
-# from kedro.framework.hooks.manager import get_hook_manager
-from kedro.framework.session.session import _deactivate_session
-
 from kedro_mlflow.framework.cli.cli import TEMPLATE_FOLDER_PATH
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 
@@ -22,13 +19,6 @@ def cleanup_mlflow_after_runs():
     while mlflow.active_run():
         mlflow.end_run()
     mlflow.set_experiment("Default")
-
-
-@pytest.fixture(autouse=True)
-def cleanup_kedro_session():
-    # A test function will be run at this point
-    yield
-    _deactivate_session()
 
 
 # see https://github.com/kedro-org/kedro/blob/859f98217eed12208a922b771a97cbfb82ba7e80/tests/framework/session/test_session.py#L173

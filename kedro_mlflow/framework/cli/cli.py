@@ -154,14 +154,22 @@ def ui(env: str, port: str, host: str):
     with KedroSession.create(
         project_path=project_path,
         env=env,
-    ):
+    ) as session:
 
-        mlflow_conf = get_mlflow_config()
-        host = host or mlflow_conf.ui.host
-        port = port or mlflow_conf.ui.port
+        print("INSIDE SESSION------------------------")
+        context = session.load_context()
+        print(context)
+        print("CONTEXT LOADED------------------------")
+        mlflow_config = get_mlflow_config(context)
+        print("MLFLOW_CONFIG------------------------")
+        print(mlflow_config)
+        print("MLFLOW_CONFIG------------------------")
+        host = host or mlflow_config.ui.host
+        port = port or mlflow_config.ui.port
 
-        if mlflow_conf.server.mlflow_tracking_uri.startswith("http"):
-            webbrowser.open(mlflow_conf.server.mlflow_tracking_uri)
+        print(mlflow_config.server.mlflow_tracking_uri)
+        if mlflow_config.server.mlflow_tracking_uri.startswith("http"):
+            webbrowser.open(mlflow_config.server.mlflow_tracking_uri)
         else:
             # call mlflow ui with specific options
             # TODO : add more options for ui
@@ -170,7 +178,7 @@ def ui(env: str, port: str, host: str):
                     "mlflow",
                     "ui",
                     "--backend-store-uri",
-                    mlflow_conf.server.mlflow_tracking_uri,
+                    mlflow_config.server.mlflow_tracking_uri,
                     "--host",
                     host,
                     "--port",
@@ -302,11 +310,11 @@ def modelify(
     project_path = Path.cwd()
     bootstrap_project(project_path)
     with KedroSession.create(project_path=project_path) as session:
-        config = get_mlflow_config()
-        config.setup()
         # "pipeline" is the Pipeline object you want to convert to a mlflow model
         pipeline = pipelines[pipeline_name]
-        context = session.load_context()
+        context = (
+            session.load_context()
+        )  # triggers config setup with after_context_created hook
         catalog = context.catalog
         input_name = input_name
 

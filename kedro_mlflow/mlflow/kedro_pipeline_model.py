@@ -208,8 +208,6 @@ class KedroPipelineModel(PythonModel):
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input):
-        # TODO : checkout out how to pass extra args in predict
-        # for instance, to enable parallelization
 
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project

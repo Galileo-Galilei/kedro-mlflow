@@ -2,16 +2,34 @@
 
 ## [Unreleased]
 
+## [0.10.0] - 2022-05-15
+
+### Added
+
+-   :arrow_up: Add support for `kedro==0.18.1` which was broken due to kedro's removal of `_active_session` private global variable ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+
+### Fixed
+
+-   :memo: Fix typo in documentation ([#302](https://github.com/Galileo-Galilei/kedro-mlflow/issues/302))
+
+### Changed
+
+-   :refactor: :boom: Refactor the `get_mlflow_config` function which now takes `context` instead of `session` as input ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309))
+
+### Removed
+
+-   :boom: :arrow_down: Drop support for `kedro=0.18.0`. `kedro-mlflow` now supports only `kedro>=0.18.1, kedro<0.19.0` ([309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+
 ## [0.9.0] - 2022-04-01
 
 ### Added
 
--   :sparkles: Add support for `kedro=0.18.X`
+-   :sparkles: Add support for `kedro=0.18.X` ([#290](https://github.com/Galileo-Galilei/kedro-mlflow/issues/290))
 -   :sparkles: `kedro-mlflow` is now available on `conda-forge` and can be installed with `conda install kedro-mlflow`. This is retroactive to `kedro-mlflow==0.8.1` ([#118](https://github.com/Galileo-Galilei/kedro-mlflow/issues/118))
 
 ### Removed
 
--   :boom: :wastebasket: Drop support for `kedro=0.17.X`
+-   :boom: :wastebasket: Drop support for `kedro=0.17.X` ([#290](https://github.com/Galileo-Galilei/kedro-mlflow/issues/290))
 
 ## [0.8.1] - 2022-02-13
 
@@ -294,7 +312,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.9.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.10.0...HEAD
+
+[0.10.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.9.0...0.10.0
 
 [0.9.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.8.1...0.9.0
 

@@ -12,12 +12,10 @@ from kedro_mlflow.config import get_mlflow_config
 
 bootstrap_project(r"<path/to/project>")
 session = KedroSession.create(project_path=r"<path/to/project>")
-config = get_mlflow_config(session)
-config.setup()
 
 # "pipeline" is the Pipeline object you want to convert to a mlflow model
 
-context = session.load_context()
+context = session.load_context()  # this setups mlflow configuration
 catalog = context.catalog
 pipeline = context.pipelines["<my-pipeline>"]
 input_name = "instances"

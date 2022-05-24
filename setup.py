@@ -25,7 +25,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version="0.9.0",  # this will be bumped automatically by bump2version
+    version="0.10.0",  # this will be bumped automatically by bump2version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
@@ -39,13 +39,11 @@ setup(
     extras_require={
         "doc": [
             "sphinx>=4.5.0,<5.0.0",
-            "recommonmark==0.7.1",
-            "sphinx_rtd_theme==1.0.0",
-            "sphinx-markdown-tables==0.0.15",
-            "sphinx-click==3.1.0",
-            "sphinx_copybutton==0.5.0",
-            "pandas>=1.0.0, <2.0.0",  # avoid to make readthedocs load rc version
-            "numpy>=1.0.0, <2.0.0",  # bug on windows for numpy 1.19.0->1.19.4
+            "sphinx_rtd_theme~=1.0.0",
+            "sphinx-markdown-tables~=0.0.15",
+            "sphinx-click~=3.1.0",
+            "sphinx_copybutton~=0.5.0",
+            "myst-parser~=0.17.2",
         ],
         "test": [
             "pytest>=5.4.0, <8.0.0",

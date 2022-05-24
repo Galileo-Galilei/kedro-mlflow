@@ -27,8 +27,8 @@ with mlflow.start_run():
     )  # create a "my_metric=0.3" value in the "metric" field in mlflow UI
 ```
 
-```eval_rst
-.. important Unlike mlflow default behaviour, if there is no active run, no run is created.
+```{warning}
+Unlike mlflow default behaviour, if there is no active run, no run is created.
 ```
 
 - You can also specify a ``run_id`` instead of logging in the active run:

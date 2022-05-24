@@ -167,7 +167,7 @@ class PipelineML(Pipeline):
 
     def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(
-            nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
+            nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name, log_model_kwargs=self.log_model_kwargs
         )
 
     def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover

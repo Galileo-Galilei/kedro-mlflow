@@ -11,7 +11,6 @@ from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfigError
 
 
@@ -25,7 +24,7 @@ def _write_yaml(filepath, config):
 # and the first import wins
 
 
-def test_get_mlflow_config_default(kedro_project):
+def test_mlflow_config_default(kedro_project):
     # kedro_project is a pytest.fixture in conftest
     dict_config = dict(
         server=dict(
@@ -56,10 +55,10 @@ def test_get_mlflow_config_default(kedro_project):
     bootstrap_project(kedro_project)
     with KedroSession.create(project_path=kedro_project) as session:
         context = session.load_context()
-        assert get_mlflow_config(context).dict(exclude={"project_path"}) == expected
+        assert context.mlflow.dict(exclude={"project_path"}) == expected
 
 
-def test_get_mlflow_config_in_uninitialized_project(kedro_project):
+def test_mlflow_config_in_uninitialized_project(kedro_project):
     # config_with_base_mlflow_conf is a pytest.fixture in conftest
     with pytest.raises(
         KedroMlflowConfigError, match="No 'mlflow.yml' config file found in environment"
@@ -192,4 +191,4 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
     bootstrap_project(fake_project)
     with KedroSession.create("fake_package", fake_project) as session:
         context = session.load_context()
-        assert get_mlflow_config(context).dict(exclude={"project_path"}) == expected
+        assert context.mlflow.dict(exclude={"project_path"}) == expected

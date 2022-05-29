@@ -11,7 +11,6 @@ from kedro.framework.cli.starters import TEMPLATE_PATH
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.cli.cli import (
     modelify as cli_modelify,  # import after changing the path to avoid registering the project, else import pippeliens does not work!
 )
@@ -232,15 +231,11 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
     bootstrap_project(Path().cwd())
     with KedroSession.create(project_path=Path().cwd()) as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow_config.setup(
-            context
-        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_list_before_cmd = mlflow_config.server._mlflow_client.list_run_infos(
-        mlflow_config.tracking.experiment._experiment.experiment_id
+    runs_list_before_cmd = context.mlflow.server._mlflow_client.list_run_infos(
+        context.mlflow.tracking.experiment._experiment.experiment_id
     )
     cli_runner = CliRunner()
 
@@ -250,8 +245,8 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
         catch_exceptions=True,
     )
 
-    runs_list_after_cmd = mlflow_config.server._mlflow_client.list_run_infos(
-        mlflow_config.tracking.experiment._experiment.experiment_id
+    runs_list_after_cmd = context.mlflow.server._mlflow_client.list_run_infos(
+        context.mlflow.tracking.experiment._experiment.experiment_id
     )
 
     assert result.exit_code == 0
@@ -291,18 +286,14 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
     bootstrap_project(Path().cwd())
     with KedroSession.create() as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow_config.setup(
-            context
-        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
     runs_id_set_before_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )
@@ -322,8 +313,8 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
     runs_id_set_after_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )
@@ -333,7 +324,7 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
     assert result.exit_code == 0
     assert "my_new_model" in [
         file.path
-        for file in mlflow_config.server._mlflow_client.list_artifacts(
+        for file in context.mlflow.server._mlflow_client.list_artifacts(
             list(new_run_id)[0]
         )
     ]
@@ -351,10 +342,6 @@ def test_modelify_with_infer_signature_arg(
     my_input_data = pd.DataFrame({"col_int": [1, 2, 3], "col_str": ["a", "b", "c"]})
     with KedroSession.create() as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow_config.setup(
-            context
-        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)
@@ -362,8 +349,8 @@ def test_modelify_with_infer_signature_arg(
     runs_id_set_before_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )
@@ -385,8 +372,8 @@ def test_modelify_with_infer_signature_arg(
     runs_id_set_after_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )
@@ -417,10 +404,6 @@ def test_modelify_with_infer_input_example(
     my_input_data = pd.DataFrame({"col_int": [1, 2, 3], "col_str": ["a", "b", "c"]})
     with KedroSession.create() as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow_config.setup(
-            context
-        )  # necessary to create mlflow_config.tracking.experiment._experiment attribute
         catalog = context.catalog
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)
@@ -428,8 +411,8 @@ def test_modelify_with_infer_input_example(
     runs_id_set_before_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )
@@ -455,8 +438,8 @@ def test_modelify_with_infer_input_example(
     runs_id_set_after_cmd = set(
         [
             run_info.run_id
-            for run_info in mlflow_config.server._mlflow_client.list_run_infos(
-                mlflow_config.tracking.experiment._experiment.experiment_id
+            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+                context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
     )

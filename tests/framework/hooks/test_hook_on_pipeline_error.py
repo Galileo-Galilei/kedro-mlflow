@@ -12,7 +12,6 @@ from kedro.pipeline import Pipeline, node
 from mlflow.entities import RunStatus
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 
 
@@ -97,14 +96,13 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
         with pytest.raises(ValueError):
             session.run()
 
         # the run we want is the last one in the configuration experiment
         mlflow_client = MlflowClient(tracking_uri)
         experiment = mlflow_client.get_experiment_by_name(
-            mlflow_config.tracking.experiment.name
+            context.mlflow.tracking.experiment.name
         )
         failing_run_info = MlflowClient(tracking_uri).list_run_infos(
             experiment.experiment_id

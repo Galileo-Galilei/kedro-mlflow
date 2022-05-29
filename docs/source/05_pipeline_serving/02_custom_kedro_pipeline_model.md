@@ -8,7 +8,6 @@ To convert a ``Pipeline`` to a mlflow model, you need to create a ``KedroPipelin
 from pathlib import Path
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
-from kedro_mlflow.config import get_mlflow_config
 
 bootstrap_project(r"<path/to/project>")
 session = KedroSession.create(project_path=r"<path/to/project>")

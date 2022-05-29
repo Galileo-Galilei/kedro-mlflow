@@ -13,7 +13,6 @@ from kedro.framework.project import _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.cli.cli import init as cli_init
 from kedro_mlflow.framework.cli.cli import mlflow_commands as cli_mlflow
@@ -128,7 +127,7 @@ def test_cli_init_existing_config(
 
         context = session.load_context()
         # check the file remains unmodified
-        assert get_mlflow_config(context).server.mlflow_tracking_uri.endswith("toto")
+        assert context.mlflow.server.mlflow_tracking_uri.endswith("toto")
 
 
 def test_cli_init_existing_config_force_option(
@@ -157,7 +156,7 @@ def test_cli_init_existing_config_force_option(
 
         # check the file remains unmodified
         context = session.load_context()
-        assert get_mlflow_config(context).server.mlflow_tracking_uri.endswith("mlruns")
+        assert context.mlflow.server.mlflow_tracking_uri.endswith("mlruns")
 
 
 @pytest.mark.parametrize(

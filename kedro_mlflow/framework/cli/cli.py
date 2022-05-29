@@ -13,7 +13,6 @@ from kedro.framework.startup import _is_project, bootstrap_project
 from mlflow.models import infer_signature
 from packaging import version
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 from kedro_mlflow.mlflow import KedroPipelineModel
 
@@ -156,20 +155,12 @@ def ui(env: str, port: str, host: str):
         env=env,
     ) as session:
 
-        print("INSIDE SESSION------------------------")
         context = session.load_context()
-        print(context)
-        print("CONTEXT LOADED------------------------")
-        mlflow_config = get_mlflow_config(context)
-        print("MLFLOW_CONFIG------------------------")
-        print(mlflow_config)
-        print("MLFLOW_CONFIG------------------------")
-        host = host or mlflow_config.ui.host
-        port = port or mlflow_config.ui.port
+        host = host or context.mlflow.ui.host
+        port = port or context.mlflow.ui.port
 
-        print(mlflow_config.server.mlflow_tracking_uri)
-        if mlflow_config.server.mlflow_tracking_uri.startswith("http"):
-            webbrowser.open(mlflow_config.server.mlflow_tracking_uri)
+        if context.mlflow.server.mlflow_tracking_uri.startswith("http"):
+            webbrowser.open(context.mlflow.server.mlflow_tracking_uri)
         else:
             # call mlflow ui with specific options
             # TODO : add more options for ui
@@ -178,7 +169,7 @@ def ui(env: str, port: str, host: str):
                     "mlflow",
                     "ui",
                     "--backend-store-uri",
-                    mlflow_config.server.mlflow_tracking_uri,
+                    context.mlflow.server.mlflow_tracking_uri,
                     "--host",
                     host,
                     "--port",

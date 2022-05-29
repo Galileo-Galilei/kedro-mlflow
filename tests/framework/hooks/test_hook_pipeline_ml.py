@@ -12,7 +12,6 @@ from kedro.runner import SequentialRunner
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
@@ -222,8 +221,7 @@ def test_mlflow_hook_save_pipeline_ml(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
         # test : parameters should have been logged
-        mlflow_config = get_mlflow_config(context)
-        mlflow_client = MlflowClient(mlflow_config.server.mlflow_tracking_uri)
+        mlflow_client = MlflowClient(context.mlflow.server.mlflow_tracking_uri)
         run_data = mlflow_client.get_run(run_id).data
 
         # all run_params are recorded as tags
@@ -326,8 +324,6 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
 
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow.set_tracking_uri(mlflow_config.server.mlflow_tracking_uri)
 
         catalog_with_parameters = DataCatalog(
             {

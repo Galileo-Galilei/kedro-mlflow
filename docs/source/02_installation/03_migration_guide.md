@@ -4,7 +4,7 @@ This page explains how to migrate an existing kedro project to a more up to date
 
 ## Migration from 0.10.x to 0.11.x
 
-- If you are registering your ``kedro_mlflow`` hooks manually (instead of using automatic registeringfrom plugin, which is the default), change your ``settings.py``
+1. If you are registering your ``kedro_mlflow`` hooks manually (instead of using automatic registeringfrom plugin, which is the default), change your ``settings.py``
 
 from this
 
@@ -23,8 +23,19 @@ from kedro_mlflow.framework.hooks import MlflowHook
 HOOKS = (MlflowHook,)
 ```
 
+2. The `get_mlflow_config` public method has been removed and the mlflow configuration is now automatically stored in the ``mlflow`` attribute of ``KedroContext``. if you need to access the mlflow configuration, you can use:
 
+```python
+from kedro.framework.session import KedroSession
+from kedro.framework.startup import bootstrap_project
 
+bootstrap_project(project_path)
+with KedroSession.create(
+    project_path=project_path,
+) as session:
+    context = session.load_context()
+    print(context.mlflow)  # this is were mlflow configuraiton is sotred
+```
 
 
 ## Migration from 0.9.x to 0.10.x

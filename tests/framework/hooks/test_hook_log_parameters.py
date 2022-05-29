@@ -128,16 +128,6 @@ def test_node_hook_logging(
     expected,
 ):
 
-    # config = KedroMlflowConfig(
-    #     project_path=tmp_path,
-    #     hooks={"node":{"flatten_dict_params": flatten_dict_params, "sep": "-"}},
-    # )
-    # # the function is imported inside the other file ant this is the file to patch
-    # # see https://stackoverflow.com/questions/30987973/python-mock-patch-doesnt-work-as-expected-for-public-method
-    # mocker.patch(
-    #     "kedro_mlflow.framework.hooks.node_hook.get_mlflow_config", return_value=config
-    # )
-
     _write_yaml(
         kedro_project / "conf" / "base" / "mlflow.yml",
         dict(

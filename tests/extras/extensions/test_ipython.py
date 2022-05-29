@@ -28,4 +28,3 @@ def test_load_global_variables_in_ipython(mocker, kedro_project_with_mlflow_conf
         )
 
     mock_ipython().push.assert_called_once_with(variables={"mlflow_client": mocker.ANY})
-    mock_ipython().run_cell.assert_called_with("mlflow_config.setup(context)")

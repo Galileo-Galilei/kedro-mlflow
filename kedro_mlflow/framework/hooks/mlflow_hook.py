@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 from typing import Any, Dict, Union
 
 import mlflow
+from kedro.config import MissingConfigException
 from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
 from kedro.io import DataCatalog
@@ -13,7 +14,10 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
-from kedro_mlflow.config import get_mlflow_config
+from kedro_mlflow.config.kedro_mlflow_config import (
+    KedroMlflowConfig,
+    KedroMlflowConfigError,
+)
 from kedro_mlflow.framework.hooks.utils import (
     _assert_mlflow_enabled,
     _flatten_dict,
@@ -52,8 +56,22 @@ class MlflowHook:
         Args:
             context: The context that was created.
         """
-        mlflow_config = get_mlflow_config(context)
+
+        try:
+            conf_mlflow_yml = context.config_loader.get("mlflow*", "mlflow*/**")
+        except MissingConfigException:
+            raise KedroMlflowConfigError(
+                "No 'mlflow.yml' config file found in environment. Use ``kedro mlflow init`` command in CLI to create a default config file."
+            )
+        conf_mlflow_yml["project_path"] = context.project_path
+        mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
         mlflow_config.setup(context)  # setup global mlflow configuration
+
+        # store in context for interactive use
+        # we use __setattr__ instead of context.mlflow because
+        # the class will become frozen in kedro>=0.19
+        context.__setattr__("mlflow", mlflow_config)
+
         self.mlflow_config = mlflow_config  # store for further reuse
 
     @hook_impl

@@ -9,7 +9,6 @@ from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config import get_mlflow_config
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataSet,
@@ -173,8 +172,6 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-        mlflow_config = get_mlflow_config(context)
-        mlflow.set_tracking_uri(mlflow_config.server.mlflow_tracking_uri)
 
         with mlflow.start_run():
             existing_run_id = mlflow.active_run().info.run_id
@@ -231,7 +228,7 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
             catalog=dummy_catalog_with_run_id,
         )
 
-        mlflow_client = MlflowClient(mlflow_config.server.mlflow_tracking_uri)
+        mlflow_client = MlflowClient(context.mlflow.server.mlflow_tracking_uri)
         # the first run is created in Default (id 0),
         # but the one initialised in before_pipeline_run
         # is create  in kedro_project experiment (id 1)

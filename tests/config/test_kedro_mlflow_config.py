@@ -68,6 +68,23 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
     ]
 
 
+def test_kedro_mlflow_config_with_use_env_tracking_uri(
+    kedro_project_with_mlflow_conf,
+):
+
+    os.environ["MLFLOW_TRACKING_URI"] = "my_mlruns"
+
+    # default key server.mlflow_tracking_uri=None, so the environment variable will be used
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+
+    assert context.mlflow.server.mlflow_tracking_uri.endswith("my_mlruns")
+    assert (kedro_project_with_mlflow_conf / "my_mlruns").is_dir()
+
+    # os.environ["MLFLOW_TRACKING_URI"] is restored by the cleanup_mlflow_after_runs fixture in conftest
+
+
 def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
 
     # create an experiment with the same name
@@ -197,7 +214,6 @@ def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_
 def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_conf):
     """Test if the mlflow_tracking uri set is the one of mlflow.yml
     if it also exist in credentials.
-
     """
     # create a ".kedro.yml" file to identify "tmp_path" as the root of a kedro project
 
@@ -222,6 +238,9 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
         mlflow.get_tracking_uri()
         == (kedro_project_with_mlflow_conf / "mlruns1").as_uri()
     )
+
+    # reset folder to avoid interference with other tests
+    (kedro_project_with_mlflow_conf / "conf/base/credentials.yml").write_text("")
 
 
 @pytest.mark.parametrize(

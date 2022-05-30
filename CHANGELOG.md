@@ -2,10 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: :boom: The ``MLFLOW_TRACKING_URI`` environment variable is now used as the default tracking uri if the ``server.mlflow_tracking_uri`` config key is ``None``. The ``mlflow.yml`` is changed to ``server: mlflow_tracking_uri: null`` to enforce this new behaviour as the default value. If the environment variable does not exists, it will behave like before. ([#321](https://github.com/Galileo-Galilei/kedro-mlflow/issues/321)).
+
 ### Changed
 
 -   :recycle: :boom: Unify the `MlflowPipelineHook` and `MlflowNodeHook` in a single `MlflowHook` to ensure consistency in registration order ([#315](https://github.com/Galileo-Galilei/kedro-mlflow/issues/315))
--   :recycle: :technologist: :boom: The `get_mlflow_config` public function is removed. If you need to access the mlflow configuration, you can do it automatically in the context ``mlflow attribute``, e.g. `session.load_context().mlflow` ([#310](https://github.com/Galileo-Galilei/kedro-mlflow/issues/310))
+-   :recycle: :technologist: :boom: The `get_mlflow_config` public function is removed. If you need to access the mlflow configuration, you can do it automatically in the context ``mlflow`` attribute, e.g. `session.load_context().mlflow` ([#310](https://github.com/Galileo-Galilei/kedro-mlflow/issues/310))
 
 ### Removed
 

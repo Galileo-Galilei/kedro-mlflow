@@ -14,7 +14,7 @@ from typing_extensions import Literal
 
 class MlflowServerOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
-    mlflow_tracking_uri: str = "mlruns"
+    mlflow_tracking_uri: Optional[str] = None
     stores_environment_variables: Dict[str, str] = {}
     credentials: Optional[str] = None
     _mlflow_client: MlflowClient = PrivateAttr()
@@ -176,6 +176,12 @@ class KedroMlflowConfig(BaseModel):
 
         # this is a special reserved keyword for mlflow which should not be converted to a path
         # se: https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
+        if uri is None:
+            # do not use mlflow.get_tracking_uri() because if there is no env var,
+            # it resolves to 'Path.cwd() /"mlruns"'
+            # but we want 'project_path /"mlruns"'
+            uri = os.environ.get("MLFLOW_TRACKING_URI", "mlruns")
+
         if uri == "databricks":
             return uri
 

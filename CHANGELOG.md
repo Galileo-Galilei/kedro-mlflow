@@ -7,6 +7,10 @@
 -   :recycle: :boom: Unify the `MlflowPipelineHook` and `MlflowNodeHook` in a single `MlflowHook` to ensure consistency in registration order ([#315](https://github.com/Galileo-Galilei/kedro-mlflow/issues/315))
 -   :recycle: :technologist: :boom: The `get_mlflow_config` public function is removed. If you need to access the mlflow configuration, you can do it automatically in the context ``mlflow attribute``, e.g. `session.load_context().mlflow` ([#310](https://github.com/Galileo-Galilei/kedro-mlflow/issues/310))
 
+### Removed
+
+-   :arrow_up: :bug: Upgrade requirements to make support for `kedro>=0.18.1, kedro<0.19.0` visible. This is the only valid compatibility range since ``kedro-mlflow==0.10.0``, but requirements had not been updated yet ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+
 ## [0.10.0] - 2022-05-15
 
 ### Added

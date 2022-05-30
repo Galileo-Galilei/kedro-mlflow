@@ -1,3 +1,4 @@
+import os
 import shutil
 
 import mlflow
@@ -19,6 +20,9 @@ def cleanup_mlflow_after_runs():
     while mlflow.active_run():
         mlflow.end_run()
     mlflow.set_experiment("Default")
+
+    if "MLFLOW_TRACKING_URI" in os.environ:
+        os.environ.pop("MLFLOW_TRACKING_URI")
 
 
 # see https://github.com/kedro-org/kedro/blob/859f98217eed12208a922b771a97cbfb82ba7e80/tests/framework/session/test_session.py#L173

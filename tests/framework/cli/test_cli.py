@@ -141,7 +141,7 @@ def test_cli_init_existing_config_force_option(
     with KedroSession.create(project_path=kedro_project) as session:
 
         # emulate first call by writing a mlflow.yml file
-        yaml_str = yaml.dump(dict(mlflow_tracking_uri="toto"))
+        yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
             kedro_project
             / mock_settings_fake_project.CONF_SOURCE

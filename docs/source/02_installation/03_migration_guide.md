@@ -37,6 +37,7 @@ with KedroSession.create(
     print(context.mlflow)  # this is were mlflow configuraiton is sotred
 ```
 
+3. Remove the ``server.stores_environment_variables`` key from ``mlflow.yml``. This is a dead key which was unused. It will now throw an error if it is still written in ``mlflow.yml``.  
 
 ## Migration from 0.9.x to 0.10.x
 

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path, PurePath
-from typing import Dict, List, Optional
+from typing import List, Optional
 from urllib.parse import urlparse
 
 import mlflow
@@ -15,7 +15,6 @@ from typing_extensions import Literal
 class MlflowServerOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
     mlflow_tracking_uri: Optional[str] = None
-    stores_environment_variables: Dict[str, str] = {}
     credentials: Optional[str] = None
     _mlflow_client: MlflowClient = PrivateAttr()
 

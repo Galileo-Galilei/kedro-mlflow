@@ -18,7 +18,6 @@
 
 server:
   mlflow_tracking_uri: null # if null, will use mlflow.get_tracking_uri() as a default
-  stores_environment_variables: {} # any valid mlflow variables either for backend store or artifact store (e.g. MLFLOW_S3_ENDPOINT_URL), see: https://www.mlflow.org/docs/latest/tracking.html#amazon-s3-and-s3-compatible-storage
   credentials: null  # must be a valid key in credentials.yml which refers to a dict of sensitive mlflow environment variables (password, tokens...). See top of the file.
 
 tracking:

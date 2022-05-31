@@ -28,7 +28,6 @@ def test_kedro_mlflow_config_init(kedro_project_with_mlflow_conf):
     assert config.dict(exclude={"project_path"}) == dict(
         server=dict(
             mlflow_tracking_uri=(kedro_project_with_mlflow_conf / "mlruns").as_uri(),
-            stores_environment_variables={},
             credentials=None,
         ),
         tracking=dict(

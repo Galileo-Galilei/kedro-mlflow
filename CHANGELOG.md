@@ -13,7 +13,8 @@
 
 ### Removed
 
--   :arrow_up: :bug: Upgrade requirements to make support for `kedro>=0.18.1, kedro<0.19.0` visible. This is the only valid compatibility range since ``kedro-mlflow==0.10.0``, but requirements had not been updated yet ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+-   :coffin: :boom: Remove unused ``stores_environment_variables`` configuration option. This key must be removed from ``mlflow.yml``.
+-   :arrow_up: :bug: Upgrade requirements to make support for `kedro>=0.18.1, kedro<0.19.0` explicit. This is the only valid compatibility range since ``kedro-mlflow==0.10.0``, but requirements had not been updated yet ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
 
 ## [0.10.0] - 2022-05-15
 

@@ -29,7 +29,6 @@ def test_mlflow_config_default(kedro_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="mlruns",
-            stores_environment_variables={},
             credentials=None,
         ),
         tracking=dict(
@@ -157,7 +156,6 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
-            stores_environment_variables={},
             credentials=None,
         ),
         tracking=dict(

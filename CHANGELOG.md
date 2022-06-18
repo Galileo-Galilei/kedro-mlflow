@@ -2,19 +2,21 @@
 
 ## [Unreleased]
 
+## [0.11.0] - 2022-06-18
+
 ### Added
 
-- :sparkles: :boom: The ``MLFLOW_TRACKING_URI`` environment variable is now used as the default tracking uri if the ``server.mlflow_tracking_uri`` config key is ``None``. The ``mlflow.yml`` is changed to ``server: mlflow_tracking_uri: null`` to enforce this new behaviour as the default value. If the environment variable does not exists, it will behave like before. ([#321](https://github.com/Galileo-Galilei/kedro-mlflow/issues/321)).
+-   :sparkles: :boom: The `MLFLOW_TRACKING_URI` environment variable is now used as the default tracking uri if the `server.mlflow_tracking_uri` config key is `None`. The `mlflow.yml` is changed to `server: mlflow_tracking_uri: null` to enforce this new behaviour as the default value. If the environment variable does not exists, it will behave like before. ([#321](https://github.com/Galileo-Galilei/kedro-mlflow/issues/321)).
 
 ### Changed
 
 -   :recycle: :boom: Unify the `MlflowPipelineHook` and `MlflowNodeHook` in a single `MlflowHook` to ensure consistency in registration order ([#315](https://github.com/Galileo-Galilei/kedro-mlflow/issues/315))
--   :recycle: :technologist: :boom: The `get_mlflow_config` public function is removed. If you need to access the mlflow configuration, you can do it automatically in the context ``mlflow`` attribute, e.g. `session.load_context().mlflow` ([#310](https://github.com/Galileo-Galilei/kedro-mlflow/issues/310))
+-   :recycle: :technologist: :boom: The `get_mlflow_config` public function is removed. If you need to access the mlflow configuration, you can do it automatically in the context `mlflow` attribute, e.g. `session.load_context().mlflow` ([#310](https://github.com/Galileo-Galilei/kedro-mlflow/issues/310))
 
 ### Removed
 
--   :coffin: :boom: Remove unused ``stores_environment_variables`` configuration option. This key must be removed from ``mlflow.yml``.
--   :arrow_up: :bug: Upgrade requirements to make support for `kedro>=0.18.1, kedro<0.19.0` explicit. This is the only valid compatibility range since ``kedro-mlflow==0.10.0``, but requirements had not been updated yet ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
+-   :coffin: :boom: Remove unused `stores_environment_variables` configuration option. This key must be removed from `mlflow.yml`.
+-   :arrow_up: :bug: Upgrade requirements to make support for `kedro>=0.18.1, kedro<0.19.0` explicit. This is the only valid compatibility range since `kedro-mlflow==0.10.0`, but requirements had not been updated yet ([#309](https://github.com/Galileo-Galilei/kedro-mlflow/issues/309)).
 
 ## [0.10.0] - 2022-05-15
 
@@ -326,7 +328,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.10.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.0...HEAD
+
+[0.11.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.10.0...0.11.0
 
 [0.10.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.9.0...0.10.0
 

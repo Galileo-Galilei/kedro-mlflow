@@ -68,9 +68,9 @@ class PipelineML(Pipeline):
                     when loaded in memory
                     - `runner`: the kedro runner to run the model with
             log_model_kwargs:
-                extra arguments to be passed to `mlflow.pyfunc.log_model`
-                - "signature" accepts an extra "auto" which automatically infer the signature
-                based on "input_name" dataset
+                extra arguments to be passed to `mlflow.pyfunc.log_model`, e.g.:
+                    - "signature" accepts an extra "auto" which automatically infer the signature
+                    based on "input_name" dataset
 
         """
 
@@ -80,16 +80,11 @@ class PipelineML(Pipeline):
         self.input_name = input_name
         # they will be passed to KedroPipelineModel to enable flexibility
 
-        kpm_kwargs_with_default = self.KPM_KWARGS_DEFAULT.copy()
         kpm_kwargs = kpm_kwargs or {}
-        kpm_kwargs_with_default.update(kpm_kwargs)
-        self.kpm_kwargs = kpm_kwargs_with_default
+        self.kpm_kwargs = {**self.KPM_KWARGS_DEFAULT, **kpm_kwargs}
 
-        log_model_kwargs_with_default = self.LOG_MODEL_KWARGS_DEFAULT.copy()
         log_model_kwargs = log_model_kwargs or {}
-        log_model_kwargs_with_default.update(log_model_kwargs)
-        self.log_model_kwargs = log_model_kwargs_with_default
-
+        self.log_model_kwargs = {**self.LOG_MODEL_KWARGS_DEFAULT, **log_model_kwargs}
         self._check_consistency()
 
     @property
@@ -167,7 +162,11 @@ class PipelineML(Pipeline):
 
     def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(
-            nodes=pipeline.nodes, inference=self.inference, input_name=self.input_name
+            nodes=pipeline.nodes,
+            inference=self.inference,
+            input_name=self.input_name,
+            kpm_kwargs=self.kpm_kwargs,
+            log_model_kwargs=self.log_model_kwargs,
         )
 
     def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover

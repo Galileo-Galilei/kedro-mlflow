@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Make ``pipeline_ml_factory`` correctly pass ``kpm_kwargs`` and ``log_model_kwargs`` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
+
 ## [0.11.0] - 2022-06-18
 
 ### Added

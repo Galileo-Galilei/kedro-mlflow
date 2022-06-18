@@ -413,7 +413,6 @@ def test_mlflow_hook_save_pipeline_ml_with_signature(
             input_name="raw_data",
             log_model_kwargs={
                 "conda_env": env_from_dict,
-                "artifact_path": "model",
                 "signature": model_signature,
             },
         )
@@ -442,3 +441,65 @@ def test_mlflow_hook_save_pipeline_ml_with_signature(
         # test : parameters should have been logged
         trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
         assert trained_model.metadata.signature == expected_signature
+
+
+@pytest.mark.parametrize(
+    "artifact_path,expected_artifact_path",
+    ([None, "model"], ["my_custom_model", "my_custom_model"]),
+)
+def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
+    kedro_project_with_mlflow_conf,
+    env_from_dict,
+    dummy_pipeline,
+    dummy_catalog,
+    dummy_run_params,
+    artifact_path,
+    expected_artifact_path,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        mlflow_hook = MlflowHook()
+        runner = SequentialRunner()
+
+        log_model_kwargs = {
+            "conda_env": env_from_dict,
+        }
+        if artifact_path is not None:
+            # we need to test what happens if the key is NOT present
+            log_model_kwargs["artifact_path"] = artifact_path
+
+        pipeline_to_run = pipeline_ml_factory(
+            training=dummy_pipeline.only_nodes_with_tags("training"),
+            inference=dummy_pipeline.only_nodes_with_tags("inference"),
+            input_name="raw_data",
+            log_model_kwargs=log_model_kwargs,
+        )
+
+        context = session.load_context()
+        mlflow_hook.after_context_created(context)
+        mlflow_hook.after_catalog_created(
+            catalog=dummy_catalog,
+            # `after_catalog_created` is not using any of arguments bellow,
+            # so we are setting them to empty values.
+            conf_catalog={},
+            conf_creds={},
+            feed_dict={},
+            save_version="",
+            load_versions="",
+        )
+        mlflow_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+        )
+        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
+        run_id = mlflow.active_run().info.run_id
+        mlflow_hook.after_pipeline_run(
+            run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+        )
+
+        # test : parameters should have been logged
+        trained_model = mlflow.pyfunc.load_model(
+            f"runs:/{run_id}/{expected_artifact_path}"
+        )
+        # the real test is that the model is loaded without error
+        assert trained_model is not None

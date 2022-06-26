@@ -277,14 +277,15 @@ def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
     project_path = tmp_path / config["repo_name"]
     shutil.rmtree(project_path / "src" / "tests")  # avoid conflicts with pytest
 
-    mlflow_config = KedroMlflowConfig(project_path=project_path.as_posix())
-    mlflow_config.server.mlflow_tracking_uri = "http://google.com"
+    mlflow_config = KedroMlflowConfig(
+        server=dict(mlflow_tracking_uri="http://google.com")
+    )
 
     with open(
-        (mlflow_config.project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
+        (project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
     ) as fhandler:
         yaml.dump(
-            mlflow_config.dict(exclude={"project_path"}),
+            mlflow_config.dict(),
             fhandler,
             default_flow_style=False,
         )

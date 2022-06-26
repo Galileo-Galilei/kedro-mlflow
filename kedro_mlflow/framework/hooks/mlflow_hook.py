@@ -63,7 +63,6 @@ class MlflowHook:
             raise KedroMlflowConfigError(
                 "No 'mlflow.yml' config file found in environment. Use ``kedro mlflow init`` command in CLI to create a default config file."
             )
-        conf_mlflow_yml["project_path"] = context.project_path
         mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
         mlflow_config.setup(context)  # setup global mlflow configuration
 

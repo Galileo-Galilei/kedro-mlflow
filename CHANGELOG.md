@@ -4,7 +4,11 @@
 
 ### Fixed
 
--   :bug: Make ``pipeline_ml_factory`` correctly pass ``kpm_kwargs`` and ``log_model_kwargs`` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
+-   :bug: Make ``pipeline_ml_factory`` now correctly uses ``kpm_kwargs`` and ``log_model_kwargs`` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
+
+### Changed
+
+-   :recycle: Refactor `KedroMlflowConfig` which no longer needs the ``project_path`` at instantiation. The uri validaiton is done at ``setup()`` time to be able to use the configuration not at a root of a kedro project. This is *not* considered as a breaking change, because the recommended way to retrieve the config is to use ``session.load_context().mlflow`` which automatically calls ``setup()`` and hence behaviour inside a kedro project is unmodified. ([#314](https://github.com/Galileo-Galilei/kedro-mlflow/issues/314))
 
 ## [0.11.0] - 2022-06-18
 

@@ -207,7 +207,3 @@ def _validate_mlflow_tracking_uri(project_path: str, uri: Optional[str]) -> str:
             valid_uri = uri
 
     return valid_uri
-
-
-class KedroMlflowConfigError(Exception):
-    """Error occurred when loading the configuration"""

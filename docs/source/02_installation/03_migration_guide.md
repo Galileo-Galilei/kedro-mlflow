@@ -34,7 +34,7 @@ with KedroSession.create(
     project_path=project_path,
 ) as session:
     context = session.load_context()
-    print(context.mlflow)  # this is were mlflow configuraiton is sotred
+    print(context.mlflow)  # this is where mlflow configuration is stored
 ```
 
 3. Remove the ``server.stores_environment_variables`` key from ``mlflow.yml``. This is a dead key which was unused. It will now throw an error if it is still written in ``mlflow.yml``.  

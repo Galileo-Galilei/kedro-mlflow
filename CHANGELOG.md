@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :sparkles: ``kedro-mlflow`` now runs even without a ``mlflow.yml`` file in your ``conf/<env>`` folder. As a consequence, running ``kedro mlflow init`` is now optional and should be only used for advanced configuration. ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
+
+
 ## [0.11.1] - 2022-07-06
 
 ### Fixed

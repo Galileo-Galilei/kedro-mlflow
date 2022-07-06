@@ -11,8 +11,6 @@ from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 
-from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfigError
-
 
 def _write_yaml(filepath, config):
     yaml_str = yaml.dump(config)
@@ -57,14 +55,25 @@ def test_mlflow_config_default(kedro_project):
         assert context.mlflow.dict(exclude={"project_path"}) == expected
 
 
-def test_mlflow_config_in_uninitialized_project(kedro_project):
+@pytest.mark.parametrize("package_name", [None, "fake_project"])
+def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
     # config_with_base_mlflow_conf is a pytest.fixture in conftest
-    with pytest.raises(
-        KedroMlflowConfigError, match="No 'mlflow.yml' config file found in environment"
-    ):
-        bootstrap_project(kedro_project)
-        with KedroSession.create(project_path=kedro_project) as session:
-            session.load_context()
+    bootstrap_project(kedro_project)
+    session = KedroSession.create(project_path=kedro_project, package_name=package_name)
+    context = session.load_context()
+    context.mlflow.dict() == {
+        "server": {"mlflow_tracking_uri": None, "credentials": None},
+        "tracking": {
+            "disable_tracking": {"pipelines": []},
+            "experiment": {"name": "fake_project", "restore_if_deleted": True},
+            "run": {"id": None, "name": None, "nested": True},
+            "params": {
+                "dict_params": {"flatten": False, "recursive": True, "sep": "."},
+                "long_params_strategy": "fail",
+            },
+        },
+        "ui": {"port": "5000", "host": "127.0.0.1"},
+    }
 
 
 @pytest.fixture(autouse=True)

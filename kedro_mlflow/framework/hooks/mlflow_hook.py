@@ -1,4 +1,5 @@
 import logging
+from logging import getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Union
@@ -7,6 +8,7 @@ import mlflow
 from kedro.config import MissingConfigException
 from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
+from kedro.framework.startup import _get_project_metadata
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
@@ -14,10 +16,7 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
-from kedro_mlflow.config.kedro_mlflow_config import (
-    KedroMlflowConfig,
-    KedroMlflowConfigError,
-)
+from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.hooks.utils import (
     _assert_mlflow_enabled,
     _flatten_dict,
@@ -31,6 +30,8 @@ from kedro_mlflow.io.metrics import (
 )
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
+
+LOGGER = getLogger(__name__)
 
 
 class MlflowHook:
@@ -59,11 +60,22 @@ class MlflowHook:
 
         try:
             conf_mlflow_yml = context.config_loader.get("mlflow*", "mlflow*/**")
+            mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
         except MissingConfigException:
-            raise KedroMlflowConfigError(
-                "No 'mlflow.yml' config file found in environment. Use ``kedro mlflow init`` command in CLI to create a default config file."
+            LOGGER.warning(
+                "No 'mlflow.yml' config file found in environment. Default configuration will be used. Use ``kedro mlflow init`` command in CLI to customize the configuration."
             )
-        mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
+            # the only default which is changed
+            # is to use the package_name as the experiment name
+            experiment_name = context._package_name
+            if experiment_name is None:
+                # context._package_name may be None if the session is created interactively
+                metadata = _get_project_metadata(context._project_path)
+                experiment_name = metadata.package_name
+            mlflow_config = KedroMlflowConfig(
+                tracking=dict(experiment=dict(name=experiment_name))
+            )
+
         mlflow_config.setup(context)  # setup global mlflow configuration
 
         # store in context for interactive use

@@ -5,6 +5,7 @@
 ### Fixed
 
 -   :bug: Make ``pipeline_ml_factory`` now correctly uses ``kpm_kwargs`` and ``log_model_kwargs`` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
+-   :bug: ``kedro mlflow init`` command no longer raises both a success and an error message when the command is failing. ([#336](https://github.com/Galileo-Galilei/kedro-mlflow/issues/336))
 
 ### Changed
 

@@ -106,18 +106,18 @@ def init(env: str, force: bool, silent: bool):
                 dst=mlflow_yml_path,
                 python_package=project_metadata.package_name,
             )
+            if not silent:
+                click.secho(
+                    click.style(
+                        f"'{settings.CONF_SOURCE}/{env}/{mlflow_yml}' successfully updated.",
+                        fg="green",
+                    )
+                )
         except FileNotFoundError:
             click.secho(
                 click.style(
                     f"No env '{env}' found. Please check this folder exists inside '{settings.CONF_SOURCE}' folder.",
                     fg="red",
-                )
-            )
-        if not silent:
-            click.secho(
-                click.style(
-                    f"'{settings.CONF_SOURCE}/{env}/{mlflow_yml}' successfully updated.",
-                    fg="green",
                 )
             )
 

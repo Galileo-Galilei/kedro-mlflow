@@ -2,14 +2,16 @@
 
 ## [Unreleased]
 
+## [0.11.1] - 2022-07-06
+
 ### Fixed
 
--   :bug: Make ``pipeline_ml_factory`` now correctly uses ``kpm_kwargs`` and ``log_model_kwargs`` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
--   :bug: ``kedro mlflow init`` command no longer raises both a success and an error message when the command is failing. ([#336](https://github.com/Galileo-Galilei/kedro-mlflow/issues/336))
+-   :bug: Make `pipeline_ml_factory` now correctly uses `kpm_kwargs` and `log_model_kwargs` instead of always using the default values. ([#329](https://github.com/Galileo-Galilei/kedro-mlflow/issues/329))
+-   :bug: `kedro mlflow init` command no longer raises both a success and an error message when the command is failing. ([#336](https://github.com/Galileo-Galilei/kedro-mlflow/issues/336))
 
 ### Changed
 
--   :recycle: Refactor `KedroMlflowConfig` which no longer needs the ``project_path`` at instantiation. The uri validaiton is done at ``setup()`` time to be able to use the configuration not at a root of a kedro project. This is *not* considered as a breaking change, because the recommended way to retrieve the config is to use ``session.load_context().mlflow`` which automatically calls ``setup()`` and hence behaviour inside a kedro project is unmodified. ([#314](https://github.com/Galileo-Galilei/kedro-mlflow/issues/314))
+-   :recycle: Refactor `KedroMlflowConfig` which no longer needs the `project_path` at instantiation. The uri validaiton is done at `setup()` time to be able to use the configuration not at a root of a kedro project. This is _not_ considered as a breaking change, because the recommended way to retrieve the config is to use `session.load_context().mlflow` which automatically calls `setup()` and hence behaviour inside a kedro project is unmodified. ([#314](https://github.com/Galileo-Galilei/kedro-mlflow/issues/314))
 
 ## [0.11.0] - 2022-06-18
 
@@ -337,7 +339,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.1...HEAD
+
+[0.11.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.0...0.11.1
 
 [0.11.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.10.0...0.11.0
 

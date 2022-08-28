@@ -2,10 +2,11 @@
 
 ## [Unreleased]
 
+## [0.11.2] - 2022-08-28
+
 ### Changed
 
--   :sparkles: ``kedro-mlflow`` now runs even without a ``mlflow.yml`` file in your ``conf/<env>`` folder. As a consequence, running ``kedro mlflow init`` is now optional and should be only used for advanced configuration. ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
-
+-   :sparkles: `kedro-mlflow` now runs even without a `mlflow.yml` file in your `conf/<env>` folder. As a consequence, running `kedro mlflow init` is now optional and should be only used for advanced configuration. ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
 
 ## [0.11.1] - 2022-07-06
 
@@ -344,7 +345,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.2...HEAD
+
+[0.11.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.1...0.11.2
 
 [0.11.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.0...0.11.1
 

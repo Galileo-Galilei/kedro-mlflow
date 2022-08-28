@@ -6,7 +6,7 @@
 
 
 A Mlflow Model is composed of:
-- a ``MLModel`` file which is a configuration file to indicate to mlflow how to load thde model. This file may also contain the ``Signature`` of the model (i.e. the ``Schema`` of the input and output of your model, including the columns names and order) as well as example data.  
+- a ``MLModel`` file which is a configuration file to indicate to mlflow how to load the model. This file may also contain the ``Signature`` of the model (i.e. the ``Schema`` of the input and output of your model, including the columns names and order) as well as example data.  
 - a ``conda.yml`` file which contains the specifications of the virtual conda environment inside which the model should run. It contains the packages versions necessary for your model to be executed.
 - a ``model.pkl`` (or a ``python_function.pkl`` for custom model) file containing the trained model.  
 - an ``artifacts`` folder containing all other data necessary to execute the models

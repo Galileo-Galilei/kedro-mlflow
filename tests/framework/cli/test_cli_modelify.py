@@ -252,7 +252,7 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
     assert result.exit_code == 0
     for artifact in artifacts_list:
         assert (
-            f"The data_set '{artifact}' is added to the Pipeline catalog"
+            f"The data_set \x1b[32m'{artifact}'\x1b[0m is added to the Pipeline catalog"
             in result.output
         )
     assert "Model successfully logged" in result.output

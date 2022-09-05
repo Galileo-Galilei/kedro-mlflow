@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :loud_sound: `kedro-mlflow` has its default logging level set to ``INFO``. This was the default for ``kedro<=0.18.1``. For ``kedro>=0.18.2``, you can change the level in ``logging.yml`` ([#348](https://github.com/Galileo-Galilei/kedro-mlflow/issues/348))
+
 ## [0.11.2] - 2022-08-28
 
 ### Changed

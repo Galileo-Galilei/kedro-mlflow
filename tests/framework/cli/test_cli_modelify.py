@@ -1,3 +1,4 @@
+import re
 import shutil
 from pathlib import Path
 
@@ -250,12 +251,20 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
     )
 
     assert result.exit_code == 0
+    # parse the log
+    stripped_output = re.sub(r"\[.+\]", "", result.output)
+    stripped_output = re.sub(
+        "(TRACE|DEBUG|INFO|WARNING|ERROR|CRITICAL)", "", stripped_output
+    )
+    stripped_output = re.sub(r"\w+\.py:\d+", "", stripped_output)
+    stripped_output = re.sub(r"[ \n]+", " ", stripped_output)
+
     for artifact in artifacts_list:
         assert (
             f"The data_set '{artifact}' is added to the Pipeline catalog"
-            in result.output
+            in stripped_output
         )
-    assert "Model successfully logged" in result.output
+    assert "Model successfully logged" in stripped_output
     assert len(runs_list_after_cmd) - len(runs_list_before_cmd) == 1
 
 

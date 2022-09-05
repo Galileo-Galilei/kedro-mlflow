@@ -165,7 +165,7 @@ class KedroPipelineModel(PythonModel):
                     self._logger.info(
                         (
                             f"The parameter '{name[7:]}' is persisted (as pickle) "
-                            "at the following location: '{artifact_path}'"
+                            "at the following location: f'{artifact_path}'"
                         )
                     )
                 else:

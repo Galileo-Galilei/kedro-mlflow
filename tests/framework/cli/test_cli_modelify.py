@@ -259,12 +259,6 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
     stripped_output = re.sub(r"\w+\.py:\d+", "", stripped_output)
     stripped_output = re.sub(r"[ \n]+", " ", stripped_output)
 
-    with open(
-        r"C:\Users\Yolan\Documents\DEVELOPPEMENT\kedro-mlflow\bidouille.txt",
-        mode="w",
-        encoding="utf-8",
-    ) as fh:
-        fh.write(stripped_output)
     for artifact in artifacts_list:
         assert (
             f"The data_set '{artifact}' is added to the Pipeline catalog"

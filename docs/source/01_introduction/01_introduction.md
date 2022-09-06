@@ -60,7 +60,7 @@ This approach suffers from two main drawbacks:
 On the other hand, ``Mlflow``:
 
 - distinguishes between artifacts (i.e. any data file), metrics (integers that may evolve over time) and parameters. The logging is very straightforward since there is a one-liner function for logging the desired type. This separation makes further manipulation easier.
-- offers a way to configure the logging in a database through the ``mlflow_tracking_uri`` parameter. This database-like logging comes with easy [querying of different runs through a client](https://www.mlflow.org/docs/latest/python_api/mlflow.tracking.html#mlflow.tracking.MlflowClient) (for instance "find the most recent run with a metric at least above a given threshold" is immediate with ``Mlflow`` but hacky in ``Kedro``).
+- offers a way to configure the logging in a database through the ``mlflow_tracking_uri`` parameter. This database-like logging comes with easy [querying of different runs through a client](https://www.mlflow.org/docs/latest/python_api/mlflow.client.html#mlflow.client.MlflowClient) (for instance "find the most recent run with a metric at least above a given threshold" is immediate with ``Mlflow`` but hacky in ``Kedro``).
 - [comes with a *User Interface* (UI)](https://mlflow.org/docs/latest/tracking.html#id7) which enable to browse / filter / sort the runs, display graphs of the metrics, render plots... This make the run management much easier than in ``Kedro``.
 - has a command to reproduce exactly the run from a given ``git sha``, [which is not possible in ``Kedro``](https://github.com/quantumblacklabs/kedro/issues/297).
 

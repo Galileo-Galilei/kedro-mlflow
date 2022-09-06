@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+## [0.11.3] - 2022-09-06
+
 ### Changed
 
--   :loud_sound: `kedro-mlflow` has its default logging level set to ``INFO``. This was the default for ``kedro<=0.18.1``. For ``kedro>=0.18.2``, you can change the level in ``logging.yml`` ([#348](https://github.com/Galileo-Galilei/kedro-mlflow/issues/348))
+-   :loud_sound: `kedro-mlflow` has its default logging level set to `INFO`. This was the default for `kedro<=0.18.1`. For `kedro>=0.18.2`, you can change the level in `logging.yml` ([#348](https://github.com/Galileo-Galilei/kedro-mlflow/issues/348))
 
 ### Fixed
 
--   :bug: ``kedro-mlflow`` now use the ``package_name`` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no ``mlflow.yml`` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
+-   :bug: `kedro-mlflow` now use the `package_name` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no `mlflow.yml` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
 -   :memo: Update broken links to the most recent kedro and mlflow documentation
 
 ## [0.11.2] - 2022-08-28
@@ -354,7 +356,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.2...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.3...HEAD
+
+[0.11.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.2...0.11.3
 
 [0.11.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.1...0.11.2
 

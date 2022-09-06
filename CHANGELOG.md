@@ -6,6 +6,10 @@
 
 -   :loud_sound: `kedro-mlflow` has its default logging level set to ``INFO``. This was the default for ``kedro<=0.18.1``. For ``kedro>=0.18.2``, you can change the level in ``logging.yml`` ([#348](https://github.com/Galileo-Galilei/kedro-mlflow/issues/348))
 
+### Fixed
+
+-   :bug: ``kedro-mlflow`` now use the ``package_name`` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no ``mlflow.yml`` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
+
 ## [0.11.2] - 2022-08-28
 
 ### Changed

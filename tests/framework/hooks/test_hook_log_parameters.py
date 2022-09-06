@@ -151,6 +151,7 @@ def test_node_hook_logging(
         mlflow_node_hook = MlflowHook()
         mlflow_node_hook.after_context_created(context)  # setup mlflow_config
         mlflow.set_tracking_uri(mlflow_tracking_uri)
+
         with mlflow.start_run():
             mlflow_node_hook.before_pipeline_run(
                 run_params=dummy_run_params,

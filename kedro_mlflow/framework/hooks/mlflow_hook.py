@@ -60,11 +60,21 @@ class MlflowHook:
 
         try:
             conf_mlflow_yml = context.config_loader.get("mlflow*", "mlflow*/**")
-            mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
         except MissingConfigException:
             LOGGER.warning(
                 "No 'mlflow.yml' config file found in environment. Default configuration will be used. Use ``kedro mlflow init`` command in CLI to customize the configuration."
             )
+            # we create an empty dict to have the same behaviour when the mlflow.yml
+            # is commented out. In this situation there is no MissingConfigException
+            # but we got an empty dict
+            conf_mlflow_yml = {}
+
+        mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
+
+        if (
+            conf_mlflow_yml.get("tracking", {}).get("experiment", {}).get("name")
+            is None
+        ):
             # the only default which is changed
             # is to use the package_name as the experiment name
             experiment_name = context._package_name
@@ -72,9 +82,7 @@ class MlflowHook:
                 # context._package_name may be None if the session is created interactively
                 metadata = _get_project_metadata(context._project_path)
                 experiment_name = metadata.package_name
-            mlflow_config = KedroMlflowConfig(
-                tracking=dict(experiment=dict(name=experiment_name))
-            )
+            mlflow_config.tracking.experiment.name = experiment_name
 
         mlflow_config.setup(context)  # setup global mlflow configuration
 

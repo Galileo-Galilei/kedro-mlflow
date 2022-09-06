@@ -61,8 +61,39 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
     bootstrap_project(kedro_project)
     session = KedroSession.create(project_path=kedro_project, package_name=package_name)
     context = session.load_context()
-    context.mlflow.dict() == {
-        "server": {"mlflow_tracking_uri": None, "credentials": None},
+    assert context.mlflow.dict() == {
+        "server": {
+            "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
+            "credentials": None,
+        },
+        "tracking": {
+            "disable_tracking": {"pipelines": []},
+            "experiment": {"name": "fake_project", "restore_if_deleted": True},
+            "run": {"id": None, "name": None, "nested": True},
+            "params": {
+                "dict_params": {"flatten": False, "recursive": True, "sep": "."},
+                "long_params_strategy": "fail",
+            },
+        },
+        "ui": {"port": "5000", "host": "127.0.0.1"},
+    }
+
+
+def test_mlflow_config_with_no_experiment_name(kedro_project):
+
+    # create empty conf
+    open((kedro_project / "conf" / "base" / "mlflow.yml").as_posix(), mode="w").close()
+
+    bootstrap_project(kedro_project)
+    session = KedroSession.create(
+        project_path=kedro_project, package_name="fake_project"
+    )
+    context = session.load_context()
+    assert context.mlflow.dict() == {
+        "server": {
+            "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
+            "credentials": None,
+        },
         "tracking": {
             "disable_tracking": {"pipelines": []},
             "experiment": {"name": "fake_project", "restore_if_deleted": True},

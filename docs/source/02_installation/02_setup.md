@@ -47,17 +47,17 @@ kedro mlflow init --env=<other-environment>
 
 ### Declaring ``kedro-mlflow`` hooks
 
-``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html).
+``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://kedro.readthedocs.io/en/latest/hooks/introduction.html).
 
 **Note that you must register the hook provided by kedro-mlflow** (``MlflowHook``) to make the plugin work.
 
 #### Declaring hooks through auto-discovery (for `kedro>=0.16.4`) [Default behaviour]
 
-If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
+If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
 
 #### Declaring hooks statically in settings.py
 
-If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#registering-your-hook-implementations-with-kedro):
+If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro):
 
 ```python
 # <your_project>/src/<your_project>/settings.py

@@ -9,6 +9,7 @@
 ### Fixed
 
 -   :bug: ``kedro-mlflow`` now use the ``package_name`` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no ``mlflow.yml`` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
+-   :memo: Update broken links to the most recent kedro and mlflow documentation
 
 ## [0.11.2] - 2022-08-28
 
@@ -238,7 +239,7 @@
 -   :sparkles: `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` ([#71](https://github.com/Galileo-Galilei/kedro-mlflow/issues/71))
 -   :sparkles: `pipeline_ml_factory` now infer automatically the schema of the input dataset to validate data automatically at inference time. The output schema can be declared manually in `model_signature` argument ([#70](https://github.com/Galileo-Galilei/kedro-mlflow/issues/70))
 -   :sparkles: Add two DataSets for model logging and saving: `MlflowModelLoggerDataSet` and `MlflowModelSaverDataSet` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
--   :sparkles: `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/extend_kedro/hooks.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
+-   :sparkles: `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
 
 ### Fixed
 

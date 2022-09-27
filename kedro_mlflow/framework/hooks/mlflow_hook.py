@@ -14,6 +14,7 @@ from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
+from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
@@ -69,22 +70,60 @@ class MlflowHook:
             # but we got an empty dict
             conf_mlflow_yml = {}
 
-        mlflow_config = KedroMlflowConfig.parse_obj(conf_mlflow_yml)
+        mlflow_config = KedroMlflowConfig.parse_obj({**conf_mlflow_yml})
 
-        if (
-            conf_mlflow_yml.get("tracking", {}).get("experiment", {}).get("name")
-            is None
-        ):
-            # the only default which is changed
-            # is to use the package_name as the experiment name
-            experiment_name = context._package_name
-            if experiment_name is None:
-                # context._package_name may be None if the session is created interactively
-                metadata = _get_project_metadata(context._project_path)
-                experiment_name = metadata.package_name
-            mlflow_config.tracking.experiment.name = experiment_name
+        self._already_active_mlflow = False
+        if mlflow.active_run():
 
-        mlflow_config.setup(context)  # setup global mlflow configuration
+            self._already_active_mlflow = True
+            active_run_info = mlflow.active_run().info
+
+            LOGGER.warning(
+                f"The mlflow run {active_run_info.run_id} is already active. Configuration is inferred from the environment, and mlflow.yml is ignored."
+            )
+
+            mlflow_config.server.mlflow_tracking_uri = mlflow.get_tracking_uri()
+            mlflow_config.server._mlflow_client = MlflowClient(
+                tracking_uri=mlflow_config.server.mlflow_tracking_uri
+            )
+            # BEWARE: kedro supports python=3.7 which does nto accepts the shorthand f"{x=}" for f"x={x}"
+            LOGGER.warning(
+                f"mlflow_config.server.mlflow_tracking_uri={mlflow_config.server.mlflow_tracking_uri}"
+            )
+
+            mlflow_config.tracking.run.id = active_run_info.run_id
+            LOGGER.warning(
+                f"mlflow_config.tracking.run.id={mlflow_config.tracking.run.id}"
+            )
+
+            mlflow_config.tracking.experiment.name = mlflow.get_experiment(
+                experiment_id=active_run_info.experiment_id
+            ).name
+            LOGGER.warning(
+                f"mlflow_config.tracking.experiment.name={mlflow_config.tracking.experiment.name}"
+            )
+
+        else:
+            # we infer and setup the configuration only if there is no active run:
+            # if there is an active run, we assume everything is already configured and
+            # configuration was inferred from environment so there is no need to set it up
+            # the goal is to enable an orchestrator to start the run by itself
+            if (
+                conf_mlflow_yml.get("tracking", {}).get("experiment", {}).get("name")
+                is None
+            ):
+                # the only default which is changed
+                # is to use the package_name as the experiment name
+                experiment_name = context._package_name
+                if experiment_name is None:
+                    # context._package_name may be None if the session is created interactively
+                    metadata = _get_project_metadata(context._project_path)
+                    experiment_name = metadata.package_name
+                mlflow_config.tracking.experiment.name = experiment_name
+
+            mlflow_config.setup(
+                context
+            )  # setup global mlflow configuration (environment variables, tracking uri, experiment...)
 
         # store in context for interactive use
         # we use __setattr__ instead of context.mlflow because
@@ -188,12 +227,17 @@ class MlflowHook:
                 self.mlflow_config.tracking.run.name or run_params["pipeline_name"]
             )
 
-            mlflow.start_run(
-                run_id=self.mlflow_config.tracking.run.id,
-                experiment_id=self.mlflow_config.tracking.experiment._experiment.experiment_id,
-                run_name=run_name,
-                nested=self.mlflow_config.tracking.run.nested,
-            )
+            if self._already_active_mlflow:
+                LOGGER.warning(
+                    f"A mlflow run was already active (run_id='{mlflow.active_run().info.run_id}') before the KedroSession was started. This run will be used for logging."
+                )
+            else:
+                mlflow.start_run(
+                    run_id=self.mlflow_config.tracking.run.id,
+                    experiment_id=self.mlflow_config.tracking.experiment._experiment.experiment_id,
+                    run_name=run_name,
+                    nested=self.mlflow_config.tracking.run.nested,
+                )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})
             # add manually git sha for consistency with the journal
@@ -332,7 +376,13 @@ class MlflowHook:
                         **log_model_kwargs,
                     )
             # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
-            mlflow.end_run()
+            if self._already_active_mlflow:
+                LOGGER.warning(
+                    f"The run '{mlflow.active_run().info.run_id}' was already opened before launching 'kedro run' so it is not closed. You should close it manually."
+                )
+            else:
+                mlflow.end_run()
+
         else:
             switch_catalog_logging(catalog, True)
 
@@ -369,8 +419,13 @@ class MlflowHook:
             catalog: (Not used) The ``DataCatalog`` used during the run.
         """
         if self._is_mlflow_enabled:
-            while mlflow.active_run():
-                mlflow.end_run(RunStatus.to_string(RunStatus.FAILED))
+            if self._already_active_mlflow:
+                LOGGER.warning(
+                    f"The run '{mlflow.active_run().info.run_id}' was already opened before launching 'kedro run' so it is not closed. You should close it manually."
+                )
+            else:
+                while mlflow.active_run():
+                    mlflow.end_run(RunStatus.to_string(RunStatus.FAILED))
         else:  # pragma: no cover
             # the catalog is supposed to be reloaded each time with _get_catalog,
             # hence it should not be modified. this is only a safeguard

@@ -17,13 +17,22 @@ The rationale behind the separation of the backend store and the artifacts store
 
 ## The ``mlflow.yml`` file
 
-The ``mlflow.yml`` file contains all configuration you can pass either to kedro or mlflow through the plugin. Note that you can duplicate `mlflow.yml` file in as many  environments (i.e. `conf/` folders) as you need.
+The ``mlflow.yml`` file contains all configuration you can pass either to kedro or mlflow through the plugin. Note that you can duplicate `mlflow.yml` file in as many  environments (i.e. `conf/` folders) as you need. To create a ``mlflow.yml`` file in a kedro configuration environment, use ``kedro mlflow init --env=<your-env>``.
+
+```{note}
+If no ``mlflow.yml`` file is found in the environment, ``kedro-mlflow`` will still work and use all ``mlflow.yml`` default values as configuration.  
+```
+
+```{important}
+If the kedro run is started in a process where a mlflow run is already active, ``kedro-mlflow`` will ignore all the configuration in ``mlflow.yml`` and use the active run. The mlflow run will NOT be closed at the end of the kedro run. This enable using ``kedro-mlflow`` with an orchestrator (e.g airflow, AzureML...) which starts the mlflow run and configuraiton itself.
+```
 
 ### Configure the tracking server
 
+
 #### Configure the tracking and registry uri
 
-``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly. The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded) value. The ``mlflow.yml`` default have this keys set to ``mlruns``. This will create a ``mlruns`` folder locally at the root of your kedro project and enable you to use the plugin without any setup of a mlflow tracking server.
+``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly. The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded) value. The ``mlflow.yml`` default have this keys set to ``null``. This means that it will look for a ``MLFLOW_TRACKING_URI`` environment variable, and if it is not set, it will create a ``mlruns`` folder locally at the root of your kedro project. This enables you to use the plugin without any setup of a mlflow tracking server.
 
 Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically.
 

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :sparkles: `kedro-mlflow` now uses the default configuration (ignoring ``mlflow.yml``) if an active run already exists in the process where the pipeline is started, and uses this active run for logging. This enables using `` kedro-mlflow``  with an orchestrator which starts mlflow itself before running kedro (e.g. airflow,  the ``mlflow run`` command, AzureML...) ([#358](https://github.com/Galileo-Galilei/kedro-mlflow/issues/358))
+
 ## [0.11.5] - 2022-12-12
 
 ### Added

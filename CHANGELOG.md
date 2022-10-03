@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: ``MlflowArtifactDataSet.load()`` now correctly loads the artifact when both ``artifact_path`` and ``run_id`` arguments are specified instead of raising an error ([#362](https://github.com/Galileo-Galilei/kedro-mlflow/issues/362))
+
 ## [0.11.3] - 2022-09-06
 
 ### Changed
@@ -10,7 +14,7 @@
 
 ### Fixed
 
--   :bug: `kedro-mlflow` now use the `package_name` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no `mlflow.yml` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
+-   :bug: `kedro-mlflow` now uses the `package_name` as experiment name by default if it is not specified. This is done to ensure consistency with the behaviour with no `mlflow.yml` file ([#328](https://github.com/Galileo-Galilei/kedro-mlflow/issues/328))
 -   :memo: Update broken links to the most recent kedro and mlflow documentation
 
 ## [0.11.2] - 2022-08-28

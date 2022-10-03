@@ -228,6 +228,32 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
     assert df1.equals(mlflow_csv_dataset.load())
 
 
+@pytest.mark.parametrize("artifact_path", (None, "folder", "folder/subfolder"))
+def test_artifact_dataset_load_with_run_id_and_artifact_path(
+    tmp_path, tracking_uri, df1, artifact_path
+):
+    print("artifact_path", artifact_path)
+    mlflow.set_tracking_uri(tracking_uri.as_uri())
+
+    # save first and retrieve run id
+    mlflow_csv_dataset1 = MlflowArtifactDataSet(
+        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
+        artifact_path=artifact_path,
+    )
+    with mlflow.start_run():
+        mlflow_csv_dataset1.save(df1)
+        first_run_id = mlflow.active_run().info.run_id
+
+    # same as before, but a closed run_id is specified
+    mlflow_csv_dataset2 = MlflowArtifactDataSet(
+        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
+        artifact_path=artifact_path,
+        run_id=first_run_id,
+    )
+
+    assert df1.equals(mlflow_csv_dataset2.load())
+
+
 @pytest.mark.parametrize("artifact_path", [None, "partitioned_data"])
 def test_partitioned_dataset_save_and_reload(
     tmp_path, tracking_uri, artifact_path, df1, df2

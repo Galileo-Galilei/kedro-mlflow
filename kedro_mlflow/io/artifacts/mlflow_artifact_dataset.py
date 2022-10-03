@@ -96,7 +96,7 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                         local_path = Path(self._path)
 
                     artifact_path = (
-                        (self.artifact_path / local_path.name).as_posix()
+                        (self.artifact_path / Path(local_path.name)).as_posix()
                         if self.artifact_path
                         else local_path.name
                     )

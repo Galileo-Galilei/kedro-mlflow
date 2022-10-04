@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.11.4] - 2022-10-04
+
 ### Fixed
 
--   :bug: ``MlflowArtifactDataSet.load()`` now correctly loads the artifact when both ``artifact_path`` and ``run_id`` arguments are specified instead of raising an error ([#362](https://github.com/Galileo-Galilei/kedro-mlflow/issues/362))
+-   :bug: `MlflowArtifactDataSet.load()` now correctly loads the artifact when both `artifact_path` and `run_id` arguments are specified instead of raising an error ([#362](https://github.com/Galileo-Galilei/kedro-mlflow/issues/362))
 
 ## [0.11.3] - 2022-09-06
 
@@ -360,7 +362,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.3...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.4...HEAD
+
+[0.11.4]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.3...0.11.4
 
 [0.11.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.2...0.11.3
 

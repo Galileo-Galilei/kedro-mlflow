@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 from typing import Any, Dict, Union
 
@@ -95,17 +96,30 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                         # special datasets with a folder instead of a specifi files like PartitionedDataSet
                         local_path = Path(self._path)
 
+                    # BEWARE: we must enforce Path(local_path) because it is a PurePosixPath which fails on windows
+                    # this is very weird: if you assign the value, it is converted to a Pureposixpath again, e.g:
+                    # this fails:
+                    #      local_path = Path(local_path)
+                    #      local_path.name # local_path has been converted back to PurePosixPath on windows on this 2nd row
+                    # but this works as a one liner::
+                    #      filename = Path(local_path).name
+
+                    filename = Path(local_path).name
                     artifact_path = (
-                        (self.artifact_path / Path(local_path.name)).as_posix()
+                        (self.artifact_path / Path(filename)).as_posix()
                         if self.artifact_path
-                        else local_path.name
+                        else filename
                     )
 
-                    mlflow_client.download_artifacts(
+                    # we cannot use dst_path, because it downlaods teh file to "local_path / artifact_path /filename.pkl"
+                    # the artifact_path suffix prevents from loading when we call super._load()
+                    temp_download_filepath = mlflow_client.download_artifacts(
                         run_id=self.run_id,
                         path=artifact_path,
-                        dst_path=local_path.parent.as_posix(),  # must be a **local** **directory**
+                        # dst_path=local_path.parent.as_posix(),
                     )
+
+                    shutil.copy(src=temp_download_filepath, dst=local_path)
 
                 # finally, read locally
                 return super()._load()

@@ -243,7 +243,9 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
     with mlflow.start_run():
         mlflow_csv_dataset1.save(df1)
         first_run_id = mlflow.active_run().info.run_id
-
+        (
+            tmp_path / "df1.csv"
+        ).unlink()  # we need to delete the data, else it is automatically reused instead of downloading
     # same as before, but a closed run_id is specified
     mlflow_csv_dataset2 = MlflowArtifactDataSet(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
@@ -252,6 +254,9 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
     )
 
     assert df1.equals(mlflow_csv_dataset2.load())
+    assert df1.equals(
+        mlflow_csv_dataset2.load()
+    )  # we check idempotency. When using a local tracking uri, mlflow does not downlaod in a tempfolder, so moving the folder alter the mlflow run
 
 
 @pytest.mark.parametrize("artifact_path", [None, "partitioned_data"])

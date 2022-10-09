@@ -1,7 +1,7 @@
 # How to use `kedro-mlflow` in a notebook
 
 ```{important}
-You need to call ``pip install kedro_mlflow[extras]`` to access notebook functionalities.
+You need to install ``ipython`` to access notebook functionalities.
 ```
 
 ## Reminder on mlflow's limitations with interactive use
@@ -22,24 +22,26 @@ Open your notebook / ipython session with the Kedro CLI:
 kedro jupyter notebook
 ```
 
-Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/latest/tools_integration/ipython.html#kedro-and-jupyter), including a `session` which are automatically accessible. It also registers some line_magic from plugins, including `%=reload_kedro_mlflow` from `kedro-mlflow`.
 
-In your first cell, launch:
-```
-%reload_kedro_mlflow
+Or if you are on JupyterLab,
+
+```notebook
+%load_ext kedro.ipython
 ```
 
-This automatically:
-- load and setup (create the tracking uri, export credentials...) the mlflow configuration of your `mlflow.yml`
+Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/latest/tools_integration/ipython.html#kedro-and-jupyter), including a `session`, a ``context`` and a ``catalog`` which are automatically accessible.
+
+When the context was created, ``kedro-mlflow`` automatically:
+- loaded and setup (create the tracking uri, export credentials...) the mlflow configuration of your `mlflow.yml`
 - import ``mlflow`` which is now accessible in your notebook
-- Create a `mlflow_client` object with your mlflow server settings, which is now accessible in your notebook
 
-If you change your ``mlflow.yml``, re-execute this cell for the changes to take effect.
+If you change your ``mlflow.yml``, reload the kedro extension for the changes to take effect.
 
 ## Difference with running through the CLI
 
 - The DataSets `load` and `save` methods works as usual. You can call `catalog.save("my_artifact_dataset", data)` inside a cell, and your data will be logged in mlflow properly (assuming "my_artifact_dataset" is a `kedro_mlflow.io.MlflowArtifactDataSet`).
-- The `hooks` which setup configuration are only accessible if you run the session interactive, e.g.:
+- The `hooks` which automatically save all parameters/metrics/artifacts in mlflow will work if you run the session interactively, e.g.:
+
 ```python
 session.run(
     pipeline_name="my_ml_pipeline",
@@ -49,6 +51,7 @@ session.run(
 )
 ```
 but it is not very likely in a notebook.
+- if you need to interact manually with the mlflow server, you can use ``context.mlflow.server._mlflow_client``.
 
 ## Guidelines and best practices suggestions
 

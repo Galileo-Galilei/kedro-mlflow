@@ -59,21 +59,14 @@ setup(
             "pre-commit>=2.0.0,<3.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],
-        "extras": ["notebook>=6.0.0"],
     },
     author="Yolan Honoré-Rougé",
     entry_points={
         "kedro.project_commands": [
             "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
         ],
-        # "kedro.global_commands": [
-        #     "kedro_mlflow =  kedro_mlflow.framework.cli.cli:commands"
-        # ],
         "kedro.hooks": [
             "mlflow_hook = kedro_mlflow.framework.hooks.mlflow_hook:mlflow_hook",
-        ],
-        "kedro.line_magic": [
-            "line_magic = kedro_mlflow.extras.extensions.ipython:reload_kedro_mlflow"
         ],
     },
     zip_safe=False,

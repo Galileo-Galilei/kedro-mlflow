@@ -20,6 +20,10 @@ server:
   mlflow_tracking_uri: null # if null, will use mlflow.get_tracking_uri() as a default
   mlflow_registry_uri: null # if null, mlflow_tracking_uri will be used as mlflow default
   credentials: null  # must be a valid key in credentials.yml which refers to a dict of sensitive mlflow environment variables (password, tokens...). See top of the file.
+  request_header_provider: # this is only useful to deal with expiring token, see https://github.com/Galileo-Galilei/kedro-mlflow/issues/357
+    type: null # The path to a class : my_project.pipelines.module.MyClass. Should inherit from https://github.com/mlflow/mlflow/blob/master/mlflow/tracking/request_header/abstract_request_header_provider.py#L4
+    pass_context: False # should the class be instantiated with "kedro_context" argument?
+    init_kwargs: {} # any kwargs to pass to the class when it is instantiated
 
 tracking:
   # You can specify a list of pipeline names for which tracking will be disabled

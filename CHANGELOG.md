@@ -5,6 +5,7 @@
 ### Added
 
 - :sparkles: Added an extra ``server.mlflow_registry_uri`` key in ``mlflow.yml`` to set the mlflow registry uri. ([#260](https://github.com/Galileo-Galilei/kedro-mlflow/issues/260))
+- :sparkles: Add support for authorization with expiring tokens by adding an extra ``server.request_header_provider`` entry in ``mlflow.yml`` ([#357](https://github.com/Galileo-Galilei/kedro-mlflow/issues/357))
 
 ### Fixed
 

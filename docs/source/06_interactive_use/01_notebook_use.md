@@ -29,7 +29,7 @@ Or if you are on JupyterLab,
 %load_ext kedro.ipython
 ```
 
-Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/latest/tools_integration/ipython.html#kedro-and-jupyter), including a `session`, a ``context`` and a ``catalog`` which are automatically accessible.
+Kedro [creates a bunch of global variables](https://kedro.readthedocs.io/en/stable/tools_integration/ipython.html#use-kedro-with-ipython-and-jupyter), including a `session`, a ``context`` and a ``catalog`` which are automatically accessible.
 
 When the context was created, ``kedro-mlflow`` automatically:
 - loaded and setup (create the tracking uri, export credentials...) the mlflow configuration of your `mlflow.yml`

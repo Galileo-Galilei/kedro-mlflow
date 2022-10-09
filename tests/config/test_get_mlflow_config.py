@@ -1,12 +1,15 @@
 import json
+import sys
 from pathlib import Path
 
+import mlflow.tracking.request_header.registry as mtrr  # necessary to access the global variable '_request_header_provider_registry' of the namespace
 import pytest
 import toml
 import yaml
 from dynaconf.validator import Validator
 from kedro import __version__ as kedro_version
 from kedro.config import TemplatedConfigLoader
+from kedro.framework.context import KedroContext
 from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
@@ -29,6 +32,7 @@ def test_mlflow_config_default(kedro_project):
             mlflow_tracking_uri="mlruns",
             mlflow_registry_uri=None,
             credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
@@ -62,23 +66,24 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
     bootstrap_project(kedro_project)
     session = KedroSession.create(project_path=kedro_project, package_name=package_name)
     context = session.load_context()
-    assert context.mlflow.dict() == {
-        "server": {
-            "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
-            "mlflow_registry_uri": None,
-            "credentials": None,
-        },
-        "tracking": {
-            "disable_tracking": {"pipelines": []},
-            "experiment": {"name": "fake_project", "restore_if_deleted": True},
-            "run": {"id": None, "name": None, "nested": True},
-            "params": {
-                "dict_params": {"flatten": False, "recursive": True, "sep": "."},
-                "long_params_strategy": "fail",
-            },
-        },
-        "ui": {"port": "5000", "host": "127.0.0.1"},
-    }
+    assert context.mlflow.dict() == dict(
+        server=dict(
+            mlflow_tracking_uri=(kedro_project / "mlruns").as_uri(),
+            mlflow_registry_uri=None,
+            credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="fake_project", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(flatten=False, recursive=True, sep="."),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
 
 
 def test_mlflow_config_with_no_experiment_name(kedro_project):
@@ -91,23 +96,24 @@ def test_mlflow_config_with_no_experiment_name(kedro_project):
         project_path=kedro_project, package_name="fake_project"
     )
     context = session.load_context()
-    assert context.mlflow.dict() == {
-        "server": {
-            "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
-            "mlflow_registry_uri": None,
-            "credentials": None,
-        },
-        "tracking": {
-            "disable_tracking": {"pipelines": []},
-            "experiment": {"name": "fake_project", "restore_if_deleted": True},
-            "run": {"id": None, "name": None, "nested": True},
-            "params": {
-                "dict_params": {"flatten": False, "recursive": True, "sep": "."},
-                "long_params_strategy": "fail",
-            },
-        },
-        "ui": {"port": "5000", "host": "127.0.0.1"},
-    }
+    assert context.mlflow.dict() == dict(
+        server=dict(
+            mlflow_tracking_uri=(kedro_project / "mlruns").as_uri(),
+            mlflow_registry_uri=None,
+            credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="fake_project", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(flatten=False, recursive=True, sep="."),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -201,6 +207,7 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
             mlflow_tracking_uri="${mlflow_tracking_uri}",
             mlflow_registry_uri=None,
             credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
@@ -234,3 +241,245 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
     with KedroSession.create("fake_package", fake_project) as session:
         context = session.load_context()
         assert context.mlflow.dict(exclude={"project_path"}) == expected
+
+
+@pytest.fixture
+def request_header_provider_cleaner(fake_project):
+    sys.path.append(fake_project.as_posix())
+    yield
+    # cleanup test specific setup
+    (fake_project / "custom_rhp.py").unlink()
+    sys.path.pop()
+    del sys.modules["custom_rhp"]
+    mtrr._request_header_provider_registry._registry.pop()
+
+
+@pytest.mark.usefixtures("request_header_provider_cleaner")
+def test_mlflow_config_with_request_header_provider(fake_project):
+
+    # emulate import of custom request header class
+    custom_rhp_txt = """
+from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
+
+class CustomRequestHeaderProvider(RequestHeaderProvider):
+    def in_context(self):
+        pass
+    def request_headers(self):
+        pass
+"""
+
+    with open(fake_project / "custom_rhp.py", "w") as fhandler:
+        fhandler.write(custom_rhp_txt)
+
+    dict_config = dict(
+        server=dict(
+            mlflow_tracking_uri=None,  # not setup, not modified yet
+            credentials=None,
+            request_header_provider={"type": "custom_rhp.CustomRequestHeaderProvider"},
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="Default", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(
+                    flatten=False,
+                    recursive=True,
+                    sep=".",
+                ),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
+
+    _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
+
+    bootstrap_project(fake_project)
+    with KedroSession.create("fake_package", fake_project) as session:
+        session.load_context()  # trigger setup and request_header_provider registration
+
+        assert (
+            mtrr._request_header_provider_registry._registry[-1].__class__.__name__
+            == "CustomRequestHeaderProvider"
+        )
+
+
+@pytest.mark.usefixtures("request_header_provider_cleaner")
+def test_mlflow_config_with_request_header_provider_with_init_kwargs(
+    fake_project,
+):
+
+    # emulate import of custom request header class
+    custom_rhp_txt = """
+from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
+
+class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
+    def __init__(self, a):
+        super().__init__()
+        self.a=a
+
+    def in_context(self):
+        pass
+    def request_headers(self):
+        pass
+"""
+
+    with open(fake_project / "custom_rhp.py", "w") as fhandler:
+        fhandler.write(custom_rhp_txt)
+
+    dict_config = dict(
+        server=dict(
+            mlflow_tracking_uri=None,  # not setup, not modified yet
+            credentials=None,
+            request_header_provider=dict(
+                type="custom_rhp.CustomRequestHeaderProviderInitKwargs",
+                init_kwargs=dict(a=1),
+            ),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="Default", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(
+                    flatten=False,
+                    recursive=True,
+                    sep=".",
+                ),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
+
+    _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
+
+    bootstrap_project(fake_project)
+    with KedroSession.create("fake_package", fake_project) as session:
+        session.load_context()  # trigger setup and request_header_provider registration
+
+        assert (
+            mtrr._request_header_provider_registry._registry[-1].__class__.__name__
+            == "CustomRequestHeaderProviderInitKwargs"
+        )
+    assert mtrr._request_header_provider_registry._registry[-1].a == "1"
+    assert not hasattr(mtrr._request_header_provider_registry._registry[-1], "context")
+
+
+@pytest.mark.usefixtures("request_header_provider_cleaner")
+def test_mlflow_config_with_request_header_provider_with_with_context(
+    fake_project,
+):
+
+    # emulate import of custom request header class
+    custom_rhp_txt = """
+from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
+
+class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
+    def __init__(self, kedro_context, b):
+        super().__init__()
+        self.context=kedro_context
+        self.b=b
+
+    def in_context(self):
+        pass
+    def request_headers(self):
+        pass
+"""
+
+    with open(fake_project / "custom_rhp.py", "w") as fhandler:
+        fhandler.write(custom_rhp_txt)
+
+    dict_config = dict(
+        server=dict(
+            mlflow_tracking_uri=None,  # not setup, not modified yet
+            credentials=None,
+            request_header_provider=dict(
+                type="custom_rhp.CustomRequestHeaderProviderInitKwargsKedroContext",
+                pass_context=True,
+                init_kwargs=dict(b=2),
+            ),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="Default", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(
+                    flatten=False,
+                    recursive=True,
+                    sep=".",
+                ),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
+
+    _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
+
+    bootstrap_project(fake_project)
+    with KedroSession.create("fake_package", fake_project) as session:
+        session.load_context()  # trigger setup and request_header_provider registration
+
+    assert (
+        mtrr._request_header_provider_registry._registry[-1].__class__.__name__
+        == "CustomRequestHeaderProviderInitKwargsKedroContext"
+    )
+    assert mtrr._request_header_provider_registry._registry[-1].b == "2"
+    assert hasattr(mtrr._request_header_provider_registry._registry[-1], "context")
+    assert isinstance(
+        mtrr._request_header_provider_registry._registry[-1].context, KedroContext
+    )
+
+
+def test_mlflow_config_with_bad_request_header_provider(fake_project):
+
+    # emulate import of custom request header class
+    # same as before, except CustomRequestHeaderProvider inherits from object
+    custom_rhp_txt = """
+class BadCustomRequestHeaderProvider():
+    def in_context(self):
+        pass
+    def request_headers(self):
+        pass
+"""
+    sys.path.append(fake_project.as_posix())
+    with open(fake_project / "bad_custom_rhp.py", "w") as fhandler:
+        fhandler.write(custom_rhp_txt)
+
+    dict_config = dict(
+        server=dict(
+            mlflow_tracking_uri=None,  # not setup, not modified yet
+            credentials=None,
+            request_header_provider=dict(
+                type="bad_custom_rhp.BadCustomRequestHeaderProvider"
+            ),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="Default", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(
+                    flatten=False,
+                    recursive=True,
+                    sep=".",
+                ),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
+
+    _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
+
+    bootstrap_project(fake_project)
+    with KedroSession.create("fake_package", fake_project) as session:
+        with pytest.raises(ValueError, match=r"should be a sublass of"):
+            session.load_context()  # trigger setup and request_header_provider registration
+
+    # cleanup test specific setup
+    (fake_project / "bad_custom_rhp.py").unlink()
+    sys.path.pop()

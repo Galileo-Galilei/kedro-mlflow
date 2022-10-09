@@ -32,6 +32,13 @@ server:
 
 This is the **only mandatory key in the `mlflow.yml` file**, but there are many others described hereafter that provide fine-grained control on your mlflow setup.
 
+You can also specify the registry uri:
+
+```yaml
+server:
+  mlflow_registry_uri: registry.db
+```
+
 You can also specify some environment variables needed by mlflow (e.g `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) in the credentials and specify them in the `mlflow.yml`. Any key specified will be automatically exported as environment variables.
 
 Your `credentials.yml` will look as follows:

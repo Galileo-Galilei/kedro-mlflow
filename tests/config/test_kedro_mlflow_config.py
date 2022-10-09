@@ -6,10 +6,7 @@ from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.config.kedro_mlflow_config import (
-    KedroMlflowConfig,
-    _validate_mlflow_tracking_uri,
-)
+from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig, _validate_uri
 
 
 def test_kedro_mlflow_config_init():
@@ -19,6 +16,7 @@ def test_kedro_mlflow_config_init():
     assert config.dict() == dict(
         server=dict(
             mlflow_tracking_uri=None,  # not setup, not modified yet
+            mlflow_registry_uri=None,
             credentials=None,
         ),
         tracking=dict(
@@ -176,6 +174,26 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
     assert mlflow.get_tracking_uri() == mlflow_tracking_uri
 
 
+def test_kedro_mlflow_config_setup_set_registry_uri(kedro_project_with_mlflow_conf):
+
+    mlflow_registry_uri = (
+        kedro_project_with_mlflow_conf / "awesome_registry.db"
+    ).as_uri()
+
+    config = KedroMlflowConfig(
+        server=dict(
+            mlflow_registry_uri=mlflow_registry_uri,
+        ),
+    )
+
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
+
+    assert mlflow.get_registry_uri() == mlflow_registry_uri
+
+
 def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_conf):
 
     (kedro_project_with_mlflow_conf / "conf/base/credentials.yml").write_text(
@@ -228,7 +246,7 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
 
 def test_validate_uri_local_relative_path(kedro_project_with_mlflow_conf):
 
-    validated_uri = _validate_mlflow_tracking_uri(
+    validated_uri = _validate_uri(
         uri=r"mlruns", project_path=kedro_project_with_mlflow_conf
     )
     assert validated_uri == (kedro_project_with_mlflow_conf / "mlruns").as_uri()
@@ -236,7 +254,7 @@ def test_validate_uri_local_relative_path(kedro_project_with_mlflow_conf):
 
 def test_validate_uri_local_absolute_posix(kedro_project_with_mlflow_conf, tmp_path):
 
-    validated_uri = _validate_mlflow_tracking_uri(
+    validated_uri = _validate_uri(
         uri=tmp_path.as_posix(), project_path=kedro_project_with_mlflow_conf
     )
     assert validated_uri == tmp_path.as_uri()
@@ -244,7 +262,7 @@ def test_validate_uri_local_absolute_posix(kedro_project_with_mlflow_conf, tmp_p
 
 def test_validate_uri_local_absolute_uri(kedro_project_with_mlflow_conf, tmp_path):
 
-    validated_uri = _validate_mlflow_tracking_uri(
+    validated_uri = _validate_uri(
         uri=tmp_path.as_uri(), project_path=kedro_project_with_mlflow_conf
     )
     assert validated_uri == tmp_path.as_uri()
@@ -252,7 +270,7 @@ def test_validate_uri_local_absolute_uri(kedro_project_with_mlflow_conf, tmp_pat
 
 def test_kedro_mlflow_config_validate_uri_databricks(kedro_project_with_mlflow_conf):
     # databricks is a reseved keyword which should not be modified
-    config_uri = _validate_mlflow_tracking_uri(
+    config_uri = _validate_uri(
         uri="databricks", project_path=kedro_project_with_mlflow_conf
     )
     assert config_uri == "databricks"

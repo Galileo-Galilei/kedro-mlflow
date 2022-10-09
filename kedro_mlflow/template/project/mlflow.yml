@@ -18,6 +18,7 @@
 
 server:
   mlflow_tracking_uri: null # if null, will use mlflow.get_tracking_uri() as a default
+  mlflow_registry_uri: null # if null, mlflow_tracking_uri will be used as mlflow default
   credentials: null  # must be a valid key in credentials.yml which refers to a dict of sensitive mlflow environment variables (password, tokens...). See top of the file.
 
 tracking:

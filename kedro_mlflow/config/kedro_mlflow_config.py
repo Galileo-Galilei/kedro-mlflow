@@ -17,6 +17,7 @@ LOGGER = getLogger(__name__)
 class MlflowServerOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
     mlflow_tracking_uri: Optional[str] = None
+    mlflow_registry_uri: Optional[str] = None
     credentials: Optional[str] = None
     _mlflow_client: MlflowClient = PrivateAttr()
 
@@ -104,13 +105,28 @@ class KedroMlflowConfig(BaseModel):
     def setup(self, context):
         """Setup all the mlflow configuration"""
 
-        self.server.mlflow_tracking_uri = _validate_mlflow_tracking_uri(
-            project_path=context.project_path, uri=self.server.mlflow_tracking_uri
+        # Manage the tracking uri
+        mlflow_tracking_uri = self.server.mlflow_tracking_uri
+        if mlflow_tracking_uri is None:
+            # do not use mlflow.get_tracking_uri() because if there is no env var,
+            # it resolves to 'Path.cwd() / "mlruns"'
+            # but we want 'project_path / "mlruns"'
+            mlflow_tracking_uri = os.environ.get("MLFLOW_TRACKING_URI", "mlruns")
+
+        self.server.mlflow_tracking_uri = _validate_uri(
+            project_path=context.project_path, uri=mlflow_tracking_uri
         )
+
+        # Manage the registry uri: if None, it will use the tracking
+        if self.server.mlflow_registry_uri is not None:
+            self.server.mlflow_registry_uri = _validate_uri(
+                project_path=context.project_path, uri=self.server.mlflow_registry_uri
+            )
 
         # init after validating the uri, else mlflow creates a mlruns folder at the root
         self.server._mlflow_client = MlflowClient(
-            tracking_uri=self.server.mlflow_tracking_uri
+            tracking_uri=self.server.mlflow_tracking_uri,
+            registry_uri=self.server.mlflow_registry_uri,
         )
 
         self._export_credentials(context)
@@ -118,6 +134,7 @@ class KedroMlflowConfig(BaseModel):
         # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
         mlflow.set_tracking_uri(self.server.mlflow_tracking_uri)
+        mlflow.set_registry_uri(self.server.mlflow_registry_uri)
 
         self._set_experiment()
 
@@ -134,7 +151,6 @@ class KedroMlflowConfig(BaseModel):
         Returns:
             mlflow.entities.Experiment -- [description]
         """
-
         # we retrieve the experiment manually to check if it exsits
         mlflow_experiment = self.server._mlflow_client.get_experiment_by_name(
             name=self.tracking.experiment.name
@@ -164,7 +180,7 @@ class KedroMlflowConfig(BaseModel):
         )
 
 
-def _validate_mlflow_tracking_uri(project_path: str, uri: Optional[str]) -> str:
+def _validate_uri(project_path: str, uri: Optional[str]) -> str:
     """Format the uri provided to match mlflow expectations.
 
     Arguments:
@@ -174,15 +190,9 @@ def _validate_mlflow_tracking_uri(project_path: str, uri: Optional[str]) -> str:
         str -- A valid mlflow_tracking_uri
     """
 
-    # this is a special reserved keyword for mlflow which should not be converted to a path
-    # se: https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
-    if uri is None:
-        # do not use mlflow.get_tracking_uri() because if there is no env var,
-        # it resolves to 'Path.cwd() / "mlruns"'
-        # but we want 'project_path / "mlruns"'
-        uri = os.environ.get("MLFLOW_TRACKING_URI", "mlruns")
-
     if uri == "databricks":
+        # "databricks" is a special reserved keyword for mlflow which should not be converted to a path
+        # see: https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
         return uri
 
     # if no tracking uri is provided, we register the runs locally at the root of the project
@@ -200,7 +210,7 @@ def _validate_mlflow_tracking_uri(project_path: str, uri: Optional[str]) -> str:
             # See : https://discuss.python.org/t/pathlib-absolute-vs-resolve/2573/6
             valid_uri = (Path(project_path) / uri).as_uri()
             LOGGER.info(
-                f"The 'mlflow_tracking_uri' key in mlflow.yml is relative ('server.mlflow_tracking_uri = {uri}'). It is converted to a valid uri: '{valid_uri}'"
+                f"The 'tracking_uri' key in mlflow.yml is relative ('server.mlflow_(tracking|registry)_uri = {uri}'). It is converted to a valid uri: '{valid_uri}'"
             )
         else:
             # else assume it is an uri

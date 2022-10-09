@@ -27,6 +27,7 @@ def test_mlflow_config_default(kedro_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="mlruns",
+            mlflow_registry_uri=None,
             credentials=None,
         ),
         tracking=dict(
@@ -64,6 +65,7 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
     assert context.mlflow.dict() == {
         "server": {
             "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
+            "mlflow_registry_uri": None,
             "credentials": None,
         },
         "tracking": {
@@ -92,6 +94,7 @@ def test_mlflow_config_with_no_experiment_name(kedro_project):
     assert context.mlflow.dict() == {
         "server": {
             "mlflow_tracking_uri": (kedro_project / "mlruns").as_uri(),
+            "mlflow_registry_uri": None,
             "credentials": None,
         },
         "tracking": {
@@ -196,6 +199,7 @@ def test_mlflow_config_with_templated_config_loader(fake_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
+            mlflow_registry_uri=None,
             credentials=None,
         ),
         tracking=dict(

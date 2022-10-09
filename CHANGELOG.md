@@ -2,13 +2,17 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Added an extra ``server.mlflow_registry_uri`` key in ``mlflow.yml`` to set the mlflow registry uri. ([#260](https://github.com/Galileo-Galilei/kedro-mlflow/issues/260))
+
 ### Fixed
 
 -   :bug: `MlflowArtifactDataSet.load()` now correctly loads the artifact when both `artifact_path` and `run_id` arguments are specified. Previous fix in ``0.11.4`` did not work because when the file already exist locally, mlflow did not download it again so tests were incorrectly passing ([#362](https://github.com/Galileo-Galilei/kedro-mlflow/issues/362))
 
 ### Removed
 
--   :fire: :boom: Remove ``reload_kedro_mlflow`` line magic for notebook because kedro will deprecate the entrypoint in 0.18.3. It is still possible to access the mlflow client associated to the configuration in a notebook with ``context.mlflow.server._mlflow_client`` ([#349](https://github.com/Galileo-Galilei/kedro-mlflow/issues/349)). This is not considered as a breaking change since apparently no one uses it according to a [discussion with kedro's team](https://github.com/kedro-org/kedro/issues/878#issuecomment-1226545251)
+-   :fire: :boom: Remove ``reload_kedro_mlflow`` line magic for notebook because kedro will deprecate the entrypoint in 0.18.3. It is still possible to access the mlflow client associated to the configuration in a notebook with ``context.mlflow.server._mlflow_client`` ([#349](https://github.com/Galileo-Galilei/kedro-mlflow/issues/349)). This is not considered as a breaking change since apparently no one uses it according to a [discussion with kedro's team](https://github.com/kedro-org/kedro/issues/878#issuecomment-1226545251).
 
 ## [0.11.4] - 2022-10-04
 

@@ -21,6 +21,8 @@ The ``mlflow.yml`` file contains all configuration you can pass either to kedro 
 
 ### Configure the tracking server
 
+#### Configure the tracking and registry uri
+
 ``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly. The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded) value. The ``mlflow.yml`` default have this keys set to ``mlruns``. This will create a ``mlruns`` folder locally at the root of your kedro project and enable you to use the plugin without any setup of a mlflow tracking server.
 
 Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically.
@@ -39,6 +41,10 @@ server:
   mlflow_registry_uri: registry.db
 ```
 
+#### Configure the credentials
+
+##### Default credentials with environment variables
+
 You can also specify some environment variables needed by mlflow (e.g `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`) in the credentials and specify them in the `mlflow.yml`. Any key specified will be automatically exported as environment variables.
 
 Your `credentials.yml` will look as follows:
@@ -56,7 +62,25 @@ server:
   credentials: my_mlflow_credentials
 ```
 
-For safety reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They will be exported as environment variables *on the fly* when running the pipeline.
+```{note}
+For security reasons, the credentials will not be accessible within `KedroMlflowConfig` objects. They will be exported as environment variables *on the fly* when running the pipeline.
+```
+
+##### Authentication with expiring tokens
+
+Mlflow can be deployed with OAuth2.0. authentication method : in this case, secured MLflow instances require HTTP requests to have the ``Authorization: Bearer <token>`` header. Mlflow exposes a [``RequestHeaderProvider`` abstract class](https://github.com/mlflow/mlflow/blob/master/mlflow/tracking/request_header/abstract_request_header_provider.py#L4) to mange this use case. If you need kedro-mlflow to use a *custom* header provider, you can configure your ``mlflow.yml`` as follow:  
+
+```yaml
+# mlflow.yml
+server:
+    request_header_provider:
+        type: path.to.your.class.CustomRequestHeaderProvider
+        pass_context: True # if you want to pass context. it must be named ``kedro_context`` in the ``__init__`` method of your custom ``request_header_provider``)
+        init_kwargs:
+            my_kwarg: 1
+```
+
+This will automatically register in the mlflow entrypoint the ``CustomRequestHeaderProvider(kedro_context=<kedro-context>, my_kwarg=1)`` request header when running a kedro pipeline.
 
 ### Deactivate tracking under conditions
 

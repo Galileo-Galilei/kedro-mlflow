@@ -232,7 +232,6 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
 def test_artifact_dataset_load_with_run_id_and_artifact_path(
     tmp_path, tracking_uri, df1, artifact_path
 ):
-    print("artifact_path", artifact_path)
     mlflow.set_tracking_uri(tracking_uri.as_uri())
 
     # save first and retrieve run id

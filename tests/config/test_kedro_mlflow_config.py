@@ -10,14 +10,13 @@ from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig, _validate
 
 
 def test_kedro_mlflow_config_init():
-    # kedro_project_with_mlflow_conf is a global fixture in conftest
-
     config = KedroMlflowConfig()
     assert config.dict() == dict(
         server=dict(
             mlflow_tracking_uri=None,  # not setup, not modified yet
             mlflow_registry_uri=None,
             credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[]),

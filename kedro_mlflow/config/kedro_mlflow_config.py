@@ -1,17 +1,34 @@
 import os
 from logging import getLogger
 from pathlib import Path, PurePath
-from typing import List, Optional
+from typing import Dict, List, Optional
 from urllib.parse import urlparse
 
 import mlflow
+import mlflow.tracking.request_header.registry as mtrr  # necessary to access the global variable '_request_header_provider_registry' of the namespace
 from kedro.framework.context import KedroContext
+from kedro.utils import load_obj
 from mlflow.entities import Experiment
 from mlflow.tracking.client import MlflowClient
+from mlflow.tracking.request_header.abstract_request_header_provider import (
+    RequestHeaderProvider,
+)
 from pydantic import BaseModel, PrivateAttr, StrictBool
 from typing_extensions import Literal
 
 LOGGER = getLogger(__name__)
+
+
+class RequestHeaderProviderOptions(BaseModel):
+    # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
+    type: Optional[str] = None
+    pass_context: bool = False
+    init_kwargs: Dict[str, str] = {}
+
+    class Config:
+        extra = "forbid"
+        # necessary to check instance of RequestHeaderProvider:
+        arbitrary_types_allowed = "allowed"
 
 
 class MlflowServerOptions(BaseModel):
@@ -19,6 +36,9 @@ class MlflowServerOptions(BaseModel):
     mlflow_tracking_uri: Optional[str] = None
     mlflow_registry_uri: Optional[str] = None
     credentials: Optional[str] = None
+    request_header_provider: RequestHeaderProviderOptions = (
+        RequestHeaderProviderOptions()
+    )
     _mlflow_client: MlflowClient = PrivateAttr()
 
     class Config:
@@ -131,12 +151,41 @@ class KedroMlflowConfig(BaseModel):
 
         self._export_credentials(context)
 
+        self._register_request_header_provider(context)
         # we set the configuration now: it takes priority
         # if it has already be set in export_credentials
         mlflow.set_tracking_uri(self.server.mlflow_tracking_uri)
         mlflow.set_registry_uri(self.server.mlflow_registry_uri)
 
         self._set_experiment()
+
+    def _register_request_header_provider(self, context: KedroContext):
+        # this is a specific trick to deal with expiring tokens for authentication, see https://github.com/Galileo-Galilei/kedro-mlflow/issues/357
+        if self.server.request_header_provider.type is not None:
+            # it type is none, there is nothing to register
+            request_header_provider_class = load_obj(
+                self.server.request_header_provider.type
+            )
+
+            if not issubclass(request_header_provider_class, RequestHeaderProvider):
+                raise ValueError(
+                    f"request_header_provider.type='{self.server.request_header_provider.type}' should be a sublass of 'mlflow.tracking.request_header.abstract_request_header_provider', got {request_header_provider_class} instead."
+                )
+
+            # we allow the user to instantiate the class with parameters, including the kedro context for advanded retrieval of kedro objects
+            init_kwargs = (
+                {
+                    **self.server.request_header_provider.init_kwargs,
+                    "kedro_context": context,
+                }
+                if self.server.request_header_provider.pass_context
+                else self.server.request_header_provider.init_kwargs
+            )
+
+            # the "register" method because expects a callable class with no arguments so we tricked it with a lambda
+            mtrr._request_header_provider_registry.register(
+                lambda: request_header_provider_class(**init_kwargs)
+            )
 
     def _export_credentials(self, context: KedroContext):
         conf_creds = context._get_config_credentials()

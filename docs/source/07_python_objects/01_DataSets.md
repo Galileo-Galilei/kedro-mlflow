@@ -126,7 +126,7 @@ The ``MlflowModelLoggerDataSet`` accepts the following arguments:
 - save_args (Dict[str, Any], optional): Arguments to `save_model` function from specified `flavor`. Defaults to None.
 - version (Version, optional): Kedro version to use. Defaults to None.
 
-The use is very similar to MlflowModelLoggerDataSet, but that you specify a filepath instead of a `run_id`:
+The use is very similar to ``MlflowModelLoggerDataSet``, but you have to specify a local ``filepath`` instead of a `run_id`:
 
 ```python
 from kedro_mlflow.io.models import MlflowModelLoggerDataSet
@@ -157,4 +157,48 @@ my_model:
     flavor: mlflow.sklearn
     filepath: path/to/where/you/want/model
     version: <valid-kedro-version>
+```
+
+### ``MlflowModelRegistryDataSet``
+
+The ``MlflowModelRegistryDataSet`` accepts the following arguments:
+
+- model_name (str): The name of the registered model is the mlflow registry
+- stage_or_version (str): A valid stage (either "staging" or "production") or version number for the registred model.Default to "latest" which fetch the last version and the higher "stage" available.
+- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
+- pyfunc_workflow (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
+- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+
+We assume you have registered a mlflow model first, either [with the ``MlflowClient``](https://mlflow.org/docs/latest/model-registry.html#adding-an-mlflow-model-to-the-model-registry) or [within the mlflow ui](https://mlflow.org/docs/latest/model-registry.html#ui-workflow), e.g. :
+
+```python
+from sklearn.tree import DecisionTreeClassifier
+
+import mlflow
+import mlflow.sklearn
+
+with mlflow.start_run():
+    model = DecisionTreeClassifier()
+
+    # Log the sklearn model and register as version 1
+    mlflow.sklearn.log_model(
+        sk_model=model, artifact_path="model", registered_model_name="my_awesome_model"
+    )
+```
+
+You can fetch the model by its name:
+
+```python
+from kedro_mlflow.io.models import MlflowModelRegistryDataSet
+
+mlflow_model_logger = MlflowModelRegistryDataSet(model_name="my_awesome_model")
+my_model = mlflow_model_logger.load()
+```
+
+and with the YAML API in the `catalog.yml` (only for loading an existing model):
+
+```yaml
+my_model:
+    type: kedro_mlflow.io.models.MlflowModelRegistryDataSet
+    model_name: my_awesome_model
 ```

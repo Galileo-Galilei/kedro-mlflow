@@ -4,7 +4,7 @@ We assume in this section that you have [installed `kedro-mlflow` in your virtua
 
 ## Context: mlflow tracking under the hood
 
-Mlflow is composed of four modules which are described in the [introduction section](../01_introduction/01_introduction.md). The ain module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
+Mlflow is composed of four modules which are described in the [introduction section](../01_introduction/01_introduction.md). The main module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
 
 ![mlflow_tracking_schema](../imgs/mlflow_tracking_schema.png)
 

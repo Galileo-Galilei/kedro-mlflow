@@ -52,7 +52,7 @@ setup(
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <1.2.0",
             "flake8==5.0.4",  # ensure consistency with pre-commit
-            "black==22.10.0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "black==22.12.0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.10.1",  # ensure consistency with pre-commit
         ],
         "dev": [

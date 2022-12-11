@@ -10,7 +10,7 @@ on:
         - patch
         - minor
         - major
-        default: 'minor'
+        default: 'patch'
         required: true
 
 jobs:
@@ -18,13 +18,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7]
+        python-version: [3.9]
     env:
       PYTHON_PACKAGE: kedro_mlflow
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: ${{ matrix.python-version }}
     - name: Validate inputs
@@ -52,7 +52,7 @@ jobs:
         git push
     - name: Open a PR to merge the release to master
       id: open_pr
-      uses: vsoch/pull-request-action@1.0.12
+      uses: vsoch/pull-request-action@1.0.23
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         PULL_REQUEST_BRANCH: master

@@ -6,6 +6,8 @@ labels: 'Issue: Feature Request'
 assignees: ''
 ---
 
+*If you like the repo, please give it a :star:*
+
 ## Description
 A clear and concise description of what you want to achieve. An image or a code example is worth thousand words!
 

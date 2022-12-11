@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+**_If you like the repo, please give it a :star:_**
+
 ## Description
 
 Short description of the problem here.

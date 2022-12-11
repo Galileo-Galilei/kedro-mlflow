@@ -79,7 +79,6 @@ setup(
         "Programming Language :: Python :: 3.10",
         "Framework :: Kedro",
         "Environment :: Plugins",
-        "Framework :: Kedro",
         "Intended Audience :: Developers",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: MacOS",

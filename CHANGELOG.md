@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.11.6] - 2023-01-09
+
 ### Changed
 
--   :sparkles: `kedro-mlflow` now uses the default configuration (ignoring ``mlflow.yml``) if an active run already exists in the process where the pipeline is started, and uses this active run for logging. This enables using `` kedro-mlflow``  with an orchestrator which starts mlflow itself before running kedro (e.g. airflow,  the ``mlflow run`` command, AzureML...) ([#358](https://github.com/Galileo-Galilei/kedro-mlflow/issues/358))
+-   :sparkles: `kedro-mlflow` now uses the default configuration (ignoring `mlflow.yml`) if an active run already exists in the process where the pipeline is started, and uses this active run for logging. This enables using ` kedro-mlflow`  with an orchestrator which starts mlflow itself before running kedro (e.g. airflow,  the `mlflow run` command, AzureML...) ([#358](https://github.com/Galileo-Galilei/kedro-mlflow/issues/358))
 
 ## [0.11.5] - 2022-12-12
 
@@ -381,7 +383,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.5...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.6...HEAD
+
+[0.11.6]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.5...0.11.6
 
 [0.11.5]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.4...0.11.5
 

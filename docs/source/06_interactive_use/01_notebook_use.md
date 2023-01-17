@@ -6,7 +6,7 @@ You need to install ``ipython`` to access notebook functionalities.
 
 ## Reminder on mlflow's limitations with interactive use
 
-Data science project lifecycle are very iterative. Mlflow intends to track parameters changes to imporove reproducibility. However, one must be conscious that being able to **execute functions outside of a end to end pipeline** puts a strong burden on the user shoulders **because he is in charge to make the code execution coherent** by running the notebooks cells in the right order. Any back and forth during execution to change some parameters in a previous notebook cells and then retrain a model creates an operational risk that the recorded parameter stored in mlflow is different than the real parameter used for training the model.
+Data science project lifecycle are very iterative. Mlflow intends to track parameters changes to improve reproducibility. However, one must be conscious that being able to **execute functions outside of a end to end pipeline** puts a strong burden on the user shoulders **because he is in charge to make the code execution coherent** by running the notebooks cells in the right order. Any back and forth during execution to change some parameters in a previous notebook cells and then retrain a model creates an operational risk that the recorded parameter stored in mlflow is different than the real parameter used for training the model.
 
 To make a long story short: **forget about efficient reproducibility** when using mlflow interactively.
 

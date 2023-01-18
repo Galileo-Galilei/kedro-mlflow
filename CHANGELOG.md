@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+- :bug: Use  ``__default__`` as a run name if the pipeline is not specified in the ``kedro run`` commmand to avoid empty names ([#392](https://github.com/Galileo-Galilei/kedro-mlflow/issues/392))
+
 ## [0.11.6] - 2023-01-09
 
 ### Changed

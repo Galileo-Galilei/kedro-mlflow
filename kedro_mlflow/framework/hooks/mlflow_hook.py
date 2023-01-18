@@ -224,7 +224,9 @@ class MlflowHook:
             )
 
             run_name = (
-                self.mlflow_config.tracking.run.name or run_params["pipeline_name"]
+                self.mlflow_config.tracking.run.name
+                or run_params["pipeline_name"]
+                or "__default__"
             )
 
             if self._already_active_mlflow:

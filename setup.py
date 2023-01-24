@@ -56,7 +56,7 @@ setup(
             "isort==5.11.4",  # ensure consistency with pre-commit
         ],
         "dev": [
-            "pre-commit>=2.0.0,<3.0.0",
+            "pre-commit>=2.0.0,<4.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],
     },

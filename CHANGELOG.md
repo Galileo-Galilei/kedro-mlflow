@@ -2,14 +2,15 @@
 
 ## [Unreleased]
 
+## [0.11.7] - 2023-01-28
+
 ### Added
 
 -   :sparkles: Added a `MlflowModelRegistryDataSet`  in `kedro_mlflow.io.models` to enable fetching a mlflow model from the mlflow model registry by its name([#260](https://github.com/Galileo-Galilei/kedro-mlflow/issues/260))
 
 ### Fixed
 
-- :bug: Use  ``__default__`` as a run name if the pipeline is not specified in the ``kedro run`` commmand to avoid empty names ([#392](https://github.com/Galileo-Galilei/kedro-mlflow/issues/392))
-
+-   :bug: Use  `__default__` as a run name if the pipeline is not specified in the `kedro run` commmand to avoid empty names ([#392](https://github.com/Galileo-Galilei/kedro-mlflow/issues/392))
 
 ## [0.11.6] - 2023-01-09
 
@@ -392,7 +393,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.6...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.7...HEAD
+
+[0.11.7]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.6...0.11.7
 
 [0.11.6]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.5...0.11.6
 

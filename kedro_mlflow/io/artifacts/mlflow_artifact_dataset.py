@@ -84,8 +84,6 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                     # if no run_id is specified, we take the artifact from the local path rather that the active run:
                     # there are a lot of chances that it has not been saved yet!
 
-                    mlflow_client = MlflowClient()
-
                     if hasattr(self, "_version"):
                         # all kedro datasets inherits from AbstractVersionedDataSet
                         local_path = self._get_load_path()
@@ -101,7 +99,7 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                     # this fails:
                     #      local_path = Path(local_path)
                     #      local_path.name # local_path has been converted back to PurePosixPath on windows on this 2nd row
-                    # but this works as a one liner::
+                    # but this works as a one liner:
                     #      filename = Path(local_path).name
 
                     filename = Path(local_path).name
@@ -111,13 +109,26 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                         else filename
                     )
 
-                    # we cannot use dst_path, because it downlaods teh file to "local_path / artifact_path /filename.pkl"
-                    # the artifact_path suffix prevents from loading when we call super._load()
-                    temp_download_filepath = mlflow_client.download_artifacts(
-                        run_id=self.run_id,
-                        path=artifact_path,
-                        # dst_path=local_path.parent.as_posix(),
-                    )
+                    mlflow_client = MlflowClient()
+                    # specific trick to manage different behaviour between mlflow 1 and 2
+                    if hasattr(mlflow_client, "download_artifacts"):
+                        # download in mlflow 1
+                        # we cannot use dst_path, because it downloads the file to "local_path / artifact_path /filename.pkl"
+                        # the artifact_path suffix prevents from loading when we call super._load()
+                        temp_download_filepath = mlflow_client.download_artifacts(
+                            run_id=self.run_id,
+                            path=artifact_path,
+                            # dst_path=local_path.parent.as_posix(),
+                        )
+                    else:
+                        # download in mlflow 2
+                        from mlflow.artifacts import download_artifacts
+
+                        temp_download_filepath = download_artifacts(
+                            run_id=self.run_id,
+                            artifact_path=artifact_path,
+                            # dst_path=local_path.parent.as_posix(),
+                        )
 
                     shutil.copy(src=temp_download_filepath, dst=local_path)
 

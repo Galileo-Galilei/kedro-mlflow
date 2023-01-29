@@ -18,7 +18,6 @@ from kedro.framework.project import (
 from kedro.framework.session import KedroSession
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline, node
-from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.hooks import MlflowHook
 
@@ -274,30 +273,32 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
 
     with mock_session:
 
-        mock_session.load_context()  # setup mlflow config
+        context = mock_session.load_context()  # setup mlflow config
 
-        mlflow_client = MlflowClient((Path(kedro_project_path) / "mlruns").as_uri())
+        mlflow_client = context.mlflow.server._mlflow_client
 
-        # 0 is default, 1 is "fake_exp"
-        all_runs_id_beginning = set(
-            [
-                run.run_id
-                for k in range(len(mlflow_client.list_experiments()))
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
+        # 0 is default, 1 is "mock_package_name"
+        all_experiment_ids_beginning = [
+            exp.experiment_id for exp in mlflow_client.search_experiments()
+        ]
+        all_run_ids_beginning = {
+            run.info.run_id
+            for run in mlflow_client.search_runs(
+                experiment_ids=all_experiment_ids_beginning
+            )
+        }
 
         mock_session.run(pipeline_name="pipeline_on")
 
-        all_runs_id_end = set(
-            [
-                run.run_id
-                for k in range(len(mlflow_client.list_experiments()))
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
+        all_experiment_ids_end = [
+            exp.experiment_id for exp in mlflow_client.search_experiments()
+        ]
+        all_run_ids_end = {
+            run.info.run_id
+            for run in mlflow_client.search_runs(experiment_ids=all_experiment_ids_end)
+        }
 
-        assert len(all_runs_id_end - all_runs_id_beginning) == 1  # 1 run is created
+        assert len(all_run_ids_end - all_run_ids_beginning) == 1  # 1 run is created
 
 
 def test_deactivated_tracking_for_given_pipeline(
@@ -307,25 +308,30 @@ def test_deactivated_tracking_for_given_pipeline(
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
     with mock_session:
-        mlflow_client = MlflowClient((kedro_project_path / "mlruns").as_uri())
 
-        # 0 is default, 1 is "fake_exp"
-        all_runs_id_beginning = set(
-            [
-                run.run_id
-                for k in range(len(mlflow_client.list_experiments()))
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
+        context = mock_session.load_context()  # setup mlflow config
+
+        mlflow_client = context.mlflow.server._mlflow_client
+
+        # 0 is default, 1 is "mock_package_name"
+        all_experiment_ids_beginning = [
+            exp.experiment_id for exp in mlflow_client.search_experiments()
+        ]
+        all_run_ids_beginning = {
+            run.info.run_id
+            for run in mlflow_client.search_runs(
+                experiment_ids=all_experiment_ids_beginning
+            )
+        }
 
         mock_session.run(pipeline_name="pipeline_off")
 
-        all_runs_id_end = set(
-            [
-                run.run_id
-                for k in range(len(mlflow_client.list_experiments()))
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
+        all_experiment_ids_end = [
+            exp.experiment_id for exp in mlflow_client.search_experiments()
+        ]
+        all_run_ids_end = {
+            run.info.run_id
+            for run in mlflow_client.search_runs(experiment_ids=all_experiment_ids_end)
+        }
 
-        assert all_runs_id_beginning == all_runs_id_end  # no run is created
+        assert all_run_ids_beginning == all_run_ids_end  # no run is created

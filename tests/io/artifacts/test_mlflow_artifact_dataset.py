@@ -105,7 +105,7 @@ def test_artifact_dataset_save_with_run_id(
     mlflow_csv_dataset.save(df1)
 
     # same tests as previously, bu no new experiments must have been created
-    runs_list = mlflow_client.list_run_infos(experiment_id="0")
+    runs_list = mlflow_client.search_runs(experiment_ids="0")
     run_artifacts = [
         fileinfo.path for fileinfo in mlflow_client.list_artifacts(run_id=run_id)
     ]
@@ -152,9 +152,19 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
         # Check if just one artifact was created in given run.
         assert len(run_artifacts) == 1
 
-        artifact_path = mlflow_client.download_artifacts(
-            run_id=run_id, path=run_artifacts[0]
-        )
+        # specific trick to manage different behaviour between mlflow 1 and 2
+        if hasattr(mlflow_client, "download_artifacts"):
+            # download with mlflow 1
+            artifact_path = mlflow_client.download_artifacts(
+                run_id=run_id, path=run_artifacts[0]
+            )
+        else:
+            # download with mlflow 2
+            from mlflow.artifacts import download_artifacts
+
+            artifact_path = download_artifacts(
+                run_id=run_id, artifact_path=run_artifacts[0]
+            )
 
         # Check if saved artifact is file and not folder where versioned datasets are stored.
         assert Path(artifact_path).is_file()
@@ -172,23 +182,19 @@ def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
 
     mlflow_pkl_dataset._logging_activated = False
 
-    all_runs_id_beginning = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.list_experiments()))
-            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-        ]
-    )
+    all_runs_id_beginning = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     mlflow_pkl_dataset.save(2)
 
-    all_runs_id_end = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.list_experiments()))
-            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-        ]
-    )
+    all_runs_id_end = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     assert all_runs_id_beginning == all_runs_id_end
 

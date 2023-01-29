@@ -7,7 +7,6 @@ from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
-from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.io.metrics import (
@@ -171,7 +170,7 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-        context = session.load_context()
+        context = session.load_context()  # setup mlflow
 
         with mlflow.start_run():
             existing_run_id = mlflow.active_run().info.run_id
@@ -228,24 +227,24 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
             catalog=dummy_catalog_with_run_id,
         )
 
-        mlflow_client = MlflowClient(context.mlflow.server.mlflow_tracking_uri)
+        mlflow_client = context.mlflow.server._mlflow_client
         # the first run is created in Default (id 0),
         # but the one initialised in before_pipeline_run
         # is create  in kedro_project experiment (id 1)
-        all_runs_id = set(
-            [
-                run.run_id
-                for k in range(2)
-                for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
-            ]
-        )
+        all_experiment_ids = [
+            exp.experiment_id for exp in mlflow_client.search_experiments()
+        ]
+        all_run_ids = {
+            run.info.run_id
+            for run in mlflow_client.search_runs(experiment_ids=all_experiment_ids)
+        }
 
         # the metrics are supposed to have been logged inside existing_run_id
         run_data = mlflow_client.get_run(existing_run_id).data
 
         # Check if metrics datasets have prefix with its names.
         # for metric
-        assert all_runs_id == {current_run_id, existing_run_id}
+        assert all_run_ids == {current_run_id, existing_run_id}
 
         assert run_data.metrics["my_metrics.metric_key"] == 1.1
         assert run_data.metrics["foo.metric_key"] == 1.1

@@ -104,9 +104,9 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
         experiment = mlflow_client.get_experiment_by_name(
             context.mlflow.tracking.experiment.name
         )
-        failing_run_info = MlflowClient(tracking_uri).list_run_infos(
-            experiment.experiment_id
-        )[0]
+        failing_run_info = (
+            MlflowClient(tracking_uri).search_runs(experiment.experiment_id)[0].info
+        )
         assert mlflow.active_run() is None  # the run must have been closed
         assert failing_run_info.status == RunStatus.to_string(
             RunStatus.FAILED

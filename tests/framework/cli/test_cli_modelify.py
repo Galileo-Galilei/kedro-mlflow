@@ -235,7 +235,7 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_list_before_cmd = context.mlflow.server._mlflow_client.list_run_infos(
+    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
         context.mlflow.tracking.experiment._experiment.experiment_id
     )
     cli_runner = CliRunner()
@@ -246,7 +246,7 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
         catch_exceptions=True,
     )
 
-    runs_list_after_cmd = context.mlflow.server._mlflow_client.list_run_infos(
+    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
         context.mlflow.tracking.experiment._experiment.experiment_id
     )
 
@@ -300,8 +300,8 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
 
     runs_id_set_before_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
@@ -321,8 +321,8 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
     )
     runs_id_set_after_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
@@ -344,6 +344,7 @@ def test_modelify_with_infer_signature_arg(
 ):
 
     monkeypatch.chdir(kp_for_modelify_persistent_input)
+    monkeypatch.chdir(kp_for_modelify_persistent_input)
 
     cli_runner = CliRunner()
 
@@ -357,8 +358,8 @@ def test_modelify_with_infer_signature_arg(
 
     runs_id_set_before_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
@@ -380,8 +381,8 @@ def test_modelify_with_infer_signature_arg(
 
     runs_id_set_after_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
@@ -419,8 +420,8 @@ def test_modelify_with_infer_input_example(
 
     runs_id_set_before_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]
@@ -446,8 +447,8 @@ def test_modelify_with_infer_input_example(
 
     runs_id_set_after_cmd = set(
         [
-            run_info.run_id
-            for run_info in context.mlflow.server._mlflow_client.list_run_infos(
+            run.info.run_id
+            for run in context.mlflow.server._mlflow_client.search_runs(
                 context.mlflow.tracking.experiment._experiment.experiment_id
             )
         ]

@@ -50,7 +50,7 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
         config.setup(context)
 
     assert "exp1" in [
-        exp.name for exp in config.server._mlflow_client.list_experiments()
+        exp.name for exp in config.server._mlflow_client.search_experiments()
     ]
 
 
@@ -89,7 +89,7 @@ def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
         config.setup(context)
 
     assert "exp1" in [
-        exp.name for exp in config.server._mlflow_client.list_experiments()
+        exp.name for exp in config.server._mlflow_client.search_experiments()
     ]
 
 
@@ -115,7 +115,7 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
         config.setup(context)
 
     assert "exp1" in [
-        exp.name for exp in config.server._mlflow_client.list_experiments()
+        exp.name for exp in config.server._mlflow_client.search_experiments()
     ]
 
 
@@ -137,7 +137,7 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
         config.setup(context)
 
     mlflow_client = MlflowClient(mlflow_tracking_uri)
-    runs_list_before_interactive_run = mlflow_client.list_run_infos(
+    runs_list_before_interactive_run = mlflow_client.search_runs(
         config.tracking.experiment._experiment.experiment_id
     )
 
@@ -145,7 +145,7 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
         mlflow.log_param("a", 1)
         my_run_id = mlflow.active_run().info.run_id
 
-    runs_list_after_interactive_run = mlflow_client.list_run_infos(
+    runs_list_after_interactive_run = mlflow_client.search_runs(
         config.tracking.experiment._experiment.experiment_id
     )
 
@@ -153,7 +153,7 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
         len(runs_list_after_interactive_run) - len(runs_list_before_interactive_run)
         == 1
     )
-    assert runs_list_after_interactive_run[0].run_id == my_run_id
+    assert runs_list_after_interactive_run[0].info.run_id == my_run_id
 
 
 def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_conf):

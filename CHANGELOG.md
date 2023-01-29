@@ -1,6 +1,9 @@
 # Changelog
 
 ## [Unreleased]
+### Added
+
+-   :sparkles: Added support for Mlflow 2.0 ([#390](https://github.com/Galileo-Galilei/kedro-mlflow/issues/390))
 
 ## [0.11.7] - 2023-01-28
 

@@ -36,7 +36,6 @@ def test_mlflow_model_registry_load_given_stage_or_version(tmp_path, monkeypatch
                 model, artifact_path="demo_model", registered_model_name="demo_model"
             )
             runs[i + 1] = mlflow.active_run().info.run_id
-            print(f"run_{i+1}={runs[i+1]}")
 
     client = MlflowClient(tracking_uri=tracking_uri)
     client.transition_model_version_stage(name="demo_model", version=2, stage="Staging")

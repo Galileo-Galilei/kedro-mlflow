@@ -182,8 +182,8 @@ def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
     all_runs_id_beginning = set(
         [
             run.run_id
-            for k in range(len(mlflow_client.list_experiments()))
-            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+            for k in range(len(mlflow_client.search_experiments()))
+            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
         ]
     )
 
@@ -192,8 +192,8 @@ def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
     all_runs_id_end = set(
         [
             run.run_id
-            for k in range(len(mlflow_client.list_experiments()))
-            for run in mlflow_client.list_run_infos(experiment_id=f"{k}")
+            for k in range(len(mlflow_client.search_experiments()))
+            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
         ]
     )
 

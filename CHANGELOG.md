@@ -5,6 +5,10 @@
 
 -   :sparkles: Added support for Mlflow 2.0 ([#390](https://github.com/Galileo-Galilei/kedro-mlflow/issues/390))
 
+### Fixed
+
+-   :memo: Update incorrect documentation about model registry with local relative filepath ([#400](https://github.com/Galileo-Galilei/kedro-mlflow/issues/400))
+
 ## [0.11.7] - 2023-01-28
 
 ### Added

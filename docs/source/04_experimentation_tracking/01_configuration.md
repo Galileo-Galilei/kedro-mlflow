@@ -47,7 +47,11 @@ You can also specify the registry uri:
 
 ```yaml
 server:
-  mlflow_registry_uri: registry.db
+  mlflow_registry_uri: sqlite:///path/to/registry.db
+```
+
+```{note}
+Unlike the ``mlflow_tracking_uri``, the ``mlflow_registry_uri`` must be an *absolute* path prefixed with the  [database dialect](https://mlflow.org/docs/latest/tracking.html#backend-stores) of your database, likely ``sqlite:///`` for a local database.
 ```
 
 #### Configure the credentials

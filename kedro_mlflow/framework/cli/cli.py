@@ -2,11 +2,13 @@ import subprocess
 import webbrowser
 from logging import getLogger
 from pathlib import Path
+from platform import python_version
 from tempfile import TemporaryDirectory
 from typing import Dict, Optional, Union
 
 import click
 import mlflow
+from kedro import __version__ as kedro_version
 from kedro.framework.project import pipelines, settings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import _is_project, bootstrap_project
@@ -289,13 +291,14 @@ def modelify(
     copy_mode: Optional[Union[str, Dict[str, str]]],
     artifact_path: str,
     code_path: str,
-    conda_env: str,
+    conda_env: Optional[str],
     registered_model_name: str,
     await_registration_for: int,
-    pip_requirements: str,
-    extra_pip_requirements: str,
+    pip_requirements: Optional[str],
+    extra_pip_requirements: Optional[str],
 ):
     """Export a kedro pipeline as a mlflow model for serving"""
+
     # if the command is available, we are necessarily at the root of a kedro project
 
     project_path = Path.cwd()
@@ -343,23 +346,32 @@ def modelify(
 
             artifacts = kedro_pipeline_model.extract_pipeline_artifacts(Path(tmp_dir))
 
-            if conda_env is None:
-                conda_env = {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]}
-
             log_model_kwargs = dict(
                 artifact_path=artifact_path,
                 python_model=kedro_pipeline_model,
                 artifacts=artifacts,
                 code_path=code_path,
-                conda_env=conda_env,
                 signature=model_signature,
                 input_example=input_example,
                 registered_model_name=registered_model_name,
                 await_registration_for=await_registration_for,
             )
+
             if version.parse(f"{mlflow.__version__}") >= version.parse("1.20.0"):
                 log_model_kwargs["pip_requirements"] = pip_requirements
                 log_model_kwargs["extra_pip_requirements"] = extra_pip_requirements
+
+            if (
+                (conda_env is None)
+                and (pip_requirements is None)
+                and (extra_pip_requirements is None)
+            ):
+                conda_env = {
+                    "python": python_version(),
+                    "dependencies": [f"kedro=={kedro_version}"],
+                }
+
+            log_model_kwargs["conda_env"] = conda_env
 
             with mlflow.start_run(run_id=run_id):
                 mlflow.pyfunc.log_model(**log_model_kwargs)

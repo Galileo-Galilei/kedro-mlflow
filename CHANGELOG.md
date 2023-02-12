@@ -5,7 +5,7 @@
 
 -   :sparkles: Added support for Mlflow 2.0 ([#390](https://github.com/Galileo-Galilei/kedro-mlflow/issues/390))
 
--   :sparkels: The ``modelify`` command now accepts a ``--run-name`` to specifiy the run name where the model is logged ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
+-   :sparkles: The ``modelify`` command now accepts a ``--run-name`` to specifiy the run name where the model is logged ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
 ### Fixed
 
 -   :memo: Update incorrect documentation about model registry with local relative filepath ([#400](https://github.com/Galileo-Galilei/kedro-mlflow/issues/400))

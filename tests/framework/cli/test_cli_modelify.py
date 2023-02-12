@@ -612,3 +612,56 @@ def test_modelify_fail_with_multiple_requirements(
         "Only one of `conda_env`, `pip_requirements`, and `extra_pip_requirements` can be specified"
         in str(result.exception)
     )
+
+
+@pytest.mark.parametrize(
+    "arg_run_name,actual_run_name",
+    [
+        (None, "modelify"),
+        ("abcd", "abcd"),
+    ],
+)
+def test_modelify_with_run_name(
+    monkeypatch, kp_for_modelify, arg_run_name, actual_run_name
+):
+
+    monkeypatch.chdir(kp_for_modelify)
+
+    bootstrap_project(Path().cwd())
+    with KedroSession.create(project_path=Path().cwd()) as session:
+        context = session.load_context()
+        catalog = context.catalog
+        catalog.save("trained_model", 2)
+
+    cli_runner = CliRunner()
+
+    cli_args = [
+        "--pipeline",
+        "inference",
+        "--input-name",
+        "my_input_data",
+    ]
+
+    if arg_run_name is not None:
+        cli_args = cli_args + ["--run-name", arg_run_name]
+
+    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
+        context.mlflow.tracking.experiment._experiment.experiment_id
+    )
+
+    result = cli_runner.invoke(
+        cli_modelify,
+        cli_args,
+        catch_exceptions=True,
+    )
+
+    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
+        context.mlflow.tracking.experiment._experiment.experiment_id
+    )
+
+    assert result.exit_code == 0
+
+    # check if there is a single new run
+    run_as_set = set(runs_list_after_cmd) - set(runs_list_before_cmd)
+    assert len(run_as_set) == 1
+    assert list(run_as_set)[0].info.run_name == actual_run_name

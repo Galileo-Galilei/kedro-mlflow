@@ -234,6 +234,12 @@ def run():
     help="The id of the mlflow run where the model will be logged. If unspecified, the command creates a new run.",
 )
 @click.option(
+    "--run-name",
+    required=False,
+    default="modelify",
+    help="The name of the mlflow run where the model will be logged. Defaults to 'modelify'.",
+)
+@click.option(
     "--copy-mode",
     required=False,
     default="deepcopy",
@@ -288,6 +294,7 @@ def modelify(
     flag_infer_signature: Optional[bool],
     flag_infer_input_example: Optional[bool],
     run_id: Optional[str],
+    run_name: Optional[str],
     copy_mode: Optional[Union[str, Dict[str, str]]],
     artifact_path: str,
     code_path: str,
@@ -373,7 +380,7 @@ def modelify(
 
             log_model_kwargs["conda_env"] = conda_env
 
-            with mlflow.start_run(run_id=run_id):
+            with mlflow.start_run(run_id=run_id, run_name=run_name):
                 mlflow.pyfunc.log_model(**log_model_kwargs)
                 run_id = mlflow.active_run().info.run_id
                 LOGGER.info(f"Model successfully logged in run '{run_id}'")

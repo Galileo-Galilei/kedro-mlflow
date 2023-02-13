@@ -1,20 +1,24 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.11.8] - 2023-02-13
+
 ### Added
 
 -   :sparkles: Added support for Mlflow 2.0 ([#390](https://github.com/Galileo-Galilei/kedro-mlflow/issues/390))
 
--   :sparkles: The ``modelify`` command now accepts a ``--run-name`` to specifiy the run name where the model is logged ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
+-   :sparkles: The `modelify` command now accepts a `--run-name` to specifiy the run name where the model is logged ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
+
 ### Fixed
 
 -   :memo: Update incorrect documentation about model registry with local relative filepath ([#400](https://github.com/Galileo-Galilei/kedro-mlflow/issues/400))
 
--   :bug: The ``modelify`` command now creates a conda environment based on your environment  python and kedro versions instead of hardcoded ``python=3.7`` and ``kedro=0.16.5`` ([#405](https://github.com/Galileo-Galilei/kedro-mlflow/issues/405))
+-   :bug: The `modelify` command now creates a conda environment based on your environment  python and kedro versions instead of hardcoded `python=3.7` and `kedro=0.16.5` ([#405](https://github.com/Galileo-Galilei/kedro-mlflow/issues/405))
 
--   :bug: The ``modelify`` command now uses correctly the ``--pip-requirements`` argument instead of raising an error ([#405](https://github.com/Galileo-Galilei/kedro-mlflow/issues/405))
+-   :bug: The `modelify` command now uses correctly the `--pip-requirements` argument instead of raising an error ([#405](https://github.com/Galileo-Galilei/kedro-mlflow/issues/405))
 
--   :bug: The ``modelify`` command now uses ``modelify``  as a default run name ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
+-   :bug: The `modelify` command now uses `modelify`  as a default run name ([#408](https://github.com/Galileo-Galilei/kedro-mlflow/issues/408))
 
 ## [0.11.7] - 2023-01-28
 
@@ -407,7 +411,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.7...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.8...HEAD
+
+[0.11.8]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.7...0.11.8
 
 [0.11.7]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.6...0.11.7
 

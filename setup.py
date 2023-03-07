@@ -43,7 +43,7 @@ setup(
             "sphinx-markdown-tables~=0.0.15",
             "sphinx-click>=3.1,<4.5",
             "sphinx_copybutton~=0.5.0",
-            "myst-parser>=0.17.2,<0.19.0",
+            "myst-parser>=0.17.2,<1.1.0",
         ],
         "test": [
             "pytest>=5.4.0, <8.0.0",

@@ -26,7 +26,7 @@ The hook **detects parameters through their prefix ``params:`` or the value ``pa
 
 ### How can I register a parameter if I use a ``TemplatedConfigLoader``?
 
-If you [use a ``TemplatedConfigLoader``](https://kedro.readthedocs.io/en/latest/kedro_project_setup/configuration.html#templating-configuration) to enable dynamic parameters contruction at runtime or dependency between configuration files, and if we assume your ``src/<project-name>/run.py`` file looks like:
+If you [use a ``TemplatedConfigLoader``](https://docs.kedro.org/en/stable/configuration/advanced_configuration.html#templatedconfigloader) to enable dynamic parameters contruction at runtime or dependency between configuration files, and if we assume your ``src/<project-name>/run.py`` file looks like:
 
 ```python
 from kedro.config import TemplatedConfigLoader  # new import

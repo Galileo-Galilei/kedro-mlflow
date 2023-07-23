@@ -60,7 +60,11 @@ class MlflowHook:
         """
 
         try:
-            conf_mlflow_yml = context.config_loader.get("mlflow*", "mlflow*/**")
+            if "mlflow" not in context.config_loader.config_patterns.keys():
+                context.config_loader.config_patterns.update(
+                    {"mlflow": ["mlflow*", "mlflow*/**", "**/mlflow*"]}
+                )
+            conf_mlflow_yml = context.config_loader["mlflow"]
         except MissingConfigException:
             LOGGER.warning(
                 "No 'mlflow.yml' config file found in environment. Default configuration will be used. Use ``kedro mlflow init`` command in CLI to customize the configuration."
@@ -74,7 +78,6 @@ class MlflowHook:
 
         self._already_active_mlflow = False
         if mlflow.active_run():
-
             self._already_active_mlflow = True
             active_run_info = mlflow.active_run().info
 
@@ -145,7 +148,6 @@ class MlflowHook:
         # we use this hooks to modif "MlflowmetricsDataset" to ensure consistency
         # of the metric name with the catalog name
         for name, dataset in catalog._data_sets.items():
-
             if isinstance(dataset, MlflowMetricsDataSet) and dataset._prefix is None:
                 if dataset._run_id is not None:
                     catalog._data_sets[name] = MlflowMetricsDataSet(
@@ -214,7 +216,6 @@ class MlflowHook:
         )
 
         if self._is_mlflow_enabled:
-
             # params for further for node logging
             self.flatten = self.mlflow_config.tracking.params.dict_params.flatten
             self.recursive = self.mlflow_config.tracking.params.dict_params.recursive

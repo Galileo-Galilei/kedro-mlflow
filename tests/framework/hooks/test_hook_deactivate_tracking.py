@@ -192,7 +192,6 @@ def _mock_settings_with_hooks(mocker, hooks):
 
 @pytest.fixture
 def mock_settings_with_mlflow_hooks(mocker):
-
     return _mock_settings_with_hooks(
         mocker,
         hooks=(
@@ -251,7 +250,6 @@ def mock_pipelines(mocker, dummy_pipeline):
 def mock_session(
     mocker, mock_settings_with_mlflow_hooks, kedro_project_path
 ):  # pylint: disable=unused-argument
-
     # we need to patch "kedro.framework.session.session.validate_settings" instead of
     # "kedro.framework.project.validate_settings" because it is imported
     mocker.patch("kedro.framework.session.session.validate_settings")
@@ -268,11 +266,9 @@ def mock_session(
 def test_deactivated_tracking_but_not_for_given_pipeline(
     mocker, config_dir, kedro_project_path, mock_session
 ):
-
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
     with mock_session:
-
         context = mock_session.load_context()  # setup mlflow config
 
         mlflow_client = context.mlflow.server._mlflow_client
@@ -304,11 +300,9 @@ def test_deactivated_tracking_but_not_for_given_pipeline(
 def test_deactivated_tracking_for_given_pipeline(
     mocker, config_dir, kedro_project_path, mock_session
 ):
-
     mocker.patch("kedro.framework.session.session.KedroSession._setup_logging")
 
     with mock_session:
-
         context = mock_session.load_context()  # setup mlflow config
 
         mlflow_client = context.mlflow.server._mlflow_client

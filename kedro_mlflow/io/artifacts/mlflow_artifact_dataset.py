@@ -20,7 +20,6 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
         artifact_path: str = None,
         credentials: Dict[str, Any] = None,
     ):
-
         data_set, data_set_args = parse_dataset_definition(config=data_set)
 
         # fake inheritance : this mlflow class should be a mother class which wraps
@@ -47,7 +46,6 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
                 self.__logging_activated = flag
 
             def _save(self, data: Any):
-
                 # _get_save_path needs to be called before super, otherwise
                 # it will throw exception that file under path already exist.
                 if hasattr(self, "_version"):

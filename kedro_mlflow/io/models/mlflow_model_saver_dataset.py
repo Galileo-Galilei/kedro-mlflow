@@ -22,7 +22,6 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
         log_args: Dict[str, Any] = None,
         version: Version = None,
     ) -> None:
-
         """Initialize the Kedro MlflowModelDataSet.
 
         Parameters are passed from the Data Catalog.

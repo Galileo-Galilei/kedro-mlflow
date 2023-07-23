@@ -71,7 +71,6 @@ def test_mlflow_metric_dataset_save_with_active_run(mlflow_client, save_args):
     ],
 )
 def test_mlflow_metric_dataset_save_with_run_id(mlflow_client, save_args):
-
     # this time, the run is created first and closed
     # the MlflowMetricDataSet should reopen it to interact
     with mlflow.start_run():
@@ -88,7 +87,6 @@ def test_mlflow_metric_dataset_save_with_run_id(mlflow_client, save_args):
 
 
 def test_mlflow_metric_dataset_save_append_mode(mlflow_client):
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
 
@@ -106,7 +104,6 @@ def test_mlflow_metric_dataset_save_append_mode(mlflow_client):
 
 
 def test_mlflow_metric_dataset_save_overwrite_mode(mlflow_client):
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
 
@@ -123,7 +120,6 @@ def test_mlflow_metric_dataset_save_overwrite_mode(mlflow_client):
 
 
 def test_mlflow_metric_dataset_load():
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
         mlflow.log_metric(key="awesome_metric", value=0.1)
@@ -135,7 +131,6 @@ def test_mlflow_metric_dataset_load():
 
 
 def test_mlflow_metric_dataset_load_last_logged_by_default_if_unordered():
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
         mlflow.log_metric(key="awesome_metric", value=0.4, step=3)
@@ -152,7 +147,6 @@ def test_mlflow_metric_dataset_load_last_logged_by_default_if_unordered():
 
 
 def test_mlflow_metric_dataset_load_given_step():
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
         mlflow.log_metric(key="awesome_metric", value=0.1, step=0)
@@ -169,7 +163,6 @@ def test_mlflow_metric_dataset_load_given_step():
 
 
 def test_mlflow_metric_dataset_load_last_given_step_if_duplicated():
-
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
         mlflow.log_metric(key="awesome_metric", value=0.1, step=0)

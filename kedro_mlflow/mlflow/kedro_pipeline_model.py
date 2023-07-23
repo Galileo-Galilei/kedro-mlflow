@@ -80,7 +80,6 @@ class KedroPipelineModel(PythonModel):
 
     @copy_mode.setter
     def copy_mode(self, copy_mode):
-
         if isinstance(copy_mode, str) or copy_mode is None:
             # if it is a string, we must create manually the dictionary
             # of all catalog entries with this copy_mode
@@ -105,7 +104,6 @@ class KedroPipelineModel(PythonModel):
             )
 
     def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
-
         sub_catalog = DataCatalog()
         for data_set_name in self.pipeline.inputs():
             if data_set_name == self.input_name:
@@ -137,10 +135,8 @@ class KedroPipelineModel(PythonModel):
                     sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
                 except KeyError:
                     raise KedroPipelineModelError(
-                        (
-                            f"The provided catalog must contains '{data_set_name}' data_set "
-                            "since it is the input of the pipeline."
-                        )
+                        f"The provided catalog must contains '{data_set_name}' data_set "
+                        "since it is the input of the pipeline."
                     )
 
         return sub_catalog
@@ -148,7 +144,6 @@ class KedroPipelineModel(PythonModel):
     def extract_pipeline_artifacts(
         self, parameters_saving_folder: Optional[Path] = None
     ):
-
         artifacts = {}
         for name, dataset in self.initial_catalog._data_sets.items():
             if name != self.input_name:
@@ -163,10 +158,8 @@ class KedroPipelineModel(PythonModel):
                     persisted_dataset.save(dataset.load())
                     artifact_path = absolute_param_path.as_uri()
                     self._logger.info(
-                        (
-                            f"The parameter '{name[7:]}' is persisted (as pickle) "
-                            "at the following location: f'{artifact_path}'"
-                        )
+                        f"The parameter '{name[7:]}' is persisted (as pickle) "
+                        "at the following location: f'{artifact_path}'"
                     )
                 else:
                     # In this second case, we know it cannot be a MemoryDataSet
@@ -180,7 +173,6 @@ class KedroPipelineModel(PythonModel):
         return artifacts
 
     def load_context(self, context):
-
         # a consistency check is made when loading the model
         # it would be better to check when saving the model
         # but we rely on a mlflow function for saving, and it is unaware of kedro
@@ -195,11 +187,9 @@ class KedroPipelineModel(PythonModel):
                 kedro_artifacts_keys - mlflow_artifacts_keys
             )
             raise ValueError(
-                (
-                    "Provided artifacts do not match catalog entries:"
-                    f"\n    - 'artifacts - inference.inputs()' = : {in_artifacts_but_not_inference}"
-                    f"\n    - 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}"
-                )
+                "Provided artifacts do not match catalog entries:"
+                f"\n    - 'artifacts - inference.inputs()' = : {in_artifacts_but_not_inference}"
+                f"\n    - 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}"
             )
 
         updated_catalog = self.initial_catalog.shallow_copy()
@@ -208,7 +198,6 @@ class KedroPipelineModel(PythonModel):
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input):
-
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project
         hook_manager = _create_hook_manager()

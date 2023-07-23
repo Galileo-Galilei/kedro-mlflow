@@ -17,7 +17,6 @@ def test_mlflow_model_registry_save_not_implemented(tmp_path):
 
 
 def test_mlflow_model_registry_load_given_stage_or_version(tmp_path, monkeypatch):
-
     # we must change the working directory because when
     # using mlflow with a local database tracking, the artifacts
     # are stored in a relative mlruns/ folder so we need to have

@@ -339,7 +339,6 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
 def test_modelify_with_infer_signature_arg(
     monkeypatch, kp_for_modelify_persistent_input
 ):
-
     monkeypatch.chdir(kp_for_modelify_persistent_input)
     monkeypatch.chdir(kp_for_modelify_persistent_input)
 
@@ -398,7 +397,6 @@ def test_modelify_with_infer_signature_arg(
 def test_modelify_with_infer_input_example(
     monkeypatch, kp_for_modelify_persistent_input, flag_infer_signature
 ):
-
     monkeypatch.chdir(kp_for_modelify_persistent_input)
 
     cli_runner = CliRunner()
@@ -456,7 +454,6 @@ def test_modelify_with_infer_input_example(
 
 # 3 checks: success with pip requirements, fail with pip_requirements and conda_env, success with no conda_env
 def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
-
     monkeypatch.chdir(kp_for_modelify)
 
     bootstrap_project(Path().cwd())
@@ -510,7 +507,6 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
 
 
 def test_modelify_with_default_conda_env(monkeypatch, kp_for_modelify):
-
     monkeypatch.chdir(kp_for_modelify)
 
     bootstrap_project(Path().cwd())
@@ -583,7 +579,6 @@ def test_modelify_with_default_conda_env(monkeypatch, kp_for_modelify):
 def test_modelify_fail_with_multiple_requirements(
     monkeypatch, kp_for_modelify, dependencies_args
 ):
-
     monkeypatch.chdir(kp_for_modelify)
 
     bootstrap_project(Path().cwd())
@@ -624,7 +619,6 @@ def test_modelify_fail_with_multiple_requirements(
 def test_modelify_with_run_name(
     monkeypatch, kp_for_modelify, arg_run_name, actual_run_name
 ):
-
     monkeypatch.chdir(kp_for_modelify)
 
     bootstrap_project(Path().cwd())

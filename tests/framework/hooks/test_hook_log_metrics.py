@@ -137,7 +137,6 @@ def dummy_run_params(tmp_path):
 def test_mlflow_hook_automatically_prefix_metrics_dataset(
     kedro_project_with_mlflow_conf, dummy_catalog
 ):
-
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()  # triggers conf setup
@@ -167,7 +166,6 @@ def test_mlflow_hook_automatically_prefix_metrics_dataset(
 def test_mlflow_hook_metrics_dataset_with_run_id(
     kedro_project_with_mlflow_conf, dummy_pipeline, dummy_run_params
 ):
-
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()  # setup mlflow

@@ -43,7 +43,6 @@ def dummy_node():
 
 @pytest.fixture
 def dummy_pipeline(dummy_node):
-
     dummy_pipeline = Pipeline([dummy_node])
 
     return dummy_pipeline
@@ -51,7 +50,6 @@ def dummy_pipeline(dummy_node):
 
 @pytest.fixture
 def dummy_catalog():
-
     catalog = DataCatalog(
         {
             "params:param1": 1,
@@ -70,7 +68,6 @@ def test_hook_use_active_run_if_exist_and_do_not_close(
     dummy_pipeline,
     dummy_catalog,
 ):
-
     mlflow.set_tracking_uri(f"file:///{kedro_project}/mlruns")
     with mlflow.start_run():
         mlflow_run_id = mlflow.active_run().info.run_id

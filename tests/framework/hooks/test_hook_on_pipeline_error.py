@@ -52,7 +52,6 @@ def _mock_settings_with_hooks(mocker, hooks):
 
 @pytest.fixture
 def mock_settings_with_mlflow_hooks(mocker):
-
     return _mock_settings_with_hooks(
         mocker,
         hooks=(
@@ -90,7 +89,6 @@ def mock_failing_pipeline(mocker):
 @pytest.mark.usefixtures("mock_settings_with_mlflow_hooks")
 @pytest.mark.usefixtures("mock_failing_pipeline")
 def test_on_pipeline_error(kedro_project_with_mlflow_conf):
-
     tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
 
     bootstrap_project(kedro_project_with_mlflow_conf)

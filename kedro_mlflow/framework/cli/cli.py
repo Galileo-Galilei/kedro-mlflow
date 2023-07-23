@@ -156,7 +156,6 @@ def ui(env: str, port: str, host: str):
         project_path=project_path,
         env=env,
     ) as session:
-
         context = session.load_context()
         host = host or context.mlflow.ui.host
         port = port or context.mlflow.ui.port

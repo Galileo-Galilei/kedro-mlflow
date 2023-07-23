@@ -132,7 +132,6 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
     with mlflow.start_run():
-
         run_id = mlflow.active_run().info.run_id
 
         mlflow_csv_dataset = MlflowArtifactDataSet(
@@ -209,7 +208,6 @@ def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
 
 
 def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
-
     mlflow.set_tracking_uri(tracking_uri.as_uri())
 
     # define the logger
@@ -268,7 +266,6 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
 def test_partitioned_dataset_save_and_reload(
     tmp_path, tracking_uri, artifact_path, df1, df2
 ):
-
     mlflow.set_tracking_uri(tracking_uri.as_uri())
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 

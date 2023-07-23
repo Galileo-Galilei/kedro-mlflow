@@ -44,7 +44,6 @@ class PipelineML(Pipeline):
         kpm_kwargs: Optional[Dict[str, str]] = None,
         log_model_kwargs: Optional[Dict[str, str]] = None,
     ):
-
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 
         Args:
@@ -110,10 +109,8 @@ class PipelineML(Pipeline):
         pp_allowed_names = "\n    - ".join(allowed_names)
         if name not in allowed_names:
             raise KedroMlflowPipelineMLError(
-                (
-                    f"input_name='{name}' but it must be an input of 'inference'"
-                    f", i.e. one of: \n    - {pp_allowed_names}"
-                )
+                f"input_name='{name}' but it must be an input of 'inference'"
+                f", i.e. one of: \n    - {pp_allowed_names}"
             )
         self._input_name = name
 
@@ -122,17 +119,14 @@ class PipelineML(Pipeline):
         outputs_txt = "\n - ".join(inference.outputs())
         if len(inference.outputs()) != 1:
             raise KedroMlflowPipelineMLError(
-                (
-                    "The inference pipeline must have one"
-                    " and only one output. You are trying"
-                    " to set a inference pipeline with"
-                    f" '{nb_outputs}' output(s): \n - {outputs_txt}"
-                    " "
-                )
+                "The inference pipeline must have one"
+                " and only one output. You are trying"
+                " to set a inference pipeline with"
+                f" '{nb_outputs}' output(s): \n - {outputs_txt}"
+                " "
             )
 
     def _check_consistency(self) -> None:
-
         inference_parameters = {
             input for input in self.inference.inputs() if input.startswith("params:")
         }
@@ -148,14 +142,12 @@ class PipelineML(Pipeline):
         if len(free_inputs_set) > 0:
             input_set_txt = "\n     - ".join(free_inputs_set)
             raise KedroMlflowPipelineMLError(
-                (
-                    "The following inputs are free for the inference pipeline:\n"
-                    f"    - {input_set_txt}."
-                    " \nNo free input is allowed."
-                    " Please make sure that 'inference.inputs()' are all"
-                    " in 'training.all_outputs() + training.inputs()'"
-                    "except 'input_name' and parameters which starts with 'params:'."
-                )
+                "The following inputs are free for the inference pipeline:\n"
+                f"    - {input_set_txt}."
+                " \nNo free input is allowed."
+                " Please make sure that 'inference.inputs()' are all"
+                " in 'training.all_outputs() + training.inputs()'"
+                "except 'input_name' and parameters which starts with 'params:'."
             )
 
         return None

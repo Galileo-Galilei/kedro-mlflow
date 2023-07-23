@@ -263,7 +263,6 @@ def dummy_catalog(tmp_path):
 def test_model_packaging_with_copy_mode(
     tmp_path, tmp_folder, pipeline_inference_dummy, dummy_catalog, copy_mode, expected
 ):
-
     dummy_catalog._data_sets["model"].save(2)  # emulate model fitting
 
     kedro_model = KedroPipelineModel(
@@ -282,7 +281,7 @@ def test_model_packaging_with_copy_mode(
             artifact_path="model",
             python_model=kedro_model,
             artifacts=artifacts,
-            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+            conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
         )
         run_id = mlflow.active_run().info.run_id
 
@@ -320,7 +319,6 @@ def test_kedro_pipeline_model_with_wrong_copy_mode_type(
 
 
 def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
-
     catalog = DataCatalog(
         {
             "raw_data": PickleDataSet(
@@ -356,7 +354,7 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
             artifact_path="model",
             python_model=kedro_model,
             artifacts=artifacts,
-            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+            conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
         )
         run_id = mlflow.active_run().info.run_id
 
@@ -369,7 +367,6 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
 
 
 def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
-
     catalog = DataCatalog(
         {
             "raw_data": MemoryDataSet(),
@@ -391,7 +388,7 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
             artifact_path="model",
             python_model=kedro_model,
             artifacts=None,  # no artifacts provided
-            conda_env={"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+            conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
         )
         run_id = mlflow.active_run().info.run_id
 
@@ -404,7 +401,6 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
 
 
 def test_kedro_pipeline_ml_loading_deepcopiable_catalog(tmp_path, tmp_folder):
-
     # create pipelien and catalog. The training will not be triggered
     def fit_fun(data):
         pass
@@ -510,7 +506,6 @@ def test_catalog_extraction(pipeline, catalog, input_name, result):
 
 
 def test_catalog_extraction_missing_inference_input(pipeline_inference_dummy):
-
     catalog = DataCatalog({"raw_data": MemoryDataSet(), "data": MemoryDataSet()})
     # "model" is missing in the catalog
     with pytest.raises(
@@ -599,7 +594,6 @@ def test_kedro_pipeline_model_save_and_load(
 
 
 def test_kedro_pipeline_model_too_many_outputs():
-
     catalog = DataCatalog(
         {
             "data": MemoryDataSet(),

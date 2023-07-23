@@ -147,9 +147,9 @@ def pipeline_ml_with_parameters():
         training=full_pipeline.only_nodes_with_tags("training"),
         inference=full_pipeline.only_nodes_with_tags("inference"),
         input_name="data",
-        log_model_kwargs={
-            "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
-        },
+        log_model_kwargs=dict(
+            conda_env=dict(python="3.10.0", dependencies=["kedro==0.18.11"])
+        ),
     )
     return pipeline_ml_with_parameters
 
@@ -300,7 +300,7 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
             input_name=dummy_pipeline_ml.input_name,
             log_model_kwargs={
                 "artifact_path": dummy_pipeline_ml.log_model_kwargs["artifact_path"],
-                "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+                "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
             kpm_kwargs={
                 "copy_mode": copy_mode,

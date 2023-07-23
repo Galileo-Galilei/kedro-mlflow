@@ -89,22 +89,15 @@ class MlflowHook:
             mlflow_config.server._mlflow_client = MlflowClient(
                 tracking_uri=mlflow_config.server.mlflow_tracking_uri
             )
-            # BEWARE: kedro supports python=3.7 which does nto accepts the shorthand f"{x=}" for f"x={x}"
-            LOGGER.warning(
-                f"mlflow_config.server.mlflow_tracking_uri={mlflow_config.server.mlflow_tracking_uri}"
-            )
+            LOGGER.warning(f"{mlflow_config.server.mlflow_tracking_uri=}")
 
             mlflow_config.tracking.run.id = active_run_info.run_id
-            LOGGER.warning(
-                f"mlflow_config.tracking.run.id={mlflow_config.tracking.run.id}"
-            )
+            LOGGER.warning(f"{mlflow_config.tracking.run.id=}")
 
             mlflow_config.tracking.experiment.name = mlflow.get_experiment(
                 experiment_id=active_run_info.experiment_id
             ).name
-            LOGGER.warning(
-                f"mlflow_config.tracking.experiment.name={mlflow_config.tracking.experiment.name}"
-            )
+            LOGGER.warning(f"{mlflow_config.tracking.experiment.name=}")
 
         else:
             # we infer and setup the configuration only if there is no active run:

@@ -55,7 +55,6 @@ def dummy_node():
 
 @pytest.fixture
 def dummy_pipeline(dummy_node):
-
     dummy_pipeline = Pipeline([dummy_node])
 
     return dummy_pipeline
@@ -63,7 +62,6 @@ def dummy_pipeline(dummy_node):
 
 @pytest.fixture
 def dummy_catalog():
-
     catalog = DataCatalog(
         {
             "params:param1": 1,
@@ -82,7 +80,6 @@ def test_pipeline_run_hook_getting_configs(
     dummy_pipeline,
     dummy_catalog,
 ):
-
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
@@ -127,7 +124,6 @@ def test_node_hook_logging(
     flatten,
     expected,
 ):
-
     _write_yaml(
         kedro_project / "conf" / "base" / "mlflow.yml",
         dict(
@@ -178,7 +174,6 @@ def test_node_hook_logging(
 def test_node_hook_logging_below_limit_all_strategy(
     kedro_project, dummy_run_params, param_length, strategy
 ):
-
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
@@ -226,7 +221,6 @@ def test_node_hook_logging_below_limit_all_strategy(
 def test_node_hook_logging_above_limit_truncate_strategy(
     kedro_project, dummy_run_params, param_length
 ):
-
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
@@ -275,7 +269,6 @@ def test_node_hook_logging_above_limit_truncate_strategy(
 def test_node_hook_logging_above_limit_fail_strategy(
     kedro_project, dummy_run_params, param_length
 ):
-
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(
@@ -332,7 +325,6 @@ def test_node_hook_logging_above_limit_fail_strategy(
 def test_node_hook_logging_above_limit_tag_strategy(
     kedro_project, dummy_run_params, param_length
 ):
-
     _write_yaml(
         kedro_project / "conf" / "local" / "mlflow.yml",
         dict(

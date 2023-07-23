@@ -139,7 +139,6 @@ def test_cli_init_existing_config_force_option(
 
     bootstrap_project(kedro_project)
     with KedroSession.create(project_path=kedro_project) as session:
-
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (
@@ -197,7 +196,6 @@ def test_cli_init_with_wrong_env(monkeypatch, kedro_project, env):
 # other solution is to use pytest-xprocess
 # TODO: create an initlaized_kedro_project fixture with a global scope
 def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
-
     monkeypatch.chdir(kedro_project_with_mlflow_conf)
     cli_runner = CliRunner()
 
@@ -233,7 +231,6 @@ def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
 def test_ui_overwrite_conf_at_runtime(
     monkeypatch, mocker, kedro_project_with_mlflow_conf
 ):
-
     monkeypatch.chdir(kedro_project_with_mlflow_conf)
     cli_runner = CliRunner()
 
@@ -257,7 +254,6 @@ def test_ui_overwrite_conf_at_runtime(
 
 
 def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
-
     config = {
         "output_dir": tmp_path,
         "kedro_version": kedro_version,

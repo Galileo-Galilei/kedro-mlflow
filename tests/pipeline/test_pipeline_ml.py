@@ -49,7 +49,6 @@ def convert_probs_to_pred(data, threshold):
 
 @pytest.fixture
 def pipeline_with_tag():
-
     pipeline_with_tag = Pipeline(
         [
             node(

@@ -103,7 +103,6 @@ class MlflowTrackingOptions(BaseModel):
 
 
 class UiOptions(BaseModel):
-
     port: str = "5000"
     host: str = "127.0.0.1"
 

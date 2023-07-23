@@ -69,11 +69,9 @@ class MlflowModelLoggerDataSet(MlflowAbstractModelDataSet):
             run_id = mlflow.active_run().info.run_id
         if run_id is None:
             raise DataSetError(
-                (
-                    "To access the model_uri, you must either: "
-                    "\n -  specifiy 'run_id' "
-                    "\n - have an active run to retrieve data from"
-                )
+                "To access the model_uri, you must either: "
+                "\n -  specifiy 'run_id' "
+                "\n - have an active run to retrieve data from"
             )
 
         model_uri = f"runs:/{run_id}/{self._artifact_path}"
@@ -104,13 +102,11 @@ class MlflowModelLoggerDataSet(MlflowAbstractModelDataSet):
             if mlflow.active_run():
                 # it is not possible to log in a run which is not the current opened one
                 raise DataSetError(
-                    (
-                        "'run_id' cannot be specified"
-                        " if there is an mlflow active run."
-                        "Run_id mismatch: "
-                        f"\n - 'run_id'={self._run_id}"
-                        f"\n - active_run id={mlflow.active_run().info.run_id}"
-                    )
+                    "'run_id' cannot be specified"
+                    " if there is an mlflow active run."
+                    "Run_id mismatch: "
+                    f"\n - 'run_id'={self._run_id}"
+                    f"\n - active_run id={mlflow.active_run().info.run_id}"
                 )
             else:
                 # if the run id is specified and there is no opened run,
@@ -123,7 +119,6 @@ class MlflowModelLoggerDataSet(MlflowAbstractModelDataSet):
             self._save_model_in_run(model)
 
     def _save_model_in_run(self, model):
-
         if self._flavor == "mlflow.pyfunc":
             # PyFunc models utilise either `python_model` or `loader_module`
             # workflow. We we assign the passed `model` object to one of those keys

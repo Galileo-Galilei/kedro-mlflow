@@ -38,7 +38,6 @@ def test_kedro_mlflow_config_init():
 def test_kedro_mlflow_config_new_experiment_does_not_exists(
     kedro_project_with_mlflow_conf,
 ):
-
     config = KedroMlflowConfig(
         server=dict(mlflow_tracking_uri="mlruns"),
         tracking=dict(experiment=dict(name="exp1")),
@@ -57,7 +56,6 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
 def test_kedro_mlflow_config_with_use_env_tracking_uri(
     kedro_project_with_mlflow_conf,
 ):
-
     os.environ["MLFLOW_TRACKING_URI"] = "my_mlruns"
 
     # default key server.mlflow_tracking_uri=None, so the environment variable will be used
@@ -72,7 +70,6 @@ def test_kedro_mlflow_config_with_use_env_tracking_uri(
 
 
 def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
-
     # create an experiment with the same name
     mlflow_tracking_uri = (
         kedro_project_with_mlflow_conf / "conf" / "local" / "mlruns"
@@ -94,7 +91,6 @@ def test_kedro_mlflow_config_experiment_exists(kedro_project_with_mlflow_conf):
 
 
 def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_conf):
-
     # create an experiment with the same name and then delete it
     mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
     mlflow_client = MlflowClient(mlflow_tracking_uri)
@@ -122,7 +118,6 @@ def test_kedro_mlflow_config_experiment_was_deleted(kedro_project_with_mlflow_co
 def test_kedro_mlflow_config_setup_set_experiment_globally(
     kedro_project_with_mlflow_conf,
 ):
-
     mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
 
     # the config must restore properly the experiment
@@ -157,7 +152,6 @@ def test_kedro_mlflow_config_setup_set_experiment_globally(
 
 
 def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_conf):
-
     mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "awesome_tracking").as_uri()
 
     config = KedroMlflowConfig(
@@ -174,7 +168,6 @@ def test_kedro_mlflow_config_setup_set_tracking_uri(kedro_project_with_mlflow_co
 
 
 def test_kedro_mlflow_config_setup_set_registry_uri(kedro_project_with_mlflow_conf):
-
     mlflow_registry_uri = (
         kedro_project_with_mlflow_conf / "awesome_registry.db"
     ).as_uri()
@@ -194,7 +187,6 @@ def test_kedro_mlflow_config_setup_set_registry_uri(kedro_project_with_mlflow_co
 
 
 def test_kedro_mlflow_config_setup_export_credentials(kedro_project_with_mlflow_conf):
-
     (kedro_project_with_mlflow_conf / "conf/base/credentials.yml").write_text(
         yaml.dump(dict(my_mlflow_creds=dict(fake_mlflow_cred="my_fake_cred")))
     )
@@ -244,7 +236,6 @@ def test_kedro_mlflow_config_setup_tracking_priority(kedro_project_with_mlflow_c
 
 
 def test_validate_uri_local_relative_path(kedro_project_with_mlflow_conf):
-
     validated_uri = _validate_uri(
         uri=r"mlruns", project_path=kedro_project_with_mlflow_conf
     )
@@ -252,7 +243,6 @@ def test_validate_uri_local_relative_path(kedro_project_with_mlflow_conf):
 
 
 def test_validate_uri_local_absolute_posix(kedro_project_with_mlflow_conf, tmp_path):
-
     validated_uri = _validate_uri(
         uri=tmp_path.as_posix(), project_path=kedro_project_with_mlflow_conf
     )
@@ -260,7 +250,6 @@ def test_validate_uri_local_absolute_posix(kedro_project_with_mlflow_conf, tmp_p
 
 
 def test_validate_uri_local_absolute_uri(kedro_project_with_mlflow_conf, tmp_path):
-
     validated_uri = _validate_uri(
         uri=tmp_path.as_uri(), project_path=kedro_project_with_mlflow_conf
     )

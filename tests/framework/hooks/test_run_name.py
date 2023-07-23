@@ -19,7 +19,6 @@ from kedro_mlflow.framework.hooks import MlflowHook
 def test_pipeline_use_pipeline_name_as_run_name(
     kedro_project, pipeline_name, expected_mlflow_run_name
 ):
-
     dummy_run_params = {
         "run_id": "1234",
         "project_path": "path/to/project",

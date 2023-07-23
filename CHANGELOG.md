@@ -5,6 +5,10 @@
 
 
 -   :bug: Make ``kedro-mlflow`` hook log parameters when the project is configured with the ``OmegaConfigLoader`` instead of raising an error ([#430](https://github.com/Galileo-Galilei/kedro-mlflow/issues/430))
+### Removed
+
+
+-   :bug: Drop support for ``python=3.7`` which has [reached end-of-life status](https://devguide.python.org/versions/) to prepare 0.19 ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/issues/391))
 
 ## [0.11.8] - 2023-02-13
 

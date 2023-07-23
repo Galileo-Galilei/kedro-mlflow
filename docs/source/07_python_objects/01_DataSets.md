@@ -94,7 +94,7 @@ mlflow_model_logger = MlflowModelLoggerDataSet(
     flavor="mlflow.sklearn",
     run_id="<the-model-run-id>",
     save_args={
-        "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+        "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
         "input_example": data.iloc[0:5, :],
     },
 )
@@ -110,9 +110,9 @@ my_model:
     run_id: <the-model-run-id>,
     save_args:
         conda_env:
-            python: "3.7.0"
+            python: "3.10.0"
             dependencies:
-                - "kedro==0.16.5"
+                - "kedro==0.18.11"
 ```
 
 ### ``MlflowModelSaverDataSet``

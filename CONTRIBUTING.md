@@ -7,7 +7,7 @@ The current workflow is the following:
 3. Develop locally:
     - Install the precommit file (`pip install pre-commit`, then `pre-commit install`)
     - Create a branch based on the master branch (``git checkout -b <prefix-branchname> master``)
-    - Create a conda environment (conda create -n <your-env-name> python==3.7)
+    - Create a conda environment (conda create -n <your-env-name> python==3.10)
     - Activate this environment (`conda activate <your-env-name>`)
     - Install the extra dependencies for tests (`pip install kedro-mlflow[dev,test]`)
     - Apply your changes

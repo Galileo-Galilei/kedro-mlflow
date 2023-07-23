@@ -7,7 +7,7 @@ HERE = pathlib.Path(__file__).parent
 
 
 def _parse_requirements(path, encoding="utf-8"):
-    with open(path, mode="r", encoding=encoding) as file_handler:
+    with open(path, encoding=encoding) as file_handler:
         requirements = [
             x.strip() for x in file_handler if x.strip() and not x.startswith("-r")
         ]
@@ -31,7 +31,7 @@ setup(
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/Galileo-Galilei/kedro-mlflow",
-    python_requires=">=3.7, <3.11",
+    python_requires=">=3.8, <3.11",
     packages=find_packages(exclude=["docs*", "tests*"]),
     setup_requires=["setuptools_scm"],
     include_package_data=True,
@@ -73,7 +73,6 @@ setup(
     keywords="kedro-plugin, mlflow, model versioning, model packaging, pipelines, machine learning, data pipelines, data science, data engineering",
     classifiers=[
         "Development Status :: 4 - Beta",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",

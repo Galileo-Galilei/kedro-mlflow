@@ -94,7 +94,6 @@ def dummy_catalog(tmp_path):
 
 @pytest.fixture
 def kedro_pipeline_model(tmp_path, pipeline_ml_obj, dummy_catalog):
-
     kedro_pipeline_model = KedroPipelineModel(
         pipeline=pipeline_ml_obj,
         catalog=dummy_catalog,
@@ -158,7 +157,6 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
 def test_pyfunc_flavor_python_model_save_and_load(
     tmp_path, tmp_folder, pipeline, dummy_catalog
 ):
-
     kedro_pipeline_model = KedroPipelineModel(
         pipeline=pipeline,
         catalog=dummy_catalog,
@@ -177,7 +175,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
             "pyfunc_workflow": "python_model",
             "save_args": {
                 "artifacts": artifacts,
-                "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+                "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
         },
     }

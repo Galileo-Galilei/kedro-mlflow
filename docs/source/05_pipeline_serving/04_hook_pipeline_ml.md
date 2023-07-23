@@ -23,7 +23,7 @@ For consistency, you may want to log an inference pipeline (including some data 
             log_model_kwargs=dict(
                 artifact_path="kedro_mlflow_tutorial",
                 conda_env={
-                    "python": 3.7,
+                    "python": 3.10,
                     "dependencies": [f"kedro_mlflow_tutorial=={PROJECT_VERSION}"],
                 },
                 signature="auto",

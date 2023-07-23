@@ -114,7 +114,6 @@ def dummy_catalog(tmp_path):
 
 @pytest.fixture
 def kedro_pipeline_model(pipeline_ml_obj, dummy_catalog):
-
     kedro_pipeline_model = KedroPipelineModel(
         pipeline=pipeline_ml_obj,
         catalog=dummy_catalog,
@@ -175,7 +174,6 @@ def test_save_sklearn_flavor_with_run_id_and_already_active_run(tracking_uri):
 def test_save_and_load_sklearn_flavor_with_run_id(
     tracking_uri, mlflow_client, linreg_model, active_run_when_loading
 ):
-
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():
@@ -217,7 +215,6 @@ def test_save_and_load_sklearn_flavor_with_run_id(
 def test_save_and_load_sklearn_flavor_without_run_id(
     tracking_uri, mlflow_client, linreg_model, initial_active_run
 ):
-
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():
@@ -265,7 +262,6 @@ def test_save_and_load_sklearn_flavor_without_run_id(
 
 
 def test_load_without_run_id_nor_active_run(tracking_uri):
-
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():
@@ -303,7 +299,6 @@ def test_pyfunc_flavor_python_model_save_and_load(
     pipeline,
     dummy_catalog,
 ):
-
     kedro_pipeline_model = KedroPipelineModel(
         pipeline=pipeline,
         catalog=dummy_catalog,
@@ -320,7 +315,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
             "artifact_path": "test_model",
             "save_args": {
                 "artifacts": artifacts,
-                "conda_env": {"python": "3.7.0", "dependencies": ["kedro==0.16.5"]},
+                "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
         },
     }
@@ -348,7 +343,6 @@ def test_pyfunc_flavor_python_model_save_and_load(
 
 
 def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
-
     model_config = {
         "name": "kedro_pipeline_model",
         "config": {
@@ -373,23 +367,19 @@ def test_mlflow_model_logger_logging_deactivation(tracking_uri, linreg_model):
 
     mlflow_model_logger_dataset._logging_activated = False
 
-    all_runs_id_beginning = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.search_experiments()))
-            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
-        ]
-    )
+    all_runs_id_beginning = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     mlflow_model_logger_dataset.save(linreg_model)
 
-    all_runs_id_end = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.search_experiments()))
-            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
-        ]
-    )
+    all_runs_id_end = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     assert all_runs_id_beginning == all_runs_id_end
 

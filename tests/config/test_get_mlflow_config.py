@@ -8,7 +8,7 @@ import toml
 import yaml
 from dynaconf.validator import Validator
 from kedro import __version__ as kedro_version
-from kedro.config import TemplatedConfigLoader
+from kedro.config import OmegaConfigLoader, TemplatedConfigLoader
 from kedro.framework.context import KedroContext
 from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
@@ -87,7 +87,6 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
 
 
 def test_mlflow_config_with_no_experiment_name(kedro_project):
-
     # create empty conf
     open((kedro_project / "conf" / "base" / "mlflow.yml").as_posix(), mode="w").close()
 
@@ -140,8 +139,28 @@ def mock_settings_templated_config_loader_class(mocker):
             "CONFIG_LOADER_CLASS", default=lambda *_: TemplatedConfigLoader
         )
 
+    return _mock_imported_settings_paths(mocker, MockSettings())
+
+
+@pytest.fixture
+def mock_settings_templated_config_loader_class_with_globals(mocker):
+    class MockSettings(_ProjectSettings):
+        _CONFIG_LOADER_CLASS = _IsSubclassValidator(
+            "CONFIG_LOADER_CLASS", default=lambda *_: TemplatedConfigLoader
+        )
+
         _CONFIG_LOADER_ARGS = Validator(
             "CONFIG_LOADER_ARGS", default=dict(globals_pattern="*globals.yml")
+        )
+
+    return _mock_imported_settings_paths(mocker, MockSettings())
+
+
+@pytest.fixture
+def mock_settings_omega_config_loader_class(mocker):
+    class MockSettings(_ProjectSettings):
+        _CONFIG_LOADER_CLASS = _IsSubclassValidator(
+            "CONFIG_LOADER_CLASS", default=lambda *_: OmegaConfigLoader
         )
 
     return _mock_imported_settings_paths(mocker, MockSettings())
@@ -200,8 +219,45 @@ def fake_project(tmp_path, local_logging_config):
     return fake_project_dir
 
 
-@pytest.mark.usefixtures("mock_settings_templated_config_loader_class")
-def test_mlflow_config_with_templated_config_loader(fake_project):
+@pytest.mark.parametrize(
+    "project_settings",
+    [
+        "",
+        pytest.lazy_fixture("mock_settings_templated_config_loader_class"),
+        pytest.lazy_fixture("mock_settings_omega_config_loader_class"),
+    ],
+)
+def test_mlflow_config_correctly_set(kedro_project, project_settings):
+    # create empty conf
+    open((kedro_project / "conf" / "base" / "mlflow.yml").as_posix(), mode="w").close()
+    bootstrap_project(kedro_project)
+    session = KedroSession.create(
+        project_path=kedro_project, package_name="fake_project"
+    )
+    context = session.load_context()
+    assert context.mlflow.dict(exclude={"project_path"}) == dict(
+        server=dict(
+            mlflow_tracking_uri=(kedro_project / "mlruns").as_uri(),
+            mlflow_registry_uri=None,
+            credentials=None,
+            request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
+        ),
+        tracking=dict(
+            disable_tracking=dict(pipelines=[]),
+            experiment=dict(name="fake_project", restore_if_deleted=True),
+            run=dict(id=None, name=None, nested=True),
+            params=dict(
+                dict_params=dict(flatten=False, recursive=True, sep="."),
+                long_params_strategy="fail",
+            ),
+        ),
+        ui=dict(port="5000", host="127.0.0.1"),
+    )
+
+
+# TODO: when omegacfongiloader will support templating with globals, add a similar test
+@pytest.mark.usefixtures("mock_settings_templated_config_loader_class_with_globals")
+def test_mlflow_config_interpolated_with_templated_config_loader(fake_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="${mlflow_tracking_uri}",
@@ -256,7 +312,6 @@ def request_header_provider_cleaner(fake_project):
 
 @pytest.mark.usefixtures("request_header_provider_cleaner")
 def test_mlflow_config_with_request_header_provider(fake_project):
-
     # emulate import of custom request header class
     custom_rhp_txt = """
 from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
@@ -309,7 +364,6 @@ class CustomRequestHeaderProvider(RequestHeaderProvider):
 def test_mlflow_config_with_request_header_provider_with_init_kwargs(
     fake_project,
 ):
-
     # emulate import of custom request header class
     custom_rhp_txt = """
 from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
@@ -371,7 +425,6 @@ class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
 def test_mlflow_config_with_request_header_provider_with_with_context(
     fake_project,
 ):
-
     # emulate import of custom request header class
     custom_rhp_txt = """
 from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider
@@ -435,7 +488,6 @@ class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
 
 
 def test_mlflow_config_with_bad_request_header_provider(fake_project):
-
     # emulate import of custom request header class
     # same as before, except CustomRequestHeaderProvider inherits from object
     custom_rhp_txt = """

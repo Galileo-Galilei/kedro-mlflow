@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Unreleased]
+### Fixed
+
+
+-   :bug: Make ``kedro-mlflow`` hook log parameters when the project is configured with the ``OmegaConfigLoader`` instead of raising an error ([#430](https://github.com/Galileo-Galilei/kedro-mlflow/issues/430))
 
 ## [0.11.8] - 2023-02-13
 

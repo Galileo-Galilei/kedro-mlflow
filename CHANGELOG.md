@@ -1,14 +1,16 @@
 # Changelog
 
 ## [Unreleased]
+
+## [0.11.9] - 2023-07-23
+
 ### Fixed
 
+-   :bug: Make `kedro-mlflow` hook log parameters when the project is configured with the `OmegaConfigLoader` instead of raising an error ([#430](https://github.com/Galileo-Galilei/kedro-mlflow/issues/430))
 
--   :bug: Make ``kedro-mlflow`` hook log parameters when the project is configured with the ``OmegaConfigLoader`` instead of raising an error ([#430](https://github.com/Galileo-Galilei/kedro-mlflow/issues/430))
 ### Removed
 
-
--   :bug: Drop support for ``python=3.7`` which has [reached end-of-life status](https://devguide.python.org/versions/) to prepare 0.19 ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/issues/391))
+-   :heavy_minus_sign: Drop support for `python=3.7` which has [reached end-of-life status](https://devguide.python.org/versions/) to prepare 0.19 ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/issues/391))
 
 ## [0.11.8] - 2023-02-13
 
@@ -419,7 +421,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.8...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.9...HEAD
+
+[0.11.9]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.8...0.11.9
 
 [0.11.8]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.7...0.11.8
 

@@ -75,7 +75,6 @@ def dummy_pipeline():
 
 @pytest.fixture
 def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
-
     dummy_pipeline_ml = pipeline_ml_factory(
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
@@ -193,7 +192,6 @@ def test_mlflow_hook_save_pipeline_ml(
     dummy_catalog,
     dummy_run_params,
 ):
-
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()  # triggers conf setup
@@ -239,10 +237,26 @@ def test_mlflow_hook_save_pipeline_ml(
 
         if isinstance(pipeline_to_run, PipelineML):
             trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
-            assert trained_model.metadata.signature.to_dict() == {
-                "inputs": '[{"name": "a", "type": "long"}]',
-                "outputs": None,
-            }
+
+            # there is a trick: before python 3.8, the dict is not ordered
+            # and the conversion to string sometimes leads to
+            # '[{"name": "a", "type": "long"}]' and sometimes to
+            # '[{"type": "long", "name": "a"}]'
+            # which causes random failures
+            # TODO: drop when we support only python >=3.9
+            assert (
+                (trained_model.metadata.signature.to_dict())
+                == {
+                    "inputs": '[{"name": "a", "type": "long"}]',
+                    "outputs": None,
+                }
+            ) or (
+                (trained_model.metadata.signature.to_dict())
+                == {
+                    "inputs": '[{"type": "long", "name": "a"}]',
+                    "outputs": None,
+                }
+            )
 
 
 @pytest.mark.parametrize(
@@ -322,7 +336,6 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
-
         context = session.load_context()
 
         catalog_with_parameters = DataCatalog(

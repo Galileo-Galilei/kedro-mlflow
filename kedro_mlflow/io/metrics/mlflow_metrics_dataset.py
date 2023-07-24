@@ -11,7 +11,7 @@ MetricTuple = Tuple[str, float, int]
 MetricsDict = Dict[str, MetricItem]
 
 
-class MlflowMetricsDataSet(AbstractDataSet):
+class MlflowMetricsDataset(AbstractDataSet):
     """This class represent MLflow metrics dataset."""
 
     def __init__(
@@ -19,7 +19,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
         run_id: str = None,
         prefix: Optional[str] = None,
     ):
-        """Initialise MlflowMetricsDataSet.
+        """Initialise MlflowMetricsDataset.
 
         Args:
             prefix (Optional[str]): Prefix for metrics logged in MLflow.
@@ -65,7 +65,7 @@ class MlflowMetricsDataSet(AbstractDataSet):
         self.__logging_activated = flag
 
     def _load(self) -> MetricsDict:
-        """Load MlflowMetricDataSet.
+        """Load MlflowMetricDataset.
 
         Returns:
             Dict[str, Union[int, float]]: Dictionary with MLflow metrics dataset.

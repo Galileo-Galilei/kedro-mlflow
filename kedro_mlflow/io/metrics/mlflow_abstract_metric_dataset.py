@@ -5,7 +5,7 @@ from kedro.io import AbstractDataSet
 from mlflow.tracking import MlflowClient
 
 
-class MlflowAbstractMetricDataSet(AbstractDataSet):
+class MlflowAbstractMetricDataset(AbstractDataSet):
     def __init__(
         self,
         key: str = None,
@@ -13,7 +13,7 @@ class MlflowAbstractMetricDataSet(AbstractDataSet):
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
     ):
-        """Initialise MlflowMetricsDataSet.
+        """Initialise MlflowMetricsDataset.
 
         Args:
             run_id (str): The ID of the mlflow run where the metric should be logged

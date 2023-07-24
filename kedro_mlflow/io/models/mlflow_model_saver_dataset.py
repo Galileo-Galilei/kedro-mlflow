@@ -5,11 +5,11 @@ from typing import Any, Dict, Optional
 from kedro.io import Version
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowAbstractModelDataSet,
+    MlflowAbstractModelDataset,
 )
 
 
-class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
+class MlflowLocalModelDataSet(MlflowAbstractModelDataset):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(
@@ -22,7 +22,7 @@ class MlflowModelSaverDataSet(MlflowAbstractModelDataSet):
         log_args: Dict[str, Any] = None,
         version: Version = None,
     ) -> None:
-        """Initialize the Kedro MlflowModelDataSet.
+        """Initialize the Kedro MlflowModelDataset.
 
         Parameters are passed from the Data Catalog.
 

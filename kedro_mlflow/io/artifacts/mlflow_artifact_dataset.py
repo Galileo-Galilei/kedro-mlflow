@@ -8,7 +8,7 @@ from kedro.io.core import parse_dataset_definition
 from mlflow.tracking import MlflowClient
 
 
-class MlflowArtifactDataSet(AbstractVersionedDataSet):
+class MlflowArtifactDataset(AbstractVersionedDataSet):
     """This class is a wrapper for any kedro AbstractDataSet.
     It decorates their ``save`` method to log the dataset in mlflow when ``save`` is called.
     """
@@ -147,21 +147,21 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
 
     def _load(self) -> Any:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
     def _save(self, data: Any) -> None:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
     def _describe(self) -> Dict[str, Any]:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass

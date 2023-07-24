@@ -96,13 +96,13 @@ Hence, ``kedro-mlflow`` provides a ``MlflowHook.after_pipeline_run`` hook which 
 
 ### Reuse the model in kedro
 
-Say that you an to reuse this inference model as the input of another kedro pipeline (one of the "user_app" application). ``kedro-mlflow`` provides a ``MlflowModelLoggerDataSet`` class which can be used int the ``catalog.yml`` file:
+Say that you an to reuse this inference model as the input of another kedro pipeline (one of the "user_app" application). ``kedro-mlflow`` provides a ``MlflowRemoteModelDataSet`` class which can be used int the ``catalog.yml`` file:
 
 ```yaml
 # catalog.yml
 
 pipeline_inference_model:
-  type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+  type: kedro_mlflow.io.models.MlflowRemoteModelDataSet
   flavor: mlflow.pyfunc
   pyfunc_workflow: python_model
   artifact_path: kedro_mlflow_tutorial  # the name of your mlflow folder = the model_name in pipeline_ml_factory

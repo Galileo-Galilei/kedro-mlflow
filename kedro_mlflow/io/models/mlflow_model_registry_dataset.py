@@ -1,11 +1,11 @@
 from typing import Any, Dict, Optional, Union
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowAbstractModelDataSet,
+    MlflowAbstractModelDataset,
 )
 
 
-class MlflowModelRegistryDataSet(MlflowAbstractModelDataSet):
+class MlflowModelRegistryDataset(MlflowAbstractModelDataset):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(
@@ -16,7 +16,7 @@ class MlflowModelRegistryDataSet(MlflowAbstractModelDataSet):
         pyfunc_workflow: Optional[str] = "python_model",
         load_args: Optional[Dict[str, Any]] = None,
     ) -> None:
-        """Initialize the Kedro MlflowModelRegistryDataSet.
+        """Initialize the Kedro MlflowModelRegistryDataset.
 
         Parameters are passed from the Data Catalog.
 
@@ -66,7 +66,7 @@ class MlflowModelRegistryDataSet(MlflowAbstractModelDataSet):
 
     def _save(self, model: Any) -> None:
         raise NotImplementedError(
-            "The 'save' method is not implemented for MlflowModelRegistryDataSet. You can pass 'registered_model_name' argument in 'MLflowModelLoggerDataSet(..., save_args={registered_model_name='my_model'}' to save and register a model in the same step. "
+            "The 'save' method is not implemented for MlflowModelRegistryDataset. You can pass 'registered_model_name' argument in 'MlflowRemoteModelDataSet (..., save_args={registered_model_name='my_model'}' to save and register a model in the same step. "
         )
 
     def _describe(self) -> Dict[str, Any]:

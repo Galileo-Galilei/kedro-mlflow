@@ -129,7 +129,7 @@ example_iris_data:
 
 ```
 
-And persist the model as a pickle with the ``MlflowArtifactDataSet`` class:
+And persist the model as a pickle with the ``MlflowArtifactDataset`` class:
 
 ```yaml
 # This is a data set used by the "Hello World" example pipeline provided with the project
@@ -140,7 +140,7 @@ example_iris_data:
   filepath: data/01_raw/iris.csv
 
 example_model:
-  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
   data_set:
     type: pickle.PickleDataSet
     filepath: data/06_models/trained_model.pkl
@@ -152,7 +152,7 @@ Rerun the pipeline (with `kedro run`), and reopen the UI. Select the last run an
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 
-*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowModelLoggerDataSet`*
+*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowRemoteModelDataSet`*
 
 ## Going further
 

@@ -7,7 +7,7 @@ from kedro.io import AbstractVersionedDataSet, Version
 from kedro.io.core import DataSetError
 
 
-class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
+class MlflowAbstractModelDataset(AbstractVersionedDataSet):
     """
     Absract mother class for model datasets.
     """
@@ -21,7 +21,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
         save_args: Dict[str, Any] = None,
         version: Version = None,
     ) -> None:
-        """Initialize the Kedro MlflowModelDataSet.
+        """Initialize the Kedro MlflowModelDataset.
 
         Parameters are passed from the Data Catalog.
 
@@ -103,7 +103,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
     #             continue
     #         if f"{key}_args" in kwargs_dict:
     #             new_value = cls._import_module(value)(
-    #                 MlflowModelDataSet._parse_args(kwargs_dict[f"{key}_args"])
+    #                 MlflowModelDataset._parse_args(kwargs_dict[f"{key}_args"])
     #             )
     #             parsed_kargs[key] = new_value
     #         else:

@@ -10,9 +10,9 @@ from kedro.runner import SequentialRunner
 
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.io.metrics import (
-    MlflowMetricDataSet,
-    MlflowMetricHistoryDataSet,
-    MlflowMetricsDataSet,
+    MlflowMetricDataset,
+    MlflowMetricHistoryDataset,
+    MlflowMetricsDataset,
 )
 
 
@@ -105,12 +105,12 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataSet("blah"),
             "data": MemoryDataSet(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
-            "my_metrics": MlflowMetricsDataSet(),
-            "another_metrics": MlflowMetricsDataSet(prefix="foo"),
-            "my_metric": MlflowMetricDataSet(),
-            "another_metric": MlflowMetricDataSet(key="foo"),
-            "my_metric_history": MlflowMetricHistoryDataSet(),
-            "another_metric_history": MlflowMetricHistoryDataSet(key="bar"),
+            "my_metrics": MlflowMetricsDataset(),
+            "another_metrics": MlflowMetricsDataset(prefix="foo"),
+            "my_metric": MlflowMetricDataset(),
+            "another_metric": MlflowMetricDataset(key="foo"),
+            "my_metric_history": MlflowMetricHistoryDataset(),
+            "another_metric_history": MlflowMetricHistoryDataset(key="bar"),
         }
     )
     return dummy_catalog
@@ -181,16 +181,16 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
                 "model": PickleDataSet(
                     (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
                 ),
-                "my_metrics": MlflowMetricsDataSet(run_id=existing_run_id),
-                "another_metrics": MlflowMetricsDataSet(
+                "my_metrics": MlflowMetricsDataset(run_id=existing_run_id),
+                "another_metrics": MlflowMetricsDataset(
                     run_id=existing_run_id, prefix="foo"
                 ),
-                "my_metric": MlflowMetricDataSet(run_id=existing_run_id),
-                "another_metric": MlflowMetricDataSet(
+                "my_metric": MlflowMetricDataset(run_id=existing_run_id),
+                "another_metric": MlflowMetricDataset(
                     run_id=existing_run_id, key="foo"
                 ),
-                "my_metric_history": MlflowMetricHistoryDataSet(run_id=existing_run_id),
-                "another_metric_history": MlflowMetricHistoryDataSet(
+                "my_metric_history": MlflowMetricHistoryDataset(run_id=existing_run_id),
+                "another_metric_history": MlflowMetricHistoryDataset(
                     run_id=existing_run_id, key="bar"
                 ),
             }

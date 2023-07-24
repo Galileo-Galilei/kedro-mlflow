@@ -39,7 +39,7 @@ If you change your ``mlflow.yml``, reload the kedro extension for the changes to
 
 ## Difference with running through the CLI
 
-- The DataSets `load` and `save` methods works as usual. You can call `catalog.save("my_artifact_dataset", data)` inside a cell, and your data will be logged in mlflow properly (assuming "my_artifact_dataset" is a `kedro_mlflow.io.MlflowArtifactDataSet`).
+- The DataSets `load` and `save` methods works as usual. You can call `catalog.save("my_artifact_dataset", data)` inside a cell, and your data will be logged in mlflow properly (assuming "my_artifact_dataset" is a `kedro_mlflow.io.MlflowArtifactDataset`).
 - The `hooks` which automatically save all parameters/metrics/artifacts in mlflow will work if you run the session interactively, e.g.:
 
 ```python

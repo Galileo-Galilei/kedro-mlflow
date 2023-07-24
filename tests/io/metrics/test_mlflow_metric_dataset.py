@@ -3,7 +3,7 @@ import pytest
 from kedro.io.core import DataSetError
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.io.metrics import MlflowMetricDataSet
+from kedro_mlflow.io.metrics import MlflowMetricDataset
 
 
 @pytest.fixture
@@ -21,13 +21,13 @@ def mlflow_client(mlflow_tracking_uri):
 
 def test_mlflow_wrong_save_mode():
     with pytest.raises(DataSetError, match=r"save_args\['mode'\] must be one of"):
-        metric_ds = MlflowMetricDataSet(key="my_metric", save_args={"mode": "bad_mode"})
+        metric_ds = MlflowMetricDataset(key="my_metric", save_args={"mode": "bad_mode"})
         with mlflow.start_run():
             metric_ds.save(0.3)
 
 
 def test_mlflow_metric_dataset_save_without_active_run_or_run_id():
-    metric_ds = MlflowMetricDataSet(key="my_metric")
+    metric_ds = MlflowMetricDataset(key="my_metric")
     with pytest.raises(
         DataSetError,
         match="You must either specify a run_id or have a mlflow active run opened",
@@ -47,7 +47,7 @@ def test_mlflow_metric_dataset_save_without_active_run_or_run_id():
     ],
 )
 def test_mlflow_metric_dataset_save_with_active_run(mlflow_client, save_args):
-    metric_ds = MlflowMetricDataSet(key="my_metric", save_args=save_args)
+    metric_ds = MlflowMetricDataset(key="my_metric", save_args=save_args)
     with mlflow.start_run():
         metric_ds.save(0.3)
         run_id = mlflow.active_run().info.run_id
@@ -72,11 +72,11 @@ def test_mlflow_metric_dataset_save_with_active_run(mlflow_client, save_args):
 )
 def test_mlflow_metric_dataset_save_with_run_id(mlflow_client, save_args):
     # this time, the run is created first and closed
-    # the MlflowMetricDataSet should reopen it to interact
+    # the MlflowMetricDataset should reopen it to interact
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
 
-    metric_ds = MlflowMetricDataSet(run_id=run_id, key="my_metric", save_args=save_args)
+    metric_ds = MlflowMetricDataset(run_id=run_id, key="my_metric", save_args=save_args)
     metric_ds.save(0.3)
     metric_history = mlflow_client.get_metric_history(run_id, "my_metric")
     step = 0 if save_args is None else save_args.get("step", 0)
@@ -90,7 +90,7 @@ def test_mlflow_metric_dataset_save_append_mode(mlflow_client):
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
 
-    metric_ds = MlflowMetricDataSet(
+    metric_ds = MlflowMetricDataset(
         run_id=run_id, key="my_metric", save_args={"mode": "append"}
     )
 
@@ -108,7 +108,7 @@ def test_mlflow_metric_dataset_save_overwrite_mode(mlflow_client):
         run_id = mlflow.active_run().info.run_id
 
     # overwrite is the default mode
-    metric_ds = MlflowMetricDataSet(run_id=run_id, key="my_metric")
+    metric_ds = MlflowMetricDataset(run_id=run_id, key="my_metric")
 
     metric_ds.save(0.3)
     metric_ds.save(1)
@@ -125,7 +125,7 @@ def test_mlflow_metric_dataset_load():
         mlflow.log_metric(key="awesome_metric", value=0.1)
 
     # overwrite is the default mode
-    metric_ds = MlflowMetricDataSet(run_id=run_id, key="awesome_metric")
+    metric_ds = MlflowMetricDataset(run_id=run_id, key="awesome_metric")
 
     assert metric_ds.load() == 0.1
 
@@ -139,7 +139,7 @@ def test_mlflow_metric_dataset_load_last_logged_by_default_if_unordered():
         mlflow.log_metric(key="awesome_metric", value=0.1, step=0)
 
     # overwrite is the default mode
-    metric_ds = MlflowMetricDataSet(run_id=run_id, key="awesome_metric")
+    metric_ds = MlflowMetricDataset(run_id=run_id, key="awesome_metric")
 
     assert (
         metric_ds.load() == 0.1
@@ -155,7 +155,7 @@ def test_mlflow_metric_dataset_load_given_step():
         mlflow.log_metric(key="awesome_metric", value=0.4, step=3)
 
     # overwrite is the default mode
-    metric_ds = MlflowMetricDataSet(
+    metric_ds = MlflowMetricDataset(
         run_id=run_id, key="awesome_metric", load_args={"step": 2}
     )
 
@@ -173,7 +173,7 @@ def test_mlflow_metric_dataset_load_last_given_step_if_duplicated():
         mlflow.log_metric(key="awesome_metric", value=0.4, step=3)
 
     # overwrite is the default mode
-    metric_ds = MlflowMetricDataSet(
+    metric_ds = MlflowMetricDataset(
         run_id=run_id, key="awesome_metric", load_args={"step": 2}
     )
 
@@ -181,7 +181,7 @@ def test_mlflow_metric_dataset_load_last_given_step_if_duplicated():
 
 
 def test_mlflow_metric_dataset_logging_deactivation(mlflow_tracking_uri):
-    metric_ds = MlflowMetricDataSet(key="inactive_metric")
+    metric_ds = MlflowMetricDataset(key="inactive_metric")
     metric_ds._logging_activated = False
     with mlflow.start_run():
         metric_ds.save(1)
@@ -189,7 +189,7 @@ def test_mlflow_metric_dataset_logging_deactivation(mlflow_tracking_uri):
 
 
 def test_mlflow_metric_logging_deactivation_is_bool():
-    mlflow_metric_dataset = MlflowMetricDataSet(key="hello")
+    mlflow_metric_dataset = MlflowMetricDataset(key="hello")
 
     with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
         mlflow_metric_dataset._logging_activated = "hello"

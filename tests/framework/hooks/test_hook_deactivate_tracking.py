@@ -78,23 +78,23 @@ def catalog_config(kedro_project_path):
     fake_data_filepath = str(kedro_project_path / "fake_data.pkl")
     return {
         "artifact_data": {
-            "type": "kedro_mlflow.io.artifacts.MlflowArtifactDataSet",
+            "type": "kedro_mlflow.io.artifacts.MlflowArtifactDataset",
             "data_set": {
                 "type": "pickle.PickleDataSet",
                 "filepath": fake_data_filepath,
             },
         },
         "metrics_data": {
-            "type": "kedro_mlflow.io.metrics.MlflowMetricsDataSet",
+            "type": "kedro_mlflow.io.metrics.MlflowMetricsDataset",
         },
         "metric_data": {
-            "type": "kedro_mlflow.io.metrics.MlflowMetricDataSet",
+            "type": "kedro_mlflow.io.metrics.MlflowMetricDataset",
         },
         "metric_history_data": {
-            "type": "kedro_mlflow.io.metrics.MlflowMetricHistoryDataSet",
+            "type": "kedro_mlflow.io.metrics.MlflowMetricHistoryDataset",
         },
         "model": {
-            "type": "kedro_mlflow.io.models.MlflowModelLoggerDataSet",
+            "type": "kedro_mlflow.io.models.MlflowRemoteModelDataSet ",
             "flavor": "mlflow.sklearn",
         },
     }

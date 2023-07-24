@@ -9,7 +9,7 @@ from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from sklearn.linear_model import LinearRegression
 
-from kedro_mlflow.io.models import MlflowModelSaverDataSet
+from kedro_mlflow.io.models import MlflowLocalModelDataSet
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.mlflow.kedro_pipeline_model import KedroPipelineModelError
 from kedro_mlflow.pipeline import pipeline_ml_factory
@@ -423,7 +423,7 @@ def test_kedro_pipeline_ml_loading_deepcopiable_catalog(tmp_path, tmp_folder):
     )
 
     # emulate training by creating the model manually
-    model_dataset = MlflowModelSaverDataSet(
+    model_dataset = MlflowLocalModelDataSet(
         filepath=(tmp_path / "model.pkl").resolve().as_posix(), flavor="mlflow.sklearn"
     )
 

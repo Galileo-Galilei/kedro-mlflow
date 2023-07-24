@@ -9,7 +9,7 @@ from kedro.io import PartitionedDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
-from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataset
 
 
 @pytest.fixture
@@ -52,7 +52,7 @@ def test_mlflow_csv_pkl_dataset_save_reload(
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     filepath = (tmp_path / "data").with_suffix(extension)
 
-    mlflow_dataset = MlflowArtifactDataSet(
+    mlflow_dataset = MlflowArtifactDataset(
         artifact_path=artifact_path,
         data_set=dict(type=dataset, filepath=filepath.as_posix()),
     )
@@ -98,7 +98,7 @@ def test_artifact_dataset_save_with_run_id(
         nb_runs += 1
 
     # then same scenario but the run_id where data is saved is specified
-    mlflow_csv_dataset = MlflowArtifactDataSet(
+    mlflow_csv_dataset = MlflowArtifactDataset(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
         run_id=run_id,
     )
@@ -134,7 +134,7 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
 
-        mlflow_csv_dataset = MlflowArtifactDataSet(
+        mlflow_csv_dataset = MlflowArtifactDataset(
             data_set=dict(
                 type=CSVDataSet,
                 filepath=(tmp_path / "df1.csv").as_posix(),
@@ -172,7 +172,7 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
 
 
 def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
-    mlflow_pkl_dataset = MlflowArtifactDataSet(
+    mlflow_pkl_dataset = MlflowArtifactDataset(
         data_set=dict(type=PickleDataSet, filepath=(tmp_path / "df1.csv").as_posix())
     )
 
@@ -199,7 +199,7 @@ def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
 
 
 def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
-    mlflow_csv_dataset = MlflowArtifactDataSet(
+    mlflow_csv_dataset = MlflowArtifactDataset(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix())
     )
 
@@ -211,7 +211,7 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
     mlflow.set_tracking_uri(tracking_uri.as_uri())
 
     # define the logger
-    mlflow_csv_dataset = MlflowArtifactDataSet(
+    mlflow_csv_dataset = MlflowArtifactDataset(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df.csv").as_posix())
     )
 
@@ -239,7 +239,7 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
     mlflow.set_tracking_uri(tracking_uri.as_uri())
 
     # save first and retrieve run id
-    mlflow_csv_dataset1 = MlflowArtifactDataSet(
+    mlflow_csv_dataset1 = MlflowArtifactDataset(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
         artifact_path=artifact_path,
     )
@@ -250,7 +250,7 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
             tmp_path / "df1.csv"
         ).unlink()  # we need to delete the data, else it is automatically reused instead of downloading
     # same as before, but a closed run_id is specified
-    mlflow_csv_dataset2 = MlflowArtifactDataSet(
+    mlflow_csv_dataset2 = MlflowArtifactDataset(
         data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
         artifact_path=artifact_path,
         run_id=first_run_id,
@@ -269,7 +269,7 @@ def test_partitioned_dataset_save_and_reload(
     mlflow.set_tracking_uri(tracking_uri.as_uri())
     mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
-    mlflow_dataset = MlflowArtifactDataSet(
+    mlflow_dataset = MlflowArtifactDataset(
         artifact_path=artifact_path,
         data_set=dict(
             type=PartitionedDataSet,

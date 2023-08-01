@@ -3,11 +3,11 @@ from typing import Any, Dict, List, Union
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.io.metrics.mlflow_abstract_metric_dataset import (
-    MlflowAbstractMetricDataSet,
+    MlflowAbstractMetricDataset,
 )
 
 
-class MlflowMetricHistoryDataSet(MlflowAbstractMetricDataSet):
+class MlflowMetricHistoryDataset(MlflowAbstractMetricDataset):
     def __init__(
         self,
         key: str = None,
@@ -15,7 +15,7 @@ class MlflowMetricHistoryDataSet(MlflowAbstractMetricDataSet):
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
     ):
-        """Initialise MlflowMetricDataSet.
+        """Initialise MlflowMetricDataset.
         Args:
             run_id (str): The ID of the mlflow run where the metric should be logged
         """

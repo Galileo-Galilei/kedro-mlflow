@@ -129,7 +129,7 @@ example_iris_data:
 
 ```
 
-And persist the model as a pickle with the ``MlflowArtifactDataSet`` class:
+And persist the model as a pickle with the ``MlflowArtifactDataset`` class:
 
 ```yaml
 # This is a data set used by the "Hello World" example pipeline provided with the project
@@ -140,7 +140,7 @@ example_iris_data:
   filepath: data/01_raw/iris.csv
 
 example_model:
-  type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+  type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
   data_set:
     type: pickle.PickleDataSet
     filepath: data/06_models/trained_model.pkl

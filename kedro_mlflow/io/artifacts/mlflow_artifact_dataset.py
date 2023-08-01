@@ -8,7 +8,7 @@ from kedro.io.core import parse_dataset_definition
 from mlflow.tracking import MlflowClient
 
 
-class MlflowArtifactDataSet(AbstractVersionedDataSet):
+class MlflowArtifactDataset(AbstractVersionedDataSet):
     """This class is a wrapper for any kedro AbstractDataSet.
     It decorates their ``save`` method to log the dataset in mlflow when ``save`` is called.
     """
@@ -26,7 +26,7 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
         # all dataset (i.e. it should replace AbstractVersionedDataSet)
         # instead and since we can't modify the core package,
         # we create a subclass which inherits dynamically from the data_set class
-        class MlflowArtifactDataSetChildren(data_set):
+        class MlflowArtifactDatasetChildren(data_set):
             def __init__(self, run_id, artifact_path):
                 super().__init__(**data_set_args)
                 self.run_id = run_id
@@ -135,33 +135,33 @@ class MlflowArtifactDataSet(AbstractVersionedDataSet):
 
         # rename the class
         parent_name = data_set.__name__
-        MlflowArtifactDataSetChildren.__name__ = f"Mlflow{parent_name}"
-        MlflowArtifactDataSetChildren.__qualname__ = (
+        MlflowArtifactDatasetChildren.__name__ = f"Mlflow{parent_name}"
+        MlflowArtifactDatasetChildren.__qualname__ = (
             f"{parent_name}.Mlflow{parent_name}"
         )
 
-        mlflow_dataset_instance = MlflowArtifactDataSetChildren(
+        mlflow_dataset_instance = MlflowArtifactDatasetChildren(
             run_id=run_id, artifact_path=artifact_path
         )
         return mlflow_dataset_instance
 
     def _load(self) -> Any:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
     def _save(self, data: Any) -> None:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass
 
     def _describe(self) -> Dict[str, Any]:  # pragma: no cover
         """
-        MlflowArtifactDataSet is a factory for DataSet
+        MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods
         """
         pass

@@ -2,7 +2,7 @@ import mlflow
 import pytest
 from mlflow.tracking import MlflowClient
 
-from kedro_mlflow.io.metrics import MlflowMetricHistoryDataSet
+from kedro_mlflow.io.metrics import MlflowMetricHistoryDataset
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def test_mlflow_metric_history_dataset_save_load(mlflow_client, save_mode, load_
         "history": metric_as_history,
     }
 
-    metric_ds_saver = MlflowMetricHistoryDataSet(
+    metric_ds_saver = MlflowMetricHistoryDataset(
         key="my_metric", save_args={"mode": save_mode}
     )
     with mlflow.start_run():
@@ -55,7 +55,7 @@ def test_mlflow_metric_history_dataset_save_load(mlflow_client, save_mode, load_
     run = mlflow_client.get_run(run_id)
     assert "my_metric" in run.data.metrics.keys()
 
-    metric_ds_loader = MlflowMetricHistoryDataSet(
+    metric_ds_loader = MlflowMetricHistoryDataset(
         key="my_metric", run_id=run_id, load_args={"mode": load_mode}
     )
 
@@ -63,7 +63,7 @@ def test_mlflow_metric_history_dataset_save_load(mlflow_client, save_mode, load_
 
 
 def test_mlflow_metric_history_dataset_logging_deactivation(mlflow_tracking_uri):
-    metric_ds = MlflowMetricHistoryDataSet(key="inactive_metric")
+    metric_ds = MlflowMetricHistoryDataset(key="inactive_metric")
     metric_ds._logging_activated = False
     with mlflow.start_run():
         metric_ds.save([0.1])

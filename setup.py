@@ -41,7 +41,7 @@ setup(
             "sphinx>=4.5.0,<8.0.0",
             "sphinx_rtd_theme>=1.0,<1.3",
             "sphinx-markdown-tables~=0.0.15",
-            "sphinx-click>=3.1,<4.5",
+            "sphinx-click>=3.1,<5.1",
             "sphinx_copybutton~=0.5.0",
             "myst-parser>=0.17.2,<2.1.0",
         ],

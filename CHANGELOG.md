@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Avoid error when using kedro==0.18.1 with ``TemplatedConfigLoader`` and no ``mlflow.yml`` configuration file ([#452](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
+
 ## [0.11.9] - 2023-07-23
 
 ### Fixed

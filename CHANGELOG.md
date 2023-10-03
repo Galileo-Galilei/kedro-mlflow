@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.11.10] - 2023-10-03
+
 ### Fixed
 
--   :bug: Avoid error when using kedro==0.18.1 with ``TemplatedConfigLoader`` and no ``mlflow.yml`` configuration file ([#452](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
+-   :bug: Avoid error when using kedro==0.18.1 with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
 
 ## [0.11.9] - 2023-07-23
 
@@ -425,7 +427,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.9...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.10...HEAD
+
+[0.11.10]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.9...0.11.10
 
 [0.11.9]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.8...0.11.9
 

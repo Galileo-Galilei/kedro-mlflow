@@ -20,7 +20,7 @@ Since it is an ``AbstractDataSet``, it can be used with the YAML API. Assume tha
 
 ```yaml
 my_dataset_to_version:
-    type: pandas.CSVDataSet
+    type: pandas.CSVDataset
     filepath: /path/to/a/destination/file.csv
 ```
 
@@ -30,7 +30,7 @@ You can change it to:
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/LOCAL/destination/file.csv # must be a local file, wherever you want to log the data in the end
 ```
 
@@ -46,7 +46,7 @@ The ``MlflowArtifactDataset`` takes a ``data_set`` argument which is a python di
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
         load_args:
             sep: ;
@@ -61,11 +61,11 @@ Like all Kedro ``AbstractDataSet``, ``MlflowArtifactDataset`` is callable in the
 
 ```python
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset
-from kedro.extras.datasets.pandas import CSVDataSet
+from kedro_datasets.pandas import CSVDataset
 
 csv_dataset = MlflowArtifactDataSet(
     data_set={
-        "type": CSVDataSet,  # either a string "pandas.CSVDataSet" or the class
+        "type": CSVDataset,  # either a string "pandas.CSVDataset" or the class
         "filepath": r"/path/to/a/local/destination/file.csv",
     }
 )
@@ -91,7 +91,7 @@ The ``MlflowArtifactDataset`` has an extra attribute ``run_id`` which specifies 
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv  # must be a local filepath, no matter what is your actual mlflow storage (S3 or other)
     run_id: 13245678910111213  # a valid mlflow run to log in. If None, default to active run
 ```
@@ -106,7 +106,7 @@ You may want to reuse th artifact of a previous run to reuse it in another one, 
 my_dataset_to_reload:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv # must be a local filepath, no matter what is your actual mlflow storage (S3 or other)
     run_id: 13245678910111213  # a valid mlflow run with the existing artifact. It must be named "file.csv"
 ```
@@ -121,7 +121,7 @@ With below example, the artifact will be logged in mlflow within a `reporting` f
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
     artifact_path: reporting  # relative path where the remote artifact must be stored. if None, saved in root folder.
 ```

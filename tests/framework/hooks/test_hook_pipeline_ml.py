@@ -3,12 +3,12 @@ import sys
 import mlflow
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
+from kedro_datasets.pickle import PickleDataSet
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 

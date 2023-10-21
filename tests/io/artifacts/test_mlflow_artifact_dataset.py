@@ -3,9 +3,9 @@ from pathlib import Path
 import mlflow
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pandas import CSVDataSet
-from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io import PartitionedDataSet
+from kedro_datasets.pandas import CSVDataset
+from kedro_datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
@@ -30,12 +30,12 @@ def df2():
 @pytest.mark.parametrize(
     "dataset,extension,data,artifact_path",
     [
-        (CSVDataSet, ".csv", lazy_fixture("df1"), None),
-        ("pandas.CSVDataSet", ".csv", lazy_fixture("df1"), None),
+        (CSVDataset, ".csv", lazy_fixture("df1"), None),
+        ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), None),
         (PickleDataSet, ".pkl", lazy_fixture("df1"), None),
         ("pickle.PickleDataSet", ".pkl", lazy_fixture("df1"), None),
-        (CSVDataSet, ".csv", lazy_fixture("df1"), "artifact_dir"),
-        ("pandas.CSVDataSet", ".csv", lazy_fixture("df1"), "artifact_dir"),
+        (CSVDataset, ".csv", lazy_fixture("df1"), "artifact_dir"),
+        ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), "artifact_dir"),
         (PickleDataSet, ".pkl", lazy_fixture("df1"), "artifact_dir"),
         (
             "pickle.PickleDataSet",
@@ -99,7 +99,7 @@ def test_artifact_dataset_save_with_run_id(
 
     # then same scenario but the run_id where data is saved is specified
     mlflow_csv_dataset = MlflowArtifactDataset(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
+        data_set=dict(type=CSVDataset, filepath=(tmp_path / "df1.csv").as_posix()),
         run_id=run_id,
     )
     mlflow_csv_dataset.save(df1)
@@ -136,7 +136,7 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
 
         mlflow_csv_dataset = MlflowArtifactDataset(
             data_set=dict(
-                type=CSVDataSet,
+                type=CSVDataset,
                 filepath=(tmp_path / "df1.csv").as_posix(),
                 versioned=True,
             ),
@@ -200,7 +200,7 @@ def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
 
 def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
     mlflow_csv_dataset = MlflowArtifactDataset(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix())
+        data_set=dict(type=CSVDataset, filepath=(tmp_path / "df1.csv").as_posix())
     )
 
     with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
@@ -212,7 +212,7 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
 
     # define the logger
     mlflow_csv_dataset = MlflowArtifactDataset(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df.csv").as_posix())
+        data_set=dict(type=CSVDataset, filepath=(tmp_path / "df.csv").as_posix())
     )
 
     # create a first run, save a first dataset
@@ -240,7 +240,7 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
 
     # save first and retrieve run id
     mlflow_csv_dataset1 = MlflowArtifactDataset(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
+        data_set=dict(type=CSVDataset, filepath=(tmp_path / "df1.csv").as_posix()),
         artifact_path=artifact_path,
     )
     with mlflow.start_run():
@@ -251,7 +251,7 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
         ).unlink()  # we need to delete the data, else it is automatically reused instead of downloading
     # same as before, but a closed run_id is specified
     mlflow_csv_dataset2 = MlflowArtifactDataset(
-        data_set=dict(type=CSVDataSet, filepath=(tmp_path / "df1.csv").as_posix()),
+        data_set=dict(type=CSVDataset, filepath=(tmp_path / "df1.csv").as_posix()),
         artifact_path=artifact_path,
         run_id=first_run_id,
     )
@@ -274,7 +274,7 @@ def test_partitioned_dataset_save_and_reload(
         data_set=dict(
             type=PartitionedDataSet,
             path=(tmp_path / "df_dir").as_posix(),
-            dataset="pandas.CSVDataSet",
+            dataset="pandas.CSVDataset",
             filename_suffix=".csv",
         ),
     )

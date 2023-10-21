@@ -54,6 +54,7 @@ setup(
             "flake8==6.0.0",  # ensure consistency with pre-commit
             "black==23.7.0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.12.0",  # ensure consistency with pre-commit
+            "kedro-datasets[pandas]",
         ],
         "dev": [
             "pre-commit>=2.0.0,<4.0.0",

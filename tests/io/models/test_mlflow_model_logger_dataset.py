@@ -3,10 +3,10 @@ from tempfile import TemporaryDirectory
 import mlflow
 import pandas as pd
 import pytest
-from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.io.core import DataSetError
 from kedro.pipeline import Pipeline, node
+from kedro_datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
 from sklearn.linear_model import LinearRegression
 

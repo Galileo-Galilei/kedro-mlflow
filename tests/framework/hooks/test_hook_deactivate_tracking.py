@@ -80,7 +80,7 @@ def catalog_config(kedro_project_path):
         "artifact_data": {
             "type": "kedro_mlflow.io.artifacts.MlflowArtifactDataset",
             "data_set": {
-                "type": "pickle.PickleDataSet",
+                "type": "pickle.PickleDataset",
                 "filepath": fake_data_filepath,
             },
         },

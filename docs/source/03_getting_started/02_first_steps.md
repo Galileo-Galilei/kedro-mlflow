@@ -33,7 +33,7 @@ kedro run
 If the pipeline executes properly, you should see the following log:
 
 ```console
-2020-07-13 21:29:25,401 - kedro.io.data_catalog - INFO - Loading data from `example_iris_data` (CSVDataSet)...
+2020-07-13 21:29:25,401 - kedro.io.data_catalog - INFO - Loading data from `example_iris_data` (CSVDataset)...
 2020-07-13 21:29:25,562 - kedro.io.data_catalog - INFO - Loading data from `params:example_test_data_ratio` (MemoryDataSet)...
 2020-07-13 21:29:25,969 - kedro.pipeline.node - INFO - Running node: split_data([example_iris_data,params:example_test_data_ratio]) -> [example_test_x,example_test_y,example_train_x,example_train_y]
 2020-07-13 21:29:26,053 - kedro.io.data_catalog - INFO - Saving data to `example_train_x` (MemoryDataSet)...
@@ -124,7 +124,7 @@ First, open the ``catalog.yml`` file which should like this:
 # template. Please feel free to remove it once you remove the example pipeline.
 
 example_iris_data:
-  type: pandas.CSVDataSet
+  type: pandas.CSVDataset
   filepath: data/01_raw/iris.csv
 
 ```
@@ -136,13 +136,13 @@ And persist the model as a pickle with the ``MlflowArtifactDataset`` class:
 # template. Please feel free to remove it once you remove the example pipeline.
 
 example_iris_data:
-  type: pandas.CSVDataSet
+  type: pandas.CSVDataset
   filepath: data/01_raw/iris.csv
 
 example_model:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
   data_set:
-    type: pickle.PickleDataSet
+    type: pickle.PickleDataset
     filepath: data/06_models/trained_model.pkl
 ```
 

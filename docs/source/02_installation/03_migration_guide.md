@@ -100,8 +100,8 @@ Replace the following entries:
 
 | old                                     | new                                               |
 | :-------------------------------------- | :------------------------------------------------ |
-| `kedro_mlflow.io.MlflowArtifactDataSet` | `kedro_mlflow.io.artifacts.MlflowArtifactDataSet` |
-| `kedro_mlflow.io.MlflowMetricsDataSet`  | `kedro_mlflow.io.metrics.MlflowMetricsDataSet`    |
+| `kedro_mlflow.io.MlflowArtifactDataset` | `kedro_mlflow.io.artifacts.MlflowArtifactDataset` |
+| `kedro_mlflow.io.MlflowMetricsDataset`  | `kedro_mlflow.io.metrics.MlflowMetricsDataset`    |
 
 ### Hooks
 

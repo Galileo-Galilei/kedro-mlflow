@@ -2,11 +2,20 @@
 
 ## [Unreleased]
 
+- :sparkles: Add support for python 3.11 ([#450,rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
+- :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) to match new kedro conventions from ``kedro>=0.19`` and onwards ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
+  - ``MlflowArtifactDataSet``->``MlflowArtifactDataset``
+  - ``MlflowAbstractModelDataSet``->``MlflowAbstractModelDataset``
+  - ``MlflowModelRegistryDataSet``->``MlflowModelRegistryDataset``
+  - ``MlflowMetricDataSet``->``MlflowMetricDataset``
+  - ``MlflowMetricHistoryDataSet``->``MlflowMetricHistoryDataset``
+  - ``MlflowMetricsDataSet``->``MlflowMetricsDataset``
+
 ## [0.11.10] - 2023-10-03
 
 ### Fixed
 
--   :bug: Avoid error when using kedro==0.18.1 with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
+-   :bug: Avoid error when using kedro==0.18.1 with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452, sami-sweng](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
 
 ## [0.11.9] - 2023-07-23
 

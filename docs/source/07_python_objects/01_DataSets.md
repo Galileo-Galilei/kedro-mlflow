@@ -1,12 +1,12 @@
 # New ``DataSet``
 
-## ``MlflowArtifactDataSet``
+## ``MlflowArtifactDataset``
 
-``MlflowArtifactDataSet`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
+``MlflowArtifactDataset`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
 
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -16,7 +16,7 @@ or with additional parameters:
 
 ```yaml
 my_dataset_to_version:
-    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
         type: pandas.CSVDataSet  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
@@ -32,10 +32,10 @@ my_dataset_to_version:
 or with the python API:
 
 ```python
-from kedro_mlflow.io.artifacts import MlflowArtifactDataSet
+from kedro_mlflow.io.artifacts import MlflowArtifactDataset
 from kedro.extras.datasets.pandas import CSVDataSet
 
-csv_dataset = MlflowArtifactDataSet(
+csv_dataset = MlflowArtifactDataset(
     data_set={"type": CSVDataSet, "filepath": r"/path/to/a/local/destination/file.csv"}
 )
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
@@ -43,13 +43,13 @@ csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 
 ## Metrics `DataSets`
 
-### ``MlflowMetricDataSet``
+### ``MlflowMetricDataset``
 
-[The ``MlflowMetricDataSet`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
+[The ``MlflowMetricDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
-### ``MlflowMetricHistoryDataSet``
+### ``MlflowMetricHistoryDataset``
 
-[The ``MlflowMetricHistoryDataSet`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
+[The ``MlflowMetricHistoryDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 
 ## Models `DataSets`
@@ -159,9 +159,9 @@ my_model:
     version: <valid-kedro-version>
 ```
 
-### ``MlflowModelRegistryDataSet``
+### ``MlflowModelRegistryDataset``
 
-The ``MlflowModelRegistryDataSet`` accepts the following arguments:
+The ``MlflowModelRegistryDataset`` accepts the following arguments:
 
 - model_name (str): The name of the registered model is the mlflow registry
 - stage_or_version (str): A valid stage (either "staging" or "production") or version number for the registred model.Default to "latest" which fetch the last version and the higher "stage" available.
@@ -189,9 +189,9 @@ with mlflow.start_run():
 You can fetch the model by its name:
 
 ```python
-from kedro_mlflow.io.models import MlflowModelRegistryDataSet
+from kedro_mlflow.io.models import MlflowModelRegistryDataset
 
-mlflow_model_logger = MlflowModelRegistryDataSet(model_name="my_awesome_model")
+mlflow_model_logger = MlflowModelRegistryDataset(model_name="my_awesome_model")
 my_model = mlflow_model_logger.load()
 ```
 
@@ -199,6 +199,6 @@ and with the YAML API in the `catalog.yml` (only for loading an existing model):
 
 ```yaml
 my_model:
-    type: kedro_mlflow.io.models.MlflowModelRegistryDataSet
+    type: kedro_mlflow.io.models.MlflowModelRegistryDataset
     model_name: my_awesome_model
 ```

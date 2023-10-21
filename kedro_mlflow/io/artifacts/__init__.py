@@ -1,1 +1,1 @@
-from .mlflow_artifact_dataset import MlflowArtifactDataSet
+from .mlflow_artifact_dataset import MlflowArtifactDataset

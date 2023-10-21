@@ -7,7 +7,7 @@ from kedro.io import AbstractVersionedDataSet, Version
 from kedro.io.core import DataSetError
 
 
-class MlflowAbstractModelDataSet(AbstractVersionedDataSet):
+class MlflowModelRegistryDataset(AbstractVersionedDataSet):
     """
     Absract mother class for model datasets.
     """

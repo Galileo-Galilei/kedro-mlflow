@@ -11,7 +11,7 @@ MLflow allows to serialize and deserialize models to a common format, track thos
 - the ``MlflowModelLoggerDataSet`` is used to load from and save to from the mlflow artifact store. It uses optional `run_id` argument to load and save from a given `run_id` which must exists in the mlflow server you are logging to.
 - the ``MlflowModelSaverDataSet`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
 
-*Note: If you use ``MlflowModelLoggerDataSet``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelSaverDataSet`` and ``MlflowArtifactDataSet`` to make persist it both locally and remotely, see further.*
+*Note: If you use ``MlflowModelLoggerDataSet``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelSaverDataSet`` and ``MlflowArtifactDataset`` to make persist it both locally and remotely, see further.*
 
 Suppose you would like to register a `scikit-learn` model of your `DataCatalog` in mlflow, you can use the following yaml API:
 
@@ -54,11 +54,11 @@ my_custom_model:
 
 ### How can I save model locally and log it in MLflow in one step?
 
-If you want to save your model both locally and remotely within the same run, you can leverage `MlflowArtifactDataSet`:
+If you want to save your model both locally and remotely within the same run, you can leverage `MlflowArtifactDataset`:
 
 ```yaml
 sklearn_model:
-    type: kedro_mlflow.io.artifacts.MlflowArtifactDataSet
+    type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
         type: kedro_mlflow.io.models.MlflowModelSaverDataSet
         flavor: mlflow.sklearn

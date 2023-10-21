@@ -6,9 +6,8 @@ import mlflow.tracking.request_header.registry as mtrr  # necessary to access th
 import pytest
 import toml
 import yaml
-from dynaconf.validator import Validator
 from kedro import __version__ as kedro_version
-from kedro.config import OmegaConfigLoader, TemplatedConfigLoader
+from kedro.config import OmegaConfigLoader
 from kedro.framework.context import KedroContext
 from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
@@ -133,30 +132,6 @@ def _mock_imported_settings_paths(mocker, mock_settings):
 
 
 @pytest.fixture
-def mock_settings_templated_config_loader_class(mocker):
-    class MockSettings(_ProjectSettings):
-        _CONFIG_LOADER_CLASS = _IsSubclassValidator(
-            "CONFIG_LOADER_CLASS", default=lambda *_: TemplatedConfigLoader
-        )
-
-    return _mock_imported_settings_paths(mocker, MockSettings())
-
-
-@pytest.fixture
-def mock_settings_templated_config_loader_class_with_globals(mocker):
-    class MockSettings(_ProjectSettings):
-        _CONFIG_LOADER_CLASS = _IsSubclassValidator(
-            "CONFIG_LOADER_CLASS", default=lambda *_: TemplatedConfigLoader
-        )
-
-        _CONFIG_LOADER_ARGS = Validator(
-            "CONFIG_LOADER_ARGS", default=dict(globals_pattern="*globals.yml")
-        )
-
-    return _mock_imported_settings_paths(mocker, MockSettings())
-
-
-@pytest.fixture
 def mock_settings_omega_config_loader_class(mocker):
     class MockSettings(_ProjectSettings):
         _CONFIG_LOADER_CLASS = _IsSubclassValidator(
@@ -223,13 +198,10 @@ def fake_project(tmp_path, local_logging_config):
     "project_settings",
     [
         "",
-        pytest.lazy_fixture("mock_settings_templated_config_loader_class"),
         pytest.lazy_fixture("mock_settings_omega_config_loader_class"),
     ],
 )
 def test_mlflow_config_correctly_set(kedro_project, project_settings):
-    # create empty conf
-    open((kedro_project / "conf" / "base" / "mlflow.yml").as_posix(), mode="w").close()
     bootstrap_project(kedro_project)
     session = KedroSession.create(
         project_path=kedro_project, package_name="fake_project"
@@ -255,12 +227,12 @@ def test_mlflow_config_correctly_set(kedro_project, project_settings):
     )
 
 
-# TODO: when omegacfongiloader will support templating with globals, add a similar test
-@pytest.mark.usefixtures("mock_settings_templated_config_loader_class_with_globals")
-def test_mlflow_config_interpolated_with_templated_config_loader(fake_project):
+# TODO: when OmegaConfigLoader will support templating with globals, add a similar test
+@pytest.mark.usefixtures("mock_settings_omega_config_loader_class")
+def test_mlflow_config_interpolated_with_globals_resolver(fake_project):
     dict_config = dict(
         server=dict(
-            mlflow_tracking_uri="${mlflow_tracking_uri}",
+            mlflow_tracking_uri="${globals: mlflow_tracking_uri}",
             mlflow_registry_uri=None,
             credentials=None,
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),

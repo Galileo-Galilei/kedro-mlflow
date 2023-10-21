@@ -8,7 +8,7 @@ from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 
@@ -91,7 +91,7 @@ def dummy_catalog(tmp_path):
             "raw_data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
             "params:unused_param": MemoryDataset("blah"),
             "data": MemoryDataset(),
-            "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "model": PickleDataset((tmp_path / "model.csv").as_posix()),
         }
     )
     return dummy_catalog
@@ -344,7 +344,7 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
                 "cleaned_data": MemoryDataset(),
                 "params:stopwords": MemoryDataset(["Hello", "Hi"]),
                 "params:penalty": MemoryDataset(0.1),
-                "model": PickleDataSet(
+                "model": PickleDataset(
                     (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
                 ),
                 "params:threshold": MemoryDataset(0.5),

@@ -6,7 +6,7 @@ from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 from mlflow.pyfunc import PythonModel
 
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
@@ -152,7 +152,7 @@ class KedroPipelineModel(PythonModel):
                     absolute_param_path = (
                         parameters_saving_folder / f"params_{name[7:]}.pkl"
                     )
-                    persisted_dataset = PickleDataSet(
+                    persisted_dataset = PickleDataset(
                         filepath=absolute_param_path.as_posix()
                     )
                     persisted_dataset.save(dataset.load())

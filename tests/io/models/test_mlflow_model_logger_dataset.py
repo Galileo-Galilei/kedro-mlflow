@@ -6,7 +6,7 @@ import pytest
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.io.core import DatasetError
 from kedro.pipeline import Pipeline, node
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 from mlflow.tracking import MlflowClient
 from sklearn.linear_model import LinearRegression
 
@@ -100,7 +100,7 @@ def dummy_catalog(tmp_path):
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "model": PickleDataSet(
+            "model": PickleDataset(
                 filepath=(tmp_path / "data" / "06_models" / "model.pkl")
                 .resolve()
                 .as_posix()

@@ -4,11 +4,11 @@ import mlflow
 from kedro.io.core import DataSetError
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowAbstractModelDataSet,
+    MlflowModelRegistryDataset,
 )
 
 
-class MlflowModelLoggerDataSet(MlflowAbstractModelDataSet):
+class MlflowModelLoggerDataSet(MlflowModelRegistryDataset):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(

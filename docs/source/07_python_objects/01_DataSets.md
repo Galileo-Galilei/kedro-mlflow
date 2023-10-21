@@ -159,9 +159,9 @@ my_model:
     version: <valid-kedro-version>
 ```
 
-### ``MlflowModelRegistryDataSet``
+### ``MlflowModelRegistryDataset``
 
-The ``MlflowModelRegistryDataSet`` accepts the following arguments:
+The ``MlflowModelRegistryDataset`` accepts the following arguments:
 
 - model_name (str): The name of the registered model is the mlflow registry
 - stage_or_version (str): A valid stage (either "staging" or "production") or version number for the registred model.Default to "latest" which fetch the last version and the higher "stage" available.
@@ -189,9 +189,9 @@ with mlflow.start_run():
 You can fetch the model by its name:
 
 ```python
-from kedro_mlflow.io.models import MlflowModelRegistryDataSet
+from kedro_mlflow.io.models import MlflowModelRegistryDataset
 
-mlflow_model_logger = MlflowModelRegistryDataSet(model_name="my_awesome_model")
+mlflow_model_logger = MlflowModelRegistryDataset(model_name="my_awesome_model")
 my_model = mlflow_model_logger.load()
 ```
 
@@ -199,6 +199,6 @@ and with the YAML API in the `catalog.yml` (only for loading an existing model):
 
 ```yaml
 my_model:
-    type: kedro_mlflow.io.models.MlflowModelRegistryDataSet
+    type: kedro_mlflow.io.models.MlflowModelRegistryDataset
     model_name: my_awesome_model
 ```

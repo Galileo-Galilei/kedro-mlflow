@@ -327,7 +327,7 @@
 
 -   :zap: `get_mlflow_config` now uses the Kedro `ProjectContext` `ConfigLoader` to get configs ([#66](https://github.com/Galileo-Galilei/kedro-mlflow/issues/66)). This indirectly solves the following issues:
     -   `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory ([#30](https://github.com/Galileo-Galilei/kedro-mlflow/issues/30))
-    -   kedro_mlflow now works fine with kedro jupyter notebook independently of the working directory ([#64](https://github.com/Galileo-Galilei/kedro-mlflow/issues/64))
+    -   ``kedro_mlflow`` now works fine with ``kedro jupyter notebook`` independently of the working directory ([#64](https://github.com/Galileo-Galilei/kedro-mlflow/issues/64))
     -   You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader` ([#72](https://github.com/Galileo-Galilei/kedro-mlflow/issues/72))
 -   :bug: `MlflowMetricsDataset` now saves in the specified `run_id` instead of the current one when the prefix is not specified ([#62](https://github.com/Galileo-Galilei/kedro-mlflow/issues/62))
 -   :memo: Other bug fixes and documentation improvements ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6), [#99](https://github.com/Galileo-Galilei/kedro-mlflow/issues/99))

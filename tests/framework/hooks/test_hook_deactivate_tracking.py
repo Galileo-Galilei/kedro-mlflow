@@ -253,11 +253,11 @@ def mock_session(
     # we need to patch "kedro.framework.session.session.validate_settings" instead of
     # "kedro.framework.project.validate_settings" because it is imported
     mocker.patch("kedro.framework.session.session.validate_settings")
-    # idem, we patch we need to patch "kedro.framework.session.session._register_hooks_setuptools" instead of
-    # "kedro.framework.hooks.manager._register_hooks_setuptools" because it is imported
+    # idem, we patch we need to patch "kedro.framework.session.session._register_hooks_entry_points" instead of
+    # "kedro.framework.hooks.manager._register_hooks_entry_points" because it is imported
 
     mocker.patch(
-        "kedro.framework.session.session._register_hooks_setuptools"
+        "kedro.framework.session.session._register_hooks_entry_points"
     )  # prevent registering the one of the plugins which are already installed
     configure_project(MOCK_PACKAGE_NAME)
     return KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path)

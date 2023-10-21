@@ -36,7 +36,7 @@ For consistency, you may want to log an inference pipeline (including some data 
 
     ```yaml
     label_encoder:
-    type: pickle.PickleDataset  # <- This must be any Kedro Dataset other than "MemoryDataSet"
+    type: pickle.PickleDataset  # <- This must be any Kedro Dataset other than "MemoryDataset"
     filepath: data/06_models/label_encoder.pkl  # <- This must be a local path, no matter what is your mlflow storage (S3 or other)
     ```
 

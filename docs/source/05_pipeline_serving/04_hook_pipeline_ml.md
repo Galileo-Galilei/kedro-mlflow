@@ -14,7 +14,6 @@ For consistency, you may want to log an inference pipeline (including some data 
 
 
     def register_pipelines(self) -> Dict[str, Pipeline]:
-
         ml_pipeline = create_ml_pipeline()
         training_pipeline_ml = pipeline_ml_factory(
             training=ml_pipeline.only_nodes_with_tags("training"),
@@ -37,7 +36,7 @@ For consistency, you may want to log an inference pipeline (including some data 
 
     ```yaml
     label_encoder:
-    type: pickle.PickleDataSet  # <- This must be any Kedro Dataset other than "MemoryDataSet"
+    type: pickle.PickleDataset  # <- This must be any Kedro Dataset other than "MemoryDataSet"
     filepath: data/06_models/label_encoder.pkl  # <- This must be a local path, no matter what is your mlflow storage (S3 or other)
     ```
 

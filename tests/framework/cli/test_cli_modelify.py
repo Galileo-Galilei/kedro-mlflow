@@ -78,7 +78,7 @@ def register_pipelines():
 
     catalog_yml = f"""
     trained_model:
-        type: pickle.PickleDataSet
+        type: pickle.PickleDataset
         filepath: {model_filepath}
     """
 
@@ -111,10 +111,10 @@ def kp_for_modelify_persistent_input(kp_for_modelify):
     data_filepath = (kp_for_modelify / "data" / "my_input_data.pkl").as_posix()
     catalog_yml = f"""
     trained_model:
-        type: pickle.PickleDataSet
+        type: pickle.PickleDataset
         filepath: {model_filepath}
     my_input_data:
-        type: pickle.PickleDataSet
+        type: pickle.PickleDataset
         filepath: {data_filepath}
     """
 
@@ -182,7 +182,7 @@ def register_pipelines():
 
     catalog_yml = f"""
     trained_model:
-        type: pickle.PickleDataSet
+        type: pickle.PickleDataset
         filepath: {model_filepath}
     """
 

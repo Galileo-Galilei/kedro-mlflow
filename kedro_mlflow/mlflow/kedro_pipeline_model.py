@@ -2,11 +2,11 @@ import logging
 from pathlib import Path
 from typing import Dict, Optional, Union
 
-from kedro.extras.datasets.pickle import PickleDataSet
 from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
+from kedro_datasets.pickle import PickleDataSet
 from mlflow.pyfunc import PythonModel
 
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML

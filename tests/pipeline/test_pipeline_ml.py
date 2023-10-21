@@ -1,7 +1,7 @@
 import pytest
-from kedro.extras.datasets.pandas import CSVDataSet
 from kedro.io import DataCatalog, MemoryDataSet
 from kedro.pipeline import Pipeline, node
+from kedro_datasets.pandas import CSVDataset
 
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import KedroMlflowPipelineMLError, PipelineML
@@ -199,7 +199,7 @@ def dummy_catalog():
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
-            "model": CSVDataSet("fake/path/to/model.csv"),
+            "model": CSVDataset("fake/path/to/model.csv"),
         }
     )
     return dummy_catalog
@@ -211,8 +211,8 @@ def catalog_with_encoder():
         {
             "raw_data": MemoryDataSet(),
             "data": MemoryDataSet(),
-            "encoder": CSVDataSet("fake/path/to/encoder.csv"),
-            "model": CSVDataSet("fake/path/to/model.csv"),
+            "encoder": CSVDataset("fake/path/to/encoder.csv"),
+            "model": CSVDataset("fake/path/to/model.csv"),
         }
     )
     return catalog_with_encoder
@@ -224,8 +224,8 @@ def catalog_with_stopwords():
         {
             "data": MemoryDataSet(),
             "cleaned_data": MemoryDataSet(),
-            "stopwords_from_nltk": CSVDataSet("fake/path/to/stopwords.csv"),
-            "model": CSVDataSet("fake/path/to/model.csv"),
+            "stopwords_from_nltk": CSVDataset("fake/path/to/stopwords.csv"),
+            "model": CSVDataset("fake/path/to/model.csv"),
         }
     )
     return catalog_with_stopwords
@@ -239,7 +239,7 @@ def catalog_with_parameters():
             "cleaned_data": MemoryDataSet(),
             "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
             "params:penalty": MemoryDataSet(0.1),
-            "model": CSVDataSet("fake/path/to/model.csv"),
+            "model": CSVDataset("fake/path/to/model.csv"),
             "params:threshold": MemoryDataSet(0.5),
         }
     )

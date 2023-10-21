@@ -8,7 +8,7 @@
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
 ```
 
@@ -18,7 +18,7 @@ or with additional parameters:
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: pandas.CSVDataSet  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
         load_args:
             sep: ;
@@ -33,10 +33,10 @@ or with the python API:
 
 ```python
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset
-from kedro.extras.datasets.pandas import CSVDataSet
+from kedro_datasets.pandas import CSVDataset
 
 csv_dataset = MlflowArtifactDataset(
-    data_set={"type": CSVDataSet, "filepath": r"/path/to/a/local/destination/file.csv"}
+    data_set={"type": CSVDataset, "filepath": r"/path/to/a/local/destination/file.csv"}
 )
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```

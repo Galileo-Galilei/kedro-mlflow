@@ -7,6 +7,7 @@
 - :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) as with new kedro conventions from ``kedro>=0.19`` ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
   - ``MlflowArtifactDataSet``->``MlflowArtifactDataset``
   - ``MlflowAbstractModelDataSet``->``MlflowAbstractModelDataset``
+  - ``MlflowModelRegistryDataSet``->``MlflowModelRegistryDataset``
   - ``MlflowMetricDataSet``->``MlflowMetricDataset``
   - ``MlflowMetricHistoryDataSet``->``MlflowMetricHistoryDataset``
   - ``MlflowMetricsDataSet``->``MlflowMetricsDataset``

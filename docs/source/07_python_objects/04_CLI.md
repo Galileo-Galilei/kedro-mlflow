@@ -47,7 +47,7 @@ will open the ui on port 5002.
 - ``--infer-input-example`` : A boolean which indicates if the input_example of the input data should be inferred for mlflow or not
 - ``--run-id``, ``-r`` : The id of the mlflow run where the model will be logged. If unspecified, the command creates a new run.
 - ``--run-name``: The name of the mlflow run where the model will be logged. Defaults to "modelify".
-- ``--copy-mode`` : The copy mode to use when replacing each dataset by a ``MemoryDataSet``. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.
+- ``--copy-mode`` : The copy mode to use when replacing each dataset by a ``MemoryDataset``. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.
 - ``--artifact-path" : The artifact path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
 - ``--code-path`` : The code path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
 - ``--conda-env`` : "The conda environment of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model

@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 from kedro.framework.hooks import _create_hook_manager
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
 from kedro_datasets.pickle import PickleDataSet
@@ -65,7 +65,7 @@ class KedroPipelineModel(PythonModel):
         # TODO: we need to use the runner's default dataset in case of multithreading
         self.loaded_catalog = DataCatalog(
             data_sets={
-                name: MemoryDataSet(copy_mode=copy_mode)
+                name: MemoryDataset(copy_mode=copy_mode)
                 for name, copy_mode in self.copy_mode.items()
             }
         )
@@ -112,18 +112,18 @@ class KedroPipelineModel(PythonModel):
                 # extra uneccessary dependencies: this dataset will be replaced at
                 # inference time and we do not need to know the original type, see
                 # https://github.com/Galileo-Galilei/kedro-mlflow/issues/273
-                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataSet())
+                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataset())
             else:
                 try:
                     data_set = catalog._data_sets[data_set_name]
                     if isinstance(
-                        data_set, MemoryDataSet
+                        data_set, MemoryDataset
                     ) and not data_set_name.startswith("params:"):
                         raise KedroPipelineModelError(
                             """
                                 The datasets of the training pipeline must be persisted locally
                                 to be used by the inference pipeline. You must enforce them as
-                                non 'MemoryDataSet' in the 'catalog.yml'.
+                                non 'MemoryDataset' in the 'catalog.yml'.
                                 Dataset '{data_set_name}' is not persisted currently.
                                 """.format(
                                 data_set_name=data_set_name
@@ -162,7 +162,7 @@ class KedroPipelineModel(PythonModel):
                         "at the following location: f'{artifact_path}'"
                     )
                 else:
-                    # In this second case, we know it cannot be a MemoryDataSet
+                    # In this second case, we know it cannot be a MemoryDataset
                     # weird bug when directly converting PurePosixPath to windows: it is considered as relative
                     artifact_path = (
                         Path(dataset._filepath.as_posix()).resolve().as_uri()

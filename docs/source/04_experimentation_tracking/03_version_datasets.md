@@ -14,9 +14,9 @@ Artifacts are a very flexible and convenient way to "bind" any data type to your
 
 ## How to version data in a kedro project?
 
-``kedro-mlflow`` introduces a new ``AbstractDataSet`` called ``MlflowArtifactDataset``. It is a wrapper for any ``AbstractDataSet`` which decorates the underlying dataset ``save`` method and logs the file automatically in mlflow as an artifact each time the ``save`` method is called.
+``kedro-mlflow`` introduces a new ``AbstractDataset`` called ``MlflowArtifactDataset``. It is a wrapper for any ``AbstractDataset`` which decorates the underlying dataset ``save`` method and logs the file automatically in mlflow as an artifact each time the ``save`` method is called.
 
-Since it is an ``AbstractDataSet``, it can be used with the YAML API. Assume that you have the following entry in the ``catalog.yml``:
+Since it is an ``AbstractDataset``, it can be used with the YAML API. Assume that you have the following entry in the ``catalog.yml``:
 
 ```yaml
 my_dataset_to_version:
@@ -57,7 +57,7 @@ my_dataset_to_version:
 
 ### Can I use the ``MlflowArtifactDataset`` in interactive mode?
 
-Like all Kedro ``AbstractDataSet``, ``MlflowArtifactDataset`` is callable in the python API:
+Like all Kedro ``AbstractDataset``, ``MlflowArtifactDataset`` is callable in the python API:
 
 ```python
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset

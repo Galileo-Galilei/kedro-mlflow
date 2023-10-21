@@ -35,7 +35,7 @@ class MlflowModelRegistryDataset(MlflowModelRegistryDataset):
                 function from specified `flavor`. Defaults to None.
 
         Raises:
-            DataSetError: When passed `flavor` does not exist.
+            DatasetError: When passed `flavor` does not exist.
         """
         super().__init__(
             filepath="",

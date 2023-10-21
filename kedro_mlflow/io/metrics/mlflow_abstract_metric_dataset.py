@@ -1,11 +1,11 @@
 from typing import Any, Dict, Union
 
 import mlflow
-from kedro.io import AbstractDataSet
+from kedro.io import AbstractDataset
 from mlflow.tracking import MlflowClient
 
 
-class MlflowAbstractMetricDataset(AbstractDataSet):
+class MlflowAbstractMetricDataset(AbstractDataset):
     def __init__(
         self,
         key: str = None,

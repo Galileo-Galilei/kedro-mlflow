@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
 from kedro_datasets.pickle import PickleDataSet
@@ -88,9 +88,9 @@ def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
-            "params:unused_param": MemoryDataSet("blah"),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
+            "params:unused_param": MemoryDataset("blah"),
+            "data": MemoryDataset(),
             "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
         }
     )
@@ -340,14 +340,14 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
 
         catalog_with_parameters = DataCatalog(
             {
-                "data": MemoryDataSet(pd.DataFrame(data=[1], columns=["a"])),
-                "cleaned_data": MemoryDataSet(),
-                "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
-                "params:penalty": MemoryDataSet(0.1),
+                "data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
+                "cleaned_data": MemoryDataset(),
+                "params:stopwords": MemoryDataset(["Hello", "Hi"]),
+                "params:penalty": MemoryDataset(0.1),
                 "model": PickleDataSet(
                     (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
                 ),
-                "params:threshold": MemoryDataSet(0.5),
+                "params:threshold": MemoryDataset(0.5),
             }
         )
 

@@ -3,11 +3,11 @@ from importlib.util import find_spec
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from kedro.io import AbstractVersionedDataSet, Version
-from kedro.io.core import DataSetError
+from kedro.io import AbstractVersionedDataset, Version
+from kedro.io.core import DatasetError
 
 
-class MlflowModelRegistryDataset(AbstractVersionedDataSet):
+class MlflowModelRegistryDataset(AbstractVersionedDataset):
     """
     Absract mother class for model datasets.
     """
@@ -41,7 +41,7 @@ class MlflowModelRegistryDataset(AbstractVersionedDataSet):
             version (Version, optional): Specific version to load.
 
         Raises:
-            DataSetError: When passed `flavor` does not exist.
+            DatasetError: When passed `flavor` does not exist.
         """
 
         super().__init__(Path(filepath), version)
@@ -54,7 +54,7 @@ class MlflowModelRegistryDataset(AbstractVersionedDataSet):
             "python_model",
             "loader_module",
         ):
-            raise DataSetError(
+            raise DatasetError(
                 "PyFunc models require specifying `pyfunc_workflow` "
                 "(set to either `python_model` or `loader_module`)"
             )
@@ -65,7 +65,7 @@ class MlflowModelRegistryDataset(AbstractVersionedDataSet):
         try:
             self._mlflow_model_module
         except ImportError as err:
-            raise DataSetError(err)
+            raise DatasetError(err)
 
     # we want to be able to turn logging off for an entire pipeline run
     # To avoid that a single call to a dataset in the catalog creates a new run automatically

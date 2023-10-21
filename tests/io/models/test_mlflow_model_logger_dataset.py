@@ -3,8 +3,8 @@ from tempfile import TemporaryDirectory
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import DataCatalog, MemoryDataSet
-from kedro.io.core import DataSetError
+from kedro.io import DataCatalog, MemoryDataset
+from kedro.io.core import DatasetError
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
@@ -98,8 +98,8 @@ def pipeline_inference(pipeline_ml_obj):
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "model": PickleDataSet(
                 filepath=(tmp_path / "data" / "06_models" / "model.pkl")
                 .resolve()
@@ -124,7 +124,7 @@ def kedro_pipeline_model(pipeline_ml_obj, dummy_catalog):
 
 
 def test_flavor_does_not_exists():
-    with pytest.raises(DataSetError, match="'mlflow.whoops' module not found"):
+    with pytest.raises(DatasetError, match="'mlflow.whoops' module not found"):
         MlflowModelLoggerDataSet.from_config(
             name="whoops",
             config={
@@ -164,7 +164,7 @@ def test_save_sklearn_flavor_with_run_id_and_already_active_run(tracking_uri):
     # if a run is active, it is impossible to log in another run
     with mlflow.start_run():
         with pytest.raises(
-            DataSetError,
+            DatasetError,
             match="'run_id' cannot be specified if there is an mlflow active run.",
         ):
             mlflow_model_ds.save(linreg_model)
@@ -280,7 +280,7 @@ def test_load_without_run_id_nor_active_run(tracking_uri):
     mlflow_model_ds = MlflowModelLoggerDataSet.from_config(**model_config)
 
     with pytest.raises(
-        DataSetError,
+        DatasetError,
         match="To access the model_uri, you must either",
     ):
         mlflow_model_ds.load()
@@ -353,7 +353,7 @@ def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
         },
     }
     with pytest.raises(
-        DataSetError,
+        DatasetError,
         match=r"PyFunc models require specifying `pyfunc_workflow` \(set to either `python_model` or `loader_module`\)",
     ):
         MlflowModelLoggerDataSet.from_config(**model_config)

@@ -2,7 +2,7 @@ from typing import Dict, List, Optional, Union
 
 import mlflow
 import pytest
-from kedro.io import DataSetError
+from kedro.io import DatasetError
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
@@ -164,7 +164,7 @@ def test_mlflow_metrics_dataset_fails_with_invalid_metric(
     mlflow_metrics_dataset = MlflowMetricsDataset(prefix="test_metric")
 
     with pytest.raises(
-        DataSetError, match="Unexpected metric value. Should be of type"
+        DatasetError, match="Unexpected metric value. Should be of type"
     ):
         mlflow_metrics_dataset.save(
             {"metric1": 1}
@@ -179,23 +179,19 @@ def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
 
     mlflow_metrics_dataset._logging_activated = False
 
-    all_runs_id_beginning = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.search_experiments()))
-            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
-        ]
-    )
+    all_runs_id_beginning = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     mlflow_metrics_dataset.save(metrics)
 
-    all_runs_id_end = set(
-        [
-            run.run_id
-            for k in range(len(mlflow_client.search_experiments()))
-            for run in mlflow_client.search_runs(experiment_ids=f"{k}")
-        ]
-    )
+    all_runs_id_end = {
+        run.run_id
+        for k in range(len(mlflow_client.search_experiments()))
+        for run in mlflow_client.search_runs(experiment_ids=f"{k}")
+    }
 
     assert all_runs_id_beginning == all_runs_id_end
 

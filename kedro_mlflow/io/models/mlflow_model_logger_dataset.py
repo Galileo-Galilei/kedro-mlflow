@@ -1,7 +1,7 @@
 from typing import Any, Dict, Optional
 
 import mlflow
-from kedro.io.core import DataSetError
+from kedro.io.core import DatasetError
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
     MlflowModelRegistryDataset,
@@ -42,7 +42,7 @@ class MlflowModelLoggerDataSet(MlflowModelRegistryDataset):
                 function from specified `flavor`. Defaults to None.
 
         Raises:
-            DataSetError: When passed `flavor` does not exist.
+            DatasetError: When passed `flavor` does not exist.
         """
         super().__init__(
             filepath="",
@@ -68,7 +68,7 @@ class MlflowModelLoggerDataSet(MlflowModelRegistryDataset):
         elif mlflow.active_run() is not None:
             run_id = mlflow.active_run().info.run_id
         if run_id is None:
-            raise DataSetError(
+            raise DatasetError(
                 "To access the model_uri, you must either: "
                 "\n -  specifiy 'run_id' "
                 "\n - have an active run to retrieve data from"
@@ -101,7 +101,7 @@ class MlflowModelLoggerDataSet(MlflowModelRegistryDataset):
         if self._run_id:
             if mlflow.active_run():
                 # it is not possible to log in a run which is not the current opened one
-                raise DataSetError(
+                raise DatasetError(
                     "'run_id' cannot be specified"
                     " if there is an mlflow active run."
                     "Run_id mismatch: "

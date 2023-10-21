@@ -41,7 +41,7 @@ class MlflowModelSaverDataSet(MlflowModelRegistryDataset):
                 function from specified `flavor`. Defaults to None.
             version (Version, optional): Kedro version to use. Defaults to None.
         Raises:
-            DataSetError: When passed `flavor` does not exist.
+            DatasetError: When passed `flavor` does not exist.
         """
         super().__init__(
             filepath=filepath,

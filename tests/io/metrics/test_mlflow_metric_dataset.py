@@ -1,6 +1,6 @@
 import mlflow
 import pytest
-from kedro.io.core import DataSetError
+from kedro.io.core import DatasetError
 from mlflow.tracking import MlflowClient
 
 from kedro_mlflow.io.metrics import MlflowMetricDataset
@@ -20,7 +20,7 @@ def mlflow_client(mlflow_tracking_uri):
 
 
 def test_mlflow_wrong_save_mode():
-    with pytest.raises(DataSetError, match=r"save_args\['mode'\] must be one of"):
+    with pytest.raises(DatasetError, match=r"save_args\['mode'\] must be one of"):
         metric_ds = MlflowMetricDataset(key="my_metric", save_args={"mode": "bad_mode"})
         with mlflow.start_run():
             metric_ds.save(0.3)
@@ -29,7 +29,7 @@ def test_mlflow_wrong_save_mode():
 def test_mlflow_metric_dataset_save_without_active_run_or_run_id():
     metric_ds = MlflowMetricDataset(key="my_metric")
     with pytest.raises(
-        DataSetError,
+        DatasetError,
         match="You must either specify a run_id or have a mlflow active run opened",
     ):
         metric_ds.save(0.3)

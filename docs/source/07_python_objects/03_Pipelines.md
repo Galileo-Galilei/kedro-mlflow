@@ -34,8 +34,8 @@ Now each time you will run ``kedro run --pipeline=training`` (provided you regis
 
 Note that:
 
-- the `inference` pipeline `input_name` can be a `MemoryDataSet` and it belongs to inference pipeline `inputs`
-- Apart form `input_name`, all other `inference` pipeline `inputs` must be persisted locally on disk (i.e. it must not be `MemoryDataSet` and must have a local `filepath`)
+- the `inference` pipeline `input_name` can be a `MemoryDataset` and it belongs to inference pipeline `inputs`
+- Apart form `input_name`, all other `inference` pipeline `inputs` must be persisted locally on disk (i.e. it must not be `MemoryDataset` and must have a local `filepath`)
 - the `inference` pipeline `inputs` must belong to training `outputs` (vectorizer, binarizer, machine learning model...)
 - the `inference` pipeline must have one and only one `output`
 
@@ -66,7 +66,7 @@ mlflow.pyfunc.log_model(
 )
 ```
 
-It is also possible to pass arguments to `KedroPipelineModel` to specify the runner or the copy_mode of MemoryDataSet for the inference Pipeline. This may be faster especially for  compiled model (e.g keras, tensorflow), and more suitable for an API serving pattern.
+It is also possible to pass arguments to `KedroPipelineModel` to specify the runner or the copy_mode of MemoryDataset for the inference Pipeline. This may be faster especially for  compiled model (e.g keras, tensorflow), and more suitable for an API serving pattern.
 
 ```python
 KedroPipelineModel(pipeline=pipeline_training, catalog=catalog, copy_mode="assign")

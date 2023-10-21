@@ -6,7 +6,7 @@ from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro.runner import SequentialRunner
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.io.metrics import (
@@ -104,7 +104,7 @@ def dummy_catalog(tmp_path):
             "raw_data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
             "params:unused_param": MemoryDataset("blah"),
             "data": MemoryDataset(),
-            "model": PickleDataSet((tmp_path / "model.csv").as_posix()),
+            "model": PickleDataset((tmp_path / "model.csv").as_posix()),
             "my_metrics": MlflowMetricsDataset(),
             "another_metrics": MlflowMetricsDataset(prefix="foo"),
             "my_metric": MlflowMetricDataset(),
@@ -178,7 +178,7 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
                 "raw_data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
                 "params:unused_param": MemoryDataset("blah"),
                 "data": MemoryDataset(),
-                "model": PickleDataSet(
+                "model": PickleDataset(
                     (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
                 ),
                 "my_metrics": MlflowMetricsDataset(run_id=existing_run_id),

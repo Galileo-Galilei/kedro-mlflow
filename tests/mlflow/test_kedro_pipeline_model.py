@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 from sklearn.linear_model import LinearRegression
 
 from kedro_mlflow.io.models import MlflowModelSaverDataSet
@@ -162,8 +162,8 @@ def catalog_with_encoder(tmp_path):
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "encoder": PickleDataSet((tmp_path / "encoder.pkl").resolve().as_posix()),
-            "model": PickleDataSet((tmp_path / "model.pkl").resolve().as_posix()),
+            "encoder": PickleDataset((tmp_path / "encoder.pkl").resolve().as_posix()),
+            "model": PickleDataset((tmp_path / "model.pkl").resolve().as_posix()),
         }
     )
     return catalog_with_encoder
@@ -175,10 +175,10 @@ def catalog_with_stopwords(tmp_path):
         {
             "data": MemoryDataset(),
             "cleaned_data": MemoryDataset(),
-            "stopwords_from_nltk": PickleDataSet(
+            "stopwords_from_nltk": PickleDataset(
                 (tmp_path / "stopwords.pkl").resolve().as_posix()
             ),
-            "model": PickleDataSet((tmp_path / "model.pkl").resolve().as_posix()),
+            "model": PickleDataset((tmp_path / "model.pkl").resolve().as_posix()),
         }
     )
     return catalog_with_stopwords
@@ -192,7 +192,7 @@ def catalog_with_parameters(tmp_path):
             "cleaned_data": MemoryDataset(),
             "params:stopwords": MemoryDataset(["Hello", "Hi"]),
             "params:penalty": MemoryDataset(0),
-            "model": PickleDataSet((tmp_path / "model.pkl").resolve().as_posix()),
+            "model": PickleDataset((tmp_path / "model.pkl").resolve().as_posix()),
             "params:threshold": MemoryDataset(0.5),
         }
     )
@@ -243,7 +243,7 @@ def dummy_catalog(tmp_path):
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "model": PickleDataSet(
+            "model": PickleDataset(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
         }
@@ -321,11 +321,11 @@ def test_kedro_pipeline_model_with_wrong_copy_mode_type(
 def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
     catalog = DataCatalog(
         {
-            "raw_data": PickleDataSet(
+            "raw_data": PickleDataset(
                 filepath=(tmp_path / "raw_data.pkl").resolve().as_posix()
             ),
             "data": MemoryDataset(),
-            "model": PickleDataSet(
+            "model": PickleDataset(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
         }
@@ -371,7 +371,7 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "model": PickleDataSet(
+            "model": PickleDataset(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
         }

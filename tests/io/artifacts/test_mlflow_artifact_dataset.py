@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 from kedro.io import PartitionedDataset
 from kedro_datasets.pandas import CSVDataset
-from kedro_datasets.pickle import PickleDataSet
+from kedro_datasets.pickle import PickleDataset
 from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
@@ -32,13 +32,13 @@ def df2():
     [
         (CSVDataset, ".csv", lazy_fixture("df1"), None),
         ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), None),
-        (PickleDataSet, ".pkl", lazy_fixture("df1"), None),
-        ("pickle.PickleDataSet", ".pkl", lazy_fixture("df1"), None),
+        (PickleDataset, ".pkl", lazy_fixture("df1"), None),
+        ("pickle.PickleDataset", ".pkl", lazy_fixture("df1"), None),
         (CSVDataset, ".csv", lazy_fixture("df1"), "artifact_dir"),
         ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), "artifact_dir"),
-        (PickleDataSet, ".pkl", lazy_fixture("df1"), "artifact_dir"),
+        (PickleDataset, ".pkl", lazy_fixture("df1"), "artifact_dir"),
         (
-            "pickle.PickleDataSet",
+            "pickle.PickleDataset",
             ".pkl",
             lazy_fixture("df1"),
             "artifact_dir",
@@ -173,7 +173,7 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
 
 def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
     mlflow_pkl_dataset = MlflowArtifactDataset(
-        data_set=dict(type=PickleDataSet, filepath=(tmp_path / "df1.csv").as_posix())
+        data_set=dict(type=PickleDataset, filepath=(tmp_path / "df1.csv").as_posix())
     )
 
     mlflow.set_tracking_uri(tracking_uri.as_uri())

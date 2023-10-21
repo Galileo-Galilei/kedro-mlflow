@@ -2,16 +2,14 @@
 
 ## [Unreleased]
 
-
 - :sparkles: Add support for python 3.11 ([#450,rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
-- :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) as with new kedro conventions from ``kedro>=0.19`` ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
+- :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) to match new kedro conventions from ``kedro>=0.19`` and onwards ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
   - ``MlflowArtifactDataSet``->``MlflowArtifactDataset``
   - ``MlflowAbstractModelDataSet``->``MlflowAbstractModelDataset``
   - ``MlflowModelRegistryDataSet``->``MlflowModelRegistryDataset``
   - ``MlflowMetricDataSet``->``MlflowMetricDataset``
   - ``MlflowMetricHistoryDataSet``->``MlflowMetricHistoryDataset``
   - ``MlflowMetricsDataSet``->``MlflowMetricsDataset``
-
 
 ## [0.11.10] - 2023-10-03
 

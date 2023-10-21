@@ -3,7 +3,7 @@ from itertools import chain
 from typing import Any, Dict, Generator, List, Optional, Tuple, Union
 
 import mlflow
-from kedro.io import AbstractDataSet, DataSetError
+from kedro.io import AbstractDataset, DatasetError
 from mlflow.tracking import MlflowClient
 
 MetricItem = Union[Dict[str, float], List[Dict[str, float]]]
@@ -11,7 +11,7 @@ MetricTuple = Tuple[str, float, int]
 MetricsDict = Dict[str, MetricItem]
 
 
-class MlflowMetricsDataset(AbstractDataSet):
+class MlflowMetricsDataset(AbstractDataset):
     """This class represent MLflow metrics dataset."""
 
     def __init__(
@@ -35,7 +35,7 @@ class MlflowMetricsDataset(AbstractDataSet):
 
         If active run is not found, tries to find last experiment.
 
-        Raise `DataSetError` exception if run id can't be found.
+        Raise `DatasetError` exception if run id can't be found.
 
         Returns:
             str: String contains run_id.
@@ -45,7 +45,7 @@ class MlflowMetricsDataset(AbstractDataSet):
         run = mlflow.active_run()
         if run:
             return run.info.run_id
-        raise DataSetError("Cannot find run id.")
+        raise DatasetError("Cannot find run id.")
 
     @run_id.setter
     def run_id(self, run_id):
@@ -95,7 +95,7 @@ class MlflowMetricsDataset(AbstractDataSet):
         client = MlflowClient()
         try:
             run_id = self.run_id
-        except DataSetError:
+        except DatasetError:
             # If run_id can't be found log_metric would create new run.
             run_id = None
 
@@ -191,6 +191,6 @@ class MlflowMetricsDataset(AbstractDataSet):
             return (i for i in [(key, value["value"], value["step"])])
         if isinstance(value, list) and len(value) > 0:
             return ((key, x["value"], x["step"]) for x in value)
-        raise DataSetError(
+        raise DatasetError(
             f"Unexpected metric value. Should be of type `{MetricItem}`, got {type(value)}"
         )

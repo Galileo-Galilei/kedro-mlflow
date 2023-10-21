@@ -2,7 +2,7 @@ import mlflow
 import pytest
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 
 from kedro_mlflow.framework.hooks import MlflowHook
@@ -53,8 +53,8 @@ def dummy_catalog():
     catalog = DataCatalog(
         {
             "params:param1": 1,
-            "foo": MemoryDataSet(),
-            "bar": MemoryDataSet(),
+            "foo": MemoryDataset(),
+            "bar": MemoryDataset(),
             "parameters": {"param1": 1, "param2": 2},
         }
     )

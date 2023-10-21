@@ -1,5 +1,5 @@
 import pytest
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pandas import CSVDataset
 
@@ -197,8 +197,8 @@ def pipeline_ml_with_parameters():
 def dummy_catalog():
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "model": CSVDataset("fake/path/to/model.csv"),
         }
     )
@@ -209,8 +209,8 @@ def dummy_catalog():
 def catalog_with_encoder():
     catalog_with_encoder = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "encoder": CSVDataset("fake/path/to/encoder.csv"),
             "model": CSVDataset("fake/path/to/model.csv"),
         }
@@ -222,8 +222,8 @@ def catalog_with_encoder():
 def catalog_with_stopwords():
     catalog_with_stopwords = DataCatalog(
         {
-            "data": MemoryDataSet(),
-            "cleaned_data": MemoryDataSet(),
+            "data": MemoryDataset(),
+            "cleaned_data": MemoryDataset(),
             "stopwords_from_nltk": CSVDataset("fake/path/to/stopwords.csv"),
             "model": CSVDataset("fake/path/to/model.csv"),
         }
@@ -235,12 +235,12 @@ def catalog_with_stopwords():
 def catalog_with_parameters():
     catalog_with_parameters = DataCatalog(
         {
-            "data": MemoryDataSet(),
-            "cleaned_data": MemoryDataSet(),
-            "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
-            "params:penalty": MemoryDataSet(0.1),
+            "data": MemoryDataset(),
+            "cleaned_data": MemoryDataset(),
+            "params:stopwords": MemoryDataset(["Hello", "Hi"]),
+            "params:penalty": MemoryDataset(0.1),
             "model": CSVDataset("fake/path/to/model.csv"),
-            "params:threshold": MemoryDataSet(0.5),
+            "params:threshold": MemoryDataset(0.5),
         }
     )
     return catalog_with_parameters

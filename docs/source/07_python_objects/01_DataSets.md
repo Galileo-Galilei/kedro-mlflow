@@ -2,7 +2,7 @@
 
 ## ``MlflowArtifactDataset``
 
-``MlflowArtifactDataset`` is a wrapper for any ``AbstractDataSet`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
+``MlflowArtifactDataset`` is a wrapper for any ``AbstractDataset`` which logs the dataset automatically in mlflow as an artifact when its ``save`` method is called. It can be used both with the YAML API:
 
 ```yaml
 my_dataset_to_version:
@@ -138,7 +138,7 @@ mlflow_model_logger = MlflowModelSaverDataSet(
 mlflow_model_logger.save(LinearRegression().fit(data))
 ```
 
-The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataSet`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataSet.html)
+The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataset`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataset.html)
 
 ```python
 mlflow_model_logger = MlflowModelSaverDataSet(

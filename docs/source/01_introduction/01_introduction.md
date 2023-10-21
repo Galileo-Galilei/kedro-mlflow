@@ -23,11 +23,11 @@ While ``Kedro`` and ``Mlflow`` do not compete in the same field, they provide so
 
 | Functionality                  | Kedro                                             | Mlflow                                                                              |
 | :----------------------------- | :------------------------------------------------ | :---------------------------------------------------------------------------------- |
-| I/O abstraction                | various ``AbstractDataSet``                       | N/A                                                                                 |
+| I/O abstraction                | various ``AbstractDataset``                       | N/A                                                                                 |
 | I/O configuration files        | - ``catalog.yml`` <br> - ``parameters.yml``       | ``MLproject``                                                                       |
 | Compute abstraction            | - ``Pipeline`` <br> - ``Node``                    | N/A                                                                                 |
 | Compute configuration files    | - ``hooks.py`` <br> - ``run.py``                  | `MLproject`                                                                         |
-| Parameters and data versioning | - ``Journal`` <br> - ``AbstractVersionedDataSet`` | - ``log_metric``<br> - ``log_artifact``<br> - ``log_param``                         |
+| Parameters and data versioning | - ``Journal`` <br> - ``AbstractVersionedDataset`` | - ``log_metric``<br> - ``log_artifact``<br> - ``log_param``                         |
 | Cli execution                  | command ``kedro run``                             | command ``mlflow run``                                                              |
 | Code packaging                 | command ``kedro package``                         | N/A                                                                                 |
 | Model packaging                | N/A                                               | - ``Mlflow Models`` (``mlflow.XXX.log_model`` functions) <br> - ``Mlflow Flavours`` |
@@ -40,7 +40,7 @@ We discuss hereafter how the two libraries compete on the different functionalit
 ``Mlflow`` and ``Kedro`` are essentially overlapping on the way they offer a dedicated configuration files for running the pipeline from CLI. However:  
 
 - ``Mlflow`` provides a single configuration file (the ``MLProject``) where all elements are declared (data, parameters and pipelines). Its goal is mainly to enable CLI execution of the project, but it is not very flexible. In my opinion, this file is **production oriented** and is not really intended to use for exploration.
-- ``Kedro`` offers a bunch of files (``catalog.yml``, ``parameters.yml``, ``pipeline.py``) and their associated abstraction (``AbstractDataSet``, ``DataCatalog``, ``Pipeline`` and ``node`` objects). ``Kedro`` is much more opinionated: each object has a dedicated place (and only one!) in the template. This makes the framework both **exploration and production oriented**. The downside is that it could make the learning curve a bit sharper since a newcomer has to learn all ``Kedro`` specifications. It also provides a ``kedro-viz`` plugin to visualize the DAG interactively, which is particularly handy in medium-to-big projects.
+- ``Kedro`` offers a bunch of files (``catalog.yml``, ``parameters.yml``, ``pipeline.py``) and their associated abstraction (``AbstractDataset``, ``DataCatalog``, ``Pipeline`` and ``node`` objects). ``Kedro`` is much more opinionated: each object has a dedicated place (and only one!) in the template. This makes the framework both **exploration and production oriented**. The downside is that it could make the learning curve a bit sharper since a newcomer has to learn all ``Kedro`` specifications. It also provides a ``kedro-viz`` plugin to visualize the DAG interactively, which is particularly handy in medium-to-big projects.
 
 
 > **``Kedro`` is a clear winner here, since it provides more functionnalities than ``Mlflow``. It handles very well _by design_ the exploration phase of data science projects when Mlflow is less flexible.**
@@ -52,7 +52,7 @@ We discuss hereafter how the two libraries compete on the different functionalit
 The ``Kedro`` ``Journal`` aimed at reproducibility (it was removed in ``kedro==0.18``), but is not focused on machine learning. The `Journal` keeps track of two elements:
 
 - the CLI arguments, including *on the fly* parameters. This makes the command used to run the pipeline fully reproducible.
-- the ``AbstractVersionedDataSet`` for which versioning is activated. It consists in copying the data whom ``versioned`` argument is ``True`` when the ``save`` method of the ``AbstractVersionedDataSet`` is called.
+- the ``AbstractVersionedDataset`` for which versioning is activated. It consists in copying the data whom ``versioned`` argument is ``True`` when the ``save`` method of the ``AbstractVersionedDataset`` is called.
 This approach suffers from two main drawbacks:
   - the configuration is assumed immutable (including parameters), which is not realistic ni machine learning projects where they are very volatile. To fix this, the ``git sha`` has been recently added to the ``Journal``, but it has still some bugs in my experience (including the fact that the current ``git sha`` is logged even if the pipeline is ran with uncommitted change, which prevents reproducibility). This is still recent and will likely evolve in the future.
   - there is no support for browsing old runs, which prevents [cleaning the database with old and unused datasets](https://github.com/quantumblacklabs/kedro/issues/406), compare runs between each other...

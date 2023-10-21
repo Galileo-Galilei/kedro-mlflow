@@ -3,13 +3,13 @@ from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
-from kedro.io import AbstractVersionedDataSet
+from kedro.io import AbstractVersionedDataset
 from kedro.io.core import parse_dataset_definition
 from mlflow.tracking import MlflowClient
 
 
-class MlflowArtifactDataset(AbstractVersionedDataSet):
-    """This class is a wrapper for any kedro AbstractDataSet.
+class MlflowArtifactDataset(AbstractVersionedDataset):
+    """This class is a wrapper for any kedro AbstractDataset.
     It decorates their ``save`` method to log the dataset in mlflow when ``save`` is called.
     """
 
@@ -23,7 +23,7 @@ class MlflowArtifactDataset(AbstractVersionedDataSet):
         data_set, data_set_args = parse_dataset_definition(config=data_set)
 
         # fake inheritance : this mlflow class should be a mother class which wraps
-        # all dataset (i.e. it should replace AbstractVersionedDataSet)
+        # all dataset (i.e. it should replace AbstractVersionedDataset)
         # instead and since we can't modify the core package,
         # we create a subclass which inherits dynamically from the data_set class
         class MlflowArtifactDatasetChildren(data_set):
@@ -49,13 +49,13 @@ class MlflowArtifactDataset(AbstractVersionedDataSet):
                 # _get_save_path needs to be called before super, otherwise
                 # it will throw exception that file under path already exist.
                 if hasattr(self, "_version"):
-                    # all kedro datasets inherits from AbstractVersionedDataSet
+                    # all kedro datasets inherits from AbstractVersionedDataset
                     local_path = self._get_save_path()
                 elif hasattr(self, "_filepath"):
-                    # in case custom datasets inherits from AbstractDataSet without versioning
+                    # in case custom datasets inherits from AbstractDataset without versioning
                     local_path = self._filepath  # pragma: no cover
                 elif hasattr(self, "_path"):
-                    # special datasets with a folder instead of a specifi files like PartitionedDataSet
+                    # special datasets with a folder instead of a specific files like PartitionedDataset
                     local_path = Path(self._path)
 
                 # it must be converted to a string with as_posix()
@@ -83,13 +83,13 @@ class MlflowArtifactDataset(AbstractVersionedDataSet):
                     # there are a lot of chances that it has not been saved yet!
 
                     if hasattr(self, "_version"):
-                        # all kedro datasets inherits from AbstractVersionedDataSet
+                        # all kedro datasets inherits from AbstractVersionedDataset
                         local_path = self._get_load_path()
                     elif hasattr(self, "_filepath"):
-                        # in case custom datasets inherits from AbstractDataSet without versioning
+                        # in case custom datasets inherits from AbstractDataset without versioning
                         local_path = self._filepath  # pragma: no cover
                     elif hasattr(self, "_path"):
-                        # special datasets with a folder instead of a specifi files like PartitionedDataSet
+                        # special datasets with a folder instead of a specific files like PartitionedDataset
                         local_path = Path(self._path)
 
                     # BEWARE: we must enforce Path(local_path) because it is a PurePosixPath which fails on windows

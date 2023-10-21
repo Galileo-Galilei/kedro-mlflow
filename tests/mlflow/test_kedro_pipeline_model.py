@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataSet
 from sklearn.linear_model import LinearRegression
@@ -160,8 +160,8 @@ def pipeline_inference_with_parameters():
 def catalog_with_encoder(tmp_path):
     catalog_with_encoder = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "encoder": PickleDataSet((tmp_path / "encoder.pkl").resolve().as_posix()),
             "model": PickleDataSet((tmp_path / "model.pkl").resolve().as_posix()),
         }
@@ -173,8 +173,8 @@ def catalog_with_encoder(tmp_path):
 def catalog_with_stopwords(tmp_path):
     catalog_with_stopwords = DataCatalog(
         {
-            "data": MemoryDataSet(),
-            "cleaned_data": MemoryDataSet(),
+            "data": MemoryDataset(),
+            "cleaned_data": MemoryDataset(),
             "stopwords_from_nltk": PickleDataSet(
                 (tmp_path / "stopwords.pkl").resolve().as_posix()
             ),
@@ -188,12 +188,12 @@ def catalog_with_stopwords(tmp_path):
 def catalog_with_parameters(tmp_path):
     catalog_with_parameters = DataCatalog(
         {
-            "data": MemoryDataSet(),
-            "cleaned_data": MemoryDataSet(),
-            "params:stopwords": MemoryDataSet(["Hello", "Hi"]),
-            "params:penalty": MemoryDataSet(0),
+            "data": MemoryDataset(),
+            "cleaned_data": MemoryDataset(),
+            "params:stopwords": MemoryDataset(["Hello", "Hi"]),
+            "params:penalty": MemoryDataset(0),
             "model": PickleDataSet((tmp_path / "model.pkl").resolve().as_posix()),
-            "params:threshold": MemoryDataSet(0.5),
+            "params:threshold": MemoryDataset(0.5),
         }
     )
     return catalog_with_parameters
@@ -241,8 +241,8 @@ def pipeline_ml_obj():
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "model": PickleDataSet(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
@@ -324,7 +324,7 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
             "raw_data": PickleDataSet(
                 filepath=(tmp_path / "raw_data.pkl").resolve().as_posix()
             ),
-            "data": MemoryDataSet(),
+            "data": MemoryDataset(),
             "model": PickleDataSet(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
@@ -340,7 +340,7 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
         .resolve()
         .as_uri()  # weird bug when directly converting PurePosixPath to windows: it is considered as relative
         for name, dataset in catalog._data_sets.items()
-        if not isinstance(dataset, MemoryDataSet)
+        if not isinstance(dataset, MemoryDataset)
     }
 
     kedro_model = KedroPipelineModel(
@@ -369,8 +369,8 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
 def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
     catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "model": PickleDataSet(
                 filepath=(tmp_path / "model.pkl").resolve().as_posix()
             ),
@@ -440,7 +440,7 @@ def test_kedro_pipeline_ml_loading_deepcopiable_catalog(tmp_path, tmp_folder):
     model_dataset.save(linreg)
 
     # check that mlflow loading is ok
-    catalog = DataCatalog({"data": MemoryDataSet(), "model": model_dataset})
+    catalog = DataCatalog({"data": MemoryDataset(), "model": model_dataset})
 
     kedro_model = KedroPipelineModel(
         pipeline=ml_pipeline, catalog=catalog, input_name=ml_pipeline.input_name
@@ -506,7 +506,7 @@ def test_catalog_extraction(pipeline, catalog, input_name, result):
 
 
 def test_catalog_extraction_missing_inference_input(pipeline_inference_dummy):
-    catalog = DataCatalog({"raw_data": MemoryDataSet(), "data": MemoryDataSet()})
+    catalog = DataCatalog({"raw_data": MemoryDataset(), "data": MemoryDataset()})
     # "model" is missing in the catalog
     with pytest.raises(
         KedroPipelineModelError,
@@ -521,10 +521,10 @@ def test_catalog_extraction_missing_inference_input(pipeline_inference_dummy):
 
 def test_catalog_extraction_unpersisted_inference_input(pipeline_inference_dummy):
     catalog = DataCatalog(
-        {"raw_data": MemoryDataSet(), "data": MemoryDataSet(), "model": MemoryDataSet()}
+        {"raw_data": MemoryDataset(), "data": MemoryDataset(), "model": MemoryDataset()}
     )
 
-    # "model" is a MemoryDataSet in the catalog
+    # "model" is a MemoryDataset in the catalog
     with pytest.raises(
         KedroPipelineModelError,
         match="The datasets of the training pipeline must be persisted locally",
@@ -596,9 +596,9 @@ def test_kedro_pipeline_model_save_and_load(
 def test_kedro_pipeline_model_too_many_outputs():
     catalog = DataCatalog(
         {
-            "data": MemoryDataSet(),
-            "predictions": MemoryDataSet(),
-            "metrics": MemoryDataSet(),
+            "data": MemoryDataset(),
+            "predictions": MemoryDataset(),
+            "metrics": MemoryDataset(),
         }
     )
 

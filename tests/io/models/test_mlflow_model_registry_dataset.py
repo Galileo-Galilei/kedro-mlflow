@@ -1,6 +1,6 @@
 import mlflow
 import pytest
-from kedro.io.core import DataSetError
+from kedro.io.core import DatasetError
 from mlflow import MlflowClient
 from sklearn.tree import DecisionTreeClassifier
 
@@ -10,7 +10,7 @@ from kedro_mlflow.io.models import MlflowModelRegistryDataset
 def test_mlflow_model_registry_save_not_implemented(tmp_path):
     ml_ds = MlflowModelRegistryDataset(model_name="demo_model")
     with pytest.raises(
-        DataSetError,
+        DatasetError,
         match=r"The 'save' method is not implemented for MlflowModelRegistryDataset",
     ):
         ml_ds.save(DecisionTreeClassifier())

@@ -3,7 +3,7 @@ from pathlib import Path
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import PartitionedDataSet
+from kedro.io import PartitionedDataset
 from kedro_datasets.pandas import CSVDataset
 from kedro_datasets.pickle import PickleDataSet
 from mlflow.tracking import MlflowClient
@@ -272,7 +272,7 @@ def test_partitioned_dataset_save_and_reload(
     mlflow_dataset = MlflowArtifactDataset(
         artifact_path=artifact_path,
         data_set=dict(
-            type=PartitionedDataSet,
+            type=PartitionedDataset,
             path=(tmp_path / "df_dir").as_posix(),
             dataset="pandas.CSVDataset",
             filename_suffix=".csv",

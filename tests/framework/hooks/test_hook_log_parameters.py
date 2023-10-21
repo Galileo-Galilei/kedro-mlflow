@@ -6,7 +6,7 @@ import pytest
 import yaml
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
@@ -65,8 +65,8 @@ def dummy_catalog():
     catalog = DataCatalog(
         {
             "params:param1": 1,
-            "foo": MemoryDataSet(),
-            "bar": MemoryDataSet(),
+            "foo": MemoryDataset(),
+            "bar": MemoryDataset(),
             "parameters": {"param1": 1, "param2": 2},
         }
     )

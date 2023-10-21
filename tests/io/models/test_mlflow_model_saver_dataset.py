@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import DataCatalog, MemoryDataSet
+from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataSet
 from sklearn.linear_model import LinearRegression
@@ -78,8 +78,8 @@ def pipeline_inference(pipeline_ml_obj):
 def dummy_catalog(tmp_path):
     dummy_catalog = DataCatalog(
         {
-            "raw_data": MemoryDataSet(),
-            "data": MemoryDataSet(),
+            "raw_data": MemoryDataset(),
+            "data": MemoryDataset(),
             "model": PickleDataSet(
                 filepath=(tmp_path / "data" / "06_models" / "model.pkl")
                 .resolve()

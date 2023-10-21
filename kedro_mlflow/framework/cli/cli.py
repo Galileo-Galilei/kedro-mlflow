@@ -242,7 +242,7 @@ def run():
     "--copy-mode",
     required=False,
     default="deepcopy",
-    help="The copy mode to use when replacing each dataset by a MemoryDataSet. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.",
+    help="The copy mode to use when replacing each dataset by a MemoryDataset. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.",
 )
 @click.option(
     "--artifact-path",

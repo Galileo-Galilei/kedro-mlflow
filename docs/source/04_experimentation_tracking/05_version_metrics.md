@@ -6,14 +6,14 @@ MLflow defines a metric as "a (key, value) pair, where the value is numeric". Ea
 
 ## How to version metrics in a kedro project?
 
-`kedro-mlflow` introduces 3 ``AbstractDataSet`` to manage metrics:
+`kedro-mlflow` introduces 3 ``AbstractDataset`` to manage metrics:
 - ``MlflowMetricDataset`` which can log a float as a metric
 - ``MlflowMetricHistoryDataset`` which can log the evolution over time of a given metric, e.g. a list or a dict of float.
 - ``MlflowMetricsDataset``. It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
 
 ### Saving a single float as a metric with ``MlflowMetricDataset``
 
-The ``MlflowMetricDataset`` is an ``AbstractDataSet`` which enable to save or load a ``float`` as a mlflow metric. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
+The ``MlflowMetricDataset`` is an ``AbstractDataset`` which enable to save or load a ``float`` as a mlflow metric. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
 
 - The most basic usage is to create the dataset and save a a value:
 
@@ -60,7 +60,7 @@ with mlflow.start_run():
     my_metric = metric_ds.load()  # value=0.1 (step number 1)
 ```
 
-Since it is an ``AbstractDataSet``, it can be used with the YAML API in your ``catalog.yml``, e.g. :
+Since it is an ``AbstractDataset``, it can be used with the YAML API in your ``catalog.yml``, e.g. :
 
 ```yaml
 my_model_metric:
@@ -76,7 +76,7 @@ my_model_metric:
 
 ### Saving the evolution of a metric during training with ``MlflowMetricHistoryDataset``
 
-The ``MlflowMetricDataset`` is an ``AbstractDataSet`` which enable to save or load the evolutionf of a metric with various formats. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
+The ``MlflowMetricDataset`` is an ``AbstractDataset`` which enable to save or load the evolutionf of a metric with various formats. You must specify the ``key`` (i.e. the name to display in mlflow) when creating the dataset. Somes examples follow:
 
 It enables logging either:
   - a list of int as a metric with incremental step, e.g ``[0.1,0.2,0.3]`` with ``mode=list`` for either ``save_args`` or ``load_args``
@@ -135,7 +135,7 @@ with mlflow.start_run():
 metric_history_ds.load()  # return [0.1,0.2,0.3]
 ```
 
-As usual, since it is an ``AbstractDataSet``, it can be used with the YAML API in your ``catalog.yml``, and in this case, the ``key`` argument is optional:
+As usual, since it is an ``AbstractDataset``, it can be used with the YAML API in your ``catalog.yml``, and in this case, the ``key`` argument is optional:
 
 ```yaml
 my_model_metric:
@@ -150,7 +150,7 @@ my_model_metric:
 
 ### Saving several metrics with their entire history with ``MlflowMetricsDataset``
 
-Since it is an ``AbstractDataSet``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
+Since it is an ``AbstractDataset``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
 
 ```yaml
 my_model_metrics:

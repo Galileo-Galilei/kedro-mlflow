@@ -163,8 +163,8 @@
 
 ### Fixed
 
--   :bug: Force the input dataset in `KedroPipelineModel` to be a `MemoryDataSet` to remove unnecessary dependency to the underlying Kedro `AbstractDataSet` used during training ([#273](https://github.com/Galileo-Galilei/kedro-mlflow/issues/273))
--   :bug: Make `MlflowArtifactDataset` correctly log in mlflow Kedro DataSets without a `_path` attribute like `kedro.io.PartitionedDataSet`  ([#258](https://github.com/Galileo-Galilei/kedro-mlflow/issues/258)).
+-   :bug: Force the input dataset in `KedroPipelineModel` to be a `MemoryDataset` to remove unnecessary dependency to the underlying Kedro `AbstractDataset` used during training ([#273](https://github.com/Galileo-Galilei/kedro-mlflow/issues/273))
+-   :bug: Make `MlflowArtifactDataset` correctly log in mlflow Kedro DataSets without a `_path` attribute like `kedro.io.PartitionedDataset`  ([#258](https://github.com/Galileo-Galilei/kedro-mlflow/issues/258)).
 -   :bug: Automatically persist pipeline parameters when calling the `kedro mlflow modelify` command for consistency with how `PipelineML` objects are handled and for ease of use ([#282](https://github.com/Galileo-Galilei/kedro-mlflow/issues/282)).
 
 ## [0.8.0] - 2022-01-05
@@ -356,7 +356,7 @@
 ### Fixed
 
 -   :bug: Versioned datasets artifacts logging are handled correctly ([#41](https://github.com/Galileo-Galilei/kedro-mlflow/issues/41))
--   :bug: MlflowDataSet handles correctly datasets which are inherited from AbstractDataSet ([#45](https://github.com/Galileo-Galilei/kedro-mlflow/issues/45))
+-   :bug: MlflowDataSet handles correctly datasets which are inherited from AbstractDataset ([#45](https://github.com/Galileo-Galilei/kedro-mlflow/issues/45))
 -   :zap: Change the test in `_generate_kedro_command` to accept both empty `Iterable`s(default in CLI mode) and `None` values (default in interactive mode) ([#50](https://github.com/Galileo-Galilei/kedro-mlflow/issues/50))
 -   :zap: Force to close all mlflow runs when a pipeline fails. It prevents further execution of the pipeline to be logged within the same mlflow run_id as the failing pipeline. ([#10](https://github.com/Galileo-Galilei/kedro-mlflow/issues/10))
 -   :memo: Fix various documentation typos ([#34](https://github.com/Galileo-Galilei/kedro-mlflow/pull/34), [#35](https://github.com/Galileo-Galilei/kedro-mlflow/pull/35), [#36](https://github.com/Galileo-Galilei/kedro-mlflow/pull/36) and more)

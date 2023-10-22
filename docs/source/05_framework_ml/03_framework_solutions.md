@@ -25,7 +25,6 @@ from kedro_mlflow_tutorial.pipelines.ml_app.pipeline import create_ml_pipeline
 class ProjectHooks:
     @hook_impl
     def register_pipelines(self) -> Dict[str, Pipeline]:
-
         ml_pipeline = create_ml_pipeline()
 
         # convert your two pipelines to a PipelinML object
@@ -92,17 +91,17 @@ Hence, ``kedro-mlflow`` provides a ``MlflowHook.after_pipeline_run`` hook which 
 - check if the pipeline that have ust been run is a ``PipelineML`` object
 - in case it is, create the ``KedroPipelineModel`` like above and log it to mlflow
 
-> We have achieved perfect synchronicity since the exact inference pipeline (with code, and artifacts) will be logged in mlflow each time the training pipeline is executed. The model is than accessible in the mlflow UI "artifacts" section and can be downloaded, or [served as an API with the ``mlflow serve`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-serve), or [it can be used in the `catalog.yml` with the `MlflowModelLogger` for further reuse](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial#serve-the-inference-pipeline-to-a-end-user).
+> We have achieved perfect synchronicity since the exact inference pipeline (with code, and artifacts) will be logged in mlflow each time the training pipeline is executed. The model is than accessible in the mlflow UI "artifacts" section and can be downloaded, or [served as an API with the ``mlflow serve`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-serve), or [it can be used in the `catalog.yml` with the `MlflowModelTrackingDataset` for further reuse](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial#serve-the-inference-pipeline-to-a-end-user).
 
 ### Reuse the model in kedro
 
-Say that you an to reuse this inference model as the input of another kedro pipeline (one of the "user_app" application). ``kedro-mlflow`` provides a ``MlflowModelLoggerDataSet`` class which can be used int the ``catalog.yml`` file:
+Say that you an to reuse this inference model as the input of another kedro pipeline (one of the "user_app" application). ``kedro-mlflow`` provides a ``MlflowModelTrackingDataset`` class which can be used int the ``catalog.yml`` file:
 
 ```yaml
 # catalog.yml
 
 pipeline_inference_model:
-  type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+  type: kedro_mlflow.io.models.MlflowModelTrackingDataset
   flavor: mlflow.pyfunc
   pyfunc_workflow: python_model
   artifact_path: kedro_mlflow_tutorial  # the name of your mlflow folder = the model_name in pipeline_ml_factory

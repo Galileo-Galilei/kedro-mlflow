@@ -94,7 +94,7 @@ def catalog_config(kedro_project_path):
             "type": "kedro_mlflow.io.metrics.MlflowMetricHistoryDataset",
         },
         "model": {
-            "type": "kedro_mlflow.io.models.MlflowModelLoggerDataSet",
+            "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
             "flavor": "mlflow.sklearn",
         },
     }

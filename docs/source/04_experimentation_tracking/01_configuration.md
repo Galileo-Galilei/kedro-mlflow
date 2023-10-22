@@ -108,7 +108,7 @@ tracking:
       - <pipeline-name>
 ```
 
-Notice that it will stop autologging parameters but also any `Mlflow<Artifact/Metrics/ModelLogger>Dataset` you may have in these deactivated pipelines.
+Notice that it will stop autologging parameters but also any `Mlflow<Artifact/Metrics/ModelTracking>Dataset` you may have in these deactivated pipelines.
 
 ### Configure mlflow experiment
 

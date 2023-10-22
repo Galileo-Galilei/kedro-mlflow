@@ -26,7 +26,7 @@ input_name = "instances"
 input_data = catalog.load(input_name)
 model_signature = infer_signature(model_input=input_data)
 
-# you can optionnally pass other arguments, like the "copy_mode" to be used for each dataset
+# you can optionally pass other arguments, like the "copy_mode" to be used for each dataset
 kedro_pipeline_model = KedroPipelineModel(
     pipeline=pipeline, catalog=catalog, input_name=input_name
 )

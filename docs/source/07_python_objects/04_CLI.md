@@ -34,7 +34,6 @@ kedro mlflow ui --port=5002
 
 will open the ui on port 5002.
 
-
 ## ``modelify``
 
 ``kedro mlflow modelify``: this command converts a kedro pipeline to a mlflow model and logs it in mlflow. It enables distributing the kedro pipeline as a standalone model and leverages all mlflow serving capabilities (as an API).
@@ -46,9 +45,9 @@ will open the ui on port 5002.
 - ``--infer-signature`` :  A boolean which indicates if the signature of the input data should be inferred for mlflow or not.
 - ``--infer-input-example`` : A boolean which indicates if the input_example of the input data should be inferred for mlflow or not
 - ``--run-id``, ``-r`` : The id of the mlflow run where the model will be logged. If unspecified, the command creates a new run.
-- ``--run-name``: The name of the mlflow run where the model will be logged. Defaults to "modelify".
-- ``--copy-mode`` : The copy mode to use when replacing each dataset by a ``MemoryDataset``. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.
-- ``--artifact-path" : The artifact path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
+- ``--run-name``: The name of the mlflow run where the model will be logged. Defaults to ``"modelify"``.
+- ``--copy-mode`` : The copy mode to use when replacing each dataset by a ``MemoryDataset``. Either a string (applied all datasets) or a dict mapping each dataset to a ``copy_mode``.
+- ``--artifact-path"`` : The artifact path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
 - ``--code-path`` : The code path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
 - ``--conda-env`` : "The conda environment of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
 - ``--registered-model-name`` : The registered_model_name of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model

@@ -152,7 +152,7 @@ Rerun the pipeline (with `kedro run`), and reopen the UI. Select the last run an
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 
-*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowModelLoggerDataSet`*
+*Note: Mlflow offers specific logging for machine learning models that may be better suited for your use case, see `MlflowModelTrackingDataset`*
 
 ## Going further
 

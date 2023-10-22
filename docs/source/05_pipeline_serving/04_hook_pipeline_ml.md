@@ -54,7 +54,7 @@ For consistency, you may want to log an inference pipeline (including some data 
     # catalog.yml
 
     pipeline_inference_model:
-    type: kedro_mlflow.io.models.MlflowModelLoggerDataSet
+    type: kedro_mlflow.io.models.MlflowModelTrackingDataset
     flavor: mlflow.pyfunc
     pyfunc_workflow: python_model
     artifact_path: kedro_mlflow_tutorial  # the name of your mlflow folder = the model_name in pipeline_ml_factory

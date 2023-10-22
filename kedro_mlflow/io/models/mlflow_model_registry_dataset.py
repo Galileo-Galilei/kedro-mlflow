@@ -66,7 +66,7 @@ class MlflowModelRegistryDataset(MlflowModelRegistryDataset):
 
     def _save(self, model: Any) -> None:
         raise NotImplementedError(
-            "The 'save' method is not implemented for MlflowModelRegistryDataset. You can pass 'registered_model_name' argument in 'MLflowModelLoggerDataSet(..., save_args={registered_model_name='my_model'}' to save and register a model in the same step. "
+            "The 'save' method is not implemented for MlflowModelRegistryDataset. You can pass 'registered_model_name' argument in 'MLflowModelTrackingDataset(..., save_args={registered_model_name='my_model'}' to save and register a model in the same step. "
         )
 
     def _describe(self) -> Dict[str, Any]:
@@ -76,5 +76,5 @@ class MlflowModelRegistryDataset(MlflowModelRegistryDataset):
             stage_or_version=self.stage_or_version,
             flavor=self._flavor,
             pyfunc_workflow=self._pyfunc_workflow,
-            load_args=self._load_args,
+            # load_args=self._load_args,
         )

@@ -77,7 +77,7 @@ If you are working with ``kedro==0.17.0``, update your template to ``kedro>=0.17
 
 ## Migration from 0.4.x to 0.5.x
 
-The only breaking change with the previous release is the format of ``KedroPipelineMLModel`` class. Hence, if you saved a pipeline as a Mlflow Model with `pipeline_ml_factory` in ``kedro-mlflow==0.4.x``, loading it (either with ``MlflowModelLoggerDataSet`` or ``mlflow.pyfunc.load_model``) with ``kedro-mlflow==0.5.0`` installed will raise an error. You will need either to retrain the model or to load it with ``kedro-mlflow==0.4.x``.
+The only breaking change with the previous release is the format of ``KedroPipelineMLModel`` class. Hence, if you saved a pipeline as a Mlflow Model with `pipeline_ml_factory` in ``kedro-mlflow==0.4.x``, loading it (either with ``MlflowModelTrackingDataset`` or ``mlflow.pyfunc.load_model``) with ``kedro-mlflow==0.5.0`` installed will raise an error. You will need either to retrain the model or to load it with ``kedro-mlflow==0.4.x``.
 
 ## Migration from 0.4.0 to 0.4.1
 

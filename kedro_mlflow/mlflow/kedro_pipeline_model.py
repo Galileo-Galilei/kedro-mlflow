@@ -19,7 +19,7 @@ class KedroPipelineModel(PythonModel):
         catalog: DataCatalog,
         input_name: str,
         runner: Optional[AbstractRunner] = None,
-        copy_mode: Optional[Union[Dict[str, str], str]] = None,
+        copy_mode: Optional[Union[Dict[str, str], str]] = "assign",
     ):
         """[summary]
 
@@ -37,11 +37,12 @@ class KedroPipelineModel(PythonModel):
             copy_mode (Optional[Union[Dict[str,str], str]]):
             The copy_mode of each DataSet of the catalog
             when reconstructing the DataCatalog in memory.
+            The default is "assign".
             You can pass either:
                 - None to use Kedro default mode for each dataset
                 - a single string ("deepcopy", "copy" and "assign")
                 to apply to all datasets
-                - a dictionnary with (dataset name, copy_mode) key/values
+                - a dictionary with (dataset name, copy_mode) key/values
                 pairs. The associated mode must be a valid kedro mode
                 ("deepcopy", "copy" and "assign") for each. Defaults to None.
         """

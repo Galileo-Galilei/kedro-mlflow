@@ -330,6 +330,61 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
         assert actual_copy_mode == expected
 
 
+def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
+    kedro_project_with_mlflow_conf,
+    dummy_pipeline_ml,
+    dummy_catalog,
+    dummy_run_params,
+):
+    # config_with_base_mlflow_conf is a conftest fixture
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()
+        mlflow_hook = MlflowHook()
+        runner = SequentialRunner()
+        mlflow_hook.after_context_created(context)
+        mlflow_hook.after_catalog_created(
+            catalog=dummy_catalog,
+            # `after_catalog_created` is not using any of arguments bellow,
+            # so we are setting them to empty values.
+            conf_catalog={},
+            conf_creds={},
+            feed_dict={},
+            save_version="",
+            load_versions="",
+        )
+
+        pipeline_to_run = pipeline_ml_factory(
+            training=dummy_pipeline_ml.training,
+            inference=dummy_pipeline_ml.inference,
+            input_name=dummy_pipeline_ml.input_name,
+            log_model_kwargs={
+                "artifact_path": dummy_pipeline_ml.log_model_kwargs["artifact_path"],
+                "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
+            },
+        )
+        mlflow_hook.before_pipeline_run(
+            run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+        )
+        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
+        run_id = mlflow.active_run().info.run_id
+        mlflow_hook.after_pipeline_run(
+            run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
+        )
+
+        mlflow_tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
+        mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+        loaded_model = mlflow.pyfunc.load_model(model_uri=f"runs:/{run_id}/model")
+
+        assert all(
+            [
+                ds._copy_mode == "assign"
+                for ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.values()
+            ]
+        )
+
+
 def test_mlflow_hook_save_pipeline_ml_with_parameters(
     kedro_project_with_mlflow_conf,  # a fixture to be in a kedro project
     pipeline_ml_with_parameters,

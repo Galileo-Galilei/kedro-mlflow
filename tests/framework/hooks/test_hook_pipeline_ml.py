@@ -249,12 +249,14 @@ def test_mlflow_hook_save_pipeline_ml(
                 == {
                     "inputs": '[{"name": "a", "type": "long"}]',
                     "outputs": None,
+                    "params": None,
                 }
             ) or (
                 (trained_model.metadata.signature.to_dict())
                 == {
                     "inputs": '[{"type": "long", "name": "a"}]',
                     "outputs": None,
+                    "params": None,
                 }
             )
 

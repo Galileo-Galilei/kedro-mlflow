@@ -134,7 +134,7 @@ def test_node_hook_logging(
     )
 
     node_inputs = {
-        v: dummy_catalog._data_sets.get(v) for k, v in dummy_node._inputs.items()
+        v: dummy_catalog._datasets.get(v) for k, v in dummy_node._inputs.items()
     }
 
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()

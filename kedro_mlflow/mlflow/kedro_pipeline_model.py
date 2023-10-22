@@ -65,7 +65,7 @@ class KedroPipelineModel(PythonModel):
         # copy mode has been converted because it is a property
         # TODO: we need to use the runner's default dataset in case of multithreading
         self.loaded_catalog = DataCatalog(
-            data_sets={
+            datasets={
                 name: MemoryDataset(copy_mode=copy_mode)
                 for name, copy_mode in self.copy_mode.items()
             }
@@ -86,7 +86,7 @@ class KedroPipelineModel(PythonModel):
             # of all catalog entries with this copy_mode
             self._copy_mode = {
                 name: copy_mode
-                for name in self.pipeline.data_sets()
+                for name in self.pipeline.datasets()
                 if name != self.output_name
             }
         elif isinstance(copy_mode, dict):
@@ -95,7 +95,7 @@ class KedroPipelineModel(PythonModel):
             # the others will be returned as None when accessing with dict.get()
             self._copy_mode = {
                 name: None
-                for name in self.pipeline.data_sets()
+                for name in self.pipeline.datasets()
                 if name != self.output_name
             }
             self._copy_mode.update(copy_mode)
@@ -106,37 +106,37 @@ class KedroPipelineModel(PythonModel):
 
     def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
-        for data_set_name in self.pipeline.inputs():
-            if data_set_name == self.input_name:
+        for dataset_name in self.pipeline.inputs():
+            if dataset_name == self.input_name:
                 # there is no obligation that this dataset is persisted
                 # and even if it is, we keep only an ampty memory dataset to avoid
                 # extra uneccessary dependencies: this dataset will be replaced at
                 # inference time and we do not need to know the original type, see
                 # https://github.com/Galileo-Galilei/kedro-mlflow/issues/273
-                sub_catalog.add(data_set_name=data_set_name, data_set=MemoryDataset())
+                sub_catalog.add(dataset_name=dataset_name, dataset=MemoryDataset())
             else:
                 try:
-                    data_set = catalog._data_sets[data_set_name]
+                    dataset = catalog._datasets[dataset_name]
                     if isinstance(
-                        data_set, MemoryDataset
-                    ) and not data_set_name.startswith("params:"):
+                        dataset, MemoryDataset
+                    ) and not dataset_name.startswith("params:"):
                         raise KedroPipelineModelError(
                             """
                                 The datasets of the training pipeline must be persisted locally
                                 to be used by the inference pipeline. You must enforce them as
                                 non 'MemoryDataset' in the 'catalog.yml'.
-                                Dataset '{data_set_name}' is not persisted currently.
+                                Dataset '{dataset_name}' is not persisted currently.
                                 """.format(
-                                data_set_name=data_set_name
+                                dataset_name=dataset_name
                             )
                         )
                     self._logger.info(
-                        f"The data_set '{data_set_name}' is added to the Pipeline catalog."
+                        f"The dataset '{dataset_name}' is added to the Pipeline catalog."
                     )
-                    sub_catalog.add(data_set_name=data_set_name, data_set=data_set)
+                    sub_catalog.add(dataset_name=dataset_name, dataset=dataset)
                 except KeyError:
                     raise KedroPipelineModelError(
-                        f"The provided catalog must contains '{data_set_name}' data_set "
+                        f"The provided catalog must contains '{dataset_name}' dataset "
                         "since it is the input of the pipeline."
                     )
 
@@ -146,7 +146,7 @@ class KedroPipelineModel(PythonModel):
         self, parameters_saving_folder: Optional[Path] = None
     ):
         artifacts = {}
-        for name, dataset in self.initial_catalog._data_sets.items():
+        for name, dataset in self.initial_catalog._datasets.items():
             if name != self.input_name:
                 if name.startswith("params:"):
                     # we need to persist it locally for mlflow access
@@ -195,7 +195,7 @@ class KedroPipelineModel(PythonModel):
 
         updated_catalog = self.initial_catalog.shallow_copy()
         for name, uri in context.artifacts.items():
-            updated_catalog._data_sets[name]._filepath = Path(uri)
+            updated_catalog._datasets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input):

@@ -324,7 +324,7 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
 
         actual_copy_mode = {
             name: ds._copy_mode
-            for name, ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.items()
+            for name, ds in loaded_model._model_impl.python_model.loaded_catalog._datasets.items()
         }
 
         assert actual_copy_mode == expected
@@ -380,7 +380,7 @@ def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
         assert all(
             [
                 ds._copy_mode == "assign"
-                for ds in loaded_model._model_impl.python_model.loaded_catalog._data_sets.values()
+                for ds in loaded_model._model_impl.python_model.loaded_catalog._datasets.values()
             ]
         )
 

@@ -264,7 +264,7 @@ def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
 
     for artifact in artifacts_list:
         assert (
-            f"The data_set '{artifact}' is added to the Pipeline catalog"
+            f"The dataset '{artifact}' is added to the Pipeline catalog"
             in stripped_output
         )
     assert "Model successfully logged" in stripped_output

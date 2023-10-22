@@ -59,7 +59,7 @@ If you want to save your model both locally and remotely within the same run, yo
 ```yaml
 sklearn_model:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
-    data_set:
+    dataset:
         type: kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset
         flavor: mlflow.sklearn
         filepath: data/06_models/sklearn_model

@@ -45,6 +45,7 @@ def kedro_project(tmp_path):
         output_dir=config["output_dir"],
         no_input=True,
         extra_context=config,
+        accept_hooks=False,
     )
 
     shutil.rmtree(

@@ -12,6 +12,7 @@
   - ``MlflowMetricsDataSet``->``MlflowMetricsDataset``
 - :boom: :recycle: Rename the following ``DataSets`` to make their use more explicit, and use the ``Dataset`` suffix:
   -  ``MlflowModelLoggerDataSet``->``MlflowModelTrackingDataset``
+  -  ``MlflowModelSaverDataSet``->``MlflowModelLocalFileSystemDataset``
 
 ## [0.11.10] - 2023-10-03
 
@@ -304,7 +305,7 @@
 
 ### Fixed
 
--   :bug: Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelSaverDataSet` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
+-   :bug: Fix `TypeError: unsupported operand type(s) for /: 'str' and 'str'` when using `MlflowArtifactDataSet` with `MlflowModelLocalFileSystemDataset` ([#116](https://github.com/Galileo-Galilei/kedro-mlflow/issues/116))
 -   :memo: Fix various docs typo ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6))
 -   :bug: When the underlying Kedro pipeline fails, the associated mlflow run is now marked as 'FAILED' instead of 'FINISHED'. It is rendered with a red cross instead of the green tick in the mlflow user interface ([#121](https://github.com/Galileo-Galilei/kedro-mlflow/issues/121)).
 -   :bug: Fix a bug which made `KedroPipelineModel` impossible to load if one of its artifact was a `MlflowModel<Saver/Logger>DataSet`. These datasets were not deepcopiable because of one their attributes was a module ([#122](https://github.com/Galileo-Galilei/kedro-mlflow/issues/122)).
@@ -322,7 +323,7 @@
 -   :sparkles: `kedro-mlflow` now supports configuring the project in `pyproject.toml`  (_Only for kedro>=0.16.5_) ([#96](https://github.com/Galileo-Galilei/kedro-mlflow/issues/96))
 -   :sparkles: `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` ([#71](https://github.com/Galileo-Galilei/kedro-mlflow/issues/71))
 -   :sparkles: `pipeline_ml_factory` now infer automatically the schema of the input dataset to validate data automatically at inference time. The output schema can be declared manually in `model_signature` argument ([#70](https://github.com/Galileo-Galilei/kedro-mlflow/issues/70))
--   :sparkles: Add two DataSets for model logging and saving: `MlflowModelTrackingDataset` and `MlflowModelSaverDataSet` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
+-   :sparkles: Add two DataSets for model logging and saving: `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
 -   :sparkles: `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
 
 ### Fixed

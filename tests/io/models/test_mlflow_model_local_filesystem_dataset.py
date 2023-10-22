@@ -8,7 +8,7 @@ from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataset
 from sklearn.linear_model import LinearRegression
 
-from kedro_mlflow.io.models import MlflowModelSaverDataSet
+from kedro_mlflow.io.models import MlflowModelLocalFileSystemDataset
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline import pipeline_ml_factory
 
@@ -110,12 +110,12 @@ def test_save_unversioned_under_same_path(
     model_config = {
         "name": "linreg",
         "config": {
-            "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
+            "type": "kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset",
             "flavor": "mlflow.sklearn",
             "filepath": linreg_path.as_posix(),
         },
     }
-    mlflow_model_ds = MlflowModelSaverDataSet.from_config(**model_config)
+    mlflow_model_ds = MlflowModelLocalFileSystemDataset.from_config(**model_config)
     mlflow_model_ds.save(linreg_model)
     # check that second save does not fail
     # this happens if the underlying folder already exists
@@ -127,13 +127,13 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
     model_config = {
         "name": "linreg",
         "config": {
-            "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
+            "type": "kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset",
             "filepath": linreg_path.as_posix(),
             "flavor": "mlflow.sklearn",
             "versioned": versioned,
         },
     }
-    mlflow_model_ds = MlflowModelSaverDataSet.from_config(**model_config)
+    mlflow_model_ds = MlflowModelLocalFileSystemDataset.from_config(**model_config)
     mlflow_model_ds.save(linreg_model)
 
     if versioned:
@@ -167,7 +167,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
     model_config = {
         "name": "kedro_pipeline_model",
         "config": {
-            "type": "kedro_mlflow.io.models.MlflowModelSaverDataSet",
+            "type": "kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset",
             "filepath": (
                 tmp_path / "data" / "06_models" / "my_custom_model"
             ).as_posix(),
@@ -180,7 +180,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
         },
     }
 
-    mlflow_model_ds = MlflowModelSaverDataSet.from_config(**model_config)
+    mlflow_model_ds = MlflowModelLocalFileSystemDataset.from_config(**model_config)
     mlflow_model_ds.save(kedro_pipeline_model)
 
     assert mlflow.active_run() is None

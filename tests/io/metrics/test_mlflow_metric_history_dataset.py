@@ -44,11 +44,11 @@ def test_mlflow_metric_history_dataset_save_load(mlflow_client, save_mode, load_
         "history": metric_as_history,
     }
 
-    metric_ds_saver = MlflowMetricHistoryDataset(
+    metric_ds_model_local_filesystem = MlflowMetricHistoryDataset(
         key="my_metric", save_args={"mode": save_mode}
     )
     with mlflow.start_run():
-        metric_ds_saver.save(mode_metrics_mapping[save_mode])
+        metric_ds_model_local_filesystem.save(mode_metrics_mapping[save_mode])
         run_id = mlflow.active_run().info.run_id
 
     # check existence

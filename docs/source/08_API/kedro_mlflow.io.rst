@@ -41,7 +41,7 @@ Models DataSet
    :undoc-members:
    :show-inheritance:
 
-.. automodule:: kedro_mlflow.io.models.mlflow_model_saver_dataset
+.. automodule:: kedro_mlflow.io.models.mlflow_model_local_filesystem_dataset
    :members:
    :undoc-members:
    :show-inheritance:

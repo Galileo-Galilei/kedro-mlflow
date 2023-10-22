@@ -115,7 +115,7 @@ my_model:
                 - "kedro==0.18.11"
 ```
 
-### ``MlflowModelSaverDataSet``
+### ``MlflowModelLocalFileSystemDataset``
 
 The ``MlflowModelTrackingDataset`` accepts the following arguments:
 
@@ -132,7 +132,7 @@ The use is very similar to ``MlflowModelTrackingDataset``, but you have to speci
 from kedro_mlflow.io.models import MlflowModelTrackingDataset
 from sklearn.linear_model import LinearRegression
 
-mlflow_model_tracking = MlflowModelSaverDataSet(
+mlflow_model_tracking = MlflowModelLocalFileSystemDataset(
     flavor="mlflow.sklearn", filepath="path/to/where/you/want/model"
 )
 mlflow_model_tracking.save(LinearRegression().fit(data))
@@ -141,7 +141,7 @@ mlflow_model_tracking.save(LinearRegression().fit(data))
 The same arguments are available, plus an additional [`version` common to usual `AbstractVersionedDataset`](https://kedro.readthedocs.io/en/stable/kedro.io.AbstractVersionedDataset.html)
 
 ```python
-mlflow_model_tracking = MlflowModelSaverDataSet(
+mlflow_model_tracking = MlflowModelLocalFileSystemDataset(
     flavor="mlflow.sklearn",
     filepath="path/to/where/you/want/model",
     version="<valid-kedro-version>",
@@ -153,7 +153,7 @@ and with the YAML API in the `catalog.yml`:
 
 ```yaml
 my_model:
-    type: kedro_mlflow.io.models.MlflowModelSaverDataSet
+    type: kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset
     flavor: mlflow.sklearn
     filepath: path/to/where/you/want/model
     version: <valid-kedro-version>

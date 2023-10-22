@@ -6,12 +6,12 @@ MLflow allows to serialize and deserialize models to a common format, track thos
 
 ## How to track models using MLflow in Kedro project?
 
-`kedro-mlflow` introduces two new `DataSet` types that can be used in `DataCatalog` called `MlflowModelTrackingDataset` and `MlflowModelSaverDataSet`. The two have very similar API, except that:
+`kedro-mlflow` introduces two new `DataSet` types that can be used in `DataCatalog` called `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset`. The two have very similar API, except that:
 
 - the ``MlflowModelTrackingDataset`` is used to load from and save to from the mlflow artifact store. It uses optional `run_id` argument to load and save from a given `run_id` which must exists in the mlflow server you are logging to.
-- the ``MlflowModelSaverDataSet`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
+- the ``MlflowModelLocalFileSystemDataset`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
 
-*Note: If you use ``MlflowModelTrackingDataset``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelSaverDataSet`` and ``MlflowArtifactDataset`` to make persist it both locally and remotely, see further.*
+*Note: If you use ``MlflowModelTrackingDataset``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelLocalFileSystemDataset`` and ``MlflowArtifactDataset`` to make persist it both locally and remotely, see further.*
 
 Suppose you would like to register a `scikit-learn` model of your `DataCatalog` in mlflow, you can use the following yaml API:
 
@@ -35,7 +35,7 @@ During save, a model object from node output is logged to mlflow using ``log_mod
 
 During load, the model is retrieved from the ``run_id`` if specified, else it is retrieved from the mlflow active run. If there is no mlflow active run, the loading fails. This will never happen if you are using the `kedro run` command, because the `MlflowHook` creates a new run before each pipeline run.
 
-**For ``MlflowModelSaverDataSet``**
+**For ``MlflowModelLocalFileSystemDataset``**
 
 During save, a model object from node output is saved locally under specified ``filepath`` using ``save_model`` function of the specified ``flavor``.
 
@@ -60,7 +60,7 @@ If you want to save your model both locally and remotely within the same run, yo
 sklearn_model:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     data_set:
-        type: kedro_mlflow.io.models.MlflowModelSaverDataSet
+        type: kedro_mlflow.io.models.MlflowModelLocalFileSystemDataset
         flavor: mlflow.sklearn
         filepath: data/06_models/sklearn_model
 ```

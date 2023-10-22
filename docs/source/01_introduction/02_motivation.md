@@ -40,7 +40,7 @@ Above implementations have the advantage of being very straightforward and *mlfl
 | Set up configuration      | ``mlflow.yml``  | ``MlflowHook``                                             |
 | Logging parameters        | ``mlflow.yml``  | ``MlflowHook``                                             |
 | Logging artifacts         | ``catalog.yml`` | ``MlflowArtifactDataset``                                  |
-| Logging models            | ``catalog.yml`` | `MlflowModelTrackingDataset` and `MlflowModelSaverDataSet` |
+| Logging models            | ``catalog.yml`` | `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset` |
 | Logging metrics           | ``catalog.yml`` | ``MlflowMetricsDataset``                                   |
 | Logging Pipeline as model | ``hooks.py``    | ``KedroPipelineModel`` and ``pipeline_ml_factory``         |
 

@@ -268,6 +268,7 @@ def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
         output_dir=config["output_dir"],
         no_input=True,
         extra_context=config,
+        accept_hooks=False,
     )
 
     project_path = tmp_path / config["repo_name"]

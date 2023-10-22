@@ -13,8 +13,8 @@
 - :boom: :recycle: Rename the following ``DataSets`` to make their use more explicit, and use the ``Dataset`` suffix ([#465, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/465)):
   -  ``MlflowModelLoggerDataSet``->``MlflowModelTrackingDataset``
   -  ``MlflowModelSaverDataSet``->``MlflowModelLocalFileSystemDataset``
-
 - :boom: :sparkles: Change default ``copy_mode``  to ``"assign"`` in ``KedroPipelineModel`` because this is the most efficient setup (and usually the desired one) when serving a Kedro ``Pipeline`` as a Mlflow model. This is different from Kedro's default which is to deepcopy the dataset ([#463, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/463)).
+- :boom: :recycle: ``MlflowArtifactDataset.__init__`` method ``data_set`` argument is renamed ``dataset`` to match new Kedro conventions ().
 
 ## [0.11.10] - 2023-10-03
 

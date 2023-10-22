@@ -113,7 +113,7 @@ class MlflowHook:
                 experiment_name = context._package_name
                 if experiment_name is None:
                     # context._package_name may be None if the session is created interactively
-                    metadata = _get_project_metadata(context._project_path)
+                    metadata = _get_project_metadata(context.project_path)
                     experiment_name = metadata.package_name
                 mlflow_config.tracking.experiment.name = experiment_name
 
@@ -140,25 +140,25 @@ class MlflowHook:
     ):
         # we use this hooks to modif "MlflowmetricsDataset" to ensure consistency
         # of the metric name with the catalog name
-        for name, dataset in catalog._data_sets.items():
+        for name, dataset in catalog._datasets.items():
             if isinstance(dataset, MlflowMetricsDataset) and dataset._prefix is None:
                 if dataset._run_id is not None:
-                    catalog._data_sets[name] = MlflowMetricsDataset(
+                    catalog._datasets[name] = MlflowMetricsDataset(
                         run_id=dataset._run_id, prefix=name
                     )
                 else:
-                    catalog._data_sets[name] = MlflowMetricsDataset(prefix=name)
+                    catalog._datasets[name] = MlflowMetricsDataset(prefix=name)
 
             if isinstance(dataset, MlflowMetricDataset) and dataset.key is None:
                 if dataset._run_id is not None:
-                    catalog._data_sets[name] = MlflowMetricDataset(
+                    catalog._datasets[name] = MlflowMetricDataset(
                         run_id=dataset._run_id,
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
                     )
                 else:
-                    catalog._data_sets[name] = MlflowMetricDataset(
+                    catalog._datasets[name] = MlflowMetricDataset(
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
@@ -166,14 +166,14 @@ class MlflowHook:
 
             if isinstance(dataset, MlflowMetricHistoryDataset) and dataset.key is None:
                 if dataset._run_id is not None:
-                    catalog._data_sets[name] = MlflowMetricHistoryDataset(
+                    catalog._datasets[name] = MlflowMetricHistoryDataset(
                         run_id=dataset._run_id,
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
                     )
                 else:
-                    catalog._data_sets[name] = MlflowMetricHistoryDataset(
+                    catalog._datasets[name] = MlflowMetricHistoryDataset(
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,

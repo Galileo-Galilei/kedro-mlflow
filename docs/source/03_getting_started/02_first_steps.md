@@ -141,7 +141,7 @@ example_iris_data:
 
 example_model:
   type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
-  data_set:
+  dataset:
     type: pickle.PickleDataset
     filepath: data/06_models/trained_model.pkl
 ```

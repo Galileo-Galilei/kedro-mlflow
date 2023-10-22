@@ -15,20 +15,20 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
 
     def __new__(
         cls,
-        data_set: Union[str, Dict],
+        dataset: Union[str, Dict],
         run_id: str = None,
         artifact_path: str = None,
         credentials: Dict[str, Any] = None,
     ):
-        data_set, data_set_args = parse_dataset_definition(config=data_set)
+        dataset, dataset_args = parse_dataset_definition(config=dataset)
 
         # fake inheritance : this mlflow class should be a mother class which wraps
         # all dataset (i.e. it should replace AbstractVersionedDataset)
         # instead and since we can't modify the core package,
-        # we create a subclass which inherits dynamically from the data_set class
-        class MlflowArtifactDatasetChildren(data_set):
+        # we create a subclass which inherits dynamically from the dataset class
+        class MlflowArtifactDatasetChildren(dataset):
             def __init__(self, run_id, artifact_path):
-                super().__init__(**data_set_args)
+                super().__init__(**dataset_args)
                 self.run_id = run_id
                 self.artifact_path = artifact_path
                 self._logging_activated = True
@@ -134,7 +134,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
                 return super()._load()
 
         # rename the class
-        parent_name = data_set.__name__
+        parent_name = dataset.__name__
         MlflowArtifactDatasetChildren.__name__ = f"Mlflow{parent_name}"
         MlflowArtifactDatasetChildren.__qualname__ = (
             f"{parent_name}.Mlflow{parent_name}"

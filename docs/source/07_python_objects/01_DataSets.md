@@ -7,7 +7,7 @@
 ```yaml
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
-    data_set:
+    dataset:
         type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
 ```
@@ -17,14 +17,14 @@ or with additional parameters:
 ```yaml
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
-    data_set:
+    dataset:
         type: pandas.CSVDataset  # or any valid kedro DataSet
         filepath: /path/to/a/local/destination/file.csv
         load_args:
             sep: ;
         save_args:
             sep: ;
-        # ... any other valid arguments for data_set
+        # ... any other valid arguments for dataset
     run_id: 13245678910111213  # a valid mlflow run to log in. If None, default to active run
     artifact_path: reporting  # relative path where the artifact must be stored. if None, saved in root folder.
 ```
@@ -36,7 +36,7 @@ from kedro_mlflow.io.artifacts import MlflowArtifactDataset
 from kedro_datasets.pandas import CSVDataset
 
 csv_dataset = MlflowArtifactDataset(
-    data_set={"type": CSVDataset, "filepath": r"/path/to/a/local/destination/file.csv"}
+    dataset={"type": CSVDataset, "filepath": r"/path/to/a/local/destination/file.csv"}
 )
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```

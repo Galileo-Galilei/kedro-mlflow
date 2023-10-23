@@ -54,7 +54,7 @@ The documentation contains:
 
 Some frequently asked questions on more advanced features:
 
-- You want to log additional metrics to the run? -> [Try ``MlflowMetricsDataset``](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/05_version_metrics.html) !
+- You want to log additional metrics to the run? -> [Try ``MlflowMetricsHistoryDataset``](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/05_version_metrics.html) !
 - You want to log nice dataviz of your pipeline that you register with ``MatplotlibWriter``? -> [Try ``MlflowArtifactDataset`` to log any local files (.png, .pkl, .csv...) *automagically*](https://kedro-mlflow.readthedocs.io/en/stable/source/04_experimentation_tracking/03_version_datasets.html)!
 - You want to create easily an API to share your awesome model to anyone? -> [See if ``pipeline_ml_factory`` can fit your needs](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16)
 - You want to do something that is not straigthforward with current implementation? Open an issue, and let's see what happens!

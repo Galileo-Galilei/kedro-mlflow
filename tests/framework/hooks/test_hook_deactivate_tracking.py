@@ -63,7 +63,7 @@ def catalog_config(kedro_project_path):
             },
         },
         "metrics_data": {
-            "type": "kedro_mlflow.io.metrics.MlflowMetricsDataset",
+            "type": "kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset",
         },
         "metric_data": {
             "type": "kedro_mlflow.io.metrics.MlflowMetricDataset",

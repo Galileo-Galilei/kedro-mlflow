@@ -1,3 +1,3 @@
 from .mlflow_metric_dataset import MlflowMetricDataset
 from .mlflow_metric_history_dataset import MlflowMetricHistoryDataset
-from .mlflow_metrics_dataset import MlflowMetricsDataset
+from .mlflow_metrics_dataset import MlflowMetricsHistoryDataset

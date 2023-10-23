@@ -27,7 +27,7 @@ from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_loggin
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataset,
     MlflowMetricHistoryDataset,
-    MlflowMetricsDataset,
+    MlflowMetricsHistoryDataset,
 )
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
@@ -141,13 +141,16 @@ class MlflowHook:
         # we use this hooks to modif "MlflowmetricsDataset" to ensure consistency
         # of the metric name with the catalog name
         for name, dataset in catalog._datasets.items():
-            if isinstance(dataset, MlflowMetricsDataset) and dataset._prefix is None:
+            if (
+                isinstance(dataset, MlflowMetricsHistoryDataset)
+                and dataset._prefix is None
+            ):
                 if dataset._run_id is not None:
-                    catalog._datasets[name] = MlflowMetricsDataset(
+                    catalog._datasets[name] = MlflowMetricsHistoryDataset(
                         run_id=dataset._run_id, prefix=name
                     )
                 else:
-                    catalog._datasets[name] = MlflowMetricsDataset(prefix=name)
+                    catalog._datasets[name] = MlflowMetricsHistoryDataset(prefix=name)
 
             if isinstance(dataset, MlflowMetricDataset) and dataset.key is None:
                 if dataset._run_id is not None:

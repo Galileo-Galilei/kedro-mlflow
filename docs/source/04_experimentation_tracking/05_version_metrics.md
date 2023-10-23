@@ -9,7 +9,7 @@ MLflow defines a metric as "a (key, value) pair, where the value is numeric". Ea
 `kedro-mlflow` introduces 3 ``AbstractDataset`` to manage metrics:
 - ``MlflowMetricDataset`` which can log a float as a metric
 - ``MlflowMetricHistoryDataset`` which can log the evolution over time of a given metric, e.g. a list or a dict of float.
-- ``MlflowMetricsDataset``. It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
+- ``MlflowMetricsHistoryDataset``. It is a wrapper around a dictionary with metrics which is returned by node and log metrics in MLflow.
 
 ### Saving a single float as a metric with ``MlflowMetricDataset``
 
@@ -148,13 +148,13 @@ my_model_metric:
         mode: ... # OPTIONAL: "list" by default, one of {"list", "dict", "history"}
 ```
 
-### Saving several metrics with their entire history with ``MlflowMetricsDataset``
+### Saving several metrics with their entire history with ``MlflowMetricsHistoryDataset``
 
 Since it is an ``AbstractDataset``, it can be used with the YAML API. You can define it in your ``catalog.yml`` as:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.metrics.MlflowMetricsDataset
+    type: kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset
 ```
 
 You can provide a prefix key, which is useful in situations like when you have multiple nodes producing metrics with the same names which you want to distinguish. If you are using the ``v``, it will handle that automatically for you by giving as prefix metrics data set name. In the example above the prefix would be ``my_model_metrics``.
@@ -163,7 +163,7 @@ Let's look at an example with custom prefix:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.metrics.MlflowMetricsDataset
+    type: kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset
     prefix: foo
 ```
 
@@ -179,7 +179,7 @@ def metrics_node() -> Dict[str, Union[float, List[float]]]:
     }
 ```
 
-As you can see above, ``kedro_mlflow.io.metrics.MlflowMetricsDataset`` can take metrics as:
+As you can see above, ``kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset`` can take metrics as:
 
 - ``Dict[str, key]``
 - ``List[Dict[str, key]]``
@@ -188,7 +188,7 @@ To store metrics we need to define metrics dataset in Kedro Catalog:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.metrics.MlflowMetricsDataset
+    type: kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset
 ```
 
 Within a kedro run, the ``MlflowHook`` will automatically prefix the metrics datasets with their name in the catalog. In our example, the metrics will be stored in Mlflow with the following keys: ``my_model_metrics.metric1``, ``my_model_metrics.metric2``.
@@ -197,7 +197,7 @@ It is also prossible to provide a prefix manually:
 
 ```yaml
 my_model_metrics:
-    type: kedro_mlflow.io.metrics.MlflowMetricsDataset
+    type: kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset
     prefix: foo
 ```
 

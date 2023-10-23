@@ -12,7 +12,7 @@ from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataset,
     MlflowMetricHistoryDataset,
-    MlflowMetricsDataset,
+    MlflowMetricsHistoryDataset,
 )
 
 
@@ -105,8 +105,8 @@ def dummy_catalog(tmp_path):
             "params:unused_param": MemoryDataset("blah"),
             "data": MemoryDataset(),
             "model": PickleDataset((tmp_path / "model.csv").as_posix()),
-            "my_metrics": MlflowMetricsDataset(),
-            "another_metrics": MlflowMetricsDataset(prefix="foo"),
+            "my_metrics": MlflowMetricsHistoryDataset(),
+            "another_metrics": MlflowMetricsHistoryDataset(prefix="foo"),
             "my_metric": MlflowMetricDataset(),
             "another_metric": MlflowMetricDataset(key="foo"),
             "my_metric_history": MlflowMetricHistoryDataset(),
@@ -181,8 +181,8 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
                 "model": PickleDataset(
                     (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
                 ),
-                "my_metrics": MlflowMetricsDataset(run_id=existing_run_id),
-                "another_metrics": MlflowMetricsDataset(
+                "my_metrics": MlflowMetricsHistoryDataset(run_id=existing_run_id),
+                "another_metrics": MlflowMetricsHistoryDataset(
                     run_id=existing_run_id, prefix="foo"
                 ),
                 "my_metric": MlflowMetricDataset(run_id=existing_run_id),

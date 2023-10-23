@@ -101,7 +101,7 @@ Replace the following entries:
 | old                                     | new                                               |
 | :-------------------------------------- | :------------------------------------------------ |
 | `kedro_mlflow.io.MlflowArtifactDataset` | `kedro_mlflow.io.artifacts.MlflowArtifactDataset` |
-| `kedro_mlflow.io.MlflowMetricsDataset`  | `kedro_mlflow.io.metrics.MlflowMetricsDataset`    |
+| `kedro_mlflow.io.MlflowMetricsHistoryDataset`  | `kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset`    |
 
 ### Hooks
 

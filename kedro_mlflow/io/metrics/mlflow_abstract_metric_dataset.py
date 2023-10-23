@@ -13,7 +13,7 @@ class MlflowAbstractMetricDataset(AbstractDataset):
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
     ):
-        """Initialise MlflowMetricsDataset.
+        """Initialise MlflowMetricsHistoryDataset.
 
         Args:
             run_id (str): The ID of the mlflow run where the metric should be logged

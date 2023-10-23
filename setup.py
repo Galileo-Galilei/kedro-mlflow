@@ -52,7 +52,7 @@ setup(
             "pytest-mock>=3.1.0, <4.0.0",
             "scikit-learn>=0.23.0, <1.4.0",
             "flake8==6.1.0",  # ensure consistency with pre-commit
-            "black==23.10.0",  # pin black version because it is not compatible with a pip range (because of non semver version number)
+            "black==23.10.1",  # pin black version because it is not compatible with a pip range (because of non semver version number)
             "isort==5.12.0",  # ensure consistency with pre-commit
             "kedro-datasets[pandas.CSVDataSet]",
         ],

@@ -29,11 +29,11 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .[test,extras]
-    - name: Check code formatting with ruff0
+    - name: Check code formatting with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
       run: |
         ruff format . --check
-    - name: Check import order aand syntax with ruff
+    - name: Check import order and syntax with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
       #"F",  # Pyflakes
       #"E",  # Pycodestyle

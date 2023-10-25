@@ -29,21 +29,22 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install .[test,extras]
-    - name: Check code formatting with black
+    - name: Check code formatting with ruff0
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
       run: |
-        black . --check
-    - name: Check import order with isort
+        ruff format . --check
+    - name: Check import order aand syntax with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
+      #"F",  # Pyflakes
+      #"E",  # Pycodestyle
+      # "W",  # Pycodestyle
+      # "UP",  # pyupgrade
+      # "I",  # isort
+      # "PL", # Pylint
+      # PLR0913 lines-too-long managed by "ruff format"
       run: |
-        isort . --check-only
-    - name: Lint with flake8
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude kedro_mlflow/template/project/run.py
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude kedro_mlflow/template/project/run.py
+        ruff check . --select F,E,W,UP,I,PL --ignore E,PLR0913 --exclude "/template/"
+
     - name: Test with pytest and generate coverage report
       run: |
         pytest --cov=./ --cov-report=xml

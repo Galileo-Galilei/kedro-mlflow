@@ -15,6 +15,8 @@ from kedro_mlflow.io.metrics import (
     MlflowMetricsHistoryDataset,
 )
 
+TEST_METRIC_VALUE = 1.1
+
 
 @pytest.fixture
 def dummy_pipeline():
@@ -25,10 +27,10 @@ def dummy_pipeline():
         return 2
 
     def metrics_fun(data, model):
-        return {"metric_key": {"value": 1.1, "step": 0}}
+        return {"metric_key": {"value": TEST_METRIC_VALUE, "step": 0}}
 
     def metric_fun(data, model):
-        return 1.1
+        return TEST_METRIC_VALUE
 
     def metric_history_fun(data, model):
         return [0.1, 0.2]
@@ -244,13 +246,13 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
         # for metric
         assert all_run_ids == {current_run_id, existing_run_id}
 
-        assert run_data.metrics["my_metrics.metric_key"] == 1.1
-        assert run_data.metrics["foo.metric_key"] == 1.1
-        assert run_data.metrics["my_metric"] == 1.1
-        assert run_data.metrics["foo"] == 1.1
+        assert run_data.metrics["my_metrics.metric_key"] == TEST_METRIC_VALUE
+        assert run_data.metrics["foo.metric_key"] == TEST_METRIC_VALUE
+        assert run_data.metrics["my_metric"] == TEST_METRIC_VALUE
+        assert run_data.metrics["foo"] == TEST_METRIC_VALUE
         assert (
-            run_data.metrics["my_metric_history"] == 0.2
+            run_data.metrics["my_metric_history"] == 0.2  # noqa: PLR2004
         )  # the list is stored, but only the last value is retrieved
         assert (
-            run_data.metrics["bar"] == 0.2
+            run_data.metrics["bar"] == 0.2  # noqa: PLR2004
         )  # the list is stored, but only the last value is retrieved

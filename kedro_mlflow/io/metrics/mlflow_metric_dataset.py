@@ -59,9 +59,7 @@ class MlflowMetricDataset(MlflowAbstractMetricDataset):
     def _save(self, data: float):
         if self._logging_activated:
             self._validate_run_id()
-            run_id = (
-                self.run_id
-            )  # we access it once instead of calling self.run_id everywhere to avoid looking or an active run each time
+            run_id = self.run_id  # we access it once instead of calling self.run_id everywhere to avoid looking or an active run each time
 
             mlflow_client = MlflowClient()
 

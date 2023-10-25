@@ -46,7 +46,7 @@ def test_write_jinja_template(tmp_path, template_path, jinja_template):
     write_jinja_template(
         src=template_path, dst=rendered_path, fake_tag="'Hello world!'"
     )
-    with open(rendered_path, "r") as file_handler:
+    with open(rendered_path) as file_handler:
         rendered = file_handler.read()
     assert rendered == jinja_template
 
@@ -61,6 +61,6 @@ def test_write_jinja_template_with_cookiecutter_tags(
         is_cookiecutter=True,
         fake_tag="'Hello world!'",
     )
-    with open(rendered_path, "r") as file_handler:
+    with open(rendered_path) as file_handler:
         rendered = file_handler.read()
     assert rendered == cookiecutter_template

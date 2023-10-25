@@ -127,7 +127,7 @@ def test_mlflow_metric_dataset_load():
     # overwrite is the default mode
     metric_ds = MlflowMetricDataset(run_id=run_id, key="awesome_metric")
 
-    assert metric_ds.load() == 0.1
+    assert metric_ds.load() == 0.1  # noqa: PLR2004
 
 
 def test_mlflow_metric_dataset_load_last_logged_by_default_if_unordered():
@@ -142,7 +142,7 @@ def test_mlflow_metric_dataset_load_last_logged_by_default_if_unordered():
     metric_ds = MlflowMetricDataset(run_id=run_id, key="awesome_metric")
 
     assert (
-        metric_ds.load() == 0.1
+        metric_ds.load() == 0.1  # noqa: PLR2004
     )  # the last value is retrieved even if it has a smaller step
 
 
@@ -159,7 +159,7 @@ def test_mlflow_metric_dataset_load_given_step():
         run_id=run_id, key="awesome_metric", load_args={"step": 2}
     )
 
-    assert metric_ds.load() == 0.3
+    assert metric_ds.load() == 0.3  # noqa: PLR2004
 
 
 def test_mlflow_metric_dataset_load_last_given_step_if_duplicated():
@@ -177,7 +177,7 @@ def test_mlflow_metric_dataset_load_last_given_step_if_duplicated():
         run_id=run_id, key="awesome_metric", load_args={"step": 2}
     )
 
-    assert metric_ds.load() == 0.32
+    assert metric_ds.load() == 0.32  # noqa: PLR2004
 
 
 def test_mlflow_metric_dataset_logging_deactivation(mlflow_tracking_uri):

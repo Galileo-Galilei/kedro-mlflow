@@ -288,7 +288,7 @@ def test_model_packaging_with_copy_mode(
     loaded_model = mlflow.pyfunc.load_model(model_uri=f"runs:/{run_id}/model")
 
     # first assertion: prediction works
-    assert loaded_model.predict(1) == 2
+    assert loaded_model.predict(1) == 2  # noqa: PLR2004
 
     # second assertion: copy_mode works
     actual_copy_mode = {

@@ -56,14 +56,17 @@ def test_flatten_dict_with_float_keys():
         "1_4_e": 3,
         "1_4_6.7": 5,
     }
-    assert _flatten_dict(d=d, recursive=False, sep="_") == {
-        "0": 1,
-        "1_3": 1,
-        "1_4": {
-            "e": 3,
-            6.7: 5,  # 6.7 is not converted to string, but when the entire dict will be logged mlflow will take care of the conversion
-        },
-    }
+    assert (
+        _flatten_dict(d=d, recursive=False, sep="_")
+        == {
+            "0": 1,
+            "1_3": 1,
+            "1_4": {
+                "e": 3,
+                6.7: 5,  # 6.7 is not converted to string, but when the entire dict will be logged mlflow will take care of the conversion
+            },
+        }
+    )
 
 
 def test_flatten_dict_with_used_defined_sep():

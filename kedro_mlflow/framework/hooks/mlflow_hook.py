@@ -299,24 +299,23 @@ class MlflowHook:
         str_value_length = len(str_value)
         if str_value_length <= MAX_PARAM_VAL_LENGTH:
             return mlflow.log_param(name, value)
-        else:
-            if self.long_params_strategy == "fail":
-                raise ValueError(
-                    f"Parameter '{name}' length is {str_value_length}, "
-                    f"while mlflow forces it to be lower than '{MAX_PARAM_VAL_LENGTH}'. "
-                    "If you want to bypass it, try to change 'long_params_strategy' to"
-                    " 'tag' or 'truncate' in the 'mlflow.yml'configuration file."
-                )
-            elif self.long_params_strategy == "tag":
-                self._logger.warning(
-                    f"Parameter '{name}' (value length {str_value_length}) is set as a tag."
-                )
-                mlflow.set_tag(name, value)
-            elif self.long_params_strategy == "truncate":
-                self._logger.warning(
-                    f"Parameter '{name}' (value length {str_value_length}) is truncated to its {MAX_PARAM_VAL_LENGTH} first characters."
-                )
-                mlflow.log_param(name, str_value[0:MAX_PARAM_VAL_LENGTH])
+        elif self.long_params_strategy == "fail":
+            raise ValueError(
+                f"Parameter '{name}' length is {str_value_length}, "
+                f"while mlflow forces it to be lower than '{MAX_PARAM_VAL_LENGTH}'. "
+                "If you want to bypass it, try to change 'long_params_strategy' to"
+                " 'tag' or 'truncate' in the 'mlflow.yml'configuration file."
+            )
+        elif self.long_params_strategy == "tag":
+            self._logger.warning(
+                f"Parameter '{name}' (value length {str_value_length}) is set as a tag."
+            )
+            mlflow.set_tag(name, value)
+        elif self.long_params_strategy == "truncate":
+            self._logger.warning(
+                f"Parameter '{name}' (value length {str_value_length}) is truncated to its {MAX_PARAM_VAL_LENGTH} first characters."
+            )
+            mlflow.log_param(name, str_value[0:MAX_PARAM_VAL_LENGTH])
 
     @hook_impl
     def after_pipeline_run(

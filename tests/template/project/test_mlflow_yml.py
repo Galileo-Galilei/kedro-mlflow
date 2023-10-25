@@ -24,9 +24,8 @@ def template_mlflowyml(tmp_path):
 
 
 def test_mlflow_yml_rendering(template_mlflowyml):
-
     # the mlflow yml file must be consistent with the default in KedroMlflowConfig for readibility
-    with open(template_mlflowyml, "r") as file_handler:
+    with open(template_mlflowyml) as file_handler:
         mlflow_config = yaml.safe_load(file_handler)
 
     # note: Using Pydantic model Construct method skip all validations

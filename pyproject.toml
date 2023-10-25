@@ -6,3 +6,15 @@ profile = "black"
 sections=["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
 known_first_party=["kedro_mlflow"]
 known_third_party=["anyconfig","black","click","cookiecutter","flake8","isort","jinja2","kedro","mlflow","pandas","pytest","pytest_lazyfixture","setuptools","sklearn","yaml"]
+
+[tool.ruff]
+select = [
+    "F",  # Pyflakes
+    "E",  # Pycodestyle
+    "W",  # Pycodestyle
+    "UP",  # pyupgrade
+    "I",  # isort
+    "PL", # Pylint
+]
+ignore = ["E501", "PLR0913"]  # Black take care off line-too-long
+exclude = ["/template/"]

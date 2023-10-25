@@ -121,14 +121,12 @@ class KedroPipelineModel(PythonModel):
                         dataset, MemoryDataset
                     ) and not dataset_name.startswith("params:"):
                         raise KedroPipelineModelError(
-                            """
+                            f"""
                                 The datasets of the training pipeline must be persisted locally
                                 to be used by the inference pipeline. You must enforce them as
                                 non 'MemoryDataset' in the 'catalog.yml'.
                                 Dataset '{dataset_name}' is not persisted currently.
-                                """.format(
-                                dataset_name=dataset_name
-                            )
+                                """
                         )
                     self._logger.info(
                         f"The dataset '{dataset_name}' is added to the Pipeline catalog."

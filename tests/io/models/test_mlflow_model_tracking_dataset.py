@@ -208,7 +208,7 @@ def test_save_and_load_sklearn_flavor_with_run_id(
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
     linreg_model_loaded = mlflow_model_ds.load()
     assert isinstance(linreg_model_loaded, LinearRegression)
-    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5
+    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
 
 
 @pytest.mark.parametrize("initial_active_run", [False, True])
@@ -246,7 +246,7 @@ def test_save_and_load_sklearn_flavor_without_run_id(
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
     linreg_model_loaded = mlflow_model_ds.load()
     assert isinstance(linreg_model_loaded, LinearRegression)
-    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5
+    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
 
     # load a second time after closing the active_run
     mlflow.end_run()
@@ -257,7 +257,7 @@ def test_save_and_load_sklearn_flavor_without_run_id(
 
     assert isinstance(linreg_model_loaded2, LinearRegression)
     assert (
-        pytest.approx(linreg_model_loaded2.predict([[1, 2]])[0], abs=10 ** (-14)) == 5
+        pytest.approx(linreg_model_loaded2.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
     )
 
 

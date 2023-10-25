@@ -316,7 +316,6 @@ def modelify(
             session.load_context()
         )  # triggers config setup with after_context_created hook
         catalog = context.catalog
-        input_name = input_name
 
         if input_name not in pipeline.inputs():
             valid_inputs = "\n - ".join(pipeline.inputs())

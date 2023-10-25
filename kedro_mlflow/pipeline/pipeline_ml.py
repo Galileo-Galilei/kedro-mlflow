@@ -150,8 +150,6 @@ class PipelineML(Pipeline):
                 "except 'input_name' and parameters which starts with 'params:'."
             )
 
-        return None
-
     def _turn_pipeline_to_ml(self, pipeline: Pipeline):
         return PipelineML(
             nodes=pipeline.nodes,

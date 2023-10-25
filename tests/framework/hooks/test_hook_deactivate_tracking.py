@@ -209,9 +209,7 @@ def mock_pipelines(mocker, dummy_pipeline):
 
 
 @pytest.fixture
-def mock_session(
-    mocker, mock_settings_with_mlflow_hooks, kedro_project_path
-):  # pylint: disable=unused-argument
+def mock_session(mocker, mock_settings_with_mlflow_hooks, kedro_project_path):  # pylint: disable=unused-argument
     # we need to patch "kedro.framework.session.session.validate_settings" instead of
     # "kedro.framework.project.validate_settings" because it is imported
     mocker.patch("kedro.framework.session.session.validate_settings")

@@ -5,6 +5,7 @@
 ### Added
 
 - :sparkles: Add support for python 3.11 ([#450, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
+- :sparkles: :arrow_up: Add support for pydantic v2 ([#476](https://github.com/Galileo-Galilei/kedro-mlflow/pull/476))
 
 ### Changed
 

@@ -360,7 +360,7 @@ class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
             credentials=None,
             request_header_provider=dict(
                 type="custom_rhp.CustomRequestHeaderProviderInitKwargs",
-                init_kwargs=dict(a=1),
+                init_kwargs=dict(a="a"),
             ),
         ),
         tracking=dict(
@@ -389,7 +389,7 @@ class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
             mtrr._request_header_provider_registry._registry[-1].__class__.__name__
             == "CustomRequestHeaderProviderInitKwargs"
         )
-    assert mtrr._request_header_provider_registry._registry[-1].a == "1"
+    assert mtrr._request_header_provider_registry._registry[-1].a == "a"
     assert not hasattr(mtrr._request_header_provider_registry._registry[-1], "context")
 
 
@@ -423,7 +423,7 @@ class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
             request_header_provider=dict(
                 type="custom_rhp.CustomRequestHeaderProviderInitKwargsKedroContext",
                 pass_context=True,
-                init_kwargs=dict(b=2),
+                init_kwargs=dict(b="b"),
             ),
         ),
         tracking=dict(
@@ -452,7 +452,7 @@ class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
         mtrr._request_header_provider_registry._registry[-1].__class__.__name__
         == "CustomRequestHeaderProviderInitKwargsKedroContext"
     )
-    assert mtrr._request_header_provider_registry._registry[-1].b == "2"
+    assert mtrr._request_header_provider_registry._registry[-1].b == "b"
     assert hasattr(mtrr._request_header_provider_registry._registry[-1], "context")
     assert isinstance(
         mtrr._request_header_provider_registry._registry[-1].context, KedroContext

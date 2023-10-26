@@ -16,6 +16,7 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
+from pydantic import __version__ as pydantic_version
 
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.framework.hooks.utils import (
@@ -74,7 +75,11 @@ class MlflowHook:
             # but we got an empty dict
             conf_mlflow_yml = {}
 
-        mlflow_config = KedroMlflowConfig.parse_obj({**conf_mlflow_yml})
+        mlflow_config = (
+            KedroMlflowConfig.model_validate({**conf_mlflow_yml})
+            if pydantic_version > "2.0.0"
+            else KedroMlflowConfig.parse_obj({**conf_mlflow_yml})
+        )
 
         self._already_active_mlflow = False
         if mlflow.active_run():

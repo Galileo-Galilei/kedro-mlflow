@@ -7,7 +7,6 @@ from kedro.io import DataCatalog, MemoryDataset
 from kedro.io.core import DatasetError
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataset
-from mlflow.tracking import MlflowClient
 from sklearn.linear_model import LinearRegression
 
 from kedro_mlflow.io.models import MlflowModelTrackingDataset
@@ -26,21 +25,9 @@ def linreg_model():
 
 
 @pytest.fixture
-def tracking_uri(tmp_path):
-    tracking_uri = (tmp_path / "mlruns").as_uri()
-    return tracking_uri
-
-
-@pytest.fixture
 def tmp_folder():
     tmp_folder = TemporaryDirectory()
     return tmp_folder
-
-
-@pytest.fixture
-def mlflow_client(tracking_uri):
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri)
-    return mlflow_client
 
 
 @pytest.fixture
@@ -172,16 +159,10 @@ def test_save_sklearn_flavor_with_run_id_and_already_active_run(tracking_uri):
 
 @pytest.mark.parametrize("active_run_when_loading", [False, True])
 def test_save_and_load_sklearn_flavor_with_run_id(
-    tracking_uri, mlflow_client, linreg_model, active_run_when_loading
+    mlflow_client, linreg_model, active_run_when_loading
 ):
-    mlflow.set_tracking_uri(tracking_uri)
-    # close all opened mlflow runs to avoid interference between tests
-    while mlflow.active_run():
-        mlflow.end_run()
-
-    mlflow.start_run()
-    existing_run_id = mlflow.active_run().info.run_id
-    mlflow.end_run()
+    with mlflow.start_run():
+        existing_run_id = mlflow.active_run().info.run_id
 
     artifact_path = "my_linreg"
     model_config = {
@@ -213,13 +194,8 @@ def test_save_and_load_sklearn_flavor_with_run_id(
 
 @pytest.mark.parametrize("initial_active_run", [False, True])
 def test_save_and_load_sklearn_flavor_without_run_id(
-    tracking_uri, mlflow_client, linreg_model, initial_active_run
+    mlflow_client, linreg_model, initial_active_run
 ):
-    mlflow.set_tracking_uri(tracking_uri)
-    # close all opened mlflow runs to avoid interference between tests
-    while mlflow.active_run():
-        mlflow.end_run()
-
     artifact_path = "my_linreg"
     model_config = {
         "name": "linreg",
@@ -343,6 +319,7 @@ def test_pyfunc_flavor_python_model_save_and_load(
 
 
 def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
+    mlflow.set_tracking_uri(tracking_uri)
     model_config = {
         "name": "kedro_pipeline_model",
         "config": {
@@ -359,11 +336,8 @@ def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
         MlflowModelTrackingDataset.from_config(**model_config)
 
 
-def test_mlflow_model_tracking_logging_deactivation(tracking_uri, linreg_model):
+def test_mlflow_model_tracking_logging_deactivation(mlflow_client, linreg_model):
     mlflow_model_tracking_dataset = MlflowModelTrackingDataset(flavor="mlflow.sklearn")
-
-    mlflow.set_tracking_uri(tracking_uri)
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri)
 
     mlflow_model_tracking_dataset._logging_activated = False
 

@@ -39,11 +39,6 @@ def assert_are_metrics_logged(
 
 
 @pytest.fixture
-def tracking_uri(tmp_path):
-    return tmp_path / "mlruns"
-
-
-@pytest.fixture
 def metrics():
     return {
         "metric1": {"step": 0, "value": 1.1},
@@ -80,12 +75,11 @@ def metrics3():
         (lazy_fixture("metrics3"), "test"),
     ],
 )
-def test_mlflow_metrics_dataset_saved_and_logged(tmp_path, tracking_uri, data, prefix):
+def test_mlflow_metrics_dataset_saved_and_logged(mlflow_client, data, prefix):
     """Check if MlflowMetricsHistoryDataset can be saved in catalog when filepath is given,
     and if logged in mlflow.
     """
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
+
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(prefix=prefix)
 
     with mlflow.start_run():
@@ -108,14 +102,12 @@ def test_mlflow_metrics_dataset_saved_and_logged(tmp_path, tracking_uri, data, p
         assert data[data_key] == catalog_metrics[k]
 
 
-def test_mlflow_metrics_dataset_saved_without_run_id(tmp_path, tracking_uri, metrics3):
+def test_mlflow_metrics_dataset_saved_without_run_id(mlflow_client, metrics3):
     """Check if MlflowMetricsHistoryDataset can be saved in catalog when filepath is given,
     and if logged in mlflow.
     """
     prefix = "test_metric"
 
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(prefix=prefix)
 
     # a mlflow run_id is automatically created
@@ -125,13 +117,13 @@ def test_mlflow_metrics_dataset_saved_without_run_id(tmp_path, tracking_uri, met
     assert_are_metrics_logged(metrics3, mlflow_client, run_id, prefix)
 
 
-def test_mlflow_metrics_dataset_exists(tmp_path, tracking_uri, metrics3):
+def test_mlflow_metrics_dataset_exists(tracking_uri, metrics3):
     """Check if MlflowMetricsHistoryDataset is well identified as
     existing if it has already been saved.
     """
     prefix = "test_metric"
 
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(prefix=prefix)
 
     # a mlflow run_id is automatically created
@@ -139,13 +131,12 @@ def test_mlflow_metrics_dataset_exists(tmp_path, tracking_uri, metrics3):
     assert mlflow_metrics_dataset.exists()
 
 
-def test_mlflow_metrics_dataset_does_not_exist(tmp_path, tracking_uri, metrics3):
+def test_mlflow_metrics_dataset_does_not_exist(tracking_uri):
     """Check if MlflowMetricsHistoryDataset is well identified as
     not existingif it has never been saved.
     """
-
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow.start_run()  # starts a run toenable mlflow_metrics_dataset to know where to seacrh
+    mlflow.set_tracking_uri(tracking_uri)
+    mlflow.start_run()  # starts a run to enable mlflow_metrics_dataset to know where to seacrh
     run_id = mlflow.active_run().info.run_id
     mlflow.end_run()
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(
@@ -155,14 +146,12 @@ def test_mlflow_metrics_dataset_does_not_exist(tmp_path, tracking_uri, metrics3)
     assert not mlflow_metrics_dataset.exists()
 
 
-def test_mlflow_metrics_dataset_fails_with_invalid_metric(
-    tmp_path, tracking_uri, metrics3
-):
+def test_mlflow_metrics_dataset_fails_with_invalid_metric(tracking_uri):
     """Check if MlflowMetricsHistoryDataset is well identified as
     not existingif it has never been saved.
     """
 
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow.set_tracking_uri(tracking_uri)
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(prefix="test_metric")
 
     with pytest.raises(
@@ -173,11 +162,8 @@ def test_mlflow_metrics_dataset_fails_with_invalid_metric(
         )  # key: value is not valid, you must specify {key: {value, step}}
 
 
-def test_mlflow_metrics_logging_deactivation(tracking_uri, metrics):
+def test_mlflow_metrics_logging_deactivation(mlflow_client, metrics):
     mlflow_metrics_dataset = MlflowMetricsHistoryDataset(prefix="hello")
-
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
     mlflow_metrics_dataset._logging_activated = False
 

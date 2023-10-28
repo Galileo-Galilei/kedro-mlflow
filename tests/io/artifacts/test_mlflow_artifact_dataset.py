@@ -6,15 +6,9 @@ import pytest
 from kedro.io import PartitionedDataset
 from kedro_datasets.pandas import CSVDataset
 from kedro_datasets.pickle import PickleDataset
-from mlflow.tracking import MlflowClient
 from pytest_lazyfixture import lazy_fixture
 
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset
-
-
-@pytest.fixture
-def tracking_uri(tmp_path):
-    return tmp_path / "mlruns"
 
 
 @pytest.fixture
@@ -46,10 +40,8 @@ def df2():
     ],
 )
 def test_mlflow_csv_pkl_dataset_save_reload(
-    tmp_path, tracking_uri, dataset, extension, data, artifact_path
+    tmp_path, mlflow_client, dataset, extension, data, artifact_path
 ):
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     filepath = (tmp_path / "data").with_suffix(extension)
 
     mlflow_dataset = MlflowArtifactDataset(
@@ -80,10 +72,8 @@ def test_mlflow_csv_pkl_dataset_save_reload(
     [(False), (True)],
 )
 def test_artifact_dataset_save_with_run_id(
-    tmp_path, tracking_uri, df1, exists_active_run
+    tmp_path, mlflow_client, df1, exists_active_run
 ):
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
     nb_runs = 0
     # create a first run and get its id
     with mlflow.start_run():
@@ -123,13 +113,11 @@ def test_artifact_dataset_save_with_run_id(
         mlflow.end_run()
 
 
-def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri, df1):
+def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, mlflow_client, df1):
     """Check if versioned dataset is logged correctly in MLflow as artifact.
 
     For versioned datasets just artifacts from current run should be logged.
     """
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
     with mlflow.start_run():
         run_id = mlflow.active_run().info.run_id
@@ -171,13 +159,10 @@ def test_is_versioned_dataset_logged_correctly_in_mlflow(tmp_path, tracking_uri,
         assert df1.equals(mlflow_csv_dataset.load())  # and must loadable
 
 
-def test_artifact_dataset_logging_deactivation(tmp_path, tracking_uri):
+def test_artifact_dataset_logging_deactivation(tmp_path, mlflow_client):
     mlflow_pkl_dataset = MlflowArtifactDataset(
         dataset=dict(type=PickleDataset, filepath=(tmp_path / "df1.csv").as_posix())
     )
-
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
 
     mlflow_pkl_dataset._logging_activated = False
 
@@ -208,7 +193,7 @@ def test_mlflow_artifact_logging_deactivation_is_bool(tmp_path):
 
 
 def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow.set_tracking_uri(tracking_uri)
 
     # define the logger
     mlflow_csv_dataset = MlflowArtifactDataset(
@@ -236,7 +221,7 @@ def test_artifact_dataset_load_with_run_id(tmp_path, tracking_uri, df1, df2):
 def test_artifact_dataset_load_with_run_id_and_artifact_path(
     tmp_path, tracking_uri, df1, artifact_path
 ):
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
+    mlflow.set_tracking_uri(tracking_uri)
 
     # save first and retrieve run id
     mlflow_csv_dataset1 = MlflowArtifactDataset(
@@ -264,11 +249,8 @@ def test_artifact_dataset_load_with_run_id_and_artifact_path(
 
 @pytest.mark.parametrize("artifact_path", [None, "partitioned_data"])
 def test_partitioned_dataset_save_and_reload(
-    tmp_path, tracking_uri, artifact_path, df1, df2
+    tmp_path, mlflow_client, artifact_path, df1, df2
 ):
-    mlflow.set_tracking_uri(tracking_uri.as_uri())
-    mlflow_client = MlflowClient(tracking_uri=tracking_uri.as_uri())
-
     mlflow_dataset = MlflowArtifactDataset(
         artifact_path=artifact_path,
         dataset=dict(

@@ -16,9 +16,11 @@ from mlflow.entities import RunStatus
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
+from omegaconf import OmegaConf
 from pydantic import __version__ as pydantic_version
 
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
+from kedro_mlflow.config.resolvers import resolve_random_name
 from kedro_mlflow.framework.hooks.utils import (
     _assert_mlflow_enabled,
     _flatten_dict,
@@ -59,6 +61,12 @@ class MlflowHook:
         Args:
             context: The context that was created.
         """
+
+        LOGGER.info(r"Registering new custom resolver: 'km.random_name'")
+        if not OmegaConf.has_resolver("km.random_name"):
+            OmegaConf.register_new_resolver(
+                "km.random_name", resolve_random_name, use_cache=True
+            )
 
         try:
             if "mlflow" not in context.config_loader.config_patterns.keys():

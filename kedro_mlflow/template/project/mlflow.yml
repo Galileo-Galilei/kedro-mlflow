@@ -34,7 +34,7 @@ tracking:
     pipelines: []
 
   experiment:
-    name: {{ python_package }}
+    name: {{ python_package }} # you can use "${km.random_name:null}" to generate a random name (mlflow's default)
     restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
 
   run:

@@ -1,9 +1,10 @@
 import shutil
+from inspect import isclass
 from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
-from kedro.io import AbstractVersionedDataset
+from kedro.io import AbstractDataset, AbstractVersionedDataset
 from kedro.io.core import parse_dataset_definition
 from mlflow.tracking import MlflowClient
 
@@ -20,13 +21,16 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         artifact_path: str = None,
         credentials: Dict[str, Any] = None,
     ):
-        dataset, dataset_args = parse_dataset_definition(config=dataset)
+        if isclass(dataset["type"]) and issubclass(dataset["type"], AbstractDataset):
+            # parse_dataset_definition needs type to be a string, not the class itself
+            dataset["type"] = f"{dataset['type'].__module__}.{dataset['type'].__name__}"
+        dataset_obj, dataset_args = parse_dataset_definition(config=dataset)
 
         # fake inheritance : this mlflow class should be a mother class which wraps
         # all dataset (i.e. it should replace AbstractVersionedDataset)
         # instead and since we can't modify the core package,
         # we create a subclass which inherits dynamically from the dataset class
-        class MlflowArtifactDatasetChildren(dataset):
+        class MlflowArtifactDatasetChildren(dataset_obj):
             def __init__(self, run_id, artifact_path):
                 super().__init__(**dataset_args)
                 self.run_id = run_id
@@ -134,7 +138,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
                 return super()._load()
 
         # rename the class
-        parent_name = dataset.__name__
+        parent_name = dataset_obj.__name__
         MlflowArtifactDatasetChildren.__name__ = f"Mlflow{parent_name}"
         MlflowArtifactDatasetChildren.__qualname__ = (
             f"{parent_name}.Mlflow{parent_name}"

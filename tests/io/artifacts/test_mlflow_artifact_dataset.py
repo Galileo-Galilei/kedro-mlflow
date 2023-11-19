@@ -3,8 +3,8 @@ from pathlib import Path
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import PartitionedDataset
 from kedro_datasets.pandas import CSVDataset
+from kedro_datasets.partitions import PartitionedDataset
 from kedro_datasets.pickle import PickleDataset
 from pytest_lazyfixture import lazy_fixture
 

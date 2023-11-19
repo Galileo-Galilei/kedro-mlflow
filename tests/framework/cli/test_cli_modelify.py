@@ -27,24 +27,26 @@ def kp_for_modelify(tmp_path):
     # TODO: find a better way to inject dynamically
     # the templated config loader without modifying the template
 
+    _FAKE_MODELIFY_PROJECT_NAME = r"kp_for_modelify"
     config = {
-        "output_dir": tmp_path,
+        # "output_dir": tmp_path,
+        "project_name": _FAKE_MODELIFY_PROJECT_NAME,
+        "repo_name": _FAKE_MODELIFY_PROJECT_NAME,
+        "python_package": _FAKE_MODELIFY_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "project_name": "A kedro project with a pipeline for modelify command",
-        "repo_name": "kp-for-modelify",  # "kp" for "kedro_project"
-        "python_package": "kp_for_modelify",
+        "add_ons": "none",
     }
 
     cookiecutter(
         str(TEMPLATE_PATH),
-        output_dir=config["output_dir"],
+        output_dir=tmp_path,  # config["output_dir"],
         no_input=True,
         extra_context=config,
         accept_hooks=False,
     )
 
     shutil.rmtree(
-        tmp_path / config["repo_name"] / "src" / "tests"
+        tmp_path / _FAKE_MODELIFY_PROJECT_NAME / "tests"
     )  # avoid conflicts with pytest
 
     pipeline_registry_py = """
@@ -74,7 +76,7 @@ def register_pipelines():
 """
 
     model_filepath = (
-        config["output_dir"] / config["repo_name"] / "data" / "my_model.pkl"
+        tmp_path / config["repo_name"] / "data" / "my_model.pkl"
     ).as_posix()
 
     catalog_yml = f"""
@@ -131,24 +133,26 @@ def kp_for_modelify_with_parameters(tmp_path):
     # TODO: find a better way to inject dynamically
     # the templated config loader without modifying the template
 
+    _FAKE_MODELIFY_PROJECT_NAME = r"kp_for_modelify_with_params"
     config = {
-        "output_dir": tmp_path,
+        # "output_dir": tmp_path,
+        "project_name": _FAKE_MODELIFY_PROJECT_NAME,
+        "repo_name": _FAKE_MODELIFY_PROJECT_NAME,
+        "python_package": _FAKE_MODELIFY_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "project_name": "A kedro project with a pipeline for modelify command",
-        "repo_name": "kp-for-modelify-params",  # "kp" for "kedro_project"
-        "python_package": "kp_for_modelify_params",
+        "add_ons": "none",
     }
 
     cookiecutter(
         str(TEMPLATE_PATH),
-        output_dir=config["output_dir"],
+        output_dir=tmp_path,  # config["output_dir"],
         no_input=True,
         extra_context=config,
         accept_hooks=False,
     )
 
     shutil.rmtree(
-        tmp_path / config["repo_name"] / "src" / "tests"
+        tmp_path / _FAKE_MODELIFY_PROJECT_NAME / "tests"
     )  # avoid conflicts with pytest
 
     pipeline_registry_py = """
@@ -179,7 +183,7 @@ def register_pipelines():
 """
 
     model_filepath = (
-        config["output_dir"] / config["repo_name"] / "data" / "my_model.pkl"
+        tmp_path / config["repo_name"] / "data" / "my_model.pkl"
     ).as_posix()
 
     catalog_yml = f"""
@@ -467,6 +471,7 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
     runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
         context.mlflow.tracking.experiment._experiment.experiment_id
     )
+    print(runs_list_before_cmd)
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(
@@ -477,7 +482,7 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
             "--input-name",
             "my_input_data",
             "--pip-requirements",
-            "./src/requirements.txt",
+            "./requirements.txt",
         ],
         catch_exceptions=True,
     )

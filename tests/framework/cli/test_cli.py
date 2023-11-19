@@ -1,14 +1,10 @@
 import re
-import shutil
 import subprocess  # noqa: F401
 
 import pytest
 import yaml
 from click.testing import CliRunner
-from cookiecutter.main import cookiecutter
-from kedro import __version__ as kedro_version
 from kedro.framework.cli.cli import info
-from kedro.framework.cli.starters import TEMPLATE_PATH
 from kedro.framework.project import _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
@@ -253,33 +249,35 @@ def test_ui_overwrite_conf_at_runtime(
     )
 
 
-def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
-    config = {
-        "output_dir": tmp_path,
-        "kedro_version": kedro_version,
-        "project_name": "This is a fake project",
-        "repo_name": "fake-project-with-http-uri",
-        "python_package": "fake_project_with_http_uri",
-        "include_example": True,
-    }
+def test_ui_open_http_uri(monkeypatch, mocker, kedro_project):
+    # config = {
+    #     "output_dir": tmp_path,
+    #     "kedro_version": kedro_version,
+    #     "project_name": "This is a fake project",
+    #     "repo_name": "fake-project-with-http-uri",
+    #     "python_package": "fake_project_with_http_uri",
+    #     "include_example": True,
+    # }
 
-    cookiecutter(
-        str(TEMPLATE_PATH),
-        output_dir=config["output_dir"],
-        no_input=True,
-        extra_context=config,
-        accept_hooks=False,
-    )
+    # cookiecutter(
+    #     str(TEMPLATE_PATH),
+    #     output_dir=config["output_dir"],
+    #     no_input=True,
+    #     extra_context=config,
+    #     accept_hooks=False,
+    # )
 
-    project_path = tmp_path / config["repo_name"]
-    shutil.rmtree(project_path / "src" / "tests")  # avoid conflicts with pytest
+    # project_path = tmp_path / config["repo_name"]
+    # shutil.rmtree(project_path / "src" / "tests")  # avoid conflicts with pytest
 
     mlflow_config = KedroMlflowConfig(
         server=dict(mlflow_tracking_uri="http://google.com")
     )
 
     with open(
-        (project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
+        # (project_path / "conf" / "local" / "mlflow.yml").as_posix(), "w"
+        (kedro_project / "conf" / "local" / "mlflow.yml").as_posix(),
+        "w",
     ) as fhandler:
         yaml.dump(
             mlflow_config.dict(),
@@ -287,7 +285,7 @@ def test_ui_open_http_uri(monkeypatch, mocker, tmp_path):
             default_flow_style=False,
         )
 
-    monkeypatch.chdir(project_path.as_posix())
+    monkeypatch.chdir(kedro_project.as_posix())
     cli_runner = CliRunner()
 
     # This does not test anything : the goal is to check whether it raises an error

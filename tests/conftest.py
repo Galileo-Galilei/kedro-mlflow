@@ -53,27 +53,27 @@ def cleanup_mlflow_after_runs():
 def kedro_project(tmp_path):
     # TODO : this is also an integration test since this depends from the kedro version
     config = {
-        "output_dir": tmp_path,
+        # "output_dir": tmp_path,
+        "project_name": _FAKE_PROJECT_NAME,
+        "repo_name": _FAKE_PROJECT_NAME,
+        "python_package": _FAKE_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "project_name": "This is a fake project",
-        "repo_name": "fake-project",
-        "python_package": "fake_project",
-        "include_example": True,
+        "add_ons": "none",
     }
 
     cookiecutter(
         str(TEMPLATE_PATH),
-        output_dir=config["output_dir"],
+        output_dir=tmp_path,  # config["output_dir"],
         no_input=True,
         extra_context=config,
         accept_hooks=False,
     )
 
     shutil.rmtree(
-        tmp_path / "fake-project" / "src" / "tests"
+        tmp_path / _FAKE_PROJECT_NAME / "tests"
     )  # avoid conflicts with pytest
 
-    return tmp_path / "fake-project"
+    return tmp_path / _FAKE_PROJECT_NAME
 
 
 @pytest.fixture

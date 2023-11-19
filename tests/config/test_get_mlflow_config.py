@@ -178,9 +178,9 @@ def fake_project(tmp_path, local_logging_config):
     payload = {
         "tool": {
             "kedro": {
-                "project_version": kedro_version,
                 "project_name": "fake_project",
                 "package_name": "fake_package",
+                "kedro_init_version": kedro_version,
             }
         }
     }

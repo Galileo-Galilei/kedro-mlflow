@@ -2,7 +2,7 @@ from typing import Any, Dict, Iterable, Optional
 
 import mlflow
 import pytest
-from kedro.config import ConfigLoader
+from kedro.config import AbstractConfigLoader, OmegaConfigLoader
 from kedro.framework.hooks import hook_impl
 from kedro.framework.project import Validator, _ProjectPipelines, _ProjectSettings
 from kedro.framework.session import KedroSession
@@ -17,8 +17,8 @@ from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 
 class DummyProjectHooks:
     @hook_impl
-    def register_config_loader(self, conf_paths: Iterable[str]) -> ConfigLoader:
-        return ConfigLoader(conf_paths)
+    def register_config_loader(self, conf_paths: Iterable[str]) -> AbstractConfigLoader:
+        return OmegaConfigLoader(conf_paths)
 
     @hook_impl
     def register_catalog(

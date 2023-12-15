@@ -221,7 +221,7 @@ def mock_session(mocker, mock_settings_with_mlflow_hooks, kedro_project_path):  
     )  # prevent registering the one of the plugins which are already installed
 
     configure_project(MOCK_PACKAGE_NAME)
-    return KedroSession.create(MOCK_PACKAGE_NAME, kedro_project_path)
+    return KedroSession.create(kedro_project_path)
 
 
 def test_deactivated_tracking_but_not_for_given_pipeline(mock_session):

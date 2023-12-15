@@ -104,9 +104,7 @@ def test_cli_init_existing_config(
     monkeypatch.chdir(kedro_project_with_mlflow_conf)
     bootstrap_project(kedro_project_with_mlflow_conf)
 
-    with KedroSession.create(
-        "fake_project", project_path=kedro_project_with_mlflow_conf
-    ) as session:
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         # emulate first call by writing a mlflow.yml file
         yaml_str = yaml.dump(dict(server=dict(mlflow_tracking_uri="toto")))
         (

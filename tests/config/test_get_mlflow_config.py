@@ -63,7 +63,7 @@ def test_mlflow_config_default(kedro_project):
 def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
     # config_with_base_mlflow_conf is a pytest.fixture in conftest
     bootstrap_project(kedro_project)
-    session = KedroSession.create(project_path=kedro_project, package_name=package_name)
+    session = KedroSession.create(project_path=kedro_project)
     context = session.load_context()
     assert context.mlflow.dict() == dict(
         server=dict(
@@ -90,9 +90,7 @@ def test_mlflow_config_with_no_experiment_name(kedro_project):
     open((kedro_project / "conf" / "base" / "mlflow.yml").as_posix(), mode="w").close()
 
     bootstrap_project(kedro_project)
-    session = KedroSession.create(
-        project_path=kedro_project, package_name="fake_project"
-    )
+    session = KedroSession.create(project_path=kedro_project)
     context = session.load_context()
     assert context.mlflow.dict() == dict(
         server=dict(
@@ -203,9 +201,7 @@ def fake_project(tmp_path, local_logging_config):
 )
 def test_mlflow_config_correctly_set(kedro_project, project_settings):
     bootstrap_project(kedro_project)
-    session = KedroSession.create(
-        project_path=kedro_project, package_name="fake_project"
-    )
+    session = KedroSession.create(project_path=kedro_project)
     context = session.load_context()
     assert context.mlflow.dict(exclude={"project_path"}) == dict(
         server=dict(
@@ -323,7 +319,7 @@ class CustomRequestHeaderProvider(RequestHeaderProvider):
     _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project) as session:
+    with KedroSession.create(project_path=fake_project) as session:
         session.load_context()  # trigger setup and request_header_provider registration
 
         assert (
@@ -382,7 +378,7 @@ class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
     _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project) as session:
+    with KedroSession.create(project_path=fake_project) as session:
         session.load_context()  # trigger setup and request_header_provider registration
 
         assert (
@@ -445,7 +441,7 @@ class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
     _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project) as session:
+    with KedroSession.create(project_path=fake_project) as session:
         session.load_context()  # trigger setup and request_header_provider registration
 
     assert (
@@ -500,7 +496,7 @@ class BadCustomRequestHeaderProvider():
     _write_yaml(fake_project / "conf" / "local" / "mlflow.yml", dict_config)
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project) as session:
+    with KedroSession.create(project_path=fake_project) as session:
         with pytest.raises(ValueError, match=r"should be a sublass of"):
             session.load_context()  # trigger setup and request_header_provider registration
 

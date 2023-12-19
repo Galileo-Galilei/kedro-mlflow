@@ -1,10 +1,9 @@
 import shutil
-from inspect import isclass
 from pathlib import Path
 from typing import Any, Dict, Union
 
 import mlflow
-from kedro.io import AbstractDataset, AbstractVersionedDataset
+from kedro.io import AbstractVersionedDataset
 from kedro.io.core import parse_dataset_definition
 from mlflow.tracking import MlflowClient
 
@@ -21,9 +20,6 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         artifact_path: str = None,
         credentials: Dict[str, Any] = None,
     ):
-        if isclass(dataset["type"]) and issubclass(dataset["type"], AbstractDataset):
-            # parse_dataset_definition needs type to be a string, not the class itself
-            dataset["type"] = f"{dataset['type'].__module__}.{dataset['type'].__name__}"
         dataset_obj, dataset_args = parse_dataset_definition(config=dataset)
 
         # fake inheritance : this mlflow class should be a mother class which wraps

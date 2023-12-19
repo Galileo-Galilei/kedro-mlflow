@@ -6,7 +6,7 @@ Mlflow offers a user interface (UI) that enable to browse the run history.
 
 ## The ``kedro-mlflow`` helper
 
-When you use a local storage for kedro mlflow, you can call a [mlflow cli command](https://www.mlflow.org/docs/latest/quickstart.html#viewing-the-tracking-ui) to launch the UI if you do not have a [mlflow tracking server configured](https://www.mlflow.org/docs/latest/tracking.html#tracking-ui).
+When you use a local storage for kedro mlflow, you can call a [mlflow cli command](https://www.mlflow.org/docs/latest/tracking.html#tracking-ui) to launch the UI if you do not have a [mlflow tracking server configured](https://www.mlflow.org/docs/latest/tracking.html#mlflow-tracking-server-optional).
 
 To ensure this UI is linked to the tracking uri specified configuration, ``kedro-mlflow`` offers the following command:
 

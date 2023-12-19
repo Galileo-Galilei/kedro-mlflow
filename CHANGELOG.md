@@ -6,10 +6,12 @@
 
 - :sparkles: Add support for python 3.11 ([#450, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
 - :sparkles: :arrow_up: Add support for pydantic v2 ([#476](https://github.com/Galileo-Galilei/kedro-mlflow/pull/476))
+- :sparkles: :arrow_up: Add support for ``kedro==0.19.X`` ([#](https://github.com/Galileo-Galilei/kedro-mlflow/pull/))
 
 ### Changed
 
-- :boom: :sparkles: Change default ``copy_mode``  to ``"assign"`` in ``KedroPipelineModel`` because this is the most efficient setup (and usually the desired one) when serving a Kedro ``Pipeline`` as a Mlflow model. This is different from Kedro's default which is to deepcopy the dataset ([#463, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/463)).
+- :boom: ::arrow_up:: Drop support for ``kedro==0.18.X`` series.
+- :boom: :sparkles: Change default ``copy_mode``  to ``"assign"`` in ``KedroPipelineModel`` because this is the most efficient setup (and usually the desired one) when serving a Kedro ``Pipeline`` as a Mlflow model. This is different from Kedro's default which is to deepcopy the dataset ([#463](https://github.com/Galileo-Galilei/kedro-mlflow/pull/463)).
 - :boom: :recycle: ``MlflowArtifactDataset.__init__`` method ``data_set`` argument is renamed ``dataset`` to match new Kedro conventions ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391)).
 - :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) to match new kedro conventions from ``kedro>=0.19`` and onwards ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
   - ``MlflowArtifactDataSet``->``MlflowArtifactDataset``
@@ -26,7 +28,7 @@
 
 ### Fixed
 
--   :bug: Avoid error when using kedro==0.18.1 with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452, sami-sweng](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
+-   :bug: Avoid error when using ``kedro==0.18.1`` with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452, sami-sweng](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
 
 ## [0.11.9] - 2023-07-23
 

@@ -22,7 +22,7 @@ jobs:
     env:
       PYTHON_PACKAGE: kedro_mlflow
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v4
       with:
@@ -33,9 +33,9 @@ jobs:
     - name: Bump the version number  # bump2version is a maintained fork of original bumpversion
       id: bump_version
       run: |
-        pip install bump2version
-        bump2version ${{ github.event.inputs.version_part }}
-        echo "::set-output name=package_version::$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')"
+        pip install bump-my-version
+        bump-my-version bump ${{ github.event.inputs.version_part }}
+        echo "package_version=$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')" >> $GITHUB_OUTPUT
     - name: Update the CHANGELOG according to 'Keep a Changelog' guidelines
       uses: thomaseizinger/keep-a-changelog-new-release@v1
       with:
@@ -52,15 +52,12 @@ jobs:
         git push
     - name: Open a PR to merge the release to master
       id: open_pr
-      uses: vsoch/pull-request-action@1.0.23
+      run: |
+        gh pr create -B master -H release-${{ steps.bump_version.outputs.package_version }} --title "Release ${{ steps.bump_version.outputs.package_version }}" --body "Bump version and CHANGELOG for next release." --assignee "${{ github.repository_owner }}"
+        echo "pull_request_number=$(gh pr list --base master --json number,createdAt --jq 'sort_by(.createdAt) | reverse | .[0].number')" >> $GITHUB_OUTPUT
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        PULL_REQUEST_BRANCH: master
-        PULL_REQUEST_FROM_BRANCH: release-${{ steps.bump_version.outputs.package_version }}
-        PULL_REQUEST_TITLE: "Release ${{ steps.bump_version.outputs.package_version }}"
-        PULL_REQUEST_BODY: "Bump version and CHANGELOG for next release."
-        PULL_REQUEST_ASSIGNEES: "${{ github.repository_owner }}"
-    - name: Change the comit message to add PR number
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Change the commit message to add PR number
       run: |
         git commit -a --amend -m ":rocket: Bump version and CHANGELOG for release ${{ steps.bump_version.outputs.package_version }} (#${{ steps.open_pr.outputs.pull_request_number }})"
         git push -f

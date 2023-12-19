@@ -1,11 +1,11 @@
 from typing import Any, Dict, Optional, Union
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowModelRegistryDataset,
+    MlflowAbstractModelDataSet,
 )
 
 
-class MlflowModelRegistryDataset(MlflowModelRegistryDataset):
+class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(

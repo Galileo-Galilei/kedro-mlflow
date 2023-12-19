@@ -106,7 +106,7 @@ def dummy_catalog(tmp_path):
             "raw_data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
             "params:unused_param": MemoryDataset("blah"),
             "data": MemoryDataset(),
-            "model": PickleDataset((tmp_path / "model.csv").as_posix()),
+            "model": PickleDataset(filepath=(tmp_path / "model.csv").as_posix()),
             "my_metrics": MlflowMetricsHistoryDataset(),
             "another_metrics": MlflowMetricsHistoryDataset(prefix="foo"),
             "my_metric": MlflowMetricDataset(),
@@ -181,7 +181,9 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
                 "params:unused_param": MemoryDataset("blah"),
                 "data": MemoryDataset(),
                 "model": PickleDataset(
-                    (kedro_project_with_mlflow_conf / "data" / "model.csv").as_posix()
+                    filepath=(
+                        kedro_project_with_mlflow_conf / "data" / "model.csv"
+                    ).as_posix()
                 ),
                 "my_metrics": MlflowMetricsHistoryDataset(run_id=existing_run_id),
                 "another_metrics": MlflowMetricsHistoryDataset(

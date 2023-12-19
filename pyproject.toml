@@ -14,7 +14,7 @@ ignore = ["E501", "PLR0913"]  # Black take care off line-too-long
 exclude = ["/template/"]
 
 [tool.bumpversion]
-current_version = "0.11.10"
+current_version = "0.12.0"
 
 [[tool.bumpversion.files]]
 filename = "setup.py"

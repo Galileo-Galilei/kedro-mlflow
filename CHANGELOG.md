@@ -2,33 +2,35 @@
 
 ## [Unreleased]
 
+## [0.12.0] - 2023-12-19
+
 ### Added
 
-- :sparkles: Add support for python 3.11 ([#450, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
-- :sparkles: :arrow_up: Add support for pydantic v2 ([#476](https://github.com/Galileo-Galilei/kedro-mlflow/pull/476))
-- :sparkles: :arrow_up: Add support for ``kedro==0.19.X`` ([#](https://github.com/Galileo-Galilei/kedro-mlflow/pull/))
+-   :sparkles: Add support for python 3.11 ([#450, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))
+-   :sparkles: :arrow_up: Add support for pydantic v2 ([#476](https://github.com/Galileo-Galilei/kedro-mlflow/pull/476))
+-   :sparkles: :arrow_up: Add support for `kedro==0.19.X` ([#](https://github.com/Galileo-Galilei/kedro-mlflow/pull/))
 
 ### Changed
 
-- :boom: ::arrow_up:: Drop support for ``kedro==0.18.X`` series.
-- :boom: :sparkles: Change default ``copy_mode``  to ``"assign"`` in ``KedroPipelineModel`` because this is the most efficient setup (and usually the desired one) when serving a Kedro ``Pipeline`` as a Mlflow model. This is different from Kedro's default which is to deepcopy the dataset ([#463](https://github.com/Galileo-Galilei/kedro-mlflow/pull/463)).
-- :boom: :recycle: ``MlflowArtifactDataset.__init__`` method ``data_set`` argument is renamed ``dataset`` to match new Kedro conventions ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391)).
-- :boom: :recycle: Rename the following ``DataSets`` with the ``Dataset`` suffix (without capitalized ``S``) to match new kedro conventions from ``kedro>=0.19`` and onwards ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
-  - ``MlflowArtifactDataSet``->``MlflowArtifactDataset``
-  - ``MlflowAbstractModelDataSet``->``MlflowAbstractModelDataset``
-  - ``MlflowModelRegistryDataSet``->``MlflowModelRegistryDataset``
-  - ``MlflowMetricDataSet``->``MlflowMetricDataset``
-  - ``MlflowMetricHistoryDataSet``->``MlflowMetricHistoryDataset``
-- :boom: :recycle: Rename the following ``DataSets`` to make their use more explicit, and use the ``Dataset`` suffix:
-  - ``MlflowModelLoggerDataSet``->``MlflowModelTrackingDataset`` ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391))
-  - ``MlflowModelSaverDataSet``->``MlflowModelLocalFileSystemDataset`` ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391))
-  - ``MlflowMetricsDataSet``->``MlflowMetricsHistoryDataset`` ([#440](https://github.com/Galileo-Galilei/kedro-mlflow/pull/440))
+-   :boom: ::arrow_up:: Drop support for `kedro==0.18.X` series.
+-   :boom: :sparkles: Change default `copy_mode`  to `"assign"` in `KedroPipelineModel` because this is the most efficient setup (and usually the desired one) when serving a Kedro `Pipeline` as a Mlflow model. This is different from Kedro's default which is to deepcopy the dataset ([#463](https://github.com/Galileo-Galilei/kedro-mlflow/pull/463)).
+-   :boom: :recycle: `MlflowArtifactDataset.__init__` method `data_set` argument is renamed `dataset` to match new Kedro conventions ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391)).
+-   :boom: :recycle: Rename the following `DataSets` with the `Dataset` suffix (without capitalized `S`) to match new kedro conventions from `kedro>=0.19` and onwards ([#439, ShubhamZoro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/439)):
+    -   `MlflowArtifactDataSet`->`MlflowArtifactDataset`
+    -   `MlflowAbstractModelDataSet`->`MlflowAbstractModelDataset`
+    -   `MlflowModelRegistryDataSet`->`MlflowModelRegistryDataset`
+    -   `MlflowMetricDataSet`->`MlflowMetricDataset`
+    -   `MlflowMetricHistoryDataSet`->`MlflowMetricHistoryDataset`
+-   :boom: :recycle: Rename the following `DataSets` to make their use more explicit, and use the `Dataset` suffix:
+    -   `MlflowModelLoggerDataSet`->`MlflowModelTrackingDataset` ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391))
+    -   `MlflowModelSaverDataSet`->`MlflowModelLocalFileSystemDataset` ([#391](https://github.com/Galileo-Galilei/kedro-mlflow/pull/391))
+    -   `MlflowMetricsDataSet`->`MlflowMetricsHistoryDataset` ([#440](https://github.com/Galileo-Galilei/kedro-mlflow/pull/440))
 
 ## [0.11.10] - 2023-10-03
 
 ### Fixed
 
--   :bug: Avoid error when using ``kedro==0.18.1`` with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452, sami-sweng](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
+-   :bug: Avoid error when using `kedro==0.18.1` with `TemplatedConfigLoader` and no `mlflow.yml` configuration file ([#452, sami-sweng](https://github.com/Galileo-Galilei/kedro-mlflow/issues/452))
 
 ## [0.11.9] - 2023-07-23
 
@@ -340,7 +342,7 @@
 
 -   :zap: `get_mlflow_config` now uses the Kedro `ProjectContext` `ConfigLoader` to get configs ([#66](https://github.com/Galileo-Galilei/kedro-mlflow/issues/66)). This indirectly solves the following issues:
     -   `get_mlflow_config` now works in interactive mode if `load_context` is called  with a path different from the working directory ([#30](https://github.com/Galileo-Galilei/kedro-mlflow/issues/30))
-    -   ``kedro_mlflow`` now works fine with ``kedro jupyter notebook`` independently of the working directory ([#64](https://github.com/Galileo-Galilei/kedro-mlflow/issues/64))
+    -   `kedro_mlflow` now works fine with `kedro jupyter notebook` independently of the working directory ([#64](https://github.com/Galileo-Galilei/kedro-mlflow/issues/64))
     -   You can use global variables in `mlflow.yml` which is now properly parsed if you use a `TemplatedConfigLoader` ([#72](https://github.com/Galileo-Galilei/kedro-mlflow/issues/72))
 -   :bug: `MlflowMetricsHistoryDataset` now saves in the specified `run_id` instead of the current one when the prefix is not specified ([#62](https://github.com/Galileo-Galilei/kedro-mlflow/issues/62))
 -   :memo: Other bug fixes and documentation improvements ([#6](https://github.com/Galileo-Galilei/kedro-mlflow/issues/6), [#99](https://github.com/Galileo-Galilei/kedro-mlflow/issues/99))
@@ -449,7 +451,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.10...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.0...HEAD
+
+[0.12.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.10...0.12.0
 
 [0.11.10]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.9...0.11.10
 

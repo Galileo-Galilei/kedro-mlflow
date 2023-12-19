@@ -66,7 +66,7 @@ class MlflowHook:
                     {"mlflow": ["mlflow*", "mlflow*/**", "**/mlflow*"]}
                 )
             conf_mlflow_yml = context.config_loader["mlflow"]
-        except (MissingConfigException, AttributeError):
+        except MissingConfigException:
             LOGGER.warning(
                 "No 'mlflow.yml' config file found in environment. Default configuration will be used. Use ``kedro mlflow init`` command in CLI to customize the configuration."
             )

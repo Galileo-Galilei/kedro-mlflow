@@ -225,7 +225,7 @@ def test_mlflow_config_correctly_set(kedro_project, project_settings):
 
 # TODO: when OmegaConfigLoader will support templating with globals, add a similar test
 @pytest.mark.usefixtures("mock_settings_omega_config_loader_class")
-def test_mlflow_config_interpolated_with_globals_resolver(fake_project):
+def test_mlflow_config_interpolated_with_globals_resolver(monkeypatch, fake_project):
     dict_config = dict(
         server=dict(
             mlflow_tracking_uri="${globals: mlflow_tracking_uri}",
@@ -262,7 +262,7 @@ def test_mlflow_config_interpolated_with_globals_resolver(fake_project):
     ).as_uri()
 
     bootstrap_project(fake_project)
-    with KedroSession.create("fake_package", fake_project) as session:
+    with KedroSession.create(fake_project) as session:
         context = session.load_context()
         assert context.mlflow.dict(exclude={"project_path"}) == expected
 

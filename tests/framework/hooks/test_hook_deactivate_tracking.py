@@ -115,9 +115,9 @@ def config_dir(
     payload = {
         "tool": {
             "kedro": {
-                "project_version": kedro_version,
                 "project_name": MOCK_PACKAGE_NAME,
                 "package_name": MOCK_PACKAGE_NAME,
+                "kedro_init_version": kedro_version,
             }
         }
     }

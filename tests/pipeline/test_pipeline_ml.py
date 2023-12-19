@@ -199,7 +199,7 @@ def dummy_catalog():
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "model": CSVDataset("fake/path/to/model.csv"),
+            "model": CSVDataset(filepath="fake/path/to/model.csv"),
         }
     )
     return dummy_catalog
@@ -211,8 +211,8 @@ def catalog_with_encoder():
         {
             "raw_data": MemoryDataset(),
             "data": MemoryDataset(),
-            "encoder": CSVDataset("fake/path/to/encoder.csv"),
-            "model": CSVDataset("fake/path/to/model.csv"),
+            "encoder": CSVDataset(filepath="fake/path/to/encoder.csv"),
+            "model": CSVDataset(filepath="fake/path/to/model.csv"),
         }
     )
     return catalog_with_encoder
@@ -224,8 +224,8 @@ def catalog_with_stopwords():
         {
             "data": MemoryDataset(),
             "cleaned_data": MemoryDataset(),
-            "stopwords_from_nltk": CSVDataset("fake/path/to/stopwords.csv"),
-            "model": CSVDataset("fake/path/to/model.csv"),
+            "stopwords_from_nltk": CSVDataset(filepath="fake/path/to/stopwords.csv"),
+            "model": CSVDataset(filepath="fake/path/to/model.csv"),
         }
     )
     return catalog_with_stopwords
@@ -239,7 +239,7 @@ def catalog_with_parameters():
             "cleaned_data": MemoryDataset(),
             "params:stopwords": MemoryDataset(["Hello", "Hi"]),
             "params:penalty": MemoryDataset(0.1),
-            "model": CSVDataset("fake/path/to/model.csv"),
+            "model": CSVDataset(filepath="fake/path/to/model.csv"),
             "params:threshold": MemoryDataset(0.5),
         }
     )

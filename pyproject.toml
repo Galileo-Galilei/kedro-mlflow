@@ -1,3 +1,6 @@
+[tool.pytest.ini_options]
+addopts = "--cov=kedro_mlflow --cov-report=html tests/"
+
 [tool.ruff]
 select = [
     "F",  # Pyflakes
@@ -9,3 +12,21 @@ select = [
 ]
 ignore = ["E501", "PLR0913"]  # Black take care off line-too-long
 exclude = ["/template/"]
+
+[tool.bumpversion]
+current_version = "0.11.10"
+
+[[tool.bumpversion.files]]
+filename = "setup.py"
+
+[[tool.bumpversion.files]]
+filename = "kedro_mlflow/__init__.py"
+
+[[tool.bumpversion.files]]
+filename = "README.md"
+
+[[tool.bumpversion.files]]
+filename = "docs/source/02_installation/01_installation.md"
+
+[[tool.bumpversion.files]]
+filename = "docs/source/03_getting_started/01_example_project.md"

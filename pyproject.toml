@@ -1,12 +1,3 @@
-[tool.black]
-exclude = "/template/"
-
-[tool.isort]
-profile = "black"
-sections=["FUTURE","STDLIB","THIRDPARTY","FIRSTPARTY","LOCALFOLDER"]
-known_first_party=["kedro_mlflow"]
-known_third_party=["anyconfig","black","click","cookiecutter","flake8","isort","jinja2","kedro","mlflow","pandas","pytest","pytest_lazyfixture","setuptools","sklearn","yaml"]
-
 [tool.ruff]
 select = [
     "F",  # Pyflakes

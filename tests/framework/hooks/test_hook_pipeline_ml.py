@@ -7,6 +7,7 @@ from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
+from kedro.pipeline.modular_pipeline import pipeline
 from kedro.runner import SequentialRunner
 from kedro_datasets.pickle import PickleDataset
 from mlflow.models import infer_signature
@@ -177,6 +178,59 @@ def dummy_run_params(tmp_path):
         "extra_params": [],
     }
     return dummy_run_params
+
+
+@pytest.fixture
+def dummy_pipeline_dataset_factory():
+    def create_data():
+        return pd.DataFrame(data=[1], columns=["a"])
+
+    def train_fun(data):
+        return data * 2
+
+    def predict_fun(model, data):
+        return data * model
+
+    dummy_pipeline = Pipeline(
+        [
+            node(
+                func=create_data,
+                inputs=None,
+                outputs="data",
+                tags=["training"],
+            ),
+            node(
+                func=train_fun,
+                inputs="data",
+                outputs="model",
+                tags=["training"],
+            ),
+            node(
+                func=predict_fun,
+                inputs=["model", "data"],
+                outputs="predictions",
+                tags=["inference"],
+            ),
+        ]
+    )
+    return dummy_pipeline
+
+
+@pytest.fixture
+def dummy_catalog_dataset_factory(tmp_path):
+    dummy_catalog_ds_factory = DataCatalog.from_config(
+        {
+            "{namespace}.data": {
+                "type": "pandas.CSVDataset",
+                "filepath": (tmp_path / "data.csv").as_posix(),
+            },
+            "{namespace}.model": {
+                "type": "pandas.CSVDataset",
+                "filepath": (tmp_path / "model.csv").as_posix(),
+            },
+        }
+    )
+    return dummy_catalog_ds_factory
 
 
 @pytest.mark.parametrize(
@@ -573,5 +627,75 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
         trained_model = mlflow.pyfunc.load_model(
             f"runs:/{run_id}/{expected_artifact_path}"
         )
+        # the real test is that the model is loaded without error
+        assert trained_model is not None
+
+
+@pytest.mark.parametrize(
+    "namespace",
+    (["a", "b"]),
+)
+def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
+    kedro_project_with_mlflow_conf,
+    env_from_dict,
+    dummy_pipeline_dataset_factory,
+    dummy_catalog_dataset_factory,
+    dummy_run_params,
+    namespace,
+):
+    """
+    Test for PipelineML factory where the input catalog has data factories.
+    """
+
+    # config_with_base_mlflow_conf is a conftest fixture
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        mlflow_hook = MlflowHook()
+        runner = SequentialRunner()
+
+        log_model_kwargs = {
+            "conda_env": env_from_dict,
+        }
+
+        log_model_kwargs["artifact_path"] = "artifacts"
+        dummy_pipeline_with_namespace = pipeline(
+            pipe=dummy_pipeline_dataset_factory, namespace=namespace
+        )
+        pipeline_to_run = pipeline_ml_factory(
+            training=dummy_pipeline_with_namespace.only_nodes_with_tags("training"),
+            inference=dummy_pipeline_with_namespace.only_nodes_with_tags("inference"),
+            input_name=f"{namespace}.data",
+            log_model_kwargs=log_model_kwargs,
+        )
+
+        context = session.load_context()
+        mlflow_hook.after_context_created(context)
+        mlflow_hook.after_catalog_created(
+            catalog=dummy_catalog_dataset_factory,
+            # `after_catalog_created` is not using any of arguments bellow,
+            # so we are setting them to empty values.
+            conf_catalog={},
+            conf_creds={},
+            feed_dict={},
+            save_version="",
+            load_versions="",
+        )
+        mlflow_hook.before_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_to_run,
+            catalog=dummy_catalog_dataset_factory,
+        )
+        runner.run(
+            pipeline_to_run, dummy_catalog_dataset_factory, session._hook_manager
+        )
+        run_id = mlflow.active_run().info.run_id
+        mlflow_hook.after_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_to_run,
+            catalog=dummy_catalog_dataset_factory,
+        )
+
+        # test : parameters should have been logged
+        trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/artifacts")
         # the real test is that the model is loaded without error
         assert trained_model is not None

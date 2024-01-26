@@ -352,6 +352,10 @@ class MlflowHook:
         """
         if self._is_mlflow_enabled:
             if isinstance(pipeline, PipelineML):
+                # Materialize dataset factories
+                for dataset in pipeline.datasets():
+                    catalog.exists(dataset)
+
                 with TemporaryDirectory() as tmp_dir:
                     # This will be removed at the end of the context manager,
                     # but we need to log in mlflow before moving the folder

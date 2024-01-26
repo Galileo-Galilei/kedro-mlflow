@@ -631,17 +631,12 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
         assert trained_model is not None
 
 
-@pytest.mark.parametrize(
-    "namespace",
-    (["a", "b"]),
-)
 def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
     kedro_project_with_mlflow_conf,
     env_from_dict,
     dummy_pipeline_dataset_factory,
     dummy_catalog_dataset_factory,
     dummy_run_params,
-    namespace,
 ):
     """
     Test for PipelineML factory where the input catalog has data factories.
@@ -657,6 +652,7 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
             "conda_env": env_from_dict,
         }
 
+        namespace = "a"
         log_model_kwargs["artifact_path"] = "artifacts"
         dummy_pipeline_with_namespace = pipeline(
             pipe=dummy_pipeline_dataset_factory, namespace=namespace

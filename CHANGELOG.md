@@ -4,6 +4,10 @@
 
 ## [0.12.0] - 2023-12-19
 
+### Fixed
+
+-   :bug: Add support for dataset factories in KedroPipelineML ([#516, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/519))
+
 ### Added
 
 -   :sparkles: Add support for python 3.11 ([#450, rxm7706](https://github.com/Galileo-Galilei/kedro-mlflow/pull/450))

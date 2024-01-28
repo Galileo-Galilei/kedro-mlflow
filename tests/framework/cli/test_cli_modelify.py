@@ -34,7 +34,8 @@ def kp_for_modelify(tmp_path):
         "repo_name": _FAKE_MODELIFY_PROJECT_NAME,
         "python_package": _FAKE_MODELIFY_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "add_ons": "none",
+        "tools": "['None']",
+        "example_pipeline": "False",
     }
 
     cookiecutter(
@@ -140,7 +141,8 @@ def kp_for_modelify_with_parameters(tmp_path):
         "repo_name": _FAKE_MODELIFY_PROJECT_NAME,
         "python_package": _FAKE_MODELIFY_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "add_ons": "none",
+        "tools": "['None']",
+        "example_pipeline": "False",
     }
 
     cookiecutter(

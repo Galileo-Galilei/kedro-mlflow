@@ -58,7 +58,8 @@ def kedro_project(tmp_path):
         "repo_name": _FAKE_PROJECT_NAME,
         "python_package": _FAKE_PROJECT_NAME,
         "kedro_version": kedro_version,
-        "add_ons": "none",
+        "tools": "['None']",
+        "example_pipeline": "False",
     }
 
     cookiecutter(

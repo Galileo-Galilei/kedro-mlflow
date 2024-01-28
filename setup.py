@@ -39,7 +39,7 @@ setup(
     extras_require={
         "doc": [
             "sphinx>=4.5.0,<8.0.0",
-            "sphinx_rtd_theme>=1.0,<1.5",
+            "sphinx_rtd_theme>=1.0,<2.1",
             "sphinx-markdown-tables~=0.0.15",
             "sphinx-click>=3.1,<5.2",
             "sphinx_copybutton~=0.5.0",

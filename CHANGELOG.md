@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Add support for dataset factories in ``KedroPipelineModel`` ([#516, sebastiandro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/516))
+
 ## [0.12.0] - 2023-12-19
 
 ### Added

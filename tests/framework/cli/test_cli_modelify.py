@@ -393,8 +393,8 @@ def test_modelify_with_infer_signature_arg(
     loaded_model = mlflow.pyfunc.load_model(f"runs:/{new_run_id}/model")
 
     assert loaded_model.metadata.get_input_schema().to_dict() == [
-        {"name": "col_int", "type": "long"},
-        {"name": "col_str", "type": "string"},
+        {"name": "col_int", "type": "long", "required": True},
+        {"name": "col_str", "type": "string", "required": True},
     ]
 
 

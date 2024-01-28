@@ -301,14 +301,14 @@ def test_mlflow_hook_save_pipeline_ml(
             assert (
                 (trained_model.metadata.signature.to_dict())
                 == {
-                    "inputs": '[{"name": "a", "type": "long"}]',
+                    "inputs": '[{"name": "a", "type": "long", "required": true}]',
                     "outputs": None,
                     "params": None,
                 }
             ) or (
                 (trained_model.metadata.signature.to_dict())
                 == {
-                    "inputs": '[{"type": "long", "name": "a"}]',
+                    "inputs": '[{"type": "long", "name": "a", "required": true}]',
                     "outputs": None,
                     "params": None,
                 }

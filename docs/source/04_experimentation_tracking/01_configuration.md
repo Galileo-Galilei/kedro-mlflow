@@ -137,6 +137,17 @@ tracking:
     nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
 ```
 
+```{tip}
+If you want to generate a random name for each run (like mlflow's default), you can use the built-in ``km.random_name`` resolver:
+
+```yaml
+tracking:
+  run:
+    name: ${km.random_name:} # don't forget the trailing ":" at the end !
+```
+```
+
+
 - If you want to continue to log in an existing mlflow run, write its id in the `id` key.
 - If you want to enable the creation of sub runs inside your nodes (for instance, for model comparison or hyperparameter tuning), set the `nested` key to `True`
 

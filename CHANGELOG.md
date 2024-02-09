@@ -5,6 +5,8 @@
 ### Fixed
 
 -   :bug: Add support for dataset factories in ``KedroPipelineModel`` ([#516, sebastiandro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/516))
+-   :sparkles: Add a ``km.random_name`` resolver which enables to use auto-generated names for kedro runs instead of pipeline name in the ``mlflow.yml`` configuration file ([#426](https://github.com/Galileo-Galilei/kedro-mlflow/issues/426))
+
 
 ## [0.12.0] - 2023-12-19
 

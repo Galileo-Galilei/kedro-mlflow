@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+## [0.12.1] - 2024-02-09
+
+### Added
+
+-   :sparkles: Add a `km.random_name` resolver which enables to use auto-generated names for kedro runs instead of pipeline name in the `mlflow.yml` configuration file ([#426](https://github.com/Galileo-Galilei/kedro-mlflow/issues/426))
+
 ### Fixed
 
--   :bug: Add support for dataset factories in ``KedroPipelineModel`` ([#516, sebastiandro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/516))
--   :sparkles: Add a ``km.random_name`` resolver which enables to use auto-generated names for kedro runs instead of pipeline name in the ``mlflow.yml`` configuration file ([#426](https://github.com/Galileo-Galilei/kedro-mlflow/issues/426))
-
+-   :bug: Add support for dataset factories in `KedroPipelineModel` ([#516, sebastiandro](https://github.com/Galileo-Galilei/kedro-mlflow/pull/516))
 
 ## [0.12.0] - 2023-12-19
 
@@ -457,7 +461,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.1...HEAD
+
+[0.12.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.0...0.12.1
 
 [0.12.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.11.10...0.12.0
 

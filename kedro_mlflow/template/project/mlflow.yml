@@ -34,14 +34,12 @@ tracking:
     pipelines: []
 
   experiment:
-    name: {{ python_package }} # you can use "${km.random_name:null}" to generate a random name (mlflow's default)
+    name: {{ python_package }}
     restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
 
   run:
     id: null # if `id` is None, a new run will be created
-    name: null # if `name` is None, pipeline name will be used for the run name
-    nested: True  # if `nested` is False, you won't be able to launch sub-runs inside your nodes
-
+    name: null # if `name` is None, pipeline name will be used for the run name. You can use "${km.random_name:}" to generate a random name (mlflow's default)
   params:
     dict_params:
       flatten: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.

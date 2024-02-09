@@ -138,7 +138,7 @@ tracking:
 ```
 
 ```{tip}
-If you want to generate a random name for each run (like mlflow's default), you can use the built-in km.random_name resolver:
+If you want to generate a random name for each run (like mlflow's default), you can use the built-in ``km.random_name`` resolver:
 
 ```yaml
 tracking:

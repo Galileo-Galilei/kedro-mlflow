@@ -19,7 +19,8 @@ We use this project because:
 - it covers most of the common use cases
 - it is compatible with older version of ``Kedro`` so newcomers are used to it
 - it is maintained by ``Kedro`` maintainers and therefore enforces some best practices.
-### Installation with ``kedro>=0.16.3, <=0.19.0``
+
+### Installation with ``kedro>=0.19.0``
 
 The default starter is now called "pandas-iris". In a new console, enter:
 
@@ -29,7 +30,7 @@ kedro new -n km-example --example yes --tools=none
 
 This will create a new kedro project with example pipeline.
 
-### Installation with ``kedro>=0.16.3, <=0.19.0``
+### Installation with ``kedro>=0.16.3, <0.19.0``
 
 The default starter is now called "pandas-iris". In a new console, enter:
 

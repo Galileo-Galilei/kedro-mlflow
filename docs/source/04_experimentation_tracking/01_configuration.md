@@ -145,8 +145,6 @@ tracking:
   run:
     name: ${km.random_name:} # don't forget the trailing ":" at the end !
 ```
-```
-
 
 - If you want to continue to log in an existing mlflow run, write its id in the `id` key.
 - If you want to enable the creation of sub runs inside your nodes (for instance, for model comparison or hyperparameter tuning), set the `nested` key to `True`
@@ -186,3 +184,38 @@ ui:
 ```
 
 The port and host parameters set in this configuration will be used by default if you use `kedro mlflow ui` command (instead of `mlflow ui`) to open the user interface. Note that the `kedro mlflow ui` command will also use the `mlflow_tracking_uri` key set inside `mlflow.yml`.
+
+## Overwrite configuration at runtime
+
+In ``kedro>=0.19.0``, it is possible [to overwrite configuration at runtime with the ``runtime_params`` resolver](https://docs.kedro.org/en/stable/configuration/advanced_configuration.html#how-to-override-configuration-with-runtime-parameters-with-the-omegaconfigloader).
+
+```{tip}
+``mlflow.yml`` is handled exactly as Kedro native configuration files, so anything which is possible within ``catalog.yml`` or ``parameters.yml`` should work within ``mlflow.yml``  
+```
+
+For instance, assume you want to specify the run name through the CLI, you can configure your ``mlflow.yml`` as follows:
+
+```yaml
+# mlflow.yml
+tracking:
+  run:
+    name: ${runtime_params:mlflow_run_name, null} # mlflow_run_name can be any name you want
+```
+
+And then pass ``mlflow_run_name`` runtime param through the CLI:
+
+```bash
+kedro run --params mlflow_run_name="my-awesome-name"
+```
+
+```{note}
+The ``, null`` part of above configuration is the default value which will be used if  ``mlflow_run_name`` is not specified at runtime. In this case, ``kedro-mlflow`` will use the pipeline name as a run name.
+
+You can nest resolvers, so the following config will default to a random name if the ``mlflow_run_name`` is not specified at runtime:
+
+```yaml
+# mlflow.yml
+tracking:
+  run:
+    name: ${runtime_params:mlflow_run_name, ${km.random_name:}}
+```

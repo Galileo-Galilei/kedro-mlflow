@@ -12,13 +12,19 @@ pip install kedro-mlflow==0.12.1
 
 ## Install the toy project
 
-For this end to end example, we will use the [kedro starter](https://docs.kedro.org/en/stable/starters/starters.html#official-kedro-starters) with the [iris dataset](https://github.com/quantumblacklabs/kedro-starter-pandas-iris).
+For this end to end example, we will use the [kedro starter](https://docs.kedro.org/en/stable/starters/starters.html#official-kedro-starters) with the [iris dataset](https://github.com/kedro-org/kedro-starters).
 
 We use this project because:
 
 - it covers most of the common use cases
 - it is compatible with older version of ``Kedro`` so newcomers are used to it
 - it is maintained by ``Kedro`` maintainers and therefore enforces some best practices.
+
+### Installation with ``kedro>=0.19.0``
+
+```{warning}
+For ``kedro>=0.19.0``, ``pandas-iris`` starter has been removed. It is recommended to install [``spaceflights-pandas`` starter instead](https://github.com/kedro-org/kedro-starters/tree/main/spaceflights-pandas).
+```
 
 ### Installation with ``kedro>=0.16.3``
 

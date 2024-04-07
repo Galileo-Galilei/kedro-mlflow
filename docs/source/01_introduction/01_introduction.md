@@ -4,7 +4,7 @@
 
 ``Kedro`` is a python package which facilitates the prototyping of data pipelines. It aims at enforcing software engineering best practices (separation between I/O and compute, abstraction, templating...). It is specifically useful for machine learning projects since it provides within the same interface interactive objects for the exploration phase, and *Command Line Interface* (CLI) and configuration files for the production phase. This makes the transition from exploration to production as smooth as possible.
 
-For more details, see [Kedro's official documentation](https://kedro.readthedocs.io/en/stable/01_introduction/01_introduction.html).
+For more details, see [Kedro's official documentation](https://docs.kedro.org/en/stable/introduction/index.html).
 
 ## What is ``Mlflow``?
 

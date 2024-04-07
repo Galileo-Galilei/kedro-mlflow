@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Build package dist from source # A better way will be : https://packaging.python.org/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/ but pep 517 is still marked as experimental
       run: |
-        python setup.py sdist
+        python setup.py sdist bdist_wheel
     - name: Set dynamically package version as output variable # see https://github.com/actions/create-release/issues/39
       # see https://docs.github.com/en/free-pro-team@latest/actions/reference/workflow-commands-for-github-actions#setting-an-environment-variable
       id: set_package_version

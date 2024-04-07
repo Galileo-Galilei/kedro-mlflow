@@ -4,8 +4,8 @@
 
 ### Added
 
--   :construction_worker: :package: Add build distribution (instead of source only distribution) to PyPI release to make install easier and faster [#515](https://github.com/Galileo-Galilei/kedro-mlflow/issues/515))
--   :memo: Document the ability to update configuration at runtime [#395](https://github.com/Galileo-Galilei/kedro-mlflow/issues/395))
+-   :construction_worker: :package: Add build distribution (instead of source only distribution) to PyPI release to make install easier and faster ([#515](https://github.com/Galileo-Galilei/kedro-mlflow/issues/515))
+-   :memo: Document the ability to update configuration at runtime ([#395](https://github.com/Galileo-Galilei/kedro-mlflow/issues/395))
 
 ## [0.12.1] - 2024-02-09
 

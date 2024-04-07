@@ -22,4 +22,4 @@ The parameters are registered node by node (and not in a single batch at the beg
 
 ### How are parameters detected by the plugin?
 
-The hook **detects parameters through their prefix ``params:`` or the value ``parameters``**. These are the [reserved keywords used by Kedro to define parameters](https://kedro.readthedocs.io/en/stable/03_tutorial/04_create_pipelines.html?highlight=params%3A#working-with-multiple-pipelines) in the ``pipeline.py`` file(s).
+The hook **detects parameters through their prefix ``params:`` or the value ``parameters``**. These are the [reserved keywords used by Kedro to define parameters](https://docs.kedro.org/en/stable/configuration/parameters.html#how-to-use-parameters) in the ``pipeline.py`` file(s).

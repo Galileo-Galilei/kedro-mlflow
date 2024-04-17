@@ -9,11 +9,11 @@
 
 ### Changed
 
-- :sparkles: Project level CLI commands ``kedro mlflow init``, ``kedro mlflow ui`` and ``kedro mlflow modelify`` now works even inside a subdirectory and not at the root of the kedro project to be [consistent with ``kedro>0.19.4``](https://github.com/kedro-org/kedro/blob/main/RELEASE.md#major-features-and-improvements-1) ([#531](https://github.com/Galileo-Galilei/kedro-mlflow/issues/531))
+- :sparkles: Project level CLI commands ``kedro mlflow init``, ``kedro mlflow ui`` and ``kedro mlflow modelify`` now work even inside a subdirectory and not at the root of the kedro project to be [consistent with ``kedro>0.19.4``](https://github.com/kedro-org/kedro/blob/main/RELEASE.md#major-features-and-improvements-1) ([#531](https://github.com/Galileo-Galilei/kedro-mlflow/issues/531))
 
 ### Fixed
 
-- :bug: Proxy import of private kedro function ``_is_project`` and ``_find_kedro_project`` to be resilient to changes ([#531](https://github.com/Galileo-Galilei/kedro-mlflow/issues/531))
+- :bug: Proxy import of private kedro functions ``_is_project`` and ``_find_kedro_project`` to be resilient to changes ([#531](https://github.com/Galileo-Galilei/kedro-mlflow/issues/531))
 
 ## [0.12.1] - 2024-02-09
 

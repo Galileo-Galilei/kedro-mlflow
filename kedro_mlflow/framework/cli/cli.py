@@ -89,7 +89,6 @@ def init(env: str, force: bool, silent: bool):
     # get constants
     mlflow_yml = "mlflow.yml"
     project_path = _find_kedro_project(Path.cwd()) or Path.cwd()
-    project_path = Path.cwd()
     project_metadata = bootstrap_project(project_path)
     mlflow_yml_path = project_path / settings.CONF_SOURCE / env / mlflow_yml
 

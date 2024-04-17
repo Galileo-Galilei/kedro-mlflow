@@ -64,16 +64,15 @@ def test_cli_global_discovered(monkeypatch, tmp_path):
 # because discovery mechanisme is linked to setup.py
 
 
-## This command is temporarlily deactivated beacuse of a bug in kedro==0.17.3, see: https://github.com/Galileo-Galilei/kedro-mlflow/issues/193
-# def test_mlflow_commands_outside_kedro_project(monkeypatch, tmp_path):
-#     monkeypatch.chdir(tmp_path)
-#     cli_runner = CliRunner()
-#     result = cli_runner.invoke(cli_mlflow)
-#     assert {"new"} == set(extract_cmd_from_help(result.output))
+@pytest.mark.parametrize("inside_subdirectory", (True, False))
+def test_mlflow_commands_inside_kedro_project(
+    monkeypatch, kedro_project, inside_subdirectory
+):
+    if inside_subdirectory is True:
+        monkeypatch.chdir(kedro_project / "src")
+    else:
+        monkeypatch.chdir(kedro_project)
 
-
-def test_mlflow_commands_inside_kedro_project(monkeypatch, kedro_project):
-    monkeypatch.chdir(kedro_project)
     # launch the command to initialize the project
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_mlflow)
@@ -81,9 +80,13 @@ def test_mlflow_commands_inside_kedro_project(monkeypatch, kedro_project):
     assert "You have not updated your template yet" not in result.output
 
 
-def test_cli_init(monkeypatch, kedro_project):
+@pytest.mark.parametrize("inside_subdirectory", (True, False))
+def test_cli_init(monkeypatch, kedro_project, inside_subdirectory):
     # "kedro_project" is a pytest.fixture declared in conftest
-    monkeypatch.chdir(kedro_project)
+    if inside_subdirectory is True:
+        monkeypatch.chdir(kedro_project / "src")
+    else:
+        monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_init)
 
@@ -177,6 +180,7 @@ def test_cli_init_with_env(monkeypatch, kedro_project, env):
 )
 def test_cli_init_with_wrong_env(monkeypatch, kedro_project, env):
     # "kedro_project" is a pytest.fixture declared in conftest
+
     monkeypatch.chdir(kedro_project)
     cli_runner = CliRunner()
     result = cli_runner.invoke(cli_init, f"--env {env}")
@@ -189,8 +193,15 @@ def test_cli_init_with_wrong_env(monkeypatch, kedro_project, env):
 # I tried mimicking mlflow_cli with mock but did not achieve desired result
 # other solution is to use pytest-xprocess
 # TODO: create an initlaized_kedro_project fixture with a global scope
-def test_ui_is_up(monkeypatch, mocker, kedro_project_with_mlflow_conf):
-    monkeypatch.chdir(kedro_project_with_mlflow_conf)
+@pytest.mark.parametrize("inside_subdirectory", (True, False))
+def test_cli_ui_is_up(
+    monkeypatch, mocker, kedro_project_with_mlflow_conf, inside_subdirectory
+):
+    if inside_subdirectory is True:
+        monkeypatch.chdir(kedro_project_with_mlflow_conf / "src")
+    else:
+        monkeypatch.chdir(kedro_project_with_mlflow_conf)
+
     cli_runner = CliRunner()
 
     # This does not test anything : the goal is to check whether it raises an error

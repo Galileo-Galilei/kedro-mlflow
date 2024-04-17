@@ -11,12 +11,13 @@ import mlflow
 from kedro import __version__ as kedro_version
 from kedro.framework.project import pipelines, settings
 from kedro.framework.session import KedroSession
-from kedro.framework.startup import _is_project, bootstrap_project
+from kedro.framework.startup import bootstrap_project
 from mlflow.models import infer_signature
 from packaging import version
 
 from kedro_mlflow.framework.cli.cli_utils import write_jinja_template
 from kedro_mlflow.mlflow import KedroPipelineModel
+from kedro_mlflow.utils import _find_kedro_project, _is_project
 
 LOGGER = getLogger(__name__)
 TEMPLATE_FOLDER_PATH = Path(__file__).parent.parent.parent / "template" / "project"
@@ -27,7 +28,7 @@ class KedroClickGroup(click.Group):
         self.commands = {}
 
         # add commands on the fly based on conditions
-        if _is_project(Path.cwd()):
+        if _is_project(_find_kedro_project(Path.cwd()) or Path.cwd()):
             self.add_command(init)
             self.add_command(ui)
             self.add_command(modelify)
@@ -87,7 +88,8 @@ def init(env: str, force: bool, silent: bool):
 
     # get constants
     mlflow_yml = "mlflow.yml"
-    project_path = Path().cwd()
+    project_path = _find_kedro_project(Path.cwd()) or Path.cwd()
+    project_path = Path.cwd()
     project_metadata = bootstrap_project(project_path)
     mlflow_yml_path = project_path / settings.CONF_SOURCE / env / mlflow_yml
 
@@ -150,7 +152,7 @@ def ui(env: str, port: str, host: str):
     enables to browse and compares runs.
     """
 
-    project_path = Path().cwd()
+    project_path = _find_kedro_project(Path.cwd()) or Path.cwd()
     bootstrap_project(project_path)
     with KedroSession.create(
         project_path=project_path,
@@ -307,7 +309,7 @@ def modelify(
 
     # if the command is available, we are necessarily at the root of a kedro project
 
-    project_path = Path.cwd()
+    project_path = _find_kedro_project(Path.cwd()) or Path.cwd()
     bootstrap_project(project_path)
     with KedroSession.create(project_path=project_path) as session:
         # "pipeline" is the Pipeline object you want to convert to a mlflow model

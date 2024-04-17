@@ -131,9 +131,6 @@ def kp_for_modelify_persistent_input(kp_for_modelify):
 
 @pytest.fixture
 def kp_for_modelify_with_parameters(tmp_path):
-    # TODO: find a better way to inject dynamically
-    # the templated config loader without modifying the template
-
     _FAKE_MODELIFY_PROJECT_NAME = r"kp_for_modelify_with_params"
     config = {
         # "output_dir": tmp_path,
@@ -203,43 +200,55 @@ def register_pipelines():
         mlflow_tracking_uri: mlruns
     """
 
-    kp_for_modelify = tmp_path / config["repo_name"]
+    kp_for_modelify_with_parameters = tmp_path / config["repo_name"]
 
     _write_file(
-        kp_for_modelify / "src" / config["python_package"] / "pipeline_registry.py",
+        kp_for_modelify_with_parameters
+        / "src"
+        / config["python_package"]
+        / "pipeline_registry.py",
         pipeline_registry_py,
     )
     _write_file(
-        kp_for_modelify / "conf" / "base" / "catalog.yml",
+        kp_for_modelify_with_parameters / "conf" / "base" / "catalog.yml",
         catalog_yml,
     )
     _write_file(
-        kp_for_modelify / "conf" / "base" / "parameters.yml",
+        kp_for_modelify_with_parameters / "conf" / "base" / "parameters.yml",
         parameters_yml,
     )
     _write_file(
-        kp_for_modelify / "conf" / "base" / "mlflow.yml",
+        kp_for_modelify_with_parameters / "conf" / "base" / "mlflow.yml",
         mlflow_yml,
     )
 
-    return kp_for_modelify
+    return kp_for_modelify_with_parameters
 
 
 @pytest.mark.parametrize(
-    "example_repo,artifacts_list",
+    "example_repo,artifacts_list,inside_subdirectory",
     [
-        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"]),
+        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"], False),
+        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"], True),
         (
             pytest.lazy_fixture("kp_for_modelify_with_parameters"),
             ["trained_model", "params:my_param"],
+            False,
         ),
     ],
 )
-def test_modelify_logs_in_mlflow(monkeypatch, example_repo, artifacts_list):
-    monkeypatch.chdir(example_repo)
+def test_modelify_logs_in_mlflow_even_inside_subdirectory(
+    monkeypatch, example_repo, artifacts_list, inside_subdirectory
+):
+    if inside_subdirectory is True:
+        project_cwd = example_repo / "src"
+    else:
+        project_cwd = example_repo
 
-    bootstrap_project(Path().cwd())
-    with KedroSession.create(project_path=Path().cwd()) as session:
+    monkeypatch.chdir(project_cwd)
+
+    bootstrap_project(example_repo)
+    with KedroSession.create(project_path=example_repo) as session:
         context = session.load_context()
         catalog = context.catalog
         catalog.save("trained_model", 2)

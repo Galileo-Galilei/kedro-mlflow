@@ -43,14 +43,14 @@ setup(
             "sphinx-markdown-tables~=0.0.15",
             "sphinx-click>=3.1,<5.2",
             "sphinx_copybutton~=0.5.0",
-            "myst-parser>=0.17.2,<2.1.0",
+            "myst-parser>=0.17.2,<3.1.0",
         ],
         "test": [
-            "pytest>=5.4.0, <8.0.0",
-            "pytest-cov>=2.8.0, <5.0.0",
+            "pytest>=5.4.0, <9.0.0",
+            "pytest-cov>=2.8.0, <6.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
-            "ruff>=0.1.0,<0.2.0",  # ensure consistency with pre-commit
+            "ruff>=0.5.0,<0.6.0",  # ensure consistency with pre-commit
             "scikit-learn>=0.23.0, <1.5.0",
             "kedro-datasets[pandas.CSVDataSet]",
         ],

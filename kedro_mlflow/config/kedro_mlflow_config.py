@@ -36,9 +36,9 @@ class MlflowServerOptions(BaseModel):
     mlflow_tracking_uri: Optional[str] = None
     mlflow_registry_uri: Optional[str] = None
     credentials: Optional[str] = None
-    request_header_provider: (
-        RequestHeaderProviderOptions
-    ) = RequestHeaderProviderOptions()
+    request_header_provider: RequestHeaderProviderOptions = (
+        RequestHeaderProviderOptions()
+    )
     _mlflow_client: MlflowClient = PrivateAttr()
 
     class Config:

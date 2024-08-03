@@ -1,1 +1,1 @@
-"""``kedro_mlflow.framework`` provides mlflow extensions for Kedro's framework components """
+"""``kedro_mlflow.framework`` provides mlflow extensions for Kedro's framework components"""

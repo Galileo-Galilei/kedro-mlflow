@@ -35,16 +35,8 @@ jobs:
         ruff format . --check
     - name: Check import order and syntax with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
-      #"F",  # Pyflakes
-      #"E",  # Pycodestyle
-      # "W",  # Pycodestyle
-      # "UP",  # pyupgrade
-      # "I",  # isort
-      # "PL", # Pylint
-      # PLR0913 lines-too-long managed by "ruff format"
       run: |
-        ruff check . --select F,E,W,UP,I,PL --ignore E,PLR0913 --exclude "/template/"
-
+        ruff check .
     - name: Test with pytest and generate coverage report
       run: |
         pytest --cov=./ --cov-report=xml

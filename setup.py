@@ -43,7 +43,7 @@ setup(
             "sphinx-markdown-tables~=0.0.15",
             "sphinx-click>=3.1,<5.2",
             "sphinx_copybutton~=0.5.0",
-            "myst-parser>=0.17.2,<3.1.0",
+            "myst-parser>=0.17.2,<4.1.0",
         ],
         "test": [
             "pytest>=5.4.0, <8.0.0",  # pytest==8.0.0 breaks pytest-lazy-fixture : https://github.com/TvoroG/pytest-lazy-fixture/issues/65

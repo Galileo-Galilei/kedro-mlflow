@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Changed
+
+-   :boom: :pushpin: Officially drop support for ``mlflow<1.29.0`` which was implicit since the introduction of ``km.random_name`` resolver in [#481](https://github.com/Galileo-Galilei/kedro-mlflow/issues/481) ([#571](https://github.com/Galileo-Galilei/kedro-mlflow/issues/571))
+
+
 ## [0.12.2] - 2024-04-18
 
 ### Added

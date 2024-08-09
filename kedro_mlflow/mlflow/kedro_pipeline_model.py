@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, Any
 
 from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
@@ -20,6 +20,7 @@ class KedroPipelineModel(PythonModel):
         input_name: str,
         runner: Optional[AbstractRunner] = None,
         copy_mode: Optional[Union[Dict[str, str], str]] = "assign",
+        params_input_name: Optional[str] = None,
     ):
         """[summary]
 
@@ -29,6 +30,8 @@ class KedroPipelineModel(PythonModel):
 
             catalog (DataCatalog): The DataCatalog associated
             to the PipelineMl
+
+            input_name (str): TODO
 
             runner (Optional[AbstractRunner], optional): The kedro
             AbstractRunner to use. Defaults to SequentialRunner if
@@ -45,12 +48,16 @@ class KedroPipelineModel(PythonModel):
                 - a dictionary with (dataset name, copy_mode) key/values
                 pairs. The associated mode must be a valid kedro mode
                 ("deepcopy", "copy" and "assign") for each. Defaults to None.
+
+            params_input_name (Optional[str]): TODO
+
         """
 
         self.pipeline = (
             pipeline.inference if isinstance(pipeline, PipelineML) else pipeline
         )
         self.input_name = input_name
+        self.params_input_name = params_input_name
         self.initial_catalog = self._extract_pipeline_catalog(catalog)
 
         nb_outputs = len(self.pipeline.outputs())
@@ -107,7 +114,7 @@ class KedroPipelineModel(PythonModel):
     def _extract_pipeline_catalog(self, catalog: DataCatalog) -> DataCatalog:
         sub_catalog = DataCatalog()
         for dataset_name in self.pipeline.inputs():
-            if dataset_name == self.input_name:
+            if dataset_name in (self.input_name, self.params_input_name):
                 # there is no obligation that this dataset is persisted
                 # and even if it is, we keep only an ampty memory dataset to avoid
                 # extra uneccessary dependencies: this dataset will be replaced at
@@ -145,7 +152,7 @@ class KedroPipelineModel(PythonModel):
     ):
         artifacts = {}
         for name, dataset in self.initial_catalog._datasets.items():
-            if name != self.input_name:
+            if name not in (self.input_name, self.params_input_name):
                 if name.startswith("params:"):
                     # we need to persist it locally for mlflow access
                     absolute_param_path = (
@@ -177,7 +184,9 @@ class KedroPipelineModel(PythonModel):
         # but we rely on a mlflow function for saving, and it is unaware of kedro
         # pipeline structure
         mlflow_artifacts_keys = set(context.artifacts.keys())
-        kedro_artifacts_keys = set(self.pipeline.inputs() - {self.input_name})
+        kedro_artifacts_keys = set(
+            self.pipeline.inputs() - {self.input_name, self.params_input_name}
+        )
         if mlflow_artifacts_keys != kedro_artifacts_keys:
             in_artifacts_but_not_inference = (
                 mlflow_artifacts_keys - kedro_artifacts_keys
@@ -196,7 +205,7 @@ class KedroPipelineModel(PythonModel):
             updated_catalog._datasets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
-    def predict(self, context, model_input):
+    def predict(self, context, model_input, params: Optional[dict[str, Any]] = None):
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project
         hook_manager = _create_hook_manager()
@@ -205,6 +214,9 @@ class KedroPipelineModel(PythonModel):
             name=self.input_name,
             data=model_input,
         )
+
+        if self.params_input_name:
+            self.loaded_catalog.save(name=self.params_input_name, data=params)
 
         run_output = self.runner.run(
             pipeline=self.pipeline,

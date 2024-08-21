@@ -1,5 +1,4 @@
-import logging
-from logging import getLogger
+from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any, Dict, Union
@@ -35,8 +34,6 @@ from kedro_mlflow.io.metrics import (
 from kedro_mlflow.mlflow import KedroPipelineModel
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
-LOGGER = getLogger(__name__)
-
 
 class MlflowHook:
     def __init__(self):
@@ -47,8 +44,8 @@ class MlflowHook:
         self.long_parameters_strategy = "fail"
 
     @property
-    def _logger(self) -> logging.Logger:
-        return logging.getLogger(__name__)
+    def _logger(self) -> Logger:
+        return getLogger(__name__)
 
     @hook_impl
     def after_context_created(
@@ -62,7 +59,7 @@ class MlflowHook:
             context: The context that was created.
         """
 
-        LOGGER.info(r"Registering new custom resolver: 'km.random_name'")
+        self._logger.info(r"Registering new custom resolver: 'km.random_name'")
         if not OmegaConf.has_resolver("km.random_name"):
             OmegaConf.register_new_resolver(
                 "km.random_name", resolve_random_name, use_cache=True
@@ -75,7 +72,7 @@ class MlflowHook:
                 )
             conf_mlflow_yml = context.config_loader["mlflow"]
         except MissingConfigException:
-            LOGGER.warning(
+            self._logger.warning(
                 "No 'mlflow.yml' config file found in environment. Default configuration will be used. Use ``kedro mlflow init`` command in CLI to customize the configuration."
             )
             # we create an empty dict to have the same behaviour when the mlflow.yml
@@ -94,7 +91,7 @@ class MlflowHook:
             self._already_active_mlflow = True
             active_run_info = mlflow.active_run().info
 
-            LOGGER.warning(
+            self._logger.warning(
                 f"The mlflow run {active_run_info.run_id} is already active. Configuration is inferred from the environment, and mlflow.yml is ignored."
             )
 
@@ -102,15 +99,15 @@ class MlflowHook:
             mlflow_config.server._mlflow_client = MlflowClient(
                 tracking_uri=mlflow_config.server.mlflow_tracking_uri
             )
-            LOGGER.warning(f"{mlflow_config.server.mlflow_tracking_uri=}")
+            self._logger.warning(f"{mlflow_config.server.mlflow_tracking_uri=}")
 
             mlflow_config.tracking.run.id = active_run_info.run_id
-            LOGGER.warning(f"{mlflow_config.tracking.run.id=}")
+            self._logger.warning(f"{mlflow_config.tracking.run.id=}")
 
             mlflow_config.tracking.experiment.name = mlflow.get_experiment(
                 experiment_id=active_run_info.experiment_id
             ).name
-            LOGGER.warning(f"{mlflow_config.tracking.experiment.name=}")
+            self._logger.warning(f"{mlflow_config.tracking.experiment.name=}")
 
         else:
             # we infer and setup the configuration only if there is no active run:
@@ -240,7 +237,7 @@ class MlflowHook:
             )
 
             if self._already_active_mlflow:
-                LOGGER.warning(
+                self._logger.warning(
                     f"A mlflow run was already active (run_id='{mlflow.active_run().info.run_id}') before the KedroSession was started. This run will be used for logging."
                 )
             else:
@@ -249,6 +246,9 @@ class MlflowHook:
                     experiment_id=self.mlflow_config.tracking.experiment._experiment.experiment_id,
                     run_name=run_name,
                     nested=self.mlflow_config.tracking.run.nested,
+                )
+                self._logger.info(
+                    f"Mlflow run '{mlflow.active_run().info.run_id}' has started"
                 )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})
@@ -269,7 +269,7 @@ class MlflowHook:
                 ),
             )
         else:
-            logging.info(
+            self._logger.info(
                 "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes DataSets and parameters."
             )
             switch_catalog_logging(catalog, False)
@@ -392,7 +392,7 @@ class MlflowHook:
                     )
             # Close the mlflow active run at the end of the pipeline to avoid interactions with further runs
             if self._already_active_mlflow:
-                LOGGER.warning(
+                self._logger.warning(
                     f"The run '{mlflow.active_run().info.run_id}' was already opened before launching 'kedro run' so it is not closed. You should close it manually."
                 )
             else:
@@ -435,7 +435,7 @@ class MlflowHook:
         """
         if self._is_mlflow_enabled:
             if self._already_active_mlflow:
-                LOGGER.warning(
+                self._logger.warning(
                     f"The run '{mlflow.active_run().info.run_id}' was already opened before launching 'kedro run' so it is not closed. You should close it manually."
                 )
             else:

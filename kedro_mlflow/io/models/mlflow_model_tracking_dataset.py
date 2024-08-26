@@ -102,11 +102,9 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             if mlflow.active_run():
                 # it is not possible to log in a run which is not the current opened one
                 raise DatasetError(
-                    "'run_id' cannot be specified"
-                    " if there is an mlflow active run."
-                    "Run_id mismatch: "
-                    f"\n - 'run_id'={self._run_id}"
-                    f"\n - active_run id={mlflow.active_run().info.run_id}"
+                    f"'run_id' cannot be specified (run_id='{self._run_id}') "
+                    f"if there is an mlflow active run (active run id='{mlflow.active_run().info.run_id}') "
+                    f"See the rationale in this issue: https://github.com/Galileo-Galilei/kedro-mlflow/issues/549."
                 )
             else:
                 # if the run id is specified and there is no opened run,

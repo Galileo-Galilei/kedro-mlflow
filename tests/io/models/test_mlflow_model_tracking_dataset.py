@@ -152,7 +152,7 @@ def test_save_sklearn_flavor_with_run_id_and_already_active_run(tracking_uri):
     with mlflow.start_run():
         with pytest.raises(
             DatasetError,
-            match="'run_id' cannot be specified if there is an mlflow active run.",
+            match="if there is an mlflow active run",
         ):
             mlflow_model_ds.save(linreg_model)
 

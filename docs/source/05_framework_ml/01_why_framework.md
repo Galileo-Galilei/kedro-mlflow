@@ -14,7 +14,7 @@ Actually, there is a confusion on what "deployment" means, especially in big ent
 
 - **scalability and cost control**: in many cases, you need to be able to deal with a lot of (possibly concurrent) requests (likely much more than during training phase). It may be hard to ensure that the app will be able to deal with such an important amount of data. Another issue is that ML oftens needs specific infrastrusture (e.g., GPU's) which are very expensive. Since the request against the model often vary wildly over time, it may be important to adapt the infrastructure in real time to avoid a lot of infrastructure costs
 - **speed**: A lot of recent *state of the art* (SOTA) deep learning / ensemble models are computationally heavy and this may hurt inference speed, which is critical for some systems.
-- **disponibility and resilience**: Machine learning systems are more complex than traditional softwares because they have more moving parts (i.e. data and parameters). This increases the risk of errors, and since ML systems are used for critical systems making both the infrastructure and the code robust is key.
+- **availability and resilience**: Machine learning systems are more complex than traditional softwares because they have more moving parts (i.e. data and parameters). This increases the risk of errors, and since ML systems are used for critical systems making both the infrastructure and the code robust is key.
 - **portability / ease of integration with external components**: ML models are not intended to be directly used by the end users, but rather be consumed by another part of your system (e.g a call to an API). To speed up deployment, your model must be easy to be consumed, i.e. *as self contained as possible*. As a consequence, you must **deploy a ML pipeline which hanbles business objects instead of only a ML model**. If the other part which consumes your API needs to make a lot of data preprocessing *before* using your model, it makes it:
   - very risky to use, because preprocessing and model are decoupled: any change in your model must be reflected in this other data pipeline and there is a huge mismatch risk when redeploying
   - slow and costful to deploy because each deployment of your model needs some new development on the client side
@@ -40,7 +40,7 @@ Since it is a more mature industry, efficient tools exists to manage these items
 - parameters
 - data
 
-As ML is a much less mature field, efficient tooling to adress these items are very recent and not completely standardized yet (e.g. Mlflow to track parameters, DVC to version data, `great-expectations` to monitor data which go through your pipelines, `tensorboard` to monitor your model metrics...)
+As machine learning is a much less mature field, efficient tooling to adress these items are very recent and not completely standardized yet (e.g. ``Mlflow`` to track parameters, ``DVC`` to version data, `great-expectations` to ensure data quality checks along your pipelines, `tensorboard` to monitor your model metrics...)
 
 > **Mlflow is one of the most mature tool to manage these new moving parts.**
 
@@ -112,7 +112,7 @@ As stated previous paragraph, the inference pipeline is not a primary concern wh
 - in the best case, you have trained the model from a git sha which is logged in mlflow. Any potential user can (but it takes time) recreate the exact inference pipeline from your source code, and retrieve all necessary artifacts from mlflow. This is tedious, error prone, and gives a lot of responsibility and work to your end user, but at least it makes your model usable.
 - most likely, you did not train your model from a version control commit. While experimenting /debug, it is very common to modify the code and retrain without committing. The exact code associated to a given model will likely be impossible to find out later.  
 
-> `kedro-mlflow` offers a `PipelineML` (and its helpers `pipeline_ml_factory`) class which binds the `training` and `inference` pipeline, and a hook which autolog such pipelines when they are run. This enables data scientists to ensure that each training model is logged with its associated inference pipeline, and is ready to use for any end user. This decreases a lot the necessary cognitive complexity to ensure coherence between training and inference.
+> `kedro-mlflow` offers a `PipelineML` (and its helpers `pipeline_ml_factory`) class which binds the `training` and `inference` pipeline (similarly to ``scikit-learn`` ``Pipeline`` object), and a hook which autolog such pipelines when they are run. This enables data scientists to ensure that each training model is logged with its associated inference pipeline, and is ready to use for any end user. This decreases a lot the necessary cognitive complexity to ensure coherence between training and inference.
 
 ### Issue 4: Data scientists do not handle business objects
 

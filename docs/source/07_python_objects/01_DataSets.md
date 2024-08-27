@@ -117,7 +117,7 @@ my_model:
 
 ### ``MlflowModelLocalFileSystemDataset``
 
-The ``MlflowModelTrackingDataset`` accepts the following arguments:
+The ``MlflowModelLocalFileSystemDataset`` accepts the following arguments:
 
 - flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
 - filepath (str): Path to store the dataset locally.
@@ -163,11 +163,12 @@ my_model:
 
 The ``MlflowModelRegistryDataset`` accepts the following arguments:
 
-- model_name (str): The name of the registered model is the mlflow registry
-- stage_or_version (str): A valid stage (either "staging" or "production") or version number for the registred model.Default to "latest" which fetch the last version and the higher "stage" available.
-- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
-- pyfunc_workflow (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
-- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- ``model_name`` (str): The name of the registered model is the mlflow registry
+- ``stage_or_version`` (str): A valid stage (either "staging" or "production") or version number for the registred model.Default to None,(internally converted to "latest" if no alias si provided) which fetch the last version and the higher "stage" available.
+- ``alias`` (str): A valid alias, which is used instead of stage to filter model since mlflow 2.9.0. Will raise an error if both ``stage_or_version`` and ``alias`` are provided.
+- ``flavor`` (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
+- ``pyfunc_workflow`` (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
+- ``load_args`` (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
 
 We assume you have registered a mlflow model first, either [with the ``MlflowClient``](https://mlflow.org/docs/latest/model-registry.html#adding-an-mlflow-model-to-the-model-registry) or [within the mlflow ui](https://mlflow.org/docs/latest/model-registry.html#ui-workflow), e.g. :
 

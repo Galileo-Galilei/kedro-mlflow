@@ -178,7 +178,7 @@ class PipelineML(Pipeline):
     def only_nodes_with_namespace(
         self, node_namespace: str
     ) -> "Pipeline":  # pragma: no cover
-        self._logger(MSG_WARNING_KEDRO_VIZ)
+        self._logger.warning(MSG_WARNING_KEDRO_VIZ)
         return self.training.only_nodes_with_namespace(node_namespace)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":  # pragma: no cover
@@ -249,7 +249,7 @@ class PipelineML(Pipeline):
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
     def __sub__(self, other):  # pragma: no cover
-        self._logger(MSG_WARNING_KEDRO_VIZ)
+        self._logger.warning(MSG_WARNING_KEDRO_VIZ)
         return self.training - other
 
     def __and__(self, other):  # pragma: no cover

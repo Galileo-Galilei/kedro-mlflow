@@ -10,7 +10,7 @@
 
 ### Fixed
 
--   :bug: Allow ``only_nodes_with_namespace`` in ``PipelineML`` for ``kedro-viz>=9.2.0`` compatibility ([#569](https://github.com/Galileo-Galilei/kedro-mlflow/issues/569))
+-   :bug: Implement ``only_nodes_with_namespace`` and ``__sub__`` methods in ``PipelineML`` for ``kedro-viz>=9.2.0`` compatibility ([#569](https://github.com/Galileo-Galilei/kedro-mlflow/issues/569))
 
 
 ## [0.12.2] - 2024-04-18

@@ -1,6 +1,9 @@
+from logging import getLogger
 from typing import Any, Dict, Optional, Union
 
 from kedro.io.core import DatasetError
+from mlflow import MlflowClient
+from mlflow.entities.model_registry import ModelVersion
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
     MlflowAbstractModelDataSet,
@@ -67,6 +70,14 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             else f"models:/{model_name}/{stage_or_version}"
         )
 
+    @property
+    def _logger(self):
+        return getLogger(__name__)
+
+    @property
+    def _client(self):
+        return MlflowClient()
+
     def _load(self) -> Any:
         """Loads an MLflow model from local path or from MLflow run.
 
@@ -77,9 +88,34 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         # If `run_id` is specified, pull the model from MLflow.
         # TODO: enable loading from another mlflow conf (with a client with another tracking uri)
         # Alternatively, use local path to load the model.
-        return self._mlflow_model_module.load_model(
+        model = self._mlflow_model_module.load_model(
             model_uri=self.model_uri, **self._load_args
         )
+
+        # log some info because "latest" model is not very informative
+        # the model itself does not have information about its registry
+        model_version = self._get_model_version_info(model.run_id)
+
+        model_info_msg = (
+            "Loading model '{model_version.name}':\n"
+            f"    - {model_version.version=}\n"
+            f"    - {model_version.run_id=}\n"
+            f"    - {model_version.aliases=}\n"
+            f"    - {model_version.tags=}\n"
+            f"    - {model_version.current_stage=}"
+        )
+        self._logger.info(model_info_msg)
+
+        return model
+
+    def _get_model_version_info(self, run_id: str) -> ModelVersion:
+        registered_demo_model = self._client.get_registered_model(self.model_name)
+        model_version = [
+            model
+            for model in registered_demo_model.latest_versions
+            if model.run_id == run_id
+        ][0]
+        return model_version
 
     def _save(self, model: Any) -> None:
         raise NotImplementedError(

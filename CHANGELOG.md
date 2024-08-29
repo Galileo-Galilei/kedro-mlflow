@@ -8,6 +8,11 @@
 
 -   :memo: :loud_sound:  Various improvements to documentation and logging ([#549](https://github.com/Galileo-Galilei/kedro-mlflow/issues/549), [#554](https://github.com/Galileo-Galilei/kedro-mlflow/issues/554), [#567](https://github.com/Galileo-Galilei/kedro-mlflow/issues/567))
 
+### Fixed
+
+-   :bug: Implement ``only_nodes_with_namespace`` and ``__sub__`` methods in ``PipelineML`` for ``kedro-viz>=9.2.0`` compatibility ([#569](https://github.com/Galileo-Galilei/kedro-mlflow/issues/569))
+
+
 ## [0.12.2] - 2024-04-18
 
 ### Added

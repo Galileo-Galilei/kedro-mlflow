@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: Add support for "modern" datasets ([introduced in Kedro 0.19.7](https://github.com/kedro-org/kedro/commit/52458c2addd1827623d06c20228b709052a5fdf3)) that expose `load` and `save` publicly ([#590, deepyaman](https://github.com/Galileo-Galilei/kedro-mlflow/pull/590))
+
 ## [0.13.0] - 2024-09-01
 
 ### Added
 
--   :sparkles: Add support for loading model with alias in `MlflowModelRegistryDataset` [#553](https://github.com/Galileo-Galilei/kedro-mlflow/issues/553)
+-   :sparkles: Add support for loading model with alias in `MlflowModelRegistryDataset` ([#553](https://github.com/Galileo-Galilei/kedro-mlflow/issues/553))
 
 ### Changed
 

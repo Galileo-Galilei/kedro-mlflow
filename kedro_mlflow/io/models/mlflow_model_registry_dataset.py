@@ -94,7 +94,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
 
         # log some info because "latest" model is not very informative
         # the model itself does not have information about its registry
-        model_version = self._get_model_version_info(model.run_id)
+        model_version = self._get_model_version_info(model.metadata.run_id)
 
         model_info_msg = (
             "Loading model '{model_version.name}':\n"
@@ -109,12 +109,18 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         return model
 
     def _get_model_version_info(self, run_id: str) -> ModelVersion:
-        registered_demo_model = self._client.get_registered_model(self.model_name)
+        all_model_versions = self._client.search_model_versions(
+            f"name='{self.model_name}'"
+        )
+        print(f"{self._client.tracking_uri=}")
+        print(f"{self._client._registry_uri=}")
+        # setup: we train 3 version of a model und
+        print(all_model_versions)
+        print(f"{run_id=}")
         model_version = [
-            model
-            for model in registered_demo_model.latest_versions
-            if model.run_id == run_id
+            version for version in all_model_versions if version.run_id == run_id
         ][0]
+
         return model_version
 
     def _save(self, model: Any) -> None:

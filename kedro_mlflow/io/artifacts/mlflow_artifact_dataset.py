@@ -137,7 +137,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
                 if getattr(super().load, "__loadwrapped__", False):  # modern dataset
                     return super().load.__wrapped__(self)
                 else:  # legacy dataset
-                    super()._load()
+                    return super()._load()
 
         # rename the class
         parent_name = dataset_obj.__name__

@@ -131,11 +131,11 @@ class PipelineML(Pipeline):
         self._input_name = name
 
     @property
-    def params_input_name(self) -> str | None:
+    def params_input_name(self) -> Optional[str]:
         return self._params_input_name
 
     @params_input_name.setter
-    def params_input_name(self, name: str | None) -> None:
+    def params_input_name(self, name: Optional[str]) -> None:
         if name is not None:
             allowed_names = self.inference.inputs()
             pp_allowed_names = "\n    - ".join(allowed_names)

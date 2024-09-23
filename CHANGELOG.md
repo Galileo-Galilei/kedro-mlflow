@@ -8,7 +8,7 @@
 
 ### Fixed
 
--   :bug: Refactor ``MlflowMetricsHistoryDataset`` to avoid using  ``get_all_metrics`` internally because this is not compatible with all stores, hence you cannot save metrics on a remote server ([#582](https://github.com/Galileo-Galilei/kedro-mlflow/issues/582))
+-   :bug: Refactor ``MlflowMetricsHistoryDataset`` to avoid using  ``get_all_metrics`` internally because this is cannot save metrics on a remote server ([#582](https://github.com/Galileo-Galilei/kedro-mlflow/issues/582))
 
 ## [0.13.0] - 2024-09-01
 

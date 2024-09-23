@@ -466,7 +466,7 @@ def test_modelify_with_infer_input_example(
         "artifact_path": "input_example.json",
         "pandas_orient": "split",
         "type": "dataframe",
-        "serving_input_path": "serving_input_payload.json",
+        "serving_input_path": "serving_input_example.json",
     }
 
 

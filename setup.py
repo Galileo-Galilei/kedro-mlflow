@@ -25,7 +25,7 @@ with open((HERE / "README.md").as_posix(), encoding="utf-8") as file_handler:
 
 setup(
     name=NAME,
-    version="0.12.2",  # this will be bumped automatically by bump-my-version
+    version="0.13.1",  # this will be bumped automatically by bump-my-version
     description="A kedro-plugin to use mlflow in your kedro projects",
     license="Apache Software License (Apache 2.0)",
     long_description=README,
@@ -41,17 +41,17 @@ setup(
             "sphinx>=4.5.0,<8.0.0",
             "sphinx_rtd_theme>=1.0,<1.5",
             "sphinx-markdown-tables~=0.0.15",
-            "sphinx-click>=3.1,<5.2",
+            "sphinx-click>=3.1,<6.1",
             "sphinx_copybutton~=0.5.0",
-            "myst-parser>=0.17.2,<2.1.0",
+            "myst-parser>=0.17.2,<4.1.0",
         ],
         "test": [
-            "pytest>=5.4.0, <8.0.0",
-            "pytest-cov>=2.8.0, <5.0.0",
+            "pytest>=5.4.0, <8.0.0",  # pytest==8.0.0 breaks pytest-lazy-fixture : https://github.com/TvoroG/pytest-lazy-fixture/issues/65
+            "pytest-cov>=2.8.0, <6.0.0",
             "pytest-lazy-fixture>=0.6.0, <1.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
-            "ruff>=0.1.0,<0.2.0",  # ensure consistency with pre-commit
-            "scikit-learn>=0.23.0, <1.5.0",
+            "ruff>=0.5.0,<0.6.0",  # ensure consistency with pre-commit
+            "scikit-learn>=0.23.0, <1.6.0",
             "kedro-datasets[pandas.CSVDataSet]",
         ],
         "dev": [

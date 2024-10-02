@@ -1,6 +1,6 @@
 import pytest
 from kedro.io import DataCatalog, MemoryDataset
-from kedro.pipeline import Pipeline, node
+from kedro.pipeline import Pipeline, node, pipeline
 from kedro_datasets.pandas import CSVDataset
 
 from kedro_mlflow.pipeline import pipeline_ml_factory
@@ -117,6 +117,18 @@ def pipeline_ml_with_intermediary_artifacts():
         input_name="data",
     )
     return pipeline_ml_with_intermediary_artifacts
+
+
+@pytest.fixture
+def pipeline_ml_with_namespace(pipeline_ml_with_tag):
+    pipeline_ml_with_namespace = pipeline_ml_factory(
+        training=pipeline(pipeline_ml_with_tag.training, namespace="tmp_namespace"),
+        inference=pipeline(
+            pipeline_ml_with_tag.inference, inputs={"model": "tmp_namespace.model"}
+        ),
+        input_name=pipeline_ml_with_tag.input_name,
+    )
+    return pipeline_ml_with_namespace
 
 
 @pytest.fixture
@@ -244,6 +256,52 @@ def catalog_with_parameters():
         }
     )
     return catalog_with_parameters
+
+
+def test_pipeline_ml_only_nodes_with_namespace(
+    caplog,
+    pipeline_ml_with_namespace,
+):
+    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+
+    # pipeline_ml_with_namespace are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    filtered_pipeline_ml = pipeline_ml_with_namespace.only_nodes_with_namespace(
+        node_namespace="tmp_namespace"
+    )
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(filtered_pipeline_ml, Pipeline)
+    assert not isinstance(filtered_pipeline_ml, PipelineML)
+    assert str(filtered_pipeline_ml) == str(pipeline_ml_with_namespace.training)
+    assert "kedro-viz but should never be" in caplog.text
+
+
+def test_pipeline_ml_substraction(
+    caplog,
+    pipeline_ml_with_intermediary_artifacts,
+):
+    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+
+    # pipeline_ml_with_namespace are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    filtered_pipeline_ml = (
+        pipeline_ml_with_intermediary_artifacts
+        - pipeline_ml_with_intermediary_artifacts.inference
+    )
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(filtered_pipeline_ml, Pipeline)
+    assert not isinstance(filtered_pipeline_ml, PipelineML)
+    assert "kedro-viz but should never be" in caplog.text
 
 
 @pytest.mark.parametrize(

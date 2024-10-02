@@ -2,6 +2,32 @@
 
 ## [Unreleased]
 
+## [0.13.1] - 2024-09-24
+
+### Added
+
+-   :sparkles: Add support for "modern" datasets ([introduced in Kedro 0.19.7](https://github.com/kedro-org/kedro/commit/52458c2addd1827623d06c20228b709052a5fdf3)) that expose `load` and `save` publicly ([#590, deepyaman](https://github.com/Galileo-Galilei/kedro-mlflow/pull/590))
+
+### Fixed
+
+-   :bug: Refactor `MlflowMetricsHistoryDataset` to avoid using  `get_all_metrics` internally because this function cannot save metrics on a remote server ([#582](https://github.com/Galileo-Galilei/kedro-mlflow/issues/582))
+
+## [0.13.0] - 2024-09-01
+
+### Added
+
+-   :sparkles: Add support for loading model with alias in `MlflowModelRegistryDataset` ([#553](https://github.com/Galileo-Galilei/kedro-mlflow/issues/553))
+
+### Changed
+
+-   :boom: :pushpin: Officially drop support for `mlflow<1.29.0` which was implicit since the introduction of `km.random_name` resolver in [#481](https://github.com/Galileo-Galilei/kedro-mlflow/issues/481) ([#571](https://github.com/Galileo-Galilei/kedro-mlflow/issues/571))
+
+-   :memo: :loud_sound:  Various improvements to documentation and logging ([#549](https://github.com/Galileo-Galilei/kedro-mlflow/issues/549), [#554](https://github.com/Galileo-Galilei/kedro-mlflow/issues/554), [#567](https://github.com/Galileo-Galilei/kedro-mlflow/issues/567))
+
+### Fixed
+
+-   :bug: Implement `only_nodes_with_namespace` and `__sub__` methods in `PipelineML` for `kedro-viz>=9.2.0` compatibility ([#569](https://github.com/Galileo-Galilei/kedro-mlflow/issues/569))
+
 ## [0.12.2] - 2024-04-18
 
 ### Added
@@ -476,7 +502,11 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.2...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.1...HEAD
+
+[0.13.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.0...0.13.1
+
+[0.13.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.2...0.13.0
 
 [0.12.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.12.1...0.12.2
 

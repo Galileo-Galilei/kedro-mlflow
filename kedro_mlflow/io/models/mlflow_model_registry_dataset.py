@@ -1,5 +1,7 @@
 from typing import Any, Dict, Optional, Union
 
+from kedro.io.core import DatasetError
+
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
     MlflowAbstractModelDataSet,
 )
@@ -11,7 +13,8 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
     def __init__(
         self,
         model_name: str,
-        stage_or_version: Union[str, int] = "latest",
+        stage_or_version: Union[str, int, None] = None,
+        alias: Optional[str] = None,
         flavor: Optional[str] = "mlflow.pyfunc",
         pyfunc_workflow: Optional[str] = "python_model",
         load_args: Optional[Dict[str, Any]] = None,
@@ -46,9 +49,23 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             version=None,
         )
 
+        if alias is None and stage_or_version is None:
+            # reassign stage_or_version to "latest"
+            stage_or_version = "latest"
+
+        if alias and stage_or_version:
+            raise DatasetError(
+                f"You cannot specify 'alias' and 'stage_or_version' simultaneously ({alias=} and {stage_or_version=})"
+            )
+
         self.model_name = model_name
         self.stage_or_version = stage_or_version
-        self.model_uri = f"models:/{model_name}/{stage_or_version}"
+        self.alias = alias
+        self.model_uri = (
+            f"models:/{model_name}@{alias}"
+            if alias
+            else f"models:/{model_name}/{stage_or_version}"
+        )
 
     def _load(self) -> Any:
         """Loads an MLflow model from local path or from MLflow run.
@@ -74,6 +91,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             model_uri=self.model_uri,
             model_name=self.model_name,
             stage_or_version=self.stage_or_version,
+            alias=self.alias,
             flavor=self._flavor,
             pyfunc_workflow=self._pyfunc_workflow,
             # load_args=self._load_args,

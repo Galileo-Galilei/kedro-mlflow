@@ -39,7 +39,11 @@ Note that:
 - the `inference` pipeline `inputs` must belong to training `outputs` (vectorizer, binarizer, machine learning model...)
 - the `inference` pipeline must have one and only one `output`
 
-*Note: If you want to log a ``PipelineML`` object in ``mlflow`` programatically, you can use the following code snippet:*
+```{caution}
+``PipelineML`` objects do not implement all filtering methods of a regular ``Pipeline``, and you cannot add or substract 2 ``PipelineML`` together. The rationale is that a filtered ``PipelineML`` is not a ``PipelineML`` in general, because the [filtering is not consistent between training and inference](https://github.com/Galileo-Galilei/kedro-mlflow/issues/554). You can see the ones which are supported [in the code](https://github.com/Galileo-Galilei/kedro-mlflow/blob/master/kedro_mlflow/pipeline/pipeline_ml.py#L162).
+```
+
+You can also directly log a ``PipelineML`` object in ``mlflow`` programatically:
 
 ```python
 from pathlib import Path
@@ -72,4 +76,4 @@ It is also possible to pass arguments to `KedroPipelineModel` to specify the run
 KedroPipelineModel(pipeline=pipeline_training, catalog=catalog, copy_mode="assign")
 ```
 
-Available `copy_mode` are ``assign``, ``copy`` and ``deepcopy``. It is possible to pass a dictionary to specify different copy mode fo each dataset.
+Available `copy_mode` are ``assign``, ``copy`` and ``deepcopy``. It is possible to pass a dictionary to specify different copy mode for each dataset.

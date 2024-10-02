@@ -1,3 +1,4 @@
+from logging import Logger, getLogger
 from typing import Dict, Iterable, Optional, Union
 
 from kedro.pipeline import Pipeline
@@ -8,6 +9,14 @@ MSG_NOT_IMPLEMENTED = (
     "not make sense for 'PipelineML'. "
     "Manipulate directly the training pipeline and "
     "recreate the 'PipelineML' with 'pipeline_ml_factory' factory."
+)
+
+MSG_WARNING_KEDRO_VIZ = (
+    "BEWARE - This 'Pipeline' is no longer a 'PipelineML' object. "
+    "This method is only implemented for compatibility with kedro-viz "
+    "but should never be used directly.\nSee "
+    "https://github.com/Galileo-Galilei/kedro-mlflow/issues/569 "
+    " for more context. "
 )
 
 
@@ -85,6 +94,10 @@ class PipelineML(Pipeline):
         log_model_kwargs = log_model_kwargs or {}
         self.log_model_kwargs = {**self.LOG_MODEL_KWARGS_DEFAULT, **log_model_kwargs}
         self._check_consistency()
+
+    @property
+    def _logger(self) -> Logger:
+        return getLogger(__name__)
 
     @property
     def training(self) -> Pipeline:
@@ -165,7 +178,8 @@ class PipelineML(Pipeline):
     def only_nodes_with_namespace(
         self, node_namespace: str
     ) -> "Pipeline":  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+        self._logger.warning(MSG_WARNING_KEDRO_VIZ)
+        return self.training.only_nodes_with_namespace(node_namespace)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "PipelineML":  # pragma: no cover
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
@@ -235,7 +249,8 @@ class PipelineML(Pipeline):
         raise NotImplementedError(MSG_NOT_IMPLEMENTED)
 
     def __sub__(self, other):  # pragma: no cover
-        raise NotImplementedError(MSG_NOT_IMPLEMENTED)
+        self._logger.warning(MSG_WARNING_KEDRO_VIZ)
+        return self.training - other
 
     def __and__(self, other):  # pragma: no cover
         # kept for compatibility with KedroContext _filter_pipelinefunction

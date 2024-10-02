@@ -1,8 +1,9 @@
+import re
 import logging
 from logging import getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, List
 
 import mlflow
 from kedro.config import MissingConfigException
@@ -39,12 +40,19 @@ LOGGER = getLogger(__name__)
 
 
 class MlflowHook:
-    def __init__(self):
+    """
+    Hook for logging metrics, parameters, and artifacts to MLflow.
+
+    You can pass a list of parameters that should not be logged as a list of strings
+    to the constructor. This is useful for not logging secrets.
+    """
+    def __init__(self, drop_params: List[str] = []):
         self._is_mlflow_enabled = True
         self.flatten = False
         self.recursive = True
         self.sep = "."
         self.long_parameters_strategy = "fail"
+        self.drop_params = drop_params
 
     @property
     def _logger(self) -> logging.Logger:
@@ -302,6 +310,14 @@ class MlflowHook:
                 params_inputs = _flatten_dict(
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
+            
+            # sanitize params inputs to avoid mlflow errors
+            def sanitize_key(k: str) -> str:
+                return re.sub(r'[^a-zA-Z0-9_]', '_', k)
+            params_inputs = {sanitize_key(k): v for k, v in params_inputs.items()}
+
+            # avoid logging drop params (e.g. secrets)
+            params_inputs = {k: v for k, v in params_inputs.items() if k not in self.drop_params}
 
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():

@@ -37,12 +37,6 @@ from kedro_mlflow.pipeline.pipeline_ml import PipelineML
 
 
 class MlflowHook:
-    """
-    Hook for logging metrics, parameters, and artifacts to MLflow.
-
-    You can pass a list of parameters that should not be logged as a list of strings
-    to the constructor. This is useful for not logging secrets.
-    """
     def __init__(self):
         self._is_mlflow_enabled = True
         self.flatten = False

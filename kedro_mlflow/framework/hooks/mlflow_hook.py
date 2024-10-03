@@ -43,13 +43,12 @@ class MlflowHook:
     You can pass a list of parameters that should not be logged as a list of strings
     to the constructor. This is useful for not logging secrets.
     """
-    def __init__(self, drop_params: List[str] = []):
+    def __init__(self):
         self._is_mlflow_enabled = True
         self.flatten = False
         self.recursive = True
         self.sep = "."
         self.long_parameters_strategy = "fail"
-        self.drop_params = drop_params
 
     @property
     def _logger(self) -> Logger:
@@ -315,9 +314,6 @@ class MlflowHook:
             def sanitize_key(k: str) -> str:
                 return re.sub(r'[^a-zA-Z0-9_]', '_', k)
             params_inputs = {sanitize_key(k): v for k, v in params_inputs.items()}
-
-            # avoid logging drop params (e.g. secrets)
-            params_inputs = {k: v for k, v in params_inputs.items() if k not in self.drop_params}
 
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():

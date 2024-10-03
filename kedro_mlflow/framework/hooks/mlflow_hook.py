@@ -2,7 +2,7 @@ import re
 from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Union, List
+from typing import Any, Dict, Union 
 
 import mlflow
 from kedro.config import MissingConfigException

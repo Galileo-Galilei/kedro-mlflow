@@ -1,3 +1,4 @@
+import re
 from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -302,6 +303,11 @@ class MlflowHook:
                 params_inputs = _flatten_dict(
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
+            
+            # sanitize params inputs to avoid mlflow errors
+            def sanitize_key(k: str) -> str:
+                return re.sub(r'[^a-zA-Z0-9_]', '_', k)
+            params_inputs = {sanitize_key(k): v for k, v in params_inputs.items()}
 
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():

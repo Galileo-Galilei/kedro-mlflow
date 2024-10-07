@@ -55,7 +55,7 @@ setup(
             "kedro-datasets[pandas.CSVDataSet]",
         ],
         "dev": [
-            "pre-commit>=2.0.0,<4.0.0",
+            "pre-commit>=2.0.0,<5.0.0",
             "jupyter>=1.0.0,<2.0.0",
         ],
     },

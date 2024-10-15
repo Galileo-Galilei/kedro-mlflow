@@ -455,6 +455,7 @@ class MlflowHook:
 
 
 def validate_and_sanitize_param_name(name: str) -> str:
+    # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
     pattern = r"^[/\w.\- :]*$"
 
     if re.match(pattern, name):

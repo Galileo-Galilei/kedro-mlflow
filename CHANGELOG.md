@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+:bug: :ambulance: Fix ``MlflowArtifactDataset`` ``load`` and ``save`` methods to make them compatible with modern datasets without private ``_load`` and ``_save`` introduced in ``kedro-datasets>=5.0.0`` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
+
 ## [0.13.1] - 2024-09-24
 
 ### Added

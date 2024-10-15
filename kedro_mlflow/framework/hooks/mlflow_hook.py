@@ -1,3 +1,5 @@
+import platform
+import re
 from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -303,6 +305,11 @@ class MlflowHook:
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
 
+            # sanitize params inputs to avoid mlflow errors
+            params_inputs = {
+                validate_and_sanitize_param_name(k): v for k, v in params_inputs.items()
+            }
+
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():
                 self._log_param(k, v)
@@ -445,6 +452,17 @@ class MlflowHook:
             # the catalog is supposed to be reloaded each time with _get_catalog,
             # hence it should not be modified. this is only a safeguard
             switch_catalog_logging(catalog, True)
+
+
+def validate_and_sanitize_param_name(name: str) -> str:
+    # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
+    pattern = r"^[/\w.\- :]*$"
+
+    if re.match(pattern, name):
+        return name
+    else:
+        # Replace invalid characters with underscore
+        return re.sub(r"[^/\w.\- :]", "_", name)
 
 
 mlflow_hook = MlflowHook()

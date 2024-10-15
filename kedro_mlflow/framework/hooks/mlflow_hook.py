@@ -1,3 +1,4 @@
+import platform
 import re
 from logging import Logger, getLogger
 from pathlib import Path
@@ -303,11 +304,11 @@ class MlflowHook:
                 params_inputs = _flatten_dict(
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
-            
+
             # sanitize params inputs to avoid mlflow errors
-            def sanitize_key(k: str) -> str:
-                return re.sub(r'[^a-zA-Z0-9_]', '_', k)
-            params_inputs = {sanitize_key(k): v for k, v in params_inputs.items()}
+            params_inputs = {
+                validate_and_sanitize_param_name(k): v for k, v in params_inputs.items()
+            }
 
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():
@@ -451,6 +452,16 @@ class MlflowHook:
             # the catalog is supposed to be reloaded each time with _get_catalog,
             # hence it should not be modified. this is only a safeguard
             switch_catalog_logging(catalog, True)
+
+
+def validate_and_sanitize_param_name(name: str) -> str:
+    pattern = r"^[/\w.\- :]*$"
+
+    if re.match(pattern, name):
+        return name
+    else:
+        # Replace invalid characters with underscore
+        return re.sub(r"[^/\w.\- :]", "_", name)
 
 
 mlflow_hook = MlflowHook()

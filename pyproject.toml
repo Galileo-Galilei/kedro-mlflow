@@ -82,7 +82,7 @@ docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
 [tool.bumpversion]
-current_version = "0.13.1"
+current_version = "0.13.2"
 
 [[tool.bumpversion.files]]
 filename = "setup.py"

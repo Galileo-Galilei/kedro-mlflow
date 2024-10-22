@@ -1,5 +1,5 @@
 [tool.pytest.ini_options]
-addopts = "--cov=kedro_mlflow --cov-report=html"
+addopts = "--cov=kedro_mlflow --cov-report=html tests/"
 
 [tool.ruff]
 exclude = [

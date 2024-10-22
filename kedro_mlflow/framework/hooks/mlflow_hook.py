@@ -1,4 +1,3 @@
-import platform
 import re
 from logging import Logger, getLogger
 from pathlib import Path
@@ -307,7 +306,7 @@ class MlflowHook:
 
             # sanitize params inputs to avoid mlflow errors
             params_inputs = {
-                validate_and_sanitize_param_name(k): v for k, v in params_inputs.items()
+                sanitize_param_name(k): v for k, v in params_inputs.items()
             }
 
             # logging parameters based on defined strategy
@@ -453,16 +452,19 @@ class MlflowHook:
             # hence it should not be modified. this is only a safeguard
             switch_catalog_logging(catalog, True)
 
+    def sanitize_param_name(self, name: str) -> str:
+        # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
+        pattern = r"^[/\w.\- :]*$"
 
-def validate_and_sanitize_param_name(name: str) -> str:
-    # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
-    pattern = r"^[/\w.\- :]*$"
-
-    if re.match(pattern, name):
-        return name
-    else:
-        # Replace invalid characters with underscore
-        return re.sub(r"[^/\w.\- :]", "_", name)
+        if re.match(pattern, name):
+            return name
+        else:
+            # Replace invalid characters with underscore
+            sanitized_name = re.sub(r"[^/\w.\- :]", "_", name)
+            self._logger.warning(
+                f"'{name}' is ot a valid name for a mlflow paramter. It is renamed as '{sanitized_name}'"
+            )
+            return sanitized_name
 
 
 mlflow_hook = MlflowHook()

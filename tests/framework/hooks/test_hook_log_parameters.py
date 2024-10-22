@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from typing import Dict
 
@@ -78,7 +79,8 @@ def dummy_catalog():
     "param_name,expected_name",
     [
         ("valid_param", "valid_param"),
-        ("valid:param", "valid:param"),
+        ("valid:param", "valid:param"),  # on linux and mac
+        ("valid:param", "valid_param"),  # on windows
         ("valid-param", "valid-param"),
         ("invalid/param", "invalid/param"),
         ("invalid.param", "invalid.param"),
@@ -88,12 +90,89 @@ def dummy_catalog():
 def test_parameter_name_sanitization(
     kedro_project, dummy_run_params, param_name, expected_name
 ):
-    _write_yaml(
-        kedro_project / "conf" / "local" / "mlflow.yml",
-        dict(
-            tracking=dict(params=dict(long_params_strategy="fail")),
-        ),
-    )
+    mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    node_inputs = {f"params:{param_name}": "test_value"}
+
+    bootstrap_project(kedro_project)
+    with KedroSession.create(
+        project_path=kedro_project,
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook = MlflowHook()
+        mlflow_node_hook.after_context_created(context)
+
+        with mlflow.start_run():
+            mlflow_node_hook.before_pipeline_run(
+                run_params=dummy_run_params,
+                pipeline=Pipeline([]),
+                catalog=DataCatalog(),
+            )
+            mlflow_node_hook.before_node_run(
+                node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+                catalog=DataCatalog(),
+                inputs=node_inputs,
+                is_async=False,
+            )
+            run_id = mlflow.active_run().info.run_id
+
+        mlflow_client = MlflowClient(mlflow_tracking_uri)
+        current_run = mlflow_client.get_run(run_id)
+        assert expected_name in current_run.data.params
+        assert current_run.data.params[expected_name] == "test_value"
+
+
+@pytest.mark.skipif(
+    os.name != "nt", reason="Windows does not log params with colon symbol"
+)
+def test_parameter_name_with_colon_sanitization_on_windows(
+    kedro_project, dummy_run_params
+):
+    param_name = "valid:param"
+    expected_name = "valid_param"
+
+    mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
+    mlflow.set_tracking_uri(mlflow_tracking_uri)
+
+    node_inputs = {f"params:{param_name}": "test_value"}
+
+    bootstrap_project(kedro_project)
+    with KedroSession.create(
+        project_path=kedro_project,
+    ) as session:
+        context = session.load_context()
+        mlflow_node_hook = MlflowHook()
+        mlflow_node_hook.after_context_created(context)
+
+        with mlflow.start_run():
+            mlflow_node_hook.before_pipeline_run(
+                run_params=dummy_run_params,
+                pipeline=Pipeline([]),
+                catalog=DataCatalog(),
+            )
+            mlflow_node_hook.before_node_run(
+                node=node(func=lambda x: x, inputs=dict(x="a"), outputs=None),
+                catalog=DataCatalog(),
+                inputs=node_inputs,
+                is_async=False,
+            )
+            run_id = mlflow.active_run().info.run_id
+
+        mlflow_client = MlflowClient(mlflow_tracking_uri)
+        current_run = mlflow_client.get_run(run_id)
+        assert expected_name in current_run.data.params
+        assert current_run.data.params[expected_name] == "test_value"
+
+
+@pytest.mark.skipif(
+    os.name == "nt", reason="Linux and Mac do log params with colon symbol"
+)
+def test_parameter_name_with_colon_sanitization_on_mac_linux(
+    kedro_project, dummy_run_params
+):
+    param_name = "valid:param"
+    expected_name = "valid:param"
 
     mlflow_tracking_uri = (kedro_project / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)

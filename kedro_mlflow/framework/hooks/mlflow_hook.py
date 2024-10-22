@@ -1,3 +1,4 @@
+import os
 import re
 from logging import Logger, getLogger
 from pathlib import Path
@@ -454,17 +455,24 @@ class MlflowHook:
 
     def sanitize_param_name(self, name: str) -> str:
         # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
-        pattern = r"^[/\w.\- :]*$"
 
-        if re.match(pattern, name):
+        # for windows colon ':' are not accepted
+        matching_pattern = r"^[/\w.\- ]*$" if is_windows() else r"^[/\w.\- :]*$"
+
+        if re.match(matching_pattern, name):
             return name
         else:
+            replacement_pattern = r"[^/\w.\- ]" if is_windows() else r"[^/\w.\- :]"
             # Replace invalid characters with underscore
-            sanitized_name = re.sub(r"[^/\w.\- :]", "_", name)
+            sanitized_name = re.sub(replacement_pattern, "_", name)
             self._logger.warning(
-                f"'{name}' is ot a valid name for a mlflow paramter. It is renamed as '{sanitized_name}'"
+                f"'{name}' is not a valid name for a mlflow paramter. It is renamed as '{sanitized_name}'"
             )
             return sanitized_name
+
+
+def is_windows():
+    return os.name == "nt"
 
 
 mlflow_hook = MlflowHook()

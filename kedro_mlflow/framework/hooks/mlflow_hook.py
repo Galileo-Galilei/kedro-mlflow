@@ -306,7 +306,7 @@ class MlflowHook:
 
             # sanitize params inputs to avoid mlflow errors
             params_inputs = {
-                sanitize_param_name(k): v for k, v in params_inputs.items()
+                self.sanitize_param_name(k): v for k, v in params_inputs.items()
             }
 
             # logging parameters based on defined strategy

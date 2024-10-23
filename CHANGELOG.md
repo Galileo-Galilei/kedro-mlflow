@@ -4,12 +4,13 @@
 
 ### Added
 
--   :sparkles: Implement missing PipelineML filtering functionalities to let kedro display resume hints and avoid breaking kedro-viz ([#377, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
--   :sparkles: Sanitize parameters name with unsupported characters to avoid mlflow errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
+-   :sparkles: Implement missing ``PipelineML`` filtering functionalities to let ``kedro`` display resume hints and avoid breaking ``kedro-viz`` ([#377](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
+-   :sparkles: Sanitize parameters name with unsupported characters to avoid ``mlflow`` errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
 
 ### Changed
 
--   :pushpin: :sparkles: Removed lower and upper bounds for ``python`` versions of to be constantly in sync with ``kedro`` and make migrations faster [#603](https://github.com/Galileo-Galilei/kedro-mlflow/issues/603)
+-   :pushpin: :sparkles: Removed lower and upper bounds for ``python`` versions of to be constantly in sync with ``kedro`` and make migrations faster ([#603](https://github.com/Galileo-Galilei/kedro-mlflow/issues/603))
+-   :heavy_plus_sign: :heavy_minus_sign: Removed [``pytest-lazy-fixture``](https://pypi.org/project/pytest-lazy-fixture/) in favor of [``pytest-lazy-fixtures``](https://pypi.org/project/pytest-lazy-fixtures/) which has less reputation but is more up to date. The former has [not been updated in two years](https://github.com/TvoroG/pytest-lazy-fixture/issues/63) and is [not compatible with recent pytest](https://github.com/TvoroG/pytest-lazy-fixture/issues). ([#524](https://github.com/Galileo-Galilei/kedro-mlflow/issues/524), [#604](https://github.com/Galileo-Galilei/kedro-mlflow/issues/604))
 
 ## [0.13.2] - 2024-10-15
 

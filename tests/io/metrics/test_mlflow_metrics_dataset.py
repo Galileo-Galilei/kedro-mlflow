@@ -4,7 +4,7 @@ import mlflow
 import pytest
 from kedro.io import DatasetError
 from mlflow.tracking import MlflowClient
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.io.metrics import MlflowMetricsHistoryDataset
 
@@ -67,12 +67,12 @@ def metrics3():
 @pytest.mark.parametrize(
     "data, prefix",
     [
-        (lazy_fixture("metrics"), None),
-        (lazy_fixture("metrics"), "test"),
-        (lazy_fixture("metrics2"), None),
-        (lazy_fixture("metrics2"), "test"),
-        (lazy_fixture("metrics3"), None),
-        (lazy_fixture("metrics3"), "test"),
+        (lf("metrics"), None),
+        (lf("metrics"), "test"),
+        (lf("metrics2"), None),
+        (lf("metrics2"), "test"),
+        (lf("metrics3"), None),
+        (lf("metrics3"), "test"),
     ],
 )
 def test_mlflow_metrics_dataset_saved_and_logged(mlflow_client, data, prefix):

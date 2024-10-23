@@ -6,6 +6,7 @@ import pytest
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataset
+from pytest_lazy_fixtures import lf
 from sklearn.linear_model import LinearRegression
 
 from kedro_mlflow.io.models import MlflowModelLocalFileSystemDataset
@@ -150,8 +151,8 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
 @pytest.mark.parametrize(
     "pipeline",
     [
-        (pytest.lazy_fixture("pipeline_ml_obj")),  # must work for PipelineML
-        (pytest.lazy_fixture("pipeline_inference")),  # must work for Pipeline
+        (lf("pipeline_ml_obj")),  # must work for PipelineML
+        (lf("pipeline_inference")),  # must work for Pipeline
     ],
 )
 def test_pyfunc_flavor_python_model_save_and_load(

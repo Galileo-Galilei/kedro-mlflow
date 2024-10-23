@@ -296,23 +296,14 @@ def test_mlflow_hook_save_pipeline_ml(
             # and the conversion to string sometimes leads to
             # '[{"name": "a", "type": "long"}]' and sometimes to
             # '[{"type": "long", "name": "a"}]'
-            # which causes random failures
-            # TODO: drop when we support only python >=3.9
-            assert (
-                (trained_model.metadata.signature.to_dict())
-                == {
-                    "inputs": '[{"name": "a", "type": "long", "required": true}]',
-                    "outputs": None,
-                    "params": None,
-                }
-            ) or (
-                (trained_model.metadata.signature.to_dict())
-                == {
-                    "inputs": '[{"type": "long", "name": "a", "required": true}]',
-                    "outputs": None,
-                    "params": None,
-                }
-            )
+            # which causes random failures and we had to case each case
+            # This was drop when we support only python >=3.9, but
+            # I let the comment in case the bug bounces back
+            assert trained_model.metadata.signature.to_dict() == {
+                "inputs": '[{"type": "long", "name": "a", "required": true}]',
+                "outputs": None,
+                "params": None,
+            }
 
 
 @pytest.mark.parametrize(

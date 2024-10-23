@@ -90,6 +90,7 @@ def pipeline_ml_with_intermediary_artifacts():
                 inputs="data",
                 outputs="encoder",
                 tags=["training"],
+                name="node_fit_encoder_fun_data",
             ),
             node(
                 func=apply_encoder_fun,
@@ -258,11 +259,69 @@ def catalog_with_parameters():
     return catalog_with_parameters
 
 
+def test_pipeline_ml_only_nodes(
+    caplog,
+    pipeline_ml_with_intermediary_artifacts,
+):
+    """When the pipeline is filtered with only_nodes, we return only the training pipeline. This is for kedro-viz and resume hints compatibility"""
+
+    # pipeline_ml_with_namespace are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    filtered_pipeline_ml = pipeline_ml_with_intermediary_artifacts.only_nodes(
+        "node_fit_encoder_fun_data"
+    )
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(filtered_pipeline_ml, Pipeline)
+    assert not isinstance(filtered_pipeline_ml, PipelineML)
+    assert str(filtered_pipeline_ml) == str(
+        pipeline_ml_with_intermediary_artifacts.training.only_nodes(
+            "node_fit_encoder_fun_data"
+        )
+    )
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
+
+
+def test_pipeline_ml_only_nodes_with_outputs(
+    caplog,
+    pipeline_ml_with_intermediary_artifacts,
+):
+    """When the pipeline is filtered with only_nodes, we return only the training pipeline. This is for kedro-viz and resume hints compatibility"""
+
+    # pipeline_ml_with_intermediary_artifacts are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    filtered_pipeline_ml = (
+        pipeline_ml_with_intermediary_artifacts.only_nodes_with_outputs("data")
+    )
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(filtered_pipeline_ml, Pipeline)
+    assert not isinstance(filtered_pipeline_ml, PipelineML)
+    assert str(filtered_pipeline_ml) == str(
+        pipeline_ml_with_intermediary_artifacts.training.only_nodes_with_outputs("data")
+    )
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
+
+
 def test_pipeline_ml_only_nodes_with_namespace(
     caplog,
     pipeline_ml_with_namespace,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes, we return only the training pipeline. This is for kedro-viz and resume hints compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -278,7 +337,10 @@ def test_pipeline_ml_only_nodes_with_namespace(
     assert isinstance(filtered_pipeline_ml, Pipeline)
     assert not isinstance(filtered_pipeline_ml, PipelineML)
     assert str(filtered_pipeline_ml) == str(pipeline_ml_with_namespace.training)
-    assert "kedro-viz but should never be" in caplog.text
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
 
 
 def test_pipeline_ml_substraction(
@@ -301,7 +363,58 @@ def test_pipeline_ml_substraction(
     # training pipeline nodes must be identical to kedro filtering.
     assert isinstance(filtered_pipeline_ml, Pipeline)
     assert not isinstance(filtered_pipeline_ml, PipelineML)
-    assert "kedro-viz but should never be" in caplog.text
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
+
+
+def test_pipeline_ml_addition(
+    caplog,
+    pipeline_ml_with_namespace,
+    pipeline_ml_with_tag,
+):
+    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+
+    # pipeline_ml_with_namespace are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    sum_of_pipeline_ml = pipeline_ml_with_namespace + pipeline_ml_with_tag
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(sum_of_pipeline_ml, Pipeline)
+    assert not isinstance(sum_of_pipeline_ml, PipelineML)
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
+
+
+def test_pipeline_ml_or(
+    caplog,
+    pipeline_ml_with_namespace,
+    pipeline_ml_with_tag,
+):
+    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+
+    # pipeline_ml_with_namespace are fixture in conftest
+
+    # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
+
+    or_of_pipeline_ml = pipeline_ml_with_namespace | pipeline_ml_with_tag
+
+    # PipelineML class must be preserved when filtering
+    # inference should be unmodified
+    # training pipeline nodes must be identical to kedro filtering.
+    assert isinstance(or_of_pipeline_ml, Pipeline)
+    assert not isinstance(or_of_pipeline_ml, PipelineML)
+    assert (
+        "for compatibility with kedro-viz and pipeline resume hints on failure"
+        in caplog.text
+    )
 
 
 @pytest.mark.parametrize(
@@ -316,7 +429,7 @@ def test_pipeline_ml_substraction(
         (None, None, None, None, ["data"]),
     ],
 )
-def test_filtering_pipeline_ml(
+def test_pipeline_ml_filtering(
     mocker,
     pipeline_with_tag,
     pipeline_ml_with_tag,
@@ -374,7 +487,7 @@ def test_filtering_pipeline_ml(
         (None, None, None, ["preprocess_fun([raw_data]) -> [data]"], None),
     ],
 )
-def test_filtering_generate_invalid_pipeline_ml(
+def test_pipeline_ml__filtering_generate_invalid_pipeline_ml(
     mocker,
     pipeline_ml_obj,
     tags,
@@ -405,7 +518,7 @@ def test_filtering_generate_invalid_pipeline_ml(
 #     pass
 
 
-def test_too_many_free_inputs():
+def test_pipeline_ml_too_many_free_inputs():
     with pytest.raises(KedroMlflowPipelineMLError, match="No free input is allowed"):
         pipeline_ml_factory(
             training=Pipeline(
@@ -430,7 +543,7 @@ def test_too_many_free_inputs():
         )
 
 
-def test_tagging(pipeline_ml_with_tag):
+def test_pipeline_ml_tagging(pipeline_ml_with_tag):
     new_pl = pipeline_ml_with_tag.tag(["hello"])
     assert all(["hello" in node.tags for node in new_pl.nodes])
 

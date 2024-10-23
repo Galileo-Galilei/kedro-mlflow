@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [0.13.2] - 2024-10-15
+
+### Fixed
+
+:bug: :ambulance: Fix `MlflowArtifactDataset` `load` and `save` methods to make them compatible with modern datasets without private `_load` and `_save` introduced in `kedro-datasets>=5.0.0` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
+
 ## [0.13.1] - 2024-09-24
 
 ### Added
@@ -502,7 +508,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.2...HEAD
+
+[0.13.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.1...0.13.2
 
 [0.13.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.0...0.13.1
 

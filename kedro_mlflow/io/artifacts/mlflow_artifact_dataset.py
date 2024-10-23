@@ -62,7 +62,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
                 # for logging on remote storage like Azure S3
                 local_path = local_path.as_posix()
 
-                if getattr(super().save, "__savewrapped__", False):  # modern dataset
+                if hasattr(super().save, "__wrapped__"):  # modern dataset
                     super().save.__wrapped__(self, data)
                 else:  # legacy dataset
                     super()._save(data)
@@ -134,7 +134,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
                     shutil.copy(src=temp_download_filepath, dst=local_path)
 
                 # finally, read locally
-                if getattr(super().load, "__loadwrapped__", False):  # modern dataset
+                if hasattr(super().load, "__wrapped__"):  # modern dataset
                     return super().load.__wrapped__(self)
                 else:  # legacy dataset
                     return super()._load()

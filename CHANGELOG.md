@@ -7,11 +7,15 @@
 -   :sparkles: Implement missing PipelineML filtering functionalities to let kedro display resume hints and avoid breaking kedro-viz ([#377, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
 -   :sparkles: Sanitize parameters name with unsupported characters to avoid mlflow errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
 
+### Changed
+
+-   :pushpin: :sparkles: Removed lower and upper bounds for ``python`` versions of to be constantly in sync with ``kedro`` and make migrations faster [#603](https://github.com/Galileo-Galilei/kedro-mlflow/issues/603)
+
 ## [0.13.2] - 2024-10-15
 
 ### Fixed
 
-:bug: :ambulance: Fix `MlflowArtifactDataset` `load` and `save` methods to make them compatible with modern datasets without private `_load` and `_save` introduced in `kedro-datasets>=5.0.0` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
+- :bug: :ambulance: Fix `MlflowArtifactDataset` `load` and `save` methods to make them compatible with modern datasets without private `_load` and `_save` introduced in `kedro-datasets>=5.0.0` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
 
 ## [0.13.1] - 2024-09-24
 

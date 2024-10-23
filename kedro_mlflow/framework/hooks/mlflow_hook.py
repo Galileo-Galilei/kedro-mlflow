@@ -1,3 +1,5 @@
+import os
+import re
 from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -303,6 +305,11 @@ class MlflowHook:
                     d=params_inputs, recursive=self.recursive, sep=self.sep
                 )
 
+            # sanitize params inputs to avoid mlflow errors
+            params_inputs = {
+                self.sanitize_param_name(k): v for k, v in params_inputs.items()
+            }
+
             # logging parameters based on defined strategy
             for k, v in params_inputs.items():
                 self._log_param(k, v)
@@ -445,6 +452,27 @@ class MlflowHook:
             # the catalog is supposed to be reloaded each time with _get_catalog,
             # hence it should not be modified. this is only a safeguard
             switch_catalog_logging(catalog, True)
+
+    def sanitize_param_name(self, name: str) -> str:
+        # regex taken from MLFlow codebase: https://github.com/mlflow/mlflow/blob/e40e782b6fcab473159e6d4fee85bc0fc10f78fd/mlflow/utils/validation.py#L140C1-L148C44
+
+        # for windows colon ':' are not accepted
+        matching_pattern = r"^[/\w.\- ]*$" if is_windows() else r"^[/\w.\- :]*$"
+
+        if re.match(matching_pattern, name):
+            return name
+        else:
+            replacement_pattern = r"[^/\w.\- ]" if is_windows() else r"[^/\w.\- :]"
+            # Replace invalid characters with underscore
+            sanitized_name = re.sub(replacement_pattern, "_", name)
+            self._logger.warning(
+                f"'{name}' is not a valid name for a mlflow paramter. It is renamed as '{sanitized_name}'"
+            )
+            return sanitized_name
+
+
+def is_windows():
+    return os.name == "nt"
 
 
 mlflow_hook = MlflowHook()

@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: Implement missing PipelineML filtering functionalities to let kedro display resume hints and avoid breaking kedro-viz ([#377, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
+-   :sparkles: Sanitize parameters name with unsupported characters to avoid mlflow errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
+
 ## [0.13.2] - 2024-10-15
 
 ### Fixed

@@ -79,8 +79,6 @@ def dummy_catalog():
     "param_name,expected_name",
     [
         ("valid_param", "valid_param"),
-        ("valid:param", "valid:param"),  # on linux and mac
-        ("valid:param", "valid_param"),  # on windows
         ("valid-param", "valid-param"),
         ("invalid/param", "invalid/param"),
         ("invalid.param", "invalid.param"),

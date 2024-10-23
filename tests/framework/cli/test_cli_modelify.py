@@ -12,6 +12,7 @@ from kedro import __version__ as kedro_version
 from kedro.framework.cli.starters import TEMPLATE_PATH
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
+from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.framework.cli.cli import (
     modelify as cli_modelify,  # import after changing the path to avoid registering the project, else import pippeliens does not work!
@@ -228,10 +229,10 @@ def register_pipelines():
 @pytest.mark.parametrize(
     "example_repo,artifacts_list,inside_subdirectory",
     [
-        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"], False),
-        (pytest.lazy_fixture("kp_for_modelify"), ["trained_model"], True),
+        (lf("kp_for_modelify"), ["trained_model"], False),
+        (lf("kp_for_modelify"), ["trained_model"], True),
         (
-            pytest.lazy_fixture("kp_for_modelify_with_parameters"),
+            lf("kp_for_modelify_with_parameters"),
             ["trained_model", "params:my_param"],
             False,
         ),

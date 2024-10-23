@@ -12,6 +12,7 @@ from kedro.runner import SequentialRunner
 from kedro_datasets.pickle import PickleDataset
 from mlflow.models import infer_signature
 from mlflow.tracking import MlflowClient
+from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.framework.hooks.mlflow_hook import MlflowHook
 from kedro_mlflow.pipeline import pipeline_ml_factory
@@ -236,8 +237,8 @@ def dummy_catalog_dataset_factory(tmp_path):
 @pytest.mark.parametrize(
     "pipeline_to_run",
     [
-        (pytest.lazy_fixture("dummy_pipeline")),
-        (pytest.lazy_fixture("dummy_pipeline_ml")),
+        (lf("dummy_pipeline")),
+        (lf("dummy_pipeline_ml")),
     ],
 )
 def test_mlflow_hook_save_pipeline_ml(
@@ -502,10 +503,10 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
     "model_signature,expected_signature",
     (
         [None, None],
-        ["auto", pytest.lazy_fixture("dummy_signature")],
+        ["auto", lf("dummy_signature")],
         [
-            pytest.lazy_fixture("dummy_signature"),
-            pytest.lazy_fixture("dummy_signature"),
+            lf("dummy_signature"),
+            lf("dummy_signature"),
         ],
     ),
 )

@@ -8,7 +8,7 @@ from kedro.io import AbstractDataset
 from kedro_datasets.pandas import CSVDataset
 from kedro_datasets.partitions import PartitionedDataset
 from kedro_datasets.pickle import PickleDataset
-from pytest_lazyfixture import lazy_fixture
+from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset
 
@@ -28,17 +28,17 @@ def df2():
 @pytest.mark.parametrize(
     "dataset,extension,data,artifact_path",
     [
-        (CSVDataset, ".csv", lazy_fixture("df1"), None),
-        ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), None),
-        (PickleDataset, ".pkl", lazy_fixture("df1"), None),
-        ("pickle.PickleDataset", ".pkl", lazy_fixture("df1"), None),
-        (CSVDataset, ".csv", lazy_fixture("df1"), "artifact_dir"),
-        ("pandas.CSVDataset", ".csv", lazy_fixture("df1"), "artifact_dir"),
-        (PickleDataset, ".pkl", lazy_fixture("df1"), "artifact_dir"),
+        (CSVDataset, ".csv", lf("df1"), None),
+        ("pandas.CSVDataset", ".csv", lf("df1"), None),
+        (PickleDataset, ".pkl", lf("df1"), None),
+        ("pickle.PickleDataset", ".pkl", lf("df1"), None),
+        (CSVDataset, ".csv", lf("df1"), "artifact_dir"),
+        ("pandas.CSVDataset", ".csv", lf("df1"), "artifact_dir"),
+        (PickleDataset, ".pkl", lf("df1"), "artifact_dir"),
         (
             "pickle.PickleDataset",
             ".pkl",
-            lazy_fixture("df1"),
+            lf("df1"),
             "artifact_dir",
         ),
     ],

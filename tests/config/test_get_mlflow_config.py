@@ -12,6 +12,7 @@ from kedro.framework.context import KedroContext
 from kedro.framework.project import _IsSubclassValidator, _ProjectSettings
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
+from pytest_lazy_fixtures import lf
 
 
 def _write_yaml(filepath, config):
@@ -199,7 +200,7 @@ def fake_project(tmp_path, local_logging_config):
     "project_settings",
     [
         "",
-        pytest.lazy_fixture("mock_settings_omega_config_loader_class"),
+        lf("mock_settings_omega_config_loader_class"),
     ],
 )
 def test_mlflow_config_correctly_set(kedro_project, project_settings):

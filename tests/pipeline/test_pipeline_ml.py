@@ -2,6 +2,7 @@ import pytest
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node, pipeline
 from kedro_datasets.pandas import CSVDataset
+from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.pipeline import pipeline_ml_factory
 from kedro_mlflow.pipeline.pipeline_ml import KedroMlflowPipelineMLError, PipelineML
@@ -475,8 +476,8 @@ def test_pipeline_ml_filtering(
 @pytest.mark.parametrize(
     "pipeline_ml_obj",
     [
-        pytest.lazy_fixture("pipeline_ml_with_tag"),
-        pytest.lazy_fixture("pipeline_ml_with_intermediary_artifacts"),
+        lf("pipeline_ml_with_tag"),
+        lf("pipeline_ml_with_intermediary_artifacts"),
     ],
 )
 @pytest.mark.parametrize(

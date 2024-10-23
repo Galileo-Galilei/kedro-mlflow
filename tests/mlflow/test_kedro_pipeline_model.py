@@ -7,6 +7,7 @@ import pytest
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataset
+from pytest_lazy_fixtures import lf
 from sklearn.linear_model import LinearRegression
 
 from kedro_mlflow.io.models import MlflowModelLocalFileSystemDataset
@@ -475,26 +476,26 @@ def test_kedro_pipeline_ml_loading_deepcopiable_catalog(tmp_path, tmp_folder):
     "pipeline,catalog,input_name,result",
     [
         (
-            pytest.lazy_fixture("pipeline_inference_dummy"),
-            pytest.lazy_fixture("dummy_catalog"),
+            lf("pipeline_inference_dummy"),
+            lf("dummy_catalog"),
             "raw_data",
             {"raw_data", "model"},
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_intermediary_artifacts"),
-            pytest.lazy_fixture("catalog_with_encoder"),
+            lf("pipeline_inference_with_intermediary_artifacts"),
+            lf("catalog_with_encoder"),
             "raw_data",
             {"raw_data", "model", "encoder"},
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_inputs_artifacts"),
-            pytest.lazy_fixture("catalog_with_stopwords"),
+            lf("pipeline_inference_with_inputs_artifacts"),
+            lf("catalog_with_stopwords"),
             "data",
             {"data", "model", "stopwords_from_nltk"},
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_parameters"),
-            pytest.lazy_fixture("catalog_with_parameters"),
+            lf("pipeline_inference_with_parameters"),
+            lf("catalog_with_parameters"),
             "data",
             {
                 "data",
@@ -548,26 +549,26 @@ def test_catalog_extraction_unpersisted_inference_input(pipeline_inference_dummy
     "pipeline,catalog,input_name,result",
     [
         (
-            pytest.lazy_fixture("pipeline_inference_dummy"),
-            pytest.lazy_fixture("dummy_catalog"),
+            lf("pipeline_inference_dummy"),
+            lf("dummy_catalog"),
             "raw_data",
             pd.DataFrame([1, 2, 3]),
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_intermediary_artifacts"),
-            pytest.lazy_fixture("catalog_with_encoder"),
+            lf("pipeline_inference_with_intermediary_artifacts"),
+            lf("catalog_with_encoder"),
             "raw_data",
             pd.DataFrame([1, 2, 3]),
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_inputs_artifacts"),
-            pytest.lazy_fixture("catalog_with_stopwords"),
+            lf("pipeline_inference_with_inputs_artifacts"),
+            lf("catalog_with_stopwords"),
             "data",
             pd.DataFrame([1, 2, 3]),
         ),
         (
-            pytest.lazy_fixture("pipeline_inference_with_parameters"),
-            pytest.lazy_fixture("catalog_with_parameters"),
+            lf("pipeline_inference_with_parameters"),
+            lf("catalog_with_parameters"),
             "data",
             pd.DataFrame([0, 1, 1]),
         ),

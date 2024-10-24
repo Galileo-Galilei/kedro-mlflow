@@ -45,6 +45,7 @@ class PipelineML(Pipeline):
         input_name: str,
         kpm_kwargs: Optional[Dict[str, str]] = None,
         log_model_kwargs: Optional[Dict[str, str]] = None,
+        params_input_name: Optional[str] = None,
     ):
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 
@@ -58,9 +59,9 @@ class PipelineML(Pipeline):
                 stored in mlflow and use the output(s)
                 of the training pipeline (namely, the model)
                 to predict the outcome.
-            input_name (str, optional): The name of the dataset in
+            input_name (str): The name of the dataset in
                 the catalog.yml which the model's user must provide
-                for prediction (i.e. the data). Defaults to None.
+                for prediction (i.e. the data).
             kpm_kwargs:
                 extra arguments to be passed to `KedroPipelineModel`
                 when the PipelineML object is automatically saved at the end of a run.
@@ -72,6 +73,7 @@ class PipelineML(Pipeline):
                 extra arguments to be passed to `mlflow.pyfunc.log_model`, e.g.:
                     - "signature" accepts an extra "auto" which automatically infer the signature
                     based on "input_name" dataset
+            params_input_name (str, optional): TODO
 
         """
 
@@ -79,6 +81,7 @@ class PipelineML(Pipeline):
 
         self.inference = inference
         self.input_name = input_name
+        self.params_input_name = params_input_name
         # they will be passed to KedroPipelineModel to enable flexibility
 
         kpm_kwargs = kpm_kwargs or {}
@@ -97,7 +100,7 @@ class PipelineML(Pipeline):
         return Pipeline(self.nodes)
 
     @property
-    def inference(self) -> str:
+    def inference(self) -> Pipeline:
         return self._inference
 
     @inference.setter
@@ -120,6 +123,22 @@ class PipelineML(Pipeline):
             )
         self._input_name = name
 
+    @property
+    def params_input_name(self) -> Optional[str]:
+        return self._params_input_name
+
+    @params_input_name.setter
+    def params_input_name(self, name: Optional[str]) -> None:
+        if name is not None:
+            allowed_names = self.inference.inputs()
+            pp_allowed_names = "\n    - ".join(allowed_names)
+            if name not in allowed_names:
+                raise KedroMlflowPipelineMLError(
+                    f"params_input_name='{name}' but it must be an input of 'inference'"
+                    f", i.e. one of: \n    - {pp_allowed_names}"
+                )
+        self._params_input_name = name
+
     def _check_inference(self, inference: Pipeline) -> None:
         nb_outputs = len(inference.outputs())
         outputs_txt = "\n - ".join(inference.outputs())
@@ -139,7 +158,7 @@ class PipelineML(Pipeline):
 
         free_inputs_set = (
             self.inference.inputs()
-            - {self.input_name}
+            - {self.input_name, self.params_input_name}
             - self.all_outputs()
             - self.inputs()
             - inference_parameters  # it is allowed to pass parameters: they will be automatically persisted by the hook
@@ -153,7 +172,7 @@ class PipelineML(Pipeline):
                 " \nNo free input is allowed."
                 " Please make sure that 'inference.inputs()' are all"
                 " in 'training.all_outputs() + training.inputs()'"
-                "except 'input_name' and parameters which starts with 'params:'."
+                "except 'input_name', 'params_input_name' and parameters which starts with 'params:'."
             )
 
     def _turn_pipeline_to_ml(self, pipeline: Pipeline):
@@ -163,6 +182,7 @@ class PipelineML(Pipeline):
             input_name=self.input_name,
             kpm_kwargs=self.kpm_kwargs,
             log_model_kwargs=self.log_model_kwargs,
+            params_input_name=self.params_input_name,
         )
 
     def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover

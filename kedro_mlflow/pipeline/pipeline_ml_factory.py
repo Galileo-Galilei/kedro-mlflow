@@ -1,14 +1,16 @@
 from kedro.pipeline import Pipeline
 
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
+from typing import Optional
 
 
 def pipeline_ml_factory(
     training: Pipeline,
     inference: Pipeline,
-    input_name: str = None,
+    input_name: str,
     kpm_kwargs=None,
     log_model_kwargs=None,
+    params_input_name: Optional[str] = None,
 ) -> PipelineML:
     """This function is a helper to create `PipelineML`
     object directly from two Kedro `Pipelines` (one of
@@ -23,9 +25,9 @@ def pipeline_ml_factory(
             stored in mlflow and use the output(s)
             of the training pipeline (namely, the model)
             to predict the outcome.
-        input_name (str, optional): The name of the dataset in
+        input_name (str): The name of the dataset in
             the catalog.yml which the model's user must provide
-            for prediction (i.e. the data). Defaults to None.
+            for prediction (i.e. the data).
         kpm_kwargs:
             extra arguments to be passed to `KedroPipelineModel`
             when the PipelineML object is automatically saved at the end of a run.
@@ -37,6 +39,7 @@ def pipeline_ml_factory(
             extra arguments to be passed to `mlflow.pyfunc.log_model`
             when the PipelineML object is automatically saved at the end of a run.
             See mlflow documentation to see all available options: https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model
+        params_input_name (str, optional): TODO
 
     Returns:
         PipelineML: A `PipelineML` which is automatically
@@ -51,5 +54,6 @@ def pipeline_ml_factory(
         input_name=input_name,
         kpm_kwargs=kpm_kwargs,
         log_model_kwargs=log_model_kwargs,
+        params_input_name=params_input_name,
     )
     return pipeline

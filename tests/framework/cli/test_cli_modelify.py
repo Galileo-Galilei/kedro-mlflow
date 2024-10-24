@@ -484,7 +484,6 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
     runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
         context.mlflow.tracking.experiment._experiment.experiment_id
     )
-    print(runs_list_before_cmd)
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(

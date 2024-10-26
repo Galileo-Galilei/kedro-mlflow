@@ -2,7 +2,6 @@ from logging import Logger, getLogger
 from typing import Any, Dict, Optional, Union
 
 from kedro.io.core import DatasetError
-from mlflow import MlflowClient
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
     MlflowAbstractModelDataSet,
@@ -72,10 +71,6 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
     @property
     def _logger(self) -> Logger:
         return getLogger(__name__)
-
-    @property
-    def _client(self) -> MlflowClient:
-        return MlflowClient()
 
     def _load(self) -> Any:
         """Loads an MLflow model from local path or from MLflow run.

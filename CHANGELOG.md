@@ -6,7 +6,7 @@
 
 -   :sparkles: Implement missing ``PipelineML`` filtering functionalities to let ``kedro`` display resume hints and avoid breaking ``kedro-viz`` ([#377](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
 -   :sparkles: Sanitize parameters name with unsupported characters to avoid ``mlflow`` errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
--   :sparkles: :loud_sound: Add logs about the exact ``run_id`` loaded withtin a ``MlflowRegistryDataset`` because some URI are confusing (e.g. ``latest``) and hard to debug ([#552, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/552))
+-   :sparkles: :loud_sound: Add logs about the exact ``run_id`` loaded within a ``MlflowRegistryDataset`` because some URI are confusing (e.g. ``latest``) and hard to debug ([#552](https://github.com/Galileo-Galilei/kedro-mlflow/pull/552))
 
 ### Changed
 

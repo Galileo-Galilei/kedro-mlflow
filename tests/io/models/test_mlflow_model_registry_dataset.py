@@ -33,6 +33,51 @@ def test_mlflow_model_registry_alias_and_stage_or_version_fails(tmp_path):
         )
 
 
+# this test is failing because of long standing issues like this :
+# https://github.com/pytest-dev/pytest/issues/7335
+# https://github.com/pytest-dev/pytest/issues/5160
+# To make logging occur, we need to from kedro.framewrok.projcet import LOGGING at the beginning
+# ironically, the sderr error reported by pytest shows that logging actually occurs!
+
+
+@pytest.mark.xfail
+def test_mlflow_model_registry_logs_run_id(caplog, tmp_path, monkeypatch):
+    # we must change the working directory because when
+    # using mlflow with a local database tracking, the artifacts
+    # are stored in a relative mlruns/ folder so we need to have
+    # the same working directory that the one of the tracking uri
+    monkeypatch.chdir(tmp_path)
+    tracking_and_registry_uri = r"sqlite:///" + (tmp_path / "mlruns3.db").as_posix()
+    mlflow.set_tracking_uri(tracking_and_registry_uri)
+    mlflow.set_registry_uri(tracking_and_registry_uri)
+
+    # setup: we train 2 version of a model under a single
+    #  registered model and stage the 2nd one
+    run_ids = {}
+    for i in range(2):
+        with mlflow.start_run():
+            model = DecisionTreeClassifier()
+            mlflow.sklearn.log_model(
+                model, artifact_path="demo_model", registered_model_name="demo_model"
+            )
+            run_ids[i + 1] = mlflow.active_run().info.run_id
+
+    # case 1: no version is provided, we take the last one
+
+    ml_ds = MlflowModelRegistryDataset(model_name="demo_model", stage_or_version=1)
+    ml_ds.load()
+
+    # caplog.text, caplog.messages, caplog.records are all empty ???, but th stderr will show them
+    assert run_ids[1] in caplog.text
+
+    # case 2: a stage is provided, we take the last model with this stage
+    ml_ds = MlflowModelRegistryDataset(
+        model_name="demo_model", stage_or_version="latest"
+    )
+    ml_ds.load()
+    assert run_ids[2] in caplog.text
+
+
 def test_mlflow_model_registry_load_given_stage_or_version(tmp_path, monkeypatch):
     # we must change the working directory because when
     # using mlflow with a local database tracking, the artifacts

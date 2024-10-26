@@ -1,4 +1,4 @@
-from logging import getLogger
+from logging import Logger, getLogger
 from typing import Any, Dict, Optional, Union
 
 from kedro.io.core import DatasetError
@@ -70,11 +70,11 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         )
 
     @property
-    def _logger(self):
+    def _logger(self) -> Logger:
         return getLogger(__name__)
 
     @property
-    def _client(self):
+    def _client(self) -> MlflowClient:
         return MlflowClient()
 
     def _load(self) -> Any:

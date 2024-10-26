@@ -1,3 +1,4 @@
+from logging import Logger, getLogger
 from typing import Any, Dict, Optional, Union
 
 from kedro.io.core import DatasetError
@@ -67,6 +68,10 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             else f"models:/{model_name}/{stage_or_version}"
         )
 
+    @property
+    def _logger(self) -> Logger:
+        return getLogger(__name__)
+
     def _load(self) -> Any:
         """Loads an MLflow model from local path or from MLflow run.
 
@@ -77,9 +82,17 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         # If `run_id` is specified, pull the model from MLflow.
         # TODO: enable loading from another mlflow conf (with a client with another tracking uri)
         # Alternatively, use local path to load the model.
-        return self._mlflow_model_module.load_model(
+        model = self._mlflow_model_module.load_model(
             model_uri=self.model_uri, **self._load_args
         )
+
+        # log some info because "latest" model is not very informative
+        # the model itself does not have information about its registry
+        # because the same run can be registered under several different names
+        #  in the registry. See https://github.com/Galileo-Galilei/kedro-mlflow/issues/552
+
+        self._logger.info(f"Loading model from run_id='{model.metadata.run_id}'")
+        return model
 
     def _save(self, model: Any) -> None:
         raise NotImplementedError(

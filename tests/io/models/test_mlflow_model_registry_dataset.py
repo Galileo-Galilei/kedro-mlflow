@@ -36,10 +36,10 @@ def test_mlflow_model_registry_alias_and_stage_or_version_fails(tmp_path):
 # this test is failing because of long standing issues like this :
 # https://github.com/pytest-dev/pytest/issues/7335
 # https://github.com/pytest-dev/pytest/issues/5160
-# To make logging occur, we need to from kedro.framewrok.projcet import LOGGING at the beginning
+# To make logging occur, we need to from kedro.framework.projcet import LOGGING at the beginning
 # ironically, the sderr error reported by pytest shows that logging actually occurs!
-
-
+# If I remove with mlflow.start_run(), caplog is indeed not empty, it seems mlflow flushes the internal loger
+# probably related to https://github.com/mlflow/mlflow/issues/4957
 @pytest.mark.xfail
 def test_mlflow_model_registry_logs_run_id(caplog, tmp_path, monkeypatch):
     # we must change the working directory because when
@@ -74,7 +74,8 @@ def test_mlflow_model_registry_logs_run_id(caplog, tmp_path, monkeypatch):
     ml_ds = MlflowModelRegistryDataset(
         model_name="demo_model", stage_or_version="latest"
     )
-    ml_ds.load()
+    ml_ds._load()
+
     assert run_ids[2] in caplog.text
 
 

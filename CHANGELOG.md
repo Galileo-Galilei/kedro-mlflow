@@ -2,22 +2,24 @@
 
 ## [Unreleased]
 
+## [0.13.3] - 2024-10-29
+
 ### Added
 
--   :sparkles: Implement missing ``PipelineML`` filtering functionalities to let ``kedro`` display resume hints and avoid breaking ``kedro-viz`` ([#377](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
--   :sparkles: Sanitize parameters name with unsupported characters to avoid ``mlflow`` errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
--   :loud_sound: Add logs about the exact ``run_id`` loaded within a ``MlflowRegistryDataset`` because some URI are confusing (e.g. ``latest``) and hard to debug ([#552](https://github.com/Galileo-Galilei/kedro-mlflow/pull/552))
+-   :sparkles: Implement missing `PipelineML` filtering functionalities to let `kedro` display resume hints and avoid breaking `kedro-viz` ([#377](https://github.com/Galileo-Galilei/kedro-mlflow/pull/377), [#601, Calychas](https://github.com/Galileo-Galilei/kedro-mlflow/pull/601))
+-   :sparkles: Sanitize parameters name with unsupported characters to avoid `mlflow` errors when logging ([#595, pascalwhoop](https://github.com/Galileo-Galilei/kedro-mlflow/pull/595))
+-   :loud_sound: Add logs about the exact `run_id` loaded within a `MlflowRegistryDataset` because some URI are confusing (e.g. `latest`) and hard to debug ([#552](https://github.com/Galileo-Galilei/kedro-mlflow/pull/552))
 
 ### Changed
 
--   :pushpin: :sparkles: Removed lower and upper bounds for ``python`` versions of to be constantly in sync with ``kedro`` and make migrations faster ([#603](https://github.com/Galileo-Galilei/kedro-mlflow/issues/603))
--   :heavy_plus_sign: :heavy_minus_sign: Removed [``pytest-lazy-fixture``](https://pypi.org/project/pytest-lazy-fixture/) in favor of [``pytest-lazy-fixtures``](https://pypi.org/project/pytest-lazy-fixtures/) which has less reputation but is more up to date. The former has [not been updated in two years](https://github.com/TvoroG/pytest-lazy-fixture/issues/63) and is [not compatible with recent pytest](https://github.com/TvoroG/pytest-lazy-fixture/issues). ([#524](https://github.com/Galileo-Galilei/kedro-mlflow/issues/524), [#604](https://github.com/Galileo-Galilei/kedro-mlflow/issues/604))
+-   :pushpin: :sparkles: Removed lower and upper bounds for `python` versions of to be constantly in sync with `kedro` and make migrations faster ([#603](https://github.com/Galileo-Galilei/kedro-mlflow/issues/603))
+-   :heavy_plus_sign: :heavy_minus_sign: Removed [`pytest-lazy-fixture`](https://pypi.org/project/pytest-lazy-fixture/) in favor of [`pytest-lazy-fixtures`](https://pypi.org/project/pytest-lazy-fixtures/) which has less reputation but is more up to date. The former has [not been updated in two years](https://github.com/TvoroG/pytest-lazy-fixture/issues/63) and is [not compatible with recent pytest](https://github.com/TvoroG/pytest-lazy-fixture/issues). ([#524](https://github.com/Galileo-Galilei/kedro-mlflow/issues/524), [#604](https://github.com/Galileo-Galilei/kedro-mlflow/issues/604))
 
 ## [0.13.2] - 2024-10-15
 
 ### Fixed
 
-- :bug: :ambulance: Fix `MlflowArtifactDataset` `load` and `save` methods to make them compatible with modern datasets without private `_load` and `_save` introduced in `kedro-datasets>=5.0.0` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
+-   :bug: :ambulance: Fix `MlflowArtifactDataset` `load` and `save` methods to make them compatible with modern datasets without private `_load` and `_save` introduced in `kedro-datasets>=5.0.0` ([#598](https://github.com/Galileo-Galilei/kedro-mlflow/issues/598))
 
 ## [0.13.1] - 2024-09-24
 
@@ -519,7 +521,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.2...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.3...HEAD
+
+[0.13.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.2...0.13.3
 
 [0.13.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.1...0.13.2
 

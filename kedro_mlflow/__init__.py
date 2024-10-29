@@ -1,6 +1,6 @@
 """kedro-mlflow plugin constants"""
 
-__version__ = "0.13.2"
+__version__ = "0.13.3"
 
 import logging
 

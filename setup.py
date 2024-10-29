@@ -47,7 +47,7 @@ setup(
         ],
         "test": [
             "pytest>=5.4.0, <9.0.0",  # pytest==8.0.0 breaks pytest-lazy-fixture : https://github.com/TvoroG/pytest-lazy-fixture/issues/65
-            "pytest-cov>=2.8.0, <6.0.0",
+            "pytest-cov>=2.8.0, <7.0.0",
             "pytest-lazy-fixtures>=1.0.0, <2.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "ruff>=0.5.0,<0.8.0",  # ensure consistency with pre-commit

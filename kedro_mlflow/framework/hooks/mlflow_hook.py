@@ -19,7 +19,6 @@ from mlflow.tracking import MlflowClient
 from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 from omegaconf import OmegaConf
 from pydantic import __version__ as pydantic_version
-import pickle
 
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 from kedro_mlflow.config.resolvers import resolve_random_name
@@ -372,8 +371,6 @@ class MlflowHook:
                 for dataset in pipeline.datasets():
                     catalog.exists(dataset)
 
-                hooks = pipeline.hooks # TODO
-
                 with TemporaryDirectory() as tmp_dir:
                     # This will be removed at the end of the context manager,
                     # but we need to log in mlflow before moving the folder
@@ -382,19 +379,11 @@ class MlflowHook:
                         catalog=catalog,
                         input_name=pipeline.input_name,
                         hooks=pipeline.hooks,
-                        **pipeline.kpm_kwargs
+                        **pipeline.kpm_kwargs,
                     )
                     artifacts = kedro_pipeline_model.extract_pipeline_artifacts(
                         parameters_saving_folder=Path(tmp_dir)
                     )
-                    
-                    # if hooks:
-                    #     for hook in hooks:
-                    #         hook_name = f"hook_{hook.__class__}"
-                    #         hook_pickle_path = f"{Path(tmp_dir).as_posix()}/{hook_name}.pkl"
-                    #         with open(hook_pickle_path, "wb+") as f:
-                    #             pickle.dump(hook, f)
-                    #             artifacts[hook_name] = hook_pickle_path                   
 
                     log_model_kwargs = pipeline.log_model_kwargs.copy()
                     model_signature = log_model_kwargs.pop("signature", None)

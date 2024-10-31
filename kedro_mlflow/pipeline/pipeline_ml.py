@@ -45,7 +45,7 @@ class PipelineML(Pipeline):
         input_name: str,
         kpm_kwargs: Optional[Dict[str, str]] = None,
         log_model_kwargs: Optional[Dict[str, str]] = None,
-        hooks: Optional[List[object]] = None, # Hooks are arbirtary classes with certain methods - did not find a prototype
+        hooks: Optional[List[object]] = None, # Hook class does not have an abstract class
     ):
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 

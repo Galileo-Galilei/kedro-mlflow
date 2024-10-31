@@ -45,7 +45,9 @@ class PipelineML(Pipeline):
         input_name: str,
         kpm_kwargs: Optional[Dict[str, str]] = None,
         log_model_kwargs: Optional[Dict[str, str]] = None,
-        hooks: Optional[List[object]] = None, # Hook class does not have an abstract class
+        hooks: Optional[
+            List[object]
+        ] = None,  # Hook class does not have an abstract class
     ):
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 
@@ -165,7 +167,7 @@ class PipelineML(Pipeline):
             input_name=self.input_name,
             kpm_kwargs=self.kpm_kwargs,
             log_model_kwargs=self.log_model_kwargs,
-            hooks=self.hooks
+            hooks=self.hooks,
         )
 
     def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover

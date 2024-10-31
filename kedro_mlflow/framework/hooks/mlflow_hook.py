@@ -378,6 +378,7 @@ class MlflowHook:
                         pipeline=pipeline.inference,
                         catalog=catalog,
                         input_name=pipeline.input_name,
+                        hooks=pipeline.hooks,
                         **pipeline.kpm_kwargs,
                     )
                     artifacts = kedro_pipeline_model.extract_pipeline_artifacts(

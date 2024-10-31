@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Optional, Union
 
 from kedro.framework.hooks import _create_hook_manager
+from kedro import __version__
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
@@ -20,6 +21,7 @@ class KedroPipelineModel(PythonModel):
         input_name: str,
         runner: Optional[AbstractRunner] = None,
         copy_mode: Optional[Union[Dict[str, str], str]] = "assign",
+        hooks: Optional[list] = None,
     ):
         """[summary]
 
@@ -50,6 +52,7 @@ class KedroPipelineModel(PythonModel):
         self.pipeline = (
             pipeline.inference if isinstance(pipeline, PipelineML) else pipeline
         )
+        self.hooks = hooks or []
         self.input_name = input_name
         self.initial_catalog = self._extract_pipeline_catalog(catalog)
 
@@ -62,11 +65,31 @@ class KedroPipelineModel(PythonModel):
         self.output_name = list(self.pipeline.outputs())[0]
         self.runner = runner or SequentialRunner()
         self.copy_mode = copy_mode or {}
+        self.run_params = {
+            "project_path": Path.cwd().as_posix(),
+            "env": "serving",
+            "kedro_version": str(__version__),
+            "tags": [],
+            "from_nodes": [],
+            "to_nodes": [],
+            "node_names": [],
+            "from_inputs": [],
+            "load_versions": [],
+            "pipeline_name": "serving",
+            "extra_params": [],
+        }
         # copy mode has been converted because it is a property
         # TODO: we need to use the runner's default dataset in case of multithreading
         self.loaded_catalog = DataCatalog(
             datasets={
-                name: MemoryDataset(copy_mode=copy_mode)
+                name: MemoryDataset(
+                    copy_mode=copy_mode,
+                    metadata=(
+                        catalog._datasets[name].metadata
+                        if name in catalog._datasets
+                        else None
+                    ),
+                )
                 for name, copy_mode in self.copy_mode.items()
             }
         )
@@ -109,7 +132,7 @@ class KedroPipelineModel(PythonModel):
         for dataset_name in self.pipeline.inputs():
             if dataset_name == self.input_name:
                 # there is no obligation that this dataset is persisted
-                # and even if it is, we keep only an ampty memory dataset to avoid
+                # and even if it is, we keep only an empty memory dataset to avoid
                 # extra uneccessary dependencies: this dataset will be replaced at
                 # inference time and we do not need to know the original type, see
                 # https://github.com/Galileo-Galilei/kedro-mlflow/issues/273
@@ -177,7 +200,7 @@ class KedroPipelineModel(PythonModel):
         # but we rely on a mlflow function for saving, and it is unaware of kedro
         # pipeline structure
         mlflow_artifacts_keys = set(context.artifacts.keys())
-        kedro_artifacts_keys = set(self.pipeline.inputs() - {self.input_name})
+        kedro_artifacts_keys = set((self.pipeline.inputs() - {self.input_name}))
         if mlflow_artifacts_keys != kedro_artifacts_keys:
             in_artifacts_but_not_inference = (
                 mlflow_artifacts_keys - kedro_artifacts_keys
@@ -196,20 +219,62 @@ class KedroPipelineModel(PythonModel):
             updated_catalog._datasets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
+    def _init_hooks(self):
+        hook_manager = _create_hook_manager()
+        for hook in self.hooks:
+            hook_manager.register(hook())
+        return hook_manager
+        # TODO: decide what to do about catalog_created and context_created
+        # whether to mock up or placehold missing values or skip the hook calls
+        # hook_manager.hook.after_catalog_created(
+        #     catalog = self.loaded_catalog,
+        #     conf_catalog = {},
+        #     conf_creds = {},
+        #     feed_dict = {},
+        #     save_version = "",
+        #     load_versions = {},
+        # )
+
+        # hook_manager.hook.after_context_created(
+        #     KedroMockContext(
+        #         "./",
+        #         MagicMock(),
+        #         "serving",
+        #         "",
+        #         hook_manager,
+        #         None
+        #     )
+        # )
+
     def predict(self, context, model_input):
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project
-        hook_manager = _create_hook_manager()
+        # TODO see if the re-initialising part of hooks can be optimized
+        # rather than creating new hook manager & hook objects each predict
+        hook_manager = self._init_hooks()
 
         self.loaded_catalog.save(
             name=self.input_name,
             data=model_input,
         )
 
+        hook_manager.hook.before_pipeline_run(
+            run_params=self.run_params,
+            pipeline=self.pipeline,
+            catalog=self.loaded_catalog,
+        )
+
         run_output = self.runner.run(
             pipeline=self.pipeline,
             catalog=self.loaded_catalog,
             hook_manager=hook_manager,
+        )
+
+        hook_manager.hook.after_pipeline_run(
+            run_params=self.run_params,
+            run_result=run_output,
+            pipeline=self.pipeline,
+            catalog=self.loaded_catalog,
         )
 
         # unpack the result to avoid messing the json

@@ -1,5 +1,5 @@
 from logging import Logger, getLogger
-from typing import Dict, Iterable, Optional, Union
+from typing import Dict, Iterable, Optional, Union, List
 
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
@@ -45,6 +45,7 @@ class PipelineML(Pipeline):
         input_name: str,
         kpm_kwargs: Optional[Dict[str, str]] = None,
         log_model_kwargs: Optional[Dict[str, str]] = None,
+        hooks: Optional[List[object]] = None, # Hooks are arbirtary classes with certain methods - did not find a prototype
     ):
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 
@@ -86,6 +87,7 @@ class PipelineML(Pipeline):
 
         log_model_kwargs = log_model_kwargs or {}
         self.log_model_kwargs = {**self.LOG_MODEL_KWARGS_DEFAULT, **log_model_kwargs}
+        self.hooks = hooks
         self._check_consistency()
 
     @property
@@ -163,6 +165,7 @@ class PipelineML(Pipeline):
             input_name=self.input_name,
             kpm_kwargs=self.kpm_kwargs,
             log_model_kwargs=self.log_model_kwargs,
+            hooks=self.hooks
         )
 
     def only_nodes(self, *node_names: str) -> "Pipeline":  # pragma: no cover

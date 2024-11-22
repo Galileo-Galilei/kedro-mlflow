@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
@@ -8,8 +8,15 @@ from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
 from kedro_datasets.pickle import PickleDataset
 from mlflow.pyfunc import PythonModel
+from pydantic import BaseModel
 
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
+
+
+class PredictParamsSchema(BaseModel):
+    parameters: Optional[dict[str, Any]] = {}
+    # runner: AbstractRunner
+    # hooks: Iterable[Any] # cf. _register_hooks
 
 
 class KedroPipelineModel(PythonModel):
@@ -207,25 +214,20 @@ class KedroPipelineModel(PythonModel):
         # TODO hooks
         # TODO runner
 
+        params = params or {}
+        runner_class = params.pop("runner", "SequentialRunner")
+        runner = (
+            self.runner
+        )  # runner="build it dynamically from runner class" or self.runner
+
         hook_manager = _create_hook_manager()
-        # _register_hooks(hook_manager, params.hooks)
+        # _register_hooks(hook_manager, predict_params.hooks)
 
-        runner = self.runner  # params.runner or self.runner
-
-        for name, value in params.parameters.items():
+        for name, value in params.items():
+            # no need to check if params are ni the catalog, because mlflow already checks that the params mathc the signature
             param = f"params:{name}"
-            if param in self.loaded_catalog._datasets:
-                self._logger.info(f"Use {param}={value}")
-                self.loaded_catalog.save(name=param, data=value, replace=True)
-            else:
-                params_set = {
-                    ds[7:]
-                    for ds in self.loaded_catalog._datasets
-                    if ds.startswith("params:")
-                }
-                self._logger.info(
-                    f"{name} is not a valid parameter. Use one of '{','.join(params_set)}'. "
-                )
+            self._logger.info(f"Using {param}={value} for the prediction")
+            self.loaded_catalog.save(name=param, data=value)
 
         self.loaded_catalog.save(
             name=self.input_name,
@@ -247,10 +249,3 @@ class KedroPipelineModel(PythonModel):
 
 class KedroPipelineModelError(Exception):
     """Error raised when the KedroPipelineModel construction fails"""
-
-
-# from pydantic import BaseModel
-# class PredictParamsSchema(BaseModel):
-#     parameters: dict[str, Any]
-#     runner: AbstractRunner
-#     hooks: Iterable[Any] # cf. _register_hooks

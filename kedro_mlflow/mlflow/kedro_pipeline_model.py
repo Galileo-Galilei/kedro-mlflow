@@ -196,17 +196,43 @@ class KedroPipelineModel(PythonModel):
             updated_catalog._datasets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
-    def predict(self, context, model_input):
+    def predict(self, context, model_input, params=None):
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project
+
+        # params can pass
+        # TODO globals
+        # TODO runtime
+        # TODO parameters -> I'd prefer not have them, but it would require catalog to be able to not be fully resolved if we want to pass runtime and globals
+        # TODO hooks
+        # TODO runner
+
         hook_manager = _create_hook_manager()
+        # _register_hooks(hook_manager, params.hooks)
+
+        runner = self.runner  # params.runner or self.runner
+
+        for name, value in params.parameters.items():
+            param = f"params:{name}"
+            if param in self.loaded_catalog._datasets:
+                self._logger.info(f"Use {param}={value}")
+                self.loaded_catalog.save(name=param, data=value, replace=True)
+            else:
+                params_set = {
+                    ds[7:]
+                    for ds in self.loaded_catalog._datasets
+                    if ds.startswith("params:")
+                }
+                self._logger.info(
+                    f"{name} is not a valid parameter. Use one of '{','.join(params_set)}'. "
+                )
 
         self.loaded_catalog.save(
             name=self.input_name,
             data=model_input,
         )
 
-        run_output = self.runner.run(
+        run_output = runner.run(
             pipeline=self.pipeline,
             catalog=self.loaded_catalog,
             hook_manager=hook_manager,
@@ -221,3 +247,10 @@ class KedroPipelineModel(PythonModel):
 
 class KedroPipelineModelError(Exception):
     """Error raised when the KedroPipelineModel construction fails"""
+
+
+# from pydantic import BaseModel
+# class PredictParamsSchema(BaseModel):
+#     parameters: dict[str, Any]
+#     runner: AbstractRunner
+#     hooks: Iterable[Any] # cf. _register_hooks

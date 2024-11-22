@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional, Union
 
 from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
@@ -8,15 +8,8 @@ from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
 from kedro_datasets.pickle import PickleDataset
 from mlflow.pyfunc import PythonModel
-from pydantic import BaseModel
 
 from kedro_mlflow.pipeline.pipeline_ml import PipelineML
-
-
-class PredictParamsSchema(BaseModel):
-    parameters: Optional[dict[str, Any]] = {}
-    # runner: AbstractRunner
-    # hooks: Iterable[Any] # cf. _register_hooks
 
 
 class KedroPipelineModel(PythonModel):

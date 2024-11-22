@@ -45,7 +45,7 @@ def dummy_pipeline():
         return data
 
     def train_fun(data, param):
-        return 2
+        return 1
 
     def predict_fun(model, data):
         return data * model
@@ -105,7 +105,7 @@ def pipeline_ml_with_parameters():
         return data
 
     def train_fun_hyperparam(data, hyperparam):
-        return 2
+        return 1
 
     def predict_fun(model, data):
         return data * model
@@ -157,9 +157,35 @@ def pipeline_ml_with_parameters():
 
 
 @pytest.fixture
+def catalog_with_parameters(kedro_project_with_mlflow_conf):
+    catalog_with_parameters = DataCatalog(
+        {
+            "data": MemoryDataset(pd.DataFrame(data=[0.5], columns=["a"])),
+            "cleaned_data": MemoryDataset(),
+            "params:stopwords": MemoryDataset(["Hello", "Hi"]),
+            "params:penalty": MemoryDataset(0.1),
+            "model": PickleDataset(
+                filepath=(
+                    kedro_project_with_mlflow_conf / "data" / "model.csv"
+                ).as_posix()
+            ),
+            "params:threshold": MemoryDataset(0.5),
+        }
+    )
+    return catalog_with_parameters
+
+
+@pytest.fixture
 def dummy_signature(dummy_catalog, dummy_pipeline_ml):
     input_data = dummy_catalog.load(dummy_pipeline_ml.input_name)
-    dummy_signature = infer_signature(input_data)
+    params_dict = {
+        key: dummy_catalog.load(key)
+        for key in dummy_pipeline_ml.inference.inputs()
+        if key.startswith("params:")
+    }
+    dummy_signature = infer_signature(
+        model_input=input_data, params={**params_dict, "runner": "SequentialRunner"}
+    )
     return dummy_signature
 
 
@@ -303,7 +329,7 @@ def test_mlflow_hook_save_pipeline_ml(
             assert trained_model.metadata.signature.to_dict() == {
                 "inputs": '[{"type": "long", "name": "a", "required": true}]',
                 "outputs": None,
-                "params": None,
+                "params": '[{"name": "runner", "type": "string", "default": "SequentialRunner", "shape": null}]',
             }
 
 
@@ -434,27 +460,13 @@ def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
 def test_mlflow_hook_save_pipeline_ml_with_parameters(
     kedro_project_with_mlflow_conf,  # a fixture to be in a kedro project
     pipeline_ml_with_parameters,
+    catalog_with_parameters,
     dummy_run_params,
 ):
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-
-        catalog_with_parameters = DataCatalog(
-            {
-                "data": MemoryDataset(pd.DataFrame(data=[1], columns=["a"])),
-                "cleaned_data": MemoryDataset(),
-                "params:stopwords": MemoryDataset(["Hello", "Hi"]),
-                "params:penalty": MemoryDataset(0.1),
-                "model": PickleDataset(
-                    filepath=(
-                        kedro_project_with_mlflow_conf / "data" / "model.csv"
-                    ).as_posix()
-                ),
-                "params:threshold": MemoryDataset(0.5),
-            }
-        )
 
         mlflow_hook = MlflowHook()
         mlflow_hook.after_context_created(context)
@@ -687,3 +699,148 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
         trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/artifacts")
         # the real test is that the model is loaded without error
         assert trained_model is not None
+
+
+def test_mlflow_hook_save_and_load_pipeline_ml_with_inference_parameters(
+    kedro_project_with_mlflow_conf,  # a fixture to be in a kedro project
+    pipeline_ml_with_parameters,
+    catalog_with_parameters,
+    dummy_run_params,
+):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()
+
+        mlflow_hook = MlflowHook()
+        mlflow_hook.after_context_created(context)
+
+        runner = SequentialRunner()
+        mlflow_hook.after_catalog_created(
+            catalog=catalog_with_parameters,
+            # `after_catalog_created` is not using any of arguments bellow,
+            # so we are setting them to empty values.
+            conf_catalog={},
+            conf_creds={},
+            feed_dict={},
+            save_version="",
+            load_versions="",
+        )
+        mlflow_hook.before_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_ml_with_parameters,
+            catalog=catalog_with_parameters,
+        )
+        runner.run(
+            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
+        )
+
+        current_run_id = mlflow.active_run().info.run_id
+
+        # This is what we want to test: parameters should be passed by defautl to the signature
+        mlflow_hook.after_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_ml_with_parameters,
+            catalog=catalog_with_parameters,
+        )
+
+        # test 1 : parameters should have been logged
+        trained_model = mlflow.pyfunc.load_model(f"runs:/{current_run_id}/model")
+
+        # The "threshold" parameter of the inference pipeline should be in the signature
+        # {
+        #     key: dummy_catalog.load(key)
+        #     for key in dummy_pipeline_ml.inference.inputs()
+        #     if key.startswith("params:")
+        # }
+
+        assert (
+            '{"name": "threshold", "type": "double", "default": 0.5, "shape": null}'
+            in trained_model.metadata.signature.to_dict()["params"]
+        )
+
+        # test 2 : we get different results when passing parameters
+
+        inference_data = pd.DataFrame(data=[0.2, 0.6, 0.9], columns=["a"])
+
+        assert all(
+            trained_model.predict(inference_data)
+            == pd.DataFrame([0, 1, 1]).values  # no param = 0.5, the default
+        )
+
+        assert all(
+            trained_model.predict(
+                inference_data,
+                params={"threshold": 0.8},
+            )
+            == pd.DataFrame([0, 0, 1]).values  # 0.6 is now below threshold
+        )
+
+
+def test_mlflow_hook_save_and_load_pipeline_ml_specify_runner(
+    kedro_project_with_mlflow_conf,  # a fixture to be in a kedro project
+    pipeline_ml_with_parameters,
+    catalog_with_parameters,
+    dummy_run_params,
+):
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()
+
+        mlflow_hook = MlflowHook()
+        mlflow_hook.after_context_created(context)
+
+        runner = SequentialRunner()
+        mlflow_hook.after_catalog_created(
+            catalog=catalog_with_parameters,
+            # `after_catalog_created` is not using any of arguments bellow,
+            # so we are setting them to empty values.
+            conf_catalog={},
+            conf_creds={},
+            feed_dict={},
+            save_version="",
+            load_versions="",
+        )
+        mlflow_hook.before_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_ml_with_parameters,
+            catalog=catalog_with_parameters,
+        )
+        runner.run(
+            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
+        )
+
+        current_run_id = mlflow.active_run().info.run_id
+
+        # This is what we want to test: parameters should be passed by defautl to the signature
+        mlflow_hook.after_pipeline_run(
+            run_params=dummy_run_params,
+            pipeline=pipeline_ml_with_parameters,
+            catalog=catalog_with_parameters,
+        )
+
+        # test : parameters should have been logged
+        trained_model = mlflow.pyfunc.load_model(f"runs:/{current_run_id}/model")
+
+        # test 1 : the parameters in the signature should have the runner with a default "SequentialRunner"
+        assert (
+            '{"name": "runner", "type": "string", "default": "SequentialRunner", "shape": null}'
+            in trained_model.metadata.signature.to_dict()["params"]
+        )
+
+        inference_data = pd.DataFrame(data=[0.2, 0.6, 0.9], columns=["a"])
+
+        # raise an error with a non existing runner
+        with pytest.raises(
+            AttributeError,
+            match="module 'kedro.runner' has no attribute 'non_existing_runner'",
+        ):
+            trained_model.predict(
+                inference_data, params={"runner": "non_existing_runner"}
+            )
+
+        # second test : run with another runner (iI should test that it is indeed the other one which is picked)
+        # the log clearly shows it
+        assert all(
+            trained_model.predict(inference_data, params={"runner": "ThreadRunner"})
+            == pd.DataFrame([0, 1, 1]).values  # no param = 0.5, the default
+        )

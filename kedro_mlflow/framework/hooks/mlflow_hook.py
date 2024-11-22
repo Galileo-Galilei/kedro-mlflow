@@ -399,7 +399,18 @@ class MlflowHook:
                     if isinstance(model_signature, str):
                         if model_signature == "auto":
                             input_data = catalog.load(pipeline.input_name)
-                            model_signature = infer_signature(model_input=input_data)
+
+                            # all pipeline params will be overridable at predict time: https://mlflow.org/docs/latest/model/signatures.html#model-signatures-with-inference-params
+                            # I add the special "runner" parameter to be able to choose it at runtime
+                            pipeline_params = {
+                                ds_name[7:]: catalog.load(ds_name)
+                                for ds_name in pipeline.inference.inputs()
+                                if ds_name.startswith("params:")
+                            } | {"runner": "SequentialRunner"}
+                            model_signature = infer_signature(
+                                model_input=input_data,
+                                params=pipeline_params,
+                            )
 
                     mlflow.pyfunc.log_model(
                         python_model=kedro_pipeline_model,

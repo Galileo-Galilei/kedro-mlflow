@@ -394,7 +394,7 @@ class MlflowHook:
                             # I add the special "runner" parameter to be able to choose it at runtime
                             pipeline_params = {
                                 ds_name[7:]: catalog.load(ds_name)
-                                for ds_name in pipeline.inputs()
+                                for ds_name in pipeline.inference.inputs()
                                 if ds_name.startswith("params:")
                             } | {"runner": "SequentialRunner"}
                             model_signature = infer_signature(

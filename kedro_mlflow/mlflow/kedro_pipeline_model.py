@@ -6,6 +6,7 @@ from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
+from kedro.utils import load_obj
 from kedro_datasets.pickle import PickleDataset
 from mlflow.pyfunc import PythonModel
 
@@ -208,16 +209,23 @@ class KedroPipelineModel(PythonModel):
         # TODO runner
 
         params = params or {}
+
         runner_class = params.pop("runner", "SequentialRunner")
+
+        # we don't want to recreate the runner object on each predict
+        # because reimporting comes with a performance penalty in a serving setup
+        # so if it is the default we just use the existing runner
         runner = (
             self.runner
-        )  # runner="build it dynamically from runner class" or self.runner
+            if runner_class == self.runner.__name__
+            else load_obj(runner_class, "kedro.runner")
+        )
 
         hook_manager = _create_hook_manager()
         # _register_hooks(hook_manager, predict_params.hooks)
 
         for name, value in params.items():
-            # no need to check if params are ni the catalog, because mlflow already checks that the params mathc the signature
+            # no need to check if params are in the catalog, because mlflow already checks that the params matching the signature
             param = f"params:{name}"
             self._logger.info(f"Using {param}={value} for the prediction")
             self.loaded_catalog.save(name=param, data=value)

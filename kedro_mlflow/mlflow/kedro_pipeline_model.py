@@ -217,7 +217,7 @@ class KedroPipelineModel(PythonModel):
         # so if it is the default we just use the existing runner
         runner = (
             self.runner
-            if runner_class == self.runner.__name__
+            if runner_class == type(self.runner).__name__
             else load_obj(runner_class, "kedro.runner")
         )
 

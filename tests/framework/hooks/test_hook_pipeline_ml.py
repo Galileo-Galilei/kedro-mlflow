@@ -159,7 +159,14 @@ def pipeline_ml_with_parameters():
 @pytest.fixture
 def dummy_signature(dummy_catalog, dummy_pipeline_ml):
     input_data = dummy_catalog.load(dummy_pipeline_ml.input_name)
-    dummy_signature = infer_signature(input_data)
+    params_dict = {
+        key: dummy_catalog.load(key)
+        for key in dummy_pipeline_ml.inference.inputs()
+        if key.startswith("params:")
+    }
+    dummy_signature = infer_signature(
+        model_input=input_data, params={**params_dict, "runner": "SequentialRunner"}
+    )
     return dummy_signature
 
 
@@ -303,7 +310,7 @@ def test_mlflow_hook_save_pipeline_ml(
             assert trained_model.metadata.signature.to_dict() == {
                 "inputs": '[{"type": "long", "name": "a", "required": true}]',
                 "outputs": None,
-                "params": None,
+                "params": '[{"name": "runner", "type": "string", "default": "SequentialRunner", "shape": null}]',
             }
 
 

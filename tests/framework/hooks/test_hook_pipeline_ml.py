@@ -838,7 +838,7 @@ def test_mlflow_hook_save_and_load_pipeline_ml_specify_runner(
                 inference_data, params={"runner": "non_existing_runner"}
             )
 
-        # second test : run with another runner (i should test that it is indeed the other one which is picked)
+        # second test : run with another runner (iI should test that it is indeed the other one which is picked)
         # the log clearly shows it
         assert all(
             trained_model.predict(inference_data, params={"runner": "ThreadRunner"})

@@ -218,7 +218,9 @@ class KedroPipelineModel(PythonModel):
         runner = (
             self.runner
             if runner_class == type(self.runner).__name__
-            else load_obj(runner_class, "kedro.runner")
+            else load_obj(
+                runner_class, "kedro.runner"
+            )()  # do not forget to instantiate the class with ending ()
         )
 
         hook_manager = _create_hook_manager()

@@ -51,7 +51,7 @@ setup(
             "pytest-lazy-fixtures>=1.0.0, <2.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
             "ruff>=0.5.0,<0.8.0",  # ensure consistency with pre-commit
-            "scikit-learn>=0.23.0, <1.6.0",
+            "scikit-learn>=0.23.0, <1.7.0",
             "kedro-datasets[pandas.CSVDataSet]",
         ],
         "dev": [

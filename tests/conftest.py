@@ -29,8 +29,7 @@ def mlflow_client(tracking_uri):
 
 @pytest.fixture(autouse=True)
 def cleanup_mlflow_after_runs():
-    # A test function will be run at this point
-    yield
+    yield  # A test function will be run at this point
     while mlflow.active_run():
         mlflow.end_run()
 

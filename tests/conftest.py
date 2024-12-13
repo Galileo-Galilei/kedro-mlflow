@@ -34,17 +34,20 @@ def cleanup_mlflow_after_runs():
     while mlflow.active_run():
         mlflow.end_run()
 
-    import mlflow.tracking.fluent as mtf
-
     # if set_experiment has been called before, it stores the experiment_id
     # as a global variable, so if we change the tracking_uri afterwards
     # mlflow is completly lost because the experiment id no longer exists
     # we just reset it after a test, like in a brand new session
-    if hasattr(mtf, "_active_experiment_id"):
-        mtf._active_experiment_id = None
 
-    if "MLFLOW_TRACKING_URI" in os.environ:
-        os.environ.pop("MLFLOW_TRACKING_URI")
+    # CAVEAT 1 : do not import from "mlflow.tracking.fluent import _active_experiment_id"
+    # because due to python namespacing import, it will not change the global variable accessed by mlflow
+
+    # CAVEAT 2 : Since this PR: https://github.com/mlflow/mlflow/pull/13456/files
+    # we need to reset experiment ID too because its now resetted in each thread
+    mlflow.tracking.fluent._active_experiment_id = None
+    os.environ.pop("MLFLOW_EXPERIMENT_ID", None)
+    os.environ.pop("MLFLOW_TRACKING_URI", None)
+    os.environ.pop("MLFLOW_REGISTRY_URI", None)
 
     # see https://github.com/kedro-org/kedro/blob/859f98217eed12208a922b771a97cbfb82ba7e80/tests/framework/session/test_session.py#L173
 

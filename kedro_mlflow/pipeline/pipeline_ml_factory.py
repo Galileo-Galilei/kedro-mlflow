@@ -9,6 +9,7 @@ def pipeline_ml_factory(
     input_name: str = None,
     kpm_kwargs=None,
     log_model_kwargs=None,
+    hooks=None,
 ) -> PipelineML:
     """This function is a helper to create `PipelineML`
     object directly from two Kedro `Pipelines` (one of
@@ -51,5 +52,6 @@ def pipeline_ml_factory(
         input_name=input_name,
         kpm_kwargs=kpm_kwargs,
         log_model_kwargs=log_model_kwargs,
+        hooks=hooks,
     )
     return pipeline

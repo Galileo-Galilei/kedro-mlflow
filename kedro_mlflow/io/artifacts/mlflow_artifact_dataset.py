@@ -171,3 +171,9 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         and consequently does not implements abtracts methods
         """
         pass
+
+
+def _is_instance_mlflow_artifact_dataset(dataset_instance):
+    parent_classname = dataset_instance.__class__.__bases__[0].__name__
+    instance_classname = f"Mlflow{parent_classname}"
+    return type(dataset_instance).__name__ == instance_classname

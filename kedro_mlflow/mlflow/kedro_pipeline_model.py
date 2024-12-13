@@ -6,6 +6,7 @@ from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
 from kedro.pipeline import Pipeline
 from kedro.runner import AbstractRunner, SequentialRunner
+from kedro.utils import load_obj
 from kedro_datasets.pickle import PickleDataset
 from mlflow.pyfunc import PythonModel
 
@@ -196,17 +197,47 @@ class KedroPipelineModel(PythonModel):
             updated_catalog._datasets[name]._filepath = Path(uri)
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
-    def predict(self, context, model_input):
+    def predict(self, context, model_input, params=None):
         # we create an empty hook manager but do NOT register hooks
         # because we want this model be executable outside of a kedro project
+
+        # params can pass
+        # TODO globals
+        # TODO runtime
+        # TODO parameters -> I'd prefer not have them, but it would require catalog to be able to not be fully resolved if we want to pass runtime and globals
+        # TODO hooks
+        # TODO runner
+
+        params = params or {}
+
+        runner_class = params.pop("runner", "SequentialRunner")
+
+        # we don't want to recreate the runner object on each predict
+        # because reimporting comes with a performance penalty in a serving setup
+        # so if it is the default we just use the existing runner
+        runner = (
+            self.runner
+            if runner_class == type(self.runner).__name__
+            else load_obj(
+                runner_class, "kedro.runner"
+            )()  # do not forget to instantiate the class with ending ()
+        )
+
         hook_manager = _create_hook_manager()
+        # _register_hooks(hook_manager, predict_params.hooks)
+
+        for name, value in params.items():
+            # no need to check if params are in the catalog, because mlflow already checks that the params matching the signature
+            param = f"params:{name}"
+            self._logger.info(f"Using {param}={value} for the prediction")
+            self.loaded_catalog.save(name=param, data=value)
 
         self.loaded_catalog.save(
             name=self.input_name,
             data=model_input,
         )
 
-        run_output = self.runner.run(
+        run_output = runner.run(
             pipeline=self.pipeline,
             catalog=self.loaded_catalog,
             hook_manager=hook_manager,

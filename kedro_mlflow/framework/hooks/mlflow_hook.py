@@ -27,6 +27,9 @@ from kedro_mlflow.framework.hooks.utils import (
     _flatten_dict,
     _generate_kedro_command,
 )
+from kedro_mlflow.io.catalog.add_run_id_to_artifact_datasets import (
+    add_run_id_to_artifact_datasets,
+)
 from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_logging
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataset,
@@ -270,6 +273,13 @@ class MlflowHook:
                     pipeline_name=run_params["pipeline_name"],
                 ),
             )
+
+            # This function ensures the run_id started at the beginning of the pipeline
+            # is associated to all the datasets. This is necessary because to make mlflow thread safe
+            # each call to the "active run" now creates a new run when started in a new thread. See
+            # https://github.com/Galileo-Galilei/kedro-mlflow/issues/613 and https://github.com/Galileo-Galilei/kedro-mlflow/pull/615
+            add_run_id_to_artifact_datasets(catalog, mlflow.active_run().info.run_id)
+
         else:
             self._logger.info(
                 "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes DataSets and parameters."

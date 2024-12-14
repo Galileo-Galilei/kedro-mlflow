@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.13.4] - 2024-12-14
+
 ### Fixed
 
--   :bug: :ambulance: Ensure `MlflowArtifactDataset` logs in the same run that parameters to when using ``mlflow>=2.18`` in combination with ``ThreadRunner`` [#613](https://github.com/Galileo-Galilei/kedro-mlflow/issues/613))
+-   :bug: :ambulance: Ensure `MlflowArtifactDataset` logs in the same run that parameters to when using `mlflow>=2.18` in combination with `ThreadRunner` [#613](https://github.com/Galileo-Galilei/kedro-mlflow/issues/613))
 
 ## [0.13.3] - 2024-10-29
 
@@ -525,7 +527,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.3...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.4...HEAD
+
+[0.13.4]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.3...0.13.4
 
 [0.13.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.2...0.13.3
 

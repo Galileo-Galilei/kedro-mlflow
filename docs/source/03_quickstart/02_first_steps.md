@@ -2,10 +2,14 @@
 
 ## Initialize kedro-mlflow
 
-First, you need to initialize your project and add the plugin-specific configuration file with this command:
+```{note}
+This step is optional if you use ``kedro>=0.11.2``. If you do not create a ``mlflow.yml`` configuration file, ``kedro-mlflow`` will use the defaults. However this is heavily recommended because in professional setup you often need some specific enterprise configuration.
+```
+
+You can initialize your project with the plugin-specific configuration file with this command:
 
 ```console
-kedro mlflow init
+kedro mlflow init --env=local
 ```
 
 You will see the following message:
@@ -17,6 +21,7 @@ You will see the following message:
 The ``conf/local`` folder is updated and you can see the `mlflow.yml` file:
 
 ![initialized_project](../imgs/initialized_project.png)
+
 
 *Optional: If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below):*
 
@@ -109,9 +114,6 @@ You should see the following graph:
 
 which indicates clearly which parameters are logged (in the red boxes with the "parameter" icon).
 
-### Journal information
-
-The informations provided by the ``Kedro``'s ``Journal`` are also recorded as ``tags`` in the mlflow ui in order to make reproducible. In particular, the exact command used for running the pipeline and the kedro version used are stored.
 
 ### Artifacts
 
@@ -159,4 +161,4 @@ This works for any type of file (including images with ``MatplotlibWriter``) and
 Above vanilla example is just the beginning of your experience with ``kedro-mlflow``. Check out the next sections to see how `kedro-mlflow`:
 
 - offers advanced capabilities for machine learning versioning
-- can help to create standardize pipelines for deployment in production
+- offers a way to create custom mlflow model from your kedro pipelines to deploy effortlessly in production

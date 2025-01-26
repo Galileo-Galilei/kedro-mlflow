@@ -23,7 +23,7 @@ Metrics DataSet
    :show-inheritance:
 
 
-.. automodule:: kedro_mlflow.io.metrics.mlflow_metrics_dataset
+.. automodule:: kedro_mlflow.io.metrics.mlflow_metrics_history_dataset
    :members:
    :undoc-members:
    :show-inheritance:

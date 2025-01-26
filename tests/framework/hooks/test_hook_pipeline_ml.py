@@ -329,7 +329,7 @@ def test_mlflow_hook_save_pipeline_ml(
             assert trained_model.metadata.signature.to_dict() == {
                 "inputs": '[{"type": "long", "name": "a", "required": true}]',
                 "outputs": None,
-                "params": '[{"name": "runner", "type": "string", "default": "SequentialRunner", "shape": null}]',
+                "params": '[{"name": "runner", "default": "SequentialRunner", "shape": null, "type": "string"}]',
             }
 
 
@@ -754,7 +754,7 @@ def test_mlflow_hook_save_and_load_pipeline_ml_with_inference_parameters(
         # }
 
         assert (
-            '{"name": "threshold", "type": "double", "default": 0.5, "shape": null}'
+            '{"name": "threshold", "default": 0.5, "shape": null, "type": "double"}'
             in trained_model.metadata.signature.to_dict()["params"]
         )
 
@@ -823,7 +823,7 @@ def test_mlflow_hook_save_and_load_pipeline_ml_specify_runner(
 
         # test 1 : the parameters in the signature should have the runner with a default "SequentialRunner"
         assert (
-            '{"name": "runner", "type": "string", "default": "SequentialRunner", "shape": null}'
+            '{"name": "runner", "default": "SequentialRunner", "shape": null, "type": "string"}'
             in trained_model.metadata.signature.to_dict()["params"]
         )
 

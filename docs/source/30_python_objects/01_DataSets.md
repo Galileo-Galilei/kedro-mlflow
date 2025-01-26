@@ -1,4 +1,4 @@
-# New ``DataSet``
+# New ``Dataset``s
 
 ## ``MlflowArtifactDataset``
 

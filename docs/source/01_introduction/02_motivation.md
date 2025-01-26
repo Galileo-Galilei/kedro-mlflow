@@ -4,7 +4,7 @@
 
 Basically, you should use `kedro-mlflow` in **any `Kedro` project which involves machine learning** / deep learning. As stated in the [introduction](./01_introduction.md), `Kedro`'s current versioning (as of version `0.16.6`) is not sufficient for machine learning projects: it lacks a UI and a ``run`` management system. Besides, the `KedroPipelineModel` ability to serve a kedro pipeline as an API or a batch in one line of code is a great addition for collaboration and transition to production.
 
-If you do not use ``Kedro`` or if you do pure data processing which do not involve *machine learning*, this plugin is not what you are seeking for ;)
+If you do not use ``Kedro`` or if you do pure data processing which does not involve *machine learning*, this plugin is not what you are seeking for ;-)
 
 ## Why should I use kedro-mlflow?
 

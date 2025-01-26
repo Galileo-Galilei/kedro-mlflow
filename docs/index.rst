@@ -7,21 +7,33 @@ Welcome to kedro-mlflow's documentation!
 ========================================
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: -1
+   :caption: Getting started
 
    Introduction <source/01_introduction/index.rst>
    Installation <source/02_installation/index.rst>
-   Getting Started <source/03_getting_started/index.rst>
-   Experimentation tracking <source/04_experimentation_tracking/index.rst>
-   Pipeline serving <source/05_pipeline_serving/index.rst>
-   A mlops framework for continuous model serving <source/05_framework_ml/index.rst>
-   Interactive use <source/06_interactive_use/index.rst>
-   Python objects <source/07_python_objects/index.rst>
+   Quickstart in 1 mn <source/03_quickstart/index.rst>
 
 .. toctree::
-   :maxdepth: 6
+   :maxdepth: -1
+   :caption: Experiment tracking
 
-   API documentation <source/08_API/kedro_mlflow.rst>
+   In a kedro project <source/10_experiment_tracking/index.rst>
+   In a notebook <source/11_interactive_use/index.rst>
+
+.. toctree::
+   :maxdepth: -1
+   :caption: Pipeline serving
+
+   Custom mlflow model for kedro pipelines <source/21_pipeline_serving/index.rst>
+   A mlops framework for continuous model serving <source/22_framework_ml/index.rst>
+
+.. toctree::
+   :maxdepth: -1
+   :caption: Technical documentation
+
+   Python objects <source/30_python_objects/index.rst>
+   API documentation <source/31_API/kedro_mlflow.rst>
 
 Indices and tables
 ==================

@@ -79,7 +79,11 @@ The location where artifact will be stored does not depends of the logging funct
 - how to [configure a mlflow tracking server](https://www.mlflow.org/docs/latest/tracking.html#mlflow-tracking-servers)
 - how to [configure an artifact store](https://www.mlflow.org/docs/latest/tracking.html#id10) with cloud storage.
 
-Setting the `mlflow_tracking_uri` key of `mlflow.yml` to the url of this server is the only additional configuration you need to send your datasets to this remote server. Note that you still need to specify a **local** path for the underlying dataset, mlflow will take care of the upload to the server by itself.
+**Setting the `mlflow_tracking_uri` key of `mlflow.yml` to the url of this properly configured server** is the only additional configuration you need to send your datasets to this remote server.
+
+```{important}
+You still need to specify a **local** path for the underlying dataset (even to store it on a remote storage), mlflow will take care of the upload to the server by itself.
+```
 
 You can refer to [this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/15) for further details.
 

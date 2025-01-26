@@ -117,9 +117,9 @@ Be aware that if you have saved a pipeline as a mlflow model with `pipeline_ml_f
 
 ```json
 {
-    predictions:
+    "predictions":
         {
-            <your model-predictions>
+            "<your model-predictions>"
         }
 }
 ```
@@ -128,7 +128,7 @@ to:
 
 ```json
 {
-    <your model-predictions>
+    "<your model-predictions>"
 }
 ```
 

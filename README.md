@@ -30,27 +30,24 @@
 
 **Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0`` and ``mlflow>=1.0.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
-``kedro-mlflow`` is available on PyPI, so you can install it with ``pip``:
 
-```console
-pip install kedro-mlflow
-```
+You can install ``kedro-mlflow`` with several tools and packaging platforms:
 
-If you want to use the most up to date version of the package which is under development and not released yet, you can install the package from github:
+|                             **Logo**                              | **Platform** |**Command**|
+|:-----------------------------------------------------------------:|:------------:|:----------------------------------------------------:|
+|       ![PyPI logo](https://simpleicons.org/icons/pypi.svg)        |     PyPI     | ``pip install kedro-mlflow``                         |
+| ![Conda Forge logo](https://simpleicons.org/icons/condaforge.svg) | Conda Forge  | ``conda install kedro-mlflow --channel conda-forge`` |
+|     ![GitHub logo](https://simpleicons.org/icons/github.svg)      |    GitHub    | ``pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git`` |
 
-```console
-pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git
-```
-
-I strongly recommend to use ``conda`` (a package manager) to create an environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html).
+I strongly recommend to use ``conda`` (a package manager) to create a virtual environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html).
 
 # Getting started
 
 The documentation contains:
 
-- [A  "hello world" example](https://kedro-mlflow.readthedocs.io/en/latest/source/03_getting_started/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
-- A section for [advanced machine learning versioning](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
-- A section to demonstrate how to use `kedro-mlflow` as a [machine learning framework](https://kedro-mlflow.readthedocs.io/en/latest/source/05_framework_ml/index.html) to deliver production ready pipelines and serve them. This section comes with [an example repo](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial) you can clone and try out.
+- [A  quickstart in 1 mn example](https://kedro-mlflow.readthedocs.io/en/latest/source/03_quickstart/index.html) which demonstrates how you to **setup your project**, **version parameters** and **datasets**, and browse your runs in the UI.
+- A section for [advanced machine learning versioning](https://kedro-mlflow.readthedocs.io/en/latest/source/10_experiment_tracking/index.html) to show more advanced features (mlflow configuration through the plugin, package and serve a kedro ``Pipeline``...)
+- A section to demonstrate how to use `kedro-mlflow` as a [machine learning framework](https://kedro-mlflow.readthedocs.io/en/latest/source/21_pipeline_serving/index.html) to deliver production ready pipelines and serve them. This section comes with [an example repo](https://github.com/Galileo-Galilei/kedro-mlflow-tutorial) you can clone and try out.
 
 Some frequently asked questions on more advanced features:
 

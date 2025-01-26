@@ -438,7 +438,7 @@ class MlflowHook:
         catalog: DataCatalog,
     ):
         """Hook invoked when the pipeline execution fails.
-         All the mlflow runs must be closed to avoid interference with further execution.
+        All the mlflow runs must be closed to avoid interference with further execution.
 
         Args:
             error: (Not used) The uncaught exception thrown during the pipeline run.

@@ -9,5 +9,4 @@ kedro\_mlflow package
    kedro_mlflow.pipeline
    kedro_mlflow.mlflow
    kedro_mlflow.config
-   kedro_mlflow.extras.extensions
    kedro_mlflow.framework.hooks

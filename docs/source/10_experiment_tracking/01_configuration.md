@@ -17,31 +17,89 @@ The rationale behind the separation of the backend store and the artifacts store
 
 ## The ``mlflow.yml`` file
 
-The ``mlflow.yml`` file contains all configuration you can pass either to kedro or mlflow through the plugin. Note that you can duplicate `mlflow.yml` file in as many  environments (i.e. `conf/` folders) as you need. To create a ``mlflow.yml`` file in a kedro configuration environment, use ``kedro mlflow init --env=<your-env>``.
+The ``mlflow.yml`` file contains all configuration you can pass either to kedro or mlflow through the plugin. Note that you can duplicate `mlflow.yml` file in as many  environments (i.e. `conf/` folders) as you need. To create a ``mlflow.yml`` file in a kedro configuration environment, use ``kedro mlflow init --env=<your-env>``. You 'll get the following result:
+
+```yaml
+# SERVER CONFIGURATION -------------------
+
+# `mlflow_tracking_uri` is the path where the runs will be recorded.
+# For more informations, see https://www.mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
+# kedro-mlflow accepts relative path from the project root.
+# For instance, default `mlruns` will create a mlruns folder
+# at the root of the project
+
+# All credentials needed for mlflow must be stored in credentials .yml as a dict
+# they will be exported as environment variable
+# If you want to set some credentials,  e.g. AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+# > in `credentials.yml`:
+# your_mlflow_credentials:
+#   AWS_ACCESS_KEY_ID: 132456
+#   AWS_SECRET_ACCESS_KEY: 132456
+# > in this file `mlflow.yml`:
+# credentials: mlflow_credentials
+
+server:
+  mlflow_tracking_uri: null # if null, will use mlflow.get_tracking_uri() as a default
+  mlflow_registry_uri: null # if null, mlflow_tracking_uri will be used as mlflow default
+  credentials: null  # must be a valid key in credentials.yml which refers to a dict of sensitive mlflow environment variables (password, tokens...). See top of the file.
+  request_header_provider: # this is only useful to deal with expiring token, see https://github.com/Galileo-Galilei/kedro-mlflow/issues/357
+    type: null # The path to a class : my_project.pipelines.module.MyClass. Should inherit from https://github.com/mlflow/mlflow/blob/master/mlflow/tracking/request_header/abstract_request_header_provider.py#L4
+    pass_context: False # should the class be instantiated with "kedro_context" argument?
+    init_kwargs: {} # any kwargs to pass to the class when it is instantiated
+
+tracking:
+  # You can specify a list of pipeline names for which tracking will be disabled
+  # Running "kedro run --pipeline=<pipeline_name>" will not log parameters
+  # in a new mlflow run
+
+  disable_tracking:
+    pipelines: []
+
+  experiment:
+    name: {{ python_package }}
+    restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
+
+  run:
+    id: null # if `id` is None, a new run will be created
+    name: null # if `name` is None, pipeline name will be used for the run name. You can use "${km.random_name:}" to generate a random name (mlflow's default)
+    nested: True  # if `nested` is False, you won't be able to launch sub-runs inside your nodes
+  params:
+    dict_params:
+      flatten: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
+      recursive: True  # Should the dictionary flattening be applied recursively (i.e for nested dictionaries)? Not use if `flatten_dict_params` is False.
+      sep: "." # In case of recursive flattening, what separator should be used between the keys? E.g. {hyperaparam1: {p1:1, p2:2}} will be logged as hyperaparam1.p1 and hyperaparam1.p2 in mlflow.
+    long_params_strategy: fail # One of ["fail", "tag", "truncate" ] If a parameter is above mlflow limit (currently 250), what should kedro-mlflow do? -> fail, set as a tag instead of a parameter, or truncate it to its 250 first letters?
+
+
+# UI-RELATED PARAMETERS -----------------
+
+ui:
+  port: "5000" # the port to use for the ui. Use mlflow default with 5000.
+  host: "127.0.0.1"  # the host to use for the ui. Use mlflow efault of "127.0.0.1".
+```
 
 ```{note}
 If no ``mlflow.yml`` file is found in the environment, ``kedro-mlflow`` will still work and use all ``mlflow.yml`` default values as configuration.  
 ```
 
 ```{important}
-If the kedro run is started in a process where a mlflow run is already active, ``kedro-mlflow`` will ignore all the configuration in ``mlflow.yml`` and use the active run. The mlflow run will NOT be closed at the end of the kedro run. This enable using ``kedro-mlflow`` with an orchestrator (e.g airflow, AzureML...) which starts the mlflow run and configuraiton itself.
+If the kedro run is started in a process where a mlflow run is already active, ``kedro-mlflow`` will ignore all the configuration in ``mlflow.yml`` and use the active run. The mlflow run will NOT be closed at the end of the kedro run. This enables using ``kedro-mlflow`` with an orchestrator (e.g airflow, AzureML...) which starts the mlflow run itself.
 ```
 
 ### Configure the tracking server
-
 
 #### Configure the tracking and registry uri
 
 ``kedro-mlflow`` needs the tracking uri of your mlflow tracking server to operate properly. The ``mlflow.yml`` file must have the ``mlflow_tracking_uri`` key with a [valid mlflow_tracking_uri associated](https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded) value. The ``mlflow.yml`` default have this keys set to ``null``. This means that it will look for a ``MLFLOW_TRACKING_URI`` environment variable, and if it is not set, it will create a ``mlruns`` folder locally at the root of your kedro project. This enables you to use the plugin without any setup of a mlflow tracking server.
 
-Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically.
+```{tip}
+Unlike mlflow, `kedro-mlflow` allows the `mlflow_tracking_uri` to be a relative path. It will convert it to an absolute uri automatically and prefix it with `file:///`.
+```
 
 ```yaml
 server:
-  mlflow_tracking_uri: mlruns
+  mlflow_tracking_uri: mlruns # or http://path/your/server
 ```
-
-This is the **only mandatory key in the `mlflow.yml` file**, but there are many others described hereafter that provide fine-grained control on your mlflow setup.
 
 You can also specify the registry uri:
 
@@ -50,7 +108,7 @@ server:
   mlflow_registry_uri: sqlite:///path/to/registry.db
 ```
 
-```{note}
+```{important}
 Unlike the ``mlflow_tracking_uri``, the ``mlflow_registry_uri`` must be an *absolute* path prefixed with the  [database dialect](https://mlflow.org/docs/latest/tracking.html#backend-stores) of your database, likely ``sqlite:///`` for a local database.
 ```
 

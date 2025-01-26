@@ -15,7 +15,7 @@ In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration
 ### Setting up the ``kedro-mlflow`` configuration file
 
 
-``kedro-mlflow`` is [configured](../07_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the ``kedro-mlflow`` CLI](../07_python_objects/04_CLI.md), but you can create it manually.
+``kedro-mlflow`` is [configured](../30_python_objects/05_Configuration.md) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the ``kedro-mlflow`` CLI](../30_python_objects/04_CLI.md), but you can create it manually.
 
 ```{note}
 Since ``kedro-mlflow>=0.11.2``, the configuration file is optional. However, the plugin will use default ``mlflow`` configuration. Specifically, the runs will be stored in a ``mlruns`` folder at the root fo the kedro project since no ``mlflow_tracking_uri`` is configured.

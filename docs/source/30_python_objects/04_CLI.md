@@ -15,7 +15,7 @@
 
 ``kedro mlflow ui``: this command opens the mlflow UI (basically launches the ``mlflow ui`` command )
 
-`ui` accepts the port and host arguments of [``mlflow ui`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-ui). The default values used will be the ones defined in the [``mlflow.yml`` configuration file under the `ui`](../04_experimentation_tracking/01_configuration.md#configure-the-user-interface).
+`ui` accepts the port and host arguments of [``mlflow ui`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-ui). The default values used will be the ones defined in the [``mlflow.yml`` configuration file under the `ui`](../10_experimentation_tracking/01_configuration.md#configure-the-user-interface).
 
 If you provide the arguments at runtime, they wil take priority over the ``mlflow.yml``, e.g. if you have:
 

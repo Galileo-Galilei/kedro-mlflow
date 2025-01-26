@@ -42,7 +42,7 @@ Requires: pip-tools, cachetools, fsspec, toposort, anyconfig, PyYAML, click, plu
 
 ## Install the plugin
 
-The current version of the plugin is compatible with ``kedro>=0.16.0``. Since Kedro tries to enforce backward compatibility, it will very likely remain compatible with further versions.
+There are version of the plugin compatible up to ``kedro>=0.16.0`` and ``mlflow>=0.8.0``. ``kedro-mlflow`` stops adding features to a minor version 2 to 6 months after a new kedro release.
 
 ### Install from PyPI
 
@@ -70,7 +70,7 @@ Type  ``kedro info`` in a terminal to check the installation. If it has succeede
 | |/ / _ \/ _` | '__/ _ \
 |   <  __/ (_| | | | (_) |
 |_|\_\___|\__,_|_|  \___/
-v0.16.<x>
+v0.<minor>.<patch>
 
 kedro allows teams to create analytics
 projects. It is developed as part of
@@ -95,9 +95,4 @@ Usage: kedro mlflow [OPTIONS] COMMAND [ARGS]...
 
 Options:
   -h, --help  Show this message and exit.
-
-Commands:
-  new  Create a new kedro project with updated template.
 ```
-
-*Note: For now, the `kedro mlflow new` command is not implemented. You must use `kedro new` to create a project, and then call `kedro mlflow init` inside this new project.*

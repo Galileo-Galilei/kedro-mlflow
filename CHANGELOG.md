@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+## [0.14.0] - 2025-01-28
+
 ### Added
 
--   :sparkles: Enable to override parameters and the runner at predict time in ``KedroPipelineModel`` ([#445](https://github.com/Galileo-Galilei/kedro-mlflow/issues/445), [#612](https://github.com/Galileo-Galilei/kedro-mlflow/pull/612))
+-   :sparkles: Enable to override parameters and the runner at predict time in `KedroPipelineModel` ([#445](https://github.com/Galileo-Galilei/kedro-mlflow/issues/445), [#612](https://github.com/Galileo-Galilei/kedro-mlflow/pull/612))
 
 ### Changed
 
--   :boom: :pushpin: Pin ``mlflow>=2.7.0`` to support predict parameters for custom models (see above feature)
+-   :boom: :pushpin: Pin `mlflow>=2.7.0` to support predict parameters for custom models (see above feature)
 
 ## [0.13.4] - 2024-12-14
 
@@ -535,7 +537,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.4...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.0...HEAD
+
+[0.14.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.4...0.14.0
 
 [0.13.4]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.3...0.13.4
 

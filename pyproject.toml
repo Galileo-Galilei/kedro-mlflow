@@ -95,6 +95,3 @@ filename = "README.md"
 
 [[tool.bumpversion.files]]
 filename = "docs/source/02_installation/01_installation.md"
-
-[[tool.bumpversion.files]]
-filename = "docs/source/03_quickstart/01_example_project.md"

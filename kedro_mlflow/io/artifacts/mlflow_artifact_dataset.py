@@ -153,21 +153,21 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
 
     def _load(self) -> Any:  # pragma: no cover
         """
-        MlflowArtifactDataset is a factory for DataSet
+        MlflowArtifactDataset is a factory for Dataset
         and consequently does not implements abtracts methods
         """
         pass
 
     def _save(self, data: Any) -> None:  # pragma: no cover
         """
-        MlflowArtifactDataset is a factory for DataSet
+        MlflowArtifactDataset is a factory for Dataset
         and consequently does not implements abtracts methods
         """
         pass
 
     def _describe(self) -> Dict[str, Any]:  # pragma: no cover
         """
-        MlflowArtifactDataset is a factory for DataSet
+        MlflowArtifactDataset is a factory for Dataset
         and consequently does not implements abtracts methods
         """
         pass

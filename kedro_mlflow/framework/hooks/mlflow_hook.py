@@ -282,7 +282,7 @@ class MlflowHook:
 
         else:
             self._logger.info(
-                "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes DataSets and parameters."
+                "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes Datasets and parameters."
             )
             switch_catalog_logging(catalog, False)
 

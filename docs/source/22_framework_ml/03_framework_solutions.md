@@ -11,7 +11,7 @@ We assume that we want to solve the following challenges among those described i
 
 ### Synchronizing training and inference pipeline
 
-To solve the problem of desynchronization between training and inference, ``kedro-mlflow`` offers a `PipelineML` class (which subclasses Kedro `Pipeline` class). A `PipelineML` is simply a Kedro standard ``Pipeline`` (the "training") which has a reference to another ``Pipeline`` (the "inference"). The two pipelines must share a common input DataSet name, which represents the data you will perform operations on (either train on for the training pipeline, or predict on for the inference pipeline).
+To solve the problem of desynchronization between training and inference, ``kedro-mlflow`` offers a `PipelineML` class (which subclasses Kedro `Pipeline` class). A `PipelineML` is simply a Kedro standard ``Pipeline`` (the "training") which has a reference to another ``Pipeline`` (the "inference"). The two pipelines must share a common input Dataset name, which represents the data you will perform operations on (either train on for the training pipeline, or predict on for the inference pipeline).
 
 This class implements several methods to compare the ``DataCatalog``s associated to each of the two binded pipelines and performs subsetting oparations. This makes it quite difficult to handle directly. Fortunately, ``kedro-mlflow`` provides a convenient API to create ``PipelineML`` objects: the ``pipeline_ml_factory`` function.
 

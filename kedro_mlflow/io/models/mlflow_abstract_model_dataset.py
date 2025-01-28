@@ -7,7 +7,7 @@ from kedro.io import AbstractVersionedDataset, Version
 from kedro.io.core import DatasetError
 
 
-class MlflowAbstractModelDataSet(AbstractVersionedDataset):
+class MlflowAbstractModelDataset(AbstractVersionedDataset):
     """
     Abstract mother class for model datasets.
     """
@@ -21,7 +21,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
         save_args: Dict[str, Any] = None,
         version: Version = None,
     ) -> None:
-        """Initialize the Kedro MlflowAbstractModelDataSet.
+        """Initialize the Kedro MlflowAbstractModelDataset.
 
         Parameters are passed from the Data Catalog.
 
@@ -82,7 +82,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
 
     # IMPORTANT:  _mlflow_model_module is a property to avoid STORING
     # the module as an attribute but rather store a string and load on the fly
-    # The goal is to make this DataSet deepcopiable for compatibility with
+    # The goal is to make this Dataset deepcopiable for compatibility with
     # KedroPipelineModel, e.g we can't just do :
     # self._mlflow_model_module = self._import_module(self._flavor)
 
@@ -103,7 +103,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
     #             continue
     #         if f"{key}_args" in kwargs_dict:
     #             new_value = cls._import_module(value)(
-    #                 MlflowModelDataSet._parse_args(kwargs_dict[f"{key}_args"])
+    #                 MlflowModelDataset._parse_args(kwargs_dict[f"{key}_args"])
     #             )
     #             parsed_kargs[key] = new_value
     #         else:

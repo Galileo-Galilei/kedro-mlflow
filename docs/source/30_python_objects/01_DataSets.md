@@ -8,7 +8,7 @@
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     dataset:
-        type: pandas.CSVDataset  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro Dataset
         filepath: /path/to/a/local/destination/file.csv
 ```
 
@@ -18,7 +18,7 @@ or with additional parameters:
 my_dataset_to_version:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     dataset:
-        type: pandas.CSVDataset  # or any valid kedro DataSet
+        type: pandas.CSVDataset  # or any valid kedro Dataset
         filepath: /path/to/a/local/destination/file.csv
         load_args:
             sep: ;
@@ -41,18 +41,18 @@ csv_dataset = MlflowArtifactDataset(
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```
 
-## Metrics `DataSets`
+## Metrics `Datasets`
 
 ### ``MlflowMetricDataset``
 
-[The ``MlflowMetricDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
+[The ``MlflowMetricDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/10_experiment_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 ### ``MlflowMetricHistoryDataset``
 
-[The ``MlflowMetricHistoryDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
+[The ``MlflowMetricHistoryDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/10_experiment_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 
-## Models `DataSets`
+## Models `Datasets`
 
 ### ``MlflowModelTrackingDataset``
 

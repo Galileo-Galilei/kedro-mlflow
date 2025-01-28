@@ -36,7 +36,7 @@ class KedroPipelineModel(PythonModel):
             None.
 
             copy_mode (Optional[Union[Dict[str,str], str]]):
-            The copy_mode of each DataSet of the catalog
+            The copy_mode of each Dataset of the catalog
             when reconstructing the DataCatalog in memory.
             The default is "assign".
             You can pass either:

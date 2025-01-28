@@ -4,11 +4,11 @@ import mlflow
 from kedro.io.core import DatasetError
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowAbstractModelDataSet,
+    MlflowAbstractModelDataset,
 )
 
 
-class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
+class MlflowModelTrackingDataset(MlflowAbstractModelDataset):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(
@@ -20,7 +20,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         load_args: Optional[Dict[str, Any]] = None,
         save_args: Optional[Dict[str, Any]] = None,
     ) -> None:
-        """Initialize the Kedro MlflowModelDataSet.
+        """Initialize the Kedro MlflowModelDataset.
 
         Parameters are passed from the Data Catalog.
 

@@ -65,7 +65,7 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         self.__logging_activated = flag
 
     def _load(self) -> MetricsDict:
-        """Load MlflowMetricDataSet.
+        """Load MlflowMetricDataset.
 
         Returns:
             Dict[str, Union[int, float]]: Dictionary with MLflow metrics dataset.

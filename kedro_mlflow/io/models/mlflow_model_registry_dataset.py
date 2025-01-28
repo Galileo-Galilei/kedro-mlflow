@@ -4,11 +4,11 @@ from typing import Any, Dict, Optional, Union
 from kedro.io.core import DatasetError
 
 from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
-    MlflowAbstractModelDataSet,
+    MlflowAbstractModelDataset,
 )
 
 
-class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
+class MlflowModelRegistryDataset(MlflowAbstractModelDataset):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(

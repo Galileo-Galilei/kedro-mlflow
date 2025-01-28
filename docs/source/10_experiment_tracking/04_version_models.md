@@ -6,10 +6,10 @@ MLflow allows to serialize and deserialize models to a common format, track thos
 
 ## How to track models using MLflow in Kedro project?
 
-`kedro-mlflow` introduces two new `DataSet` types that can be used in `DataCatalog` called `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset`. The two have very similar API, except that:
+`kedro-mlflow` introduces two new `Dataset` types that can be used in `DataCatalog` called `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset`. The two have very similar API, except that:
 
 - the ``MlflowModelTrackingDataset`` is used to load from and save to from the mlflow artifact store. It uses optional `run_id` argument to load and save from a given `run_id` which must exists in the mlflow server you are logging to.
-- the ``MlflowModelLocalFileSystemDataset`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro DataSets. Note that it **does not log in mlflow**.
+- the ``MlflowModelLocalFileSystemDataset`` is used to load from and save to a given path. It uses the standard `filepath` argument in the constructor of Kedro Datasets. Note that it **does not log in mlflow**.
 
 *Note: If you use ``MlflowModelTrackingDataset``, it will be saved during training in your current run. However, you will need to specify the run id to predict with (since it is not persisted locally, it will not pick the latest model by default). You may prefer to combine ``MlflowModelLocalFileSystemDataset`` and ``MlflowArtifactDataset`` to make persist it both locally and remotely, see further.*
 
@@ -21,7 +21,7 @@ my_sklearn_model:
     flavor: mlflow.sklearn
 ```
 
-More informations on available parameters are available in the [dedicated section](../30_python_objects/01_DataSets.md#mlflowmodeltrackingdataset).
+More informations on available parameters are available in the [dedicated section](../30_python_objects/01_Datasets.md#mlflowmodeltrackingdataset).
 
 You are now able to use ``my_sklearn_model`` in your nodes. Since this model is registered in mlflow, you can also leverage the [mlflow model serving abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-serve) or [predicting on batch abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-predict), as well as the [mlflow models registry](https://www.mlflow.org/docs/latest/model-registry.html) to manage the lifecycle of this model.
 

@@ -4,7 +4,7 @@ Introduction
 .. toctree::
    :maxdepth: 4
 
-   DataSets <01_DataSets.md>
+   Datasets <01_Datasets.md>
    Hooks <02_Hooks.md>
    Pipelines <03_Pipelines.md>
    CLI <04_CLI.md>

@@ -6,7 +6,7 @@ This section assume that [you have installed `kedro-mlflow` in your virtual envi
 
 This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/get_started/new_project.html).
 
-If you do not have a real-world project, you can use a kedro example and [follow the "Getting started" example](../03_getting_started/01_example_project.md) to make a demo of this plugin out of the box.
+If you do not have a real-world project, you can use a kedro example and [follow the "Quickstart in 1 mn" example](../03_quickstart/01_example_project.md) to make a demo of this plugin out of the box.
 
 ## Activate `kedro-mlflow` in your kedro project
 

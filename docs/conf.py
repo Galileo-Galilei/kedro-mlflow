@@ -81,8 +81,8 @@ html_theme = "pydata_sphinx_theme"  # see: https://pydata-sphinx-theme.readthedo
 # see https://stackoverflow.com/questions/36925871/toctree-nested-drop-down:
 html_theme_options = {
     "logo": {
-        "image_light": "logo.png",
-        "image_dark": "logo_dark.png",
+        "image_light": "source/imgs/logo.png",
+        "image_dark": "source/imgs/logo.png",
     },
     # https://pydata-sphinx-theme.readthedocs.io/en/stable/user_guide/header-links.html#fontawesome-icons
     "icon_links": [
@@ -90,6 +90,16 @@ html_theme_options = {
             "name": "GitHub",
             "url": "https://github.com/Galileo-Galilei/kedro-mlflow",
             "icon": "fa-brands fa-github",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/kedro-mlflow/",
+            "icon": "fa-brands fa-python",
+        },
+        {
+            "name": "Slack",
+            "url": "https://kedro-org.slack.com/",
+            "icon": "fa-brands fa-slack",
         },
     ],
     "navbar_start": ["navbar-logo"],

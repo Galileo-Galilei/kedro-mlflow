@@ -20,7 +20,7 @@ You can log any Kedro ``Pipeline`` matching the following requirements:
 - one of its input must be a ``pandas.DataFrame``, a ``spark.DataFrame`` or a ``numpy.array``. This is the **input which contains the data to predict on**. This can be any Kedro ``AbstractDataset`` which loads data in one of the previous three formats. It can also be a ``MemoryDataset`` and not be persisted in the ``catalog.yml``.
 - all its other inputs must be persisted on disk (e.g. if the machine learning model must already be trained and saved so we can export it) or declared as "parameters" in the model ``Signature``.
 
-```{note}
+```{warning}
 If the pipeline has parameters :
 - For ``mlflow<2.7.0`` the parameters need to be persisted before exporting the model, which implies that you will not be able to modify them at runtime. This is a limitation of ``mlflow<2.6.0``
 - For ``mlflow>=2.7.0`` , they can be declared in the signature and modified at runtime. See https://github.com/Galileo-Galilei/kedro-mlflow/issues/445 for more information.

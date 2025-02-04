@@ -6,6 +6,8 @@
 This step is optional if you use ``kedro>=0.11.2``. If you do not create a ``mlflow.yml`` configuration file, ``kedro-mlflow`` will use the defaults. However this is heavily recommended because in professional setup you often need some specific enterprise configuration.
 ```
 
+:::{dropdown} (Optional) Create a configuration file
+:class: dropdown
 You can initialize your project with the plugin-specific configuration file with this command:
 
 ```console
@@ -20,12 +22,17 @@ You will see the following message:
 
 The ``conf/local`` folder is updated and you can see the `mlflow.yml` file:
 
-![initialized_project](../imgs/initialized_project.png)
+![initialized_project](../../imgs/initialized_project.png)
 
+:::
 
-*Optional: If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below):*
+:::{dropdown} (Optional) Specify the tracking uri
+:class: dropdown
 
-![mlflow_yml](../imgs/mlflow_yml.png)
+If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below):
+
+![mlflow_yml](../../imgs/mlflow_yml.png)
+:::
 
 ## Run the pipeline
 
@@ -67,7 +74,7 @@ If the pipeline executes properly, you should see the following log:
 
 Since we have kept the default value of the ``mlflow.yml``, the tracking uri (the place where runs are recorded) is a local ``mlruns`` folder which has just been created with the execution:
 
-![once_run_project](../imgs/once_run_project.png)
+![once_run_project](../../imgs/once_run_project.png)
 
 ## Open the UI
 
@@ -81,13 +88,13 @@ And open the following adress in your favorite browser
 
 ``http://localhost:5000/``
 
-![mlflow_host_page](../imgs/mlflow_host_page.png)
+![mlflow_host_page](../../imgs/mlflow_host_page.png)
 
 Click now on the last run executed, you will land on this page:
 
-![mlflow_run](../imgs/mlflow_run.png)
+![mlflow_run](../../imgs/mlflow_run.png)
 
-### Parameters versioning
+### Parameters tracking
 
 Note that the parameters have been recorded *automagically*. Here, two parameters format are used:
 
@@ -114,8 +121,7 @@ You should see the following graph:
 
 which indicates clearly which parameters are logged (in the red boxes with the "parameter" icon).
 
-
-### Artifacts
+### Artifacts tracking
 
 With this run, artifacts are empty. This is expected: mlflow does not know what it should log and it will not log all your data by default. However, you want to save your model (at least) or your run is likely useless!
 
@@ -150,7 +156,7 @@ example_model:
 
 Rerun the pipeline (with `kedro run`), and reopen the UI. Select the last run and see that the file was uploaded:
 
-![run_with_artifact](../imgs/run_with_artifact.png)
+![run_with_artifact](../../imgs/run_with_artifact.png)
 
 This works for any type of file (including images with ``MatplotlibWriter``) and the UI even offers a preview for ``png`` and ``csv``, which is really convenient to compare runs.
 

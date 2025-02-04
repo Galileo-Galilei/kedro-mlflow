@@ -20,13 +20,18 @@ We use this project because:
 - it is compatible with older version of ``Kedro`` so newcomers are used to it
 - it is maintained by ``Kedro`` maintainers and therefore enforces some best practices.
 
-### Installation with ``kedro>=0.19.0``
+
+::::{tab-set}
+
+:::{tab-item} ``kedro>=0.19.0``
 
 ```{warning}
 For ``kedro>=0.19.0``, ``pandas-iris`` starter has been removed. It is recommended to install [``spaceflights-pandas`` starter instead](https://github.com/kedro-org/kedro-starters/tree/main/spaceflights-pandas).
 ```
 
-### Installation with ``kedro>=0.16.3``
+:::
+
+:::{tab-item} ``kedro>=0.16.3,<0.19``
 
 The default starter is now called "pandas-iris". In a new console, enter:
 
@@ -58,7 +63,9 @@ Lowercase is recommended. Package name must start with a letter or underscore.
  [kedro_mlflow_example]: km_example
 ```
 
-### Installation with ``kedro>=0.16.0, <=0.16.2``
+:::
+
+:::{tab-item} ``kedro>=0.16.0, <=0.16.2``
 
 With older versions of ``Kedro``, the starter option is not available, but this ``kedro new`` provides an "Include example" question. Answer ``y`` to this question to get the same starter as above. In a new console, enter:
 
@@ -96,6 +103,10 @@ Good for first-time users. (default=N)
  [y/N]: y
 ```
 
+:::
+
+::::
+
 ## Install dependencies
 
 Move to the project directory:
@@ -104,7 +115,11 @@ Move to the project directory:
 cd km-example
 ```
 
-Install the project dependencies (**Warning: Do not use ``kedro install`` commands [does not install the packages in your activated environment](https://github.com/quantumblacklabs/kedro/issues/589)**):
+Install the project dependencies :
+
+```{warning}
+Do not use ``kedro install`` commands which [does not install the packages in your activated environment](https://github.com/quantumblacklabs/kedro/issues/589). It has been removed in ``kedro>=0.19``.
+```
 
 ```console
 pip install -r src/requirements.txt

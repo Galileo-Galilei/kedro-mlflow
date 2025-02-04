@@ -1,4 +1,4 @@
-# Versioning Kedro DataSets
+# Track Datasets as artifacts
 
 ## What is artifact tracking?
 
@@ -12,14 +12,14 @@ Artifacts are a very flexible and convenient way to "bind" any data type to your
 1. Persist the data locally in the desired file format
 2. Upload the data to the [artifact store](./01_configuration.md)
 
-## How to version data in a kedro project?
+## How to track data in a kedro project?
 
 ``kedro-mlflow`` introduces a new ``AbstractDataset`` called ``MlflowArtifactDataset``. It is a wrapper for any ``AbstractDataset`` which decorates the underlying dataset ``save`` method and logs the file automatically in mlflow as an artifact each time the ``save`` method is called.
 
 Since it is an ``AbstractDataset``, it can be used with the YAML API. Assume that you have the following entry in the ``catalog.yml``:
 
 ```yaml
-my_dataset_to_version:
+my_dataset_to_track:
     type: pandas.CSVDataset
     filepath: /path/to/a/destination/file.csv
 ```
@@ -27,7 +27,7 @@ my_dataset_to_version:
 You can change it to:
 
 ```yaml
-my_dataset_to_version:
+my_dataset_to_track:
     type: kedro_mlflow.io.artifacts.MlflowArtifactDataset
     dataset:
         type: pandas.CSVDataset  # or any valid kedro DataSet
@@ -38,8 +38,9 @@ and this dataset will be automatically versioned in each pipeline execution.
 
 ## Frequently asked questions
 
-### Can I pass extra parameters to the ``MlflowArtifactDataset`` for finer control?
 
+:::{dropdown} Can I pass extra parameters to the ``MlflowArtifactDataset`` for finer control?
+:class: dropdown
 The ``MlflowArtifactDataset`` takes a ``dataset`` argument which is a python dictionary passed to the ``__init__`` method of the dataset declared in ``type``. It means that you can pass any argument accepted by the underlying dataset in this dictionary. If you want to pass ``load_args`` and ``save_args`` in the previous example, add them in the ``dataset`` argument:
 
 ```yaml
@@ -55,8 +56,10 @@ my_dataset_to_version:
         # ... any other valid arguments for dataset
 ```
 
-### Can I use the ``MlflowArtifactDataset`` in interactive mode?
+:::
 
+:::{dropdown} Can I use the ``MlflowArtifactDataset`` in interactive mode?
+:class: dropdown
 Like all Kedro ``AbstractDataset``, ``MlflowArtifactDataset`` is callable in the python API:
 
 ```python
@@ -71,8 +74,11 @@ csv_dataset = MlflowArtifactDataSet(
 )
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```
+:::
 
-### How do I upload an artifact to a non local destination (e.g. an S3 or blog storage)?
+
+:::{dropdown} How do I upload an artifact to a non local destination (e.g. an S3 or blog storage)?
+:class: dropdown
 
 The location where artifact will be stored does not depends of the logging function but rather on the artifact store specified when configuring the mlflow server. Read mlflow documentation to see:
 
@@ -86,9 +92,10 @@ You still need to specify a **local** path for the underlying dataset (even to s
 ```
 
 You can refer to [this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/15) for further details.
+:::
 
-### Can I log an artifact in a specific run?
-
+:::{dropdown} Can I log an artifact in a specific run?
+:class: dropdown
 The ``MlflowArtifactDataset`` has an extra attribute ``run_id`` which specifies the run you will log the artifact in. **Be cautious, because this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be logged in another run that all the other data of the run.
 
 ```yaml
@@ -100,8 +107,10 @@ my_dataset_to_version:
     run_id: 13245678910111213  # a valid mlflow run to log in. If None, default to active run
 ```
 
-### Can I reload an artifact from an existing run to use it in another run ?
+:::
 
+:::{dropdown} Can I reload an artifact from an existing run to use it in another run ?
+:class: dropdown
 You may want to reuse th artifact of a previous run to reuse it in another one, e.g. to continue training from a pretrained model, or to select the best model among several runs created during an hyperparamter tuning. The ``MlflowArtifactDataset`` has an extra attribute ``run_id`` you can use to specify from which run you will load the artifact from. **Be cautious**, because:
 - this argument will take precedence over the current run** when you call ``kedro run``, causing the artifact to be loaded from another run that all the other data of the run
 - the artifact will be downloaded and erase the existing file at your local filepath
@@ -114,8 +123,10 @@ my_dataset_to_reload:
         filepath: /path/to/a/local/destination/file.csv # must be a local filepath, no matter what is your actual mlflow storage (S3 or other)
     run_id: 13245678910111213  # a valid mlflow run with the existing artifact. It must be named "file.csv"
 ```
+:::
 
-### Can I create a remote folder/subfolders architecture to organize the artifacts?
+:::{dropdown} Can I create a remote folder/subfolders architecture to organize the artifacts?
+:class: dropdown
 
 The ``MlflowArtifactDataset`` has an extra argument ``artifact_path`` which specifies a remote subfolder where the artifact will be logged. It must be a relative path.
 
@@ -129,3 +140,5 @@ my_dataset_to_version:
         filepath: /path/to/a/local/destination/file.csv
     artifact_path: reporting  # relative path where the remote artifact must be stored. if None, saved in root folder.
 ```
+
+:::

@@ -65,7 +65,7 @@ I suggest to :
 - **transition quickly to kedro pipelines**. For instance, when you preprocessing is roughly defined, try to put it in kedro pipelines. You can then use notebooks to experiment / perfom hyperparameter tuning while keeping preprocessing "fixed" to enhance reproducibility. You can run this pipeline interactively with :
 
 ```python
-res = session.run(
+result = session.run(
     pipeline_name="my_preprocessing_pipeline",
     tags="training",
     from_inputs="data_2",
@@ -73,4 +73,4 @@ res = session.run(
 )
 ```
 
-``res`` is a python dict with the outputs of your pipeline (e.g. a "preprocessed_data" ``pandas.DataFrame``), and you can use it interactively in your notebook.
+``result`` is a python `dict` with the outputs of your pipeline (e.g. a "preprocessed_data" ``pandas.DataFrame``), and you can use it interactively in your notebook.

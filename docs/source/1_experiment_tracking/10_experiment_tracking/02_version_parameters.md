@@ -1,18 +1,22 @@
-# Parameters versioning
+# Track parameters
 
-## Automatic parameters versioning
+## Automatic parameters tracking
 
 Parameters versioning is automatic when the ``MlflowHook`` is added to [the hook list of the ``ProjectContext``](https://kedro-mlflow.readthedocs.io/en/latest/source/02_installation/02_setup.html#declaring-kedro-mlflow-hooks). The `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../30_python_objects/02_Hooks.md).
 
 You **do not need any additional configuration** to benefit from parameters versioning.
 
-## How does ``MlflowHook`` operates under the hood?
+```{hint}
 
-The [medium post which introduces hooks](https://medium.com/quantumblack/introducing-kedro-hooks-fd5bc4c03ff5) explains in detail the differents execution steps ``Kedro`` executes when the user calls the ``kedro run`` command.
+**How does ``MlflowHook`` operates under the hood?**
 
-![](../imgs/hook_registration_process.png)
+The [medium post which introduces hooks](https://medium.com/quantumblack/introducing-kedro-hooks-fd5bc4c03ff5) explains in detail the steps ``Kedro`` executes when the user calls the ``kedro run`` command.
+
+![](../../imgs/hook_registration_process.png)
 
 The `MlflowHook` registers the parameters before each node (entry point number 3 on above picture) by calling `mlflow.log_parameter(param_name, param_value)` on each parameters of the node.
+
+```
 
 ## Frequently asked questions
 

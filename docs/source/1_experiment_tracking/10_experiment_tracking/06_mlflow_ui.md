@@ -1,4 +1,4 @@
-# Opening the UI
+# Open the mlflow UI
 
 ## The mlflow user interface
 

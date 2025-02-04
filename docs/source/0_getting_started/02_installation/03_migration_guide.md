@@ -64,7 +64,7 @@ This is not necessary: the mlflow config is automatically set up when the contex
 
 - Update the ``mlflow.yml`` configuration file with ``kedro mlflow init --force`` command
 - `pipeline_ml_factory(pipeline_ml=<your-pipeline-ml>,...)` (resp. `KedroPipelineModel(pipeline_ml=<your-pipeline-ml>, ...)`) first argument is renamed `pipeline`. Change the call to `pipeline_ml_factory(pipeline=<your-pipeline-ml>)` (resp. `KedroPipelineModel(pipeline=<your-pipeline-ml>, ...)`).
-- Change the call from `pipeline_ml_factory(..., model_signature=<model-signature>, conda_env=<conda-env>, model_name=<model_name>)` to `` pipeline_ml_factory(..., log_model_kwargs=dict(signature=<model-signature>, conda_env=<conda-env>, artifact_path=<model_name>})`. Notice that the arguments are renamed to match mlflow's and they are passed as a dict in `log_model_kwargs`.
+- Change the call from `pipeline_ml_factory(..., model_signature=<model-signature>, conda_env=<conda-env>, model_name=<model_name>)` to ``pipeline_ml_factory(..., log_model_kwargs=dict(signature=<model-signature>, conda_env=<conda-env>, artifact_path=<model_name>})`. Notice that the arguments are renamed to match mlflow's and they are passed as a dict in `log_model_kwargs`.
 
 
 ## Migration from 0.6.x to 0.7.x

@@ -1,4 +1,4 @@
-# Version metrics
+# Track metrics
 
 ## What is metric tracking?
 

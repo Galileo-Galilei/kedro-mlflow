@@ -1,4 +1,4 @@
-# Motivation
+# Motivation behind the plugin
 
 ## When should I use kedro-mlflow?
 

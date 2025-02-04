@@ -10,7 +10,7 @@ If you do not have a real-world project, you can use a kedro example and [follow
 
 ## Activate `kedro-mlflow` in your kedro project
 
-In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration and declare its hooks. Those 2 actions are detailled in the following paragraphs.
+In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration and declare its hooks.
 
 ### Setting up the ``kedro-mlflow`` configuration file
 
@@ -49,13 +49,19 @@ kedro mlflow init --env=<other-environment>
 
 ``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://kedro.readthedocs.io/en/latest/hooks/introduction.html).
 
-**Note that you must register the hook provided by kedro-mlflow** (``MlflowHook``) to make the plugin work.
+```{important}
+You must register the hook provided by ``kedro-mlflow`` (the ``MlflowHook``) to make the plugin work.
+```
 
-#### Declaring hooks through auto-discovery (for `kedro>=0.16.4`) [Default behaviour]
+::::{tab-set}
+
+:::{tab-item} `kedro>=0.16.4` - auto-discovery
 
 If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
 
-#### Declaring hooks statically in settings.py
+:::
+
+:::{tab-item} `kedro>=0.16.0, <=0.16.3` - register in ``settings.py``
 
 If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro):
 
@@ -65,3 +71,7 @@ from kedro_mlflow.framework.hooks import MlflowHook
 
 HOOKS = (MlflowHook(),)
 ```
+
+:::
+
+::::

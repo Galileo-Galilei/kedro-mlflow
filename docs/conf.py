@@ -102,7 +102,7 @@ html_theme_options = {
             "icon": "fa-brands fa-slack",
         },
     ],
-    "navbar_start": ["navbar-logo"],
+    "navbar_start": ["navbar-logo"],  # "version-switcher" to be configured
     "navbar_align": "content",
     "header_links_before_dropdown": 5,
     "secondary_sidebar_items": ["page-toc", "edit-this-page", "sourcelink"],

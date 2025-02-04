@@ -4,7 +4,7 @@
 
 ### Create a virtual environment
 
-I strongly recommend to use ``conda`` (a package manager) to create an environment in order to avoid version conflicts between packages.
+I strongly recommend to create a virtual environment in order to avoid version conflicts between packages. I use ``conda`` in this tutorial.
 
 I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html) to set up your Kedro project.
 
@@ -12,7 +12,7 @@ I also recommend to read [Kedro installation guide](https://kedro.readthedocs.io
 conda create -n <your-environment-name> python=<3.[6-8].X>
 ```
 
-For the rest of the section, we assume the envirpnment is activated:
+For the rest of the section, we assume the environment is activated:
 
 ```console
 conda activate <your-environment-name>
@@ -42,9 +42,11 @@ Requires: pip-tools, cachetools, fsspec, toposort, anyconfig, PyYAML, click, plu
 
 ## Install the plugin
 
-There are version of the plugin compatible up to ``kedro>=0.16.0`` and ``mlflow>=0.8.0``. ``kedro-mlflow`` stops adding features to a minor version 2 to 6 months after a new kedro release.
+There are versions of the plugin compatible up to ``kedro>=0.16.0`` and ``mlflow>=0.8.0``. ``kedro-mlflow`` stops adding features to a minor version 2 to 6 months after a new kedro release.
 
-### Install from PyPI
+::::{tab-set}
+
+:::{tab-item} Install with pip
 
 You can install ``kedro-mlflow`` plugin from ``PyPi`` with `pip`:
 
@@ -52,17 +54,34 @@ You can install ``kedro-mlflow`` plugin from ``PyPi`` with `pip`:
 pip install --upgrade kedro-mlflow
 ```
 
-### Install from sources
+:::
 
-You may want to install the master branch which has unreleased features:
+:::{tab-item} Install with conda / mamba / micromamba
+
+You can install ``kedro-mlflow`` plugin with `conda` from the ``conda-forge`` channel:
+
+```console
+conda install kedro-mlflow -c conda-forge
+```
+
+:::
+
+:::{tab-item} Install from github
+
+You may want to install the master branch from source which has unreleased features:
 
 ```console
 pip install git+https://github.com/Galileo-Galilei/kedro-mlflow.git
 ```
 
+:::
+
+::::
+
+
 ## Check the installation
 
-Type  ``kedro info`` in a terminal to check the installation. If it has succeeded, you should see the following ascii art:
+Enter  ``kedro info`` in a terminal with the activated virtual env to check the installation. If it has succeeded, you should see the following ascii art:
 
 ```console
  _            _

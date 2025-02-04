@@ -71,7 +71,13 @@ Try on github {fas}`fa-solid fa-code`
 maxdepth: 1
 hidden: true
 ---
-source/01_introduction/index
-source/02_installation/index
+source/0_getting_started/index
+source/1_experiment_tracking/index
+<!-- source/02_installation/index
 source/03_quickstart/index
+source/10_experiment_tracking/index
+source/11_interactive_use/index
+source/21_pipeline_serving/index
+source/22_framework_ml/index
+source/30_python_objects/index -->
 ```

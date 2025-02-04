@@ -27,7 +27,7 @@ You are now able to use ``my_sklearn_model`` in your nodes. Since this model is 
 
 ## Frequently asked questions
 
-### How is it working under the hood?
+:::{dropdown} How is it working under the hood?
 
 **For ``MlflowModelTrackingDataset``**
 
@@ -40,8 +40,9 @@ During load, the model is retrieved from the ``run_id`` if specified, else it is
 During save, a model object from node output is saved locally under specified ``filepath`` using ``save_model`` function of the specified ``flavor``.
 
 When model is loaded, the latest version stored locally is read using ``load_model`` function of the specified ``flavor``. You can also load a model from a specific kedro run by specifying the `version` argument to the constructor.
+:::
 
-### How can I track a custom MLflow model flavor?
+:::{dropdown} How can I track a custom MLflow model flavor?
 
 To track a custom MLflow model flavor you need to set the `flavor` parameter to import the module of your custom flavor and to specify a [pyfunc workflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#pyfunc-create-custom-workflows) which can be set either to `python_model` or `loader_module`. The former is the more high level and user friendly and is [recommend by mlflow](https://mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#which-workflow-is-right-for-my-use-case) while the latter offer more control. We haven't tested the integration in `kedro-mlflow` of this second workflow extensively, and it should be used with caution.
 
@@ -52,7 +53,11 @@ my_custom_model:
     pyfunc_workflow: python_model # or loader_module
 ```
 
+:::
+
 ### How can I save model locally and log it in MLflow in one step?
+
+:::{dropdown} How can I save model locally and log it in MLflow in one step?
 
 If you want to save your model both locally and remotely within the same run, you can leverage `MlflowArtifactDataset`:
 
@@ -66,3 +71,5 @@ sklearn_model:
 ```
 
 This might be useful if you want to always read the lastest model saved locally and log it to MLflow each time the new model is being trained for tracking purpose.
+
+:::

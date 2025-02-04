@@ -20,10 +20,10 @@ The `MlflowHook` registers the parameters before each node (entry point number 3
 
 ## Frequently asked questions
 
-### Will parameters be recorded if the pipeline fails during execution?
-
-The parameters are registered node by node (and not in a single batch at the beginning of the execution). If the pipeline fails in the middle of its execution, the **parameters of the nodes who have been run will be recorded**, but **not the parameters of non executed nodes**.
-
-### How are parameters detected by the plugin?
-
+:::{dropdown} How are parameters detected by the plugin?
 The hook **detects parameters through their prefix ``params:`` or the value ``parameters``**. These are the [reserved keywords used by Kedro to define parameters](https://docs.kedro.org/en/stable/configuration/parameters.html#how-to-use-parameters) in the ``pipeline.py`` file(s).
+:::
+
+:::{dropdown} Will parameters be recorded if the pipeline fails during execution?
+The parameters are registered node by node (and not in a single batch at the beginning of the execution). If the pipeline fails in the middle of its execution, the **parameters of the nodes who have been run will be recorded**, but **not the parameters of non executed nodes**.
+:::

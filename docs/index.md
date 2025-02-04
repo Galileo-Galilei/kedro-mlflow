@@ -1,20 +1,17 @@
-# The kedro-mlflow plugin
+```kedro-mlflow``` is a Kedro [plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) to integrate [MLflow](https://www.mlflow.org/) effortlessly inside [Kedro](https://kedro.org/) projects.
 
-## What is kedro-mlflow ?
+## Key Features
 
-```kedro-mlflow``` is a kedro plugin to integrate [MLflow](https://www.mlflow.org/) effortlessly inside [Kedro](https://kedro.org/) projects.
-
-## Features
-
-Its main features are automatic parameters tracking, datasets versioning, Kedro pipelines packaging and serving and automatic synchronisation between training and inference pipelines. It aims at providing a complete yet modular framework for high reproducibility of machine learning experiments and ease of deployment.
+Its main features are **automatic parameters tracking**, **datasets tracking as artifacts**, Kedro **pipelines packaging** and serving and **automatic synchronisation between training and inference** pipelines. It aims at providing a complete yet modular framework for high reproducibility of machine learning experiments and ease of deployment.
 
 ::::{grid} 1 1 2 2
 :gutter: 3
 
 :::{grid-item-card}
-:link: https://kedro-mlflow.readthedocs.io/en/stable/source/10_experiment_tracking/index.html
+:link: source/1_experiment_tracking/10_experiment_tracking/01_configuration.html
 :link-type: url
 :class-header: bg-light
+:columns: 4
 
 {fas}`flask;pst-color-primary` Experiment tracking
 ^^^
@@ -23,27 +20,29 @@ Track the **parameters**, **metrics**, **artifacts** and **models** of your kedr
 :::
 
 :::{grid-item-card}
-:link: https://kedro-mlflow.readthedocs.io/en/stable/source/21_pipeline_serving/index.html
+:link:
 :link-type: url
 :class-header: bg-light
+:columns: 8
 
-{fas}`rocket;pst-color-primary` Pipeline serving
+{fas}`rocket;pst-color-primary` Pipeline as model
 ^^^
 
-Package any kedro pipeline to a **custom mlflow model** for serving. The custom model for an inference pipeline can be **registered** in mlflow **automatically** at the end of each training in a *scikit-learn* like way.
+Package any kedro pipeline to a **custom mlflow model** for deployment and serving. The custom model for an inference pipeline can be **registered** in mlflow **automatically** at the end of each training in a *scikit-learn* like way.
 :::
 
 ::::
 
 ## Resources
 
-::::{grid} 1 1 2 2
+::::{grid} 3 3 3 3
 :gutter: 3
 
 :::{grid-item-card}
-:link: https://kedro-mlflow.readthedocs.io/en/stable/source/10_experiment_tracking/index.html
+:link: source/0_getting_started/02_installation/01_installation.html
 :link-type: url
 :class-header: bg-light
+:columns: 3
 
 {fas}`book;pst-color-primary` Quickstart
 ^^^
@@ -57,6 +56,7 @@ Try out {fas}`arrow-right`
 :link: https://github.com/Galileo-Galilei/kedro-mlflow-tutorial
 :link-type: url
 :class-header: bg-light
+:columns: 5
 
 {fas}`fa-solid fa-chalkboard-user;pst-color-primary` Advanced tutorial
 ^^^
@@ -67,8 +67,22 @@ The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to le
 Try on github {fab}`fa-brands fa-github`
 :::
 
-::::
+:::{grid-item-card}
+:link: https://www.youtube.com/watch?v=Az_6UKqbznw
+:link-type: url
+:class-header: bg-light
+:columns: 4
 
+{fas}`fa-solid fa-video;pst-color-primary` Demonstration in video
+^^^
+
+A youtube video by the kedro team to introduce the plugin, with live coding
+
++++
+See on youtube {fab}`fa-brands fa-youtube`
+:::
+
+::::
 
 ```{toctree}
 ---

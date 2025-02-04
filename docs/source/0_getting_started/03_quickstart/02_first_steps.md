@@ -7,7 +7,6 @@ This step is optional if you use ``kedro>=0.11.2``. If you do not create a ``mlf
 ```
 
 :::{dropdown} (Optional) Create a configuration file
-:class: dropdown
 You can initialize your project with the plugin-specific configuration file with this command:
 
 ```console
@@ -27,7 +26,6 @@ The ``conf/local`` folder is updated and you can see the `mlflow.yml` file:
 :::
 
 :::{dropdown} (Optional) Specify the tracking uri
-:class: dropdown
 
 If you have configured your own mlflow server, you can specify the tracking uri in the ``mlflow.yml`` (replace the highlighted line below):
 

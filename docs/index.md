@@ -59,7 +59,7 @@ Learn how {fas}`arrow-right`
 The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as a mlops framework!
 
 +++
-Try on github {fas}`fa-solid fa-code`
+Try on github {fab}`fa-github`
 :::
 
 ::::

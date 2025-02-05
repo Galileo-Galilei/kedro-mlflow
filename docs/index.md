@@ -11,7 +11,6 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 :link: source/1_experiment_tracking/10_experiment_tracking/01_configuration.html
 :link-type: url
 :class-header: bg-light
-:columns: 4
 
 {fas}`flask;pst-color-primary` Experiment tracking
 ^^^
@@ -23,7 +22,6 @@ Track the **parameters**, **metrics**, **artifacts** and **models** of your kedr
 :link:
 :link-type: url
 :class-header: bg-light
-:columns: 8
 
 {fas}`rocket;pst-color-primary` Pipeline as model
 ^^^
@@ -42,7 +40,6 @@ Package any kedro pipeline to a **custom mlflow model** for deployment and servi
 :link: source/0_getting_started/02_installation/01_installation.html
 :link-type: url
 :class-header: bg-light
-:columns: 3
 
 {fas}`book;pst-color-primary` Quickstart
 ^^^
@@ -56,7 +53,6 @@ Try out {fas}`arrow-right`
 :link: https://github.com/Galileo-Galilei/kedro-mlflow-tutorial
 :link-type: url
 :class-header: bg-light
-:columns: 5
 
 {fas}`fa-solid fa-chalkboard-user;pst-color-primary` Advanced tutorial
 ^^^
@@ -71,7 +67,6 @@ Try on github {fab}`fa-brands fa-github`
 :link: https://www.youtube.com/watch?v=Az_6UKqbznw
 :link-type: url
 :class-header: bg-light
-:columns: 4
 
 {fas}`fa-solid fa-video;pst-color-primary` Demonstration in video
 ^^^

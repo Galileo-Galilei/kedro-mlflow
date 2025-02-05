@@ -2,7 +2,7 @@
 
 ## When should I use kedro-mlflow?
 
-Basically, you should use `kedro-mlflow` in **any `Kedro` project which involves machine learning** / deep learning. As stated in the [introduction](./01_introduction.md), `Kedro`'s current versioning (as of version `0.19.10`) is not sufficient for machine learning projects: it lacks a UI and a ``run`` management system. Besides, the `KedroPipelineModel` ability to serve a kedro pipeline as an API or a batch in one line of code is a great addition for collaboration and transition to production.
+Basically, you should use `kedro-mlflow` in **any `Kedro` project which involves machine learning** / deep learning. As stated in the [introduction](./01_introduction.html), `Kedro`'s current versioning (as of version `0.19.10`) is not sufficient for machine learning projects: it lacks a UI and a ``run`` management system. Besides, the `KedroPipelineModel` ability to serve a kedro pipeline as an API or a batch in one line of code is a great addition for collaboration and transition to production.
 
 If you do not use ``Kedro`` or if you do pure data processing which does not involve *machine learning*, this plugin is not what you are seeking for ;-)
 
@@ -47,5 +47,5 @@ Above implementations have the advantage of being very straightforward and *mlfl
 `kedro-mlflow` does not currently provide interface to set tags outside a Kedro ``Pipeline``. Some of above decisions are subject to debate and design decisions (for instance, metrics are often updated in a loop during each epoch / training iteration and it does not always make sense to register the metric between computation steps, e.g. as a an I/O operation after a node run).
 
 ```{note}
-You do **not** need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.md), this file overlaps with Kedro configuration files.
+You do **not** need any ``MLProject`` file to use mlflow inside your Kedro project. As seen in the [introduction](./01_introduction.html), this file overlaps with Kedro configuration files.
 ```

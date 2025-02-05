@@ -4,7 +4,7 @@
 
  ``kedro mlflow init``: this command is needed to initalize your project. You cannot run any other commands before you run this one once. It performs 2 actions:
     - creates a ``mlflow.yml`` configuration file in your ``conf/local`` folder
-    - replace the ``src/PYTHON_PACKAGE/run.py`` file by an updated version of the template. If your template has been modified since project creation, a warning will be raised. You can either run ``kedro mlflow init --force`` to ignore this warning (but this will erase your ``run.py``) or [set hooks manually](../../02_getting_started/01_installation/02_setup.md).
+    - replace the ``src/PYTHON_PACKAGE/run.py`` file by an updated version of the template. If your template has been modified since project creation, a warning will be raised. You can either run ``kedro mlflow init --force`` to ignore this warning (but this will erase your ``run.py``) or [set hooks manually](../../02_getting_started/01_installation/02_setup.html).
 
 `init` has two arguments:
 
@@ -15,7 +15,7 @@
 
 ``kedro mlflow ui``: this command opens the mlflow UI (basically launches the ``mlflow ui`` command )
 
-`ui` accepts the port and host arguments of [``mlflow ui`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-ui). The default values used will be the ones defined in the [``mlflow.yml`` configuration file under the `ui`](../02_experimentation_tracking/01_configuration.md).
+`ui` accepts the port and host arguments of [``mlflow ui`` command](https://www.mlflow.org/docs/latest/cli.html#mlflow-ui). The default values used will be the ones defined in the [``mlflow.yml`` configuration file under the `ui`](../../03_experiment_tracking/01_experiment_tracking/01_configuration.html).
 
 If you provide the arguments at runtime, they wil take priority over the ``mlflow.yml``, e.g. if you have:
 

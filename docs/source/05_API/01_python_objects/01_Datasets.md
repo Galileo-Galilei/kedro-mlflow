@@ -41,7 +41,7 @@ csv_dataset = MlflowArtifactDataset(
 csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 ```
 
-## Metrics `DataSets`
+## Metrics `Datasets`
 
 ### ``MlflowMetricDataset``
 
@@ -52,7 +52,7 @@ csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 [The ``MlflowMetricHistoryDataset`` is documented here](https://kedro-mlflow.readthedocs.io/en/latest/source/04_experimentation_tracking/05_version_metrics.html#saving-a-single-float-as-a-metric-with-mlflowmetricdataset).
 
 
-## Models `DataSets`
+## Models `Datasets`
 
 ### ``MlflowModelTrackingDataset``
 
@@ -60,7 +60,7 @@ The ``MlflowModelTrackingDataset`` accepts the following arguments:
 
 - flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
 - run_id (Optional[str], optional): MLflow run ID to use to load the model from or save the model to. It plays the same role as "filepath" for standard mlflow datasets. Defaults to None.
-- artifact_path (str, optional): the run relative path tothe model.
+- artifact_path (str, optional): the run relative path to the model.
 - pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
 - load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
 - save_args (Dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`. Defaults to None.

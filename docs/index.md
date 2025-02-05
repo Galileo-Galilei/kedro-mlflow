@@ -1,6 +1,15 @@
-```kedro-mlflow``` is a Kedro [plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) to integrate [MLflow](https://www.mlflow.org/) effortlessly inside [Kedro](https://kedro.org/) projects.
+---
+myst:
+  html_meta:
+    "description lang=en": |
+      Top-level documentation for kedro-mlflow, with links to the rest
+      of the site.
+html_theme.sidebar_secondary.remove: true
+---
 
-## Key Features
+# The kedro-mlflow plugin
+
+```kedro-mlflow``` is a Kedro [plugin](https://docs.kedro.org/en/stable/extend_kedro/plugins.html) to integrate [MLflow](https://www.mlflow.org/) effortlessly inside [Kedro](https://kedro.org/) projects.
 
 Its main features are **automatic parameters tracking**, **datasets tracking as artifacts**, Kedro **pipelines packaging** and serving and **automatic synchronisation between training and inference** pipelines. It aims at providing a complete yet modular framework for high reproducibility of machine learning experiments and ease of deployment.
 
@@ -8,7 +17,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 :gutter: 3
 
 :::{grid-item-card}
-:link: source/1_experiment_tracking/10_experiment_tracking/01_configuration.html
+:link: source/03_experiment_tracking/01_experiment_tracking/01_configuration.html
 :link-type: url
 :class-header: bg-light
 
@@ -19,7 +28,7 @@ Track the **parameters**, **metrics**, **artifacts** and **models** of your kedr
 :::
 
 :::{grid-item-card}
-:link:
+:link: source/04_pipeline_as_model/01_pipeline_as_custom_model/01_mlflow_models.html
 :link-type: url
 :class-header: bg-light
 
@@ -37,11 +46,11 @@ Package any kedro pipeline to a **custom mlflow model** for deployment and servi
 :gutter: 3
 
 :::{grid-item-card}
-:link: source/0_getting_started/02_installation/01_installation.html
+:link: source/02_gettnig_started/01_installation/01_installation.html
 :link-type: url
 :class-header: bg-light
 
-{fas}`book fa-xl;pst-color-primary` Quickstart
+{fas}`fa-solid fa-graduation-cap fa-xl;pst-color-primary` Quickstart
 ^^^
 
 Get started in **1 mn** with experiment tracking!
@@ -89,4 +98,5 @@ source/02_getting_started/index
 source/03_experiment_tracking/index
 source/04_pipeline_as_model/index
 source/05_API/index
+Changelog <https://github.com/Galileo-Galilei/kedro-mlflow/releases>
 ```

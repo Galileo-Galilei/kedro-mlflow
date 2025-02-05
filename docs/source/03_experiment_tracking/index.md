@@ -1,4 +1,4 @@
-# Experiment tracking
+# {octicon}`beaker` Experiment tracking
 
 ```{toctree}
 :caption: Experiment tracking

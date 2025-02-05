@@ -104,7 +104,7 @@ html_theme_options = {
     ],
     "navbar_start": ["navbar-logo"],  # "version-switcher" to be configured
     "navbar_align": "content",
-    "header_links_before_dropdown": 5,
+    "header_links_before_dropdown": 4,
     "secondary_sidebar_items": ["page-toc", "edit-this-page", "sourcelink"],
     "use_edit_page_button": True,
 }

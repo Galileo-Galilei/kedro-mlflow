@@ -1,10 +1,10 @@
 # Configure mlflow inside your project
 
-We assume in this section that you have [installed `kedro-mlflow` in your virtual environment](../../02_getting_started/01_installation/01_installation.md) and you have [configured your project](../../0_getting_started/02_installation/02_setup.md) with a `mlflow.yml` configuration file and hooks declaration.
+We assume in this section that you have [installed `kedro-mlflow` in your virtual environment](../../02_getting_started/01_installation/01_installation.html) and you have [configured your project](../../0_getting_started/02_installation/02_setup.html) with a `mlflow.yml` configuration file and hooks declaration.
 
 ## Context: mlflow tracking under the hood
 
-Mlflow is composed of four modules which are described in the [introduction section](../../01_introduction/01_introduction.md). The main module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
+Mlflow is composed of four modules which are described in the [introduction section](../../01_introduction/01_introduction.html). The main module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
 
 ![mlflow_tracking_schema](../../imgs/mlflow_tracking_schema.png)
 

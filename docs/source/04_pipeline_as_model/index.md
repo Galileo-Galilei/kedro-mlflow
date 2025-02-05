@@ -1,5 +1,5 @@
 
-# Pipeline as model
+# {octicon}`rocket` Pipeline as model
 
 ```{toctree}
 :caption: Pipeline as model

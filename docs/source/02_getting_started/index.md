@@ -1,4 +1,4 @@
-# Getting started
+# {octicon}`mortar-board` Getting started
 
 ```{toctree}
 :caption: Installation

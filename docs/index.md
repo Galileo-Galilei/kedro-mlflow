@@ -7,7 +7,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 ::::{grid} 1 1 2 2
 :gutter: 3
 
-:::{grid-item}
+:::{grid-item-card}
 :link: source/1_experiment_tracking/10_experiment_tracking/01_configuration.html
 :link-type: url
 :class-header: bg-light
@@ -18,7 +18,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 Track the **parameters**, **metrics**, **artifacts** and **models** of your kedro pipelines for reproducibility.
 :::
 
-:::{grid-item}
+:::{grid-item-card}
 :link:
 :link-type: url
 :class-header: bg-light
@@ -33,7 +33,7 @@ Package any kedro pipeline to a **custom mlflow model** for deployment and servi
 
 ## Resources
 
-::::{grid} 3 3 3 3
+::::{grid} 1 1 3 3
 :gutter: 3
 
 :::{grid-item-card}
@@ -71,7 +71,7 @@ Try on github {fab}`github;fa-xl`
 {fas}`fa-solid fa-video fa-xl;pst-color-primary` Demonstration in video
 ^^^
 
-A youtube video by the kedro team to introduce the plugin, with live coding
+A youtube video by the kedro team to introduce the plugin, with live coding.
 
 +++
 See on youtube {fab}`youtube;fa-xl`

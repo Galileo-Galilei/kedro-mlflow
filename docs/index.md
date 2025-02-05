@@ -7,7 +7,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 ::::{grid} 1 1 2 2
 :gutter: 3
 
-:::{grid-item-card}
+:::{grid-item}
 :link: source/1_experiment_tracking/10_experiment_tracking/01_configuration.html
 :link-type: url
 :class-header: bg-light
@@ -18,7 +18,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 Track the **parameters**, **metrics**, **artifacts** and **models** of your kedro pipelines for reproducibility.
 :::
 
-:::{grid-item-card}
+:::{grid-item}
 :link:
 :link-type: url
 :class-header: bg-light

@@ -109,13 +109,12 @@ kedro viz
 
 Open your browser at the following adress:
 
-```{browser}
-http://localhost:4141/
+```{button-link} http://localhost:4141/
 ```
 
 You should see the following graph:
 
-![kedro_viz_params](../imgs/kedro_viz_params.png)
+![kedro_viz_params](../../imgs/kedro_viz_params.png)
 
 which indicates clearly which parameters are logged (in the red boxes with the "parameter" icon).
 

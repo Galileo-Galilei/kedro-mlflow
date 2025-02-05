@@ -1,6 +1,6 @@
-# Pipeline serving with kedro-mlflow
+# Introduction to mlflow models
 
-## Introduction to Mlflow Models
+## What are Mlflow Models ?
 
 [Mlflow Models are a standardised agnostic format to store machine learning models](https://www.mlflow.org/docs/latest/models.html). They intend to be standalone to be as portable as possible to be deployed virtually anywhere and mlflow provides built-in CLI commands to deploy a mlflow model to most common cloud platforms or to create an API.
 
@@ -11,9 +11,11 @@ A Mlflow Model is composed of:
 - a ``model.pkl`` (or a ``python_function.pkl`` for custom model) file containing the trained model.  
 - an ``artifacts`` folder containing all other data necessary to execute the models
 
-Mlflow enable to create custom models "flavors" to convert any object to a Mlflow Model providing we have these informations. Inside a Kedro prpojects, the ``Pipeline`` and ``DataCatalog`` objects contains all these informations: as a consequence, it is easy to create a custom model to convert entire Kedro ``Pipeline``s to mlflow models.
+```{important}
+Mlflow enable to create **custom models "flavors" to convert any object to a Mlflow Model** provided we have these informations. Inside a Kedro project, the ``Pipeline`` and ``DataCatalog`` objects contain all these informations. As a consequence, it is easy to create a custom model to convert entire Kedro ``Pipeline``s to mlflow models, and it the purpose of ``pipeline_ml_factory`` and ``KedroPipelineModel`` that we will present in the following sections.
+```
 
-## Pre-requisite for serving a pipeline
+## Pre-requisite for converting a pipeline to a mlflow model
 
 You can log any Kedro ``Pipeline`` matching the following requirements:
 

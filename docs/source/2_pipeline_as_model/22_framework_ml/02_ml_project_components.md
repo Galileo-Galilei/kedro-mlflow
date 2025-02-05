@@ -27,7 +27,7 @@ Note that there are **as many _etl_app_ and _user_app_** as needed for the diffe
 
 We saw that the data scientist has to create some code that will be replaced by other people code when deploying the model. As a consequence, the interactions between these apps must be very clearly defined at the beginning of the project. We claim that it is possible to cover most use case with the following schema:
 
-![apps_interaction](../imgs/apps_interaction.png)
+![apps_interaction](../../imgs/apps_interaction.png)
 
 The *ml_app* takes `instances` (i.e. examples of the business object to handle) as input. This implies that the *ml_app* will include some machine learning-specific preprocessing and not only the model training. It also (optionally) takes labels as inputs if the underlying problem is supervised. Even in this situation, the labels will not be known at inference time so the *etl_app* does not necessarily produce them.
 

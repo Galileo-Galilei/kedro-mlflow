@@ -1,12 +1,12 @@
 # Configure mlflow inside your project
 
-We assume in this section that you have [installed `kedro-mlflow` in your virtual environment](../02_installation/01_installation.md) and you have [configured your project](../02_installation/02_setup.md) with a `mlflow.yml` configuration file and hooks declaration.
+We assume in this section that you have [installed `kedro-mlflow` in your virtual environment](../../0_getting_started/02_installation/01_installation.md) and you have [configured your project](../../0_getting_started/02_installation/02_setup.md) with a `mlflow.yml` configuration file and hooks declaration.
 
 ## Context: mlflow tracking under the hood
 
-Mlflow is composed of four modules which are described in the [introduction section](../01_introduction/01_introduction.md). The main module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
+Mlflow is composed of four modules which are described in the [introduction section](../../0_getting_started/01_introduction/01_introduction.md). The main module is "tracking". The goal of this module is to keep track of every varying parameters across different code execution (parameters, metrics and artifacts). The following schema describes how this modules operates under the hood:
 
-![mlflow_tracking_schema](../imgs/mlflow_tracking_schema.png)
+![mlflow_tracking_schema](../../imgs/mlflow_tracking_schema.png)
 
 Basically, this schema shows that mlflow separates WHERE the artifacts are logged from HOW they are logged inside your code. You need to setup your mlflow tracking server separately from your code, and then each logging will send a request to the tracking server to store the elements you want to track in the appropriate location. The advantage of such a setup are numerous:
 

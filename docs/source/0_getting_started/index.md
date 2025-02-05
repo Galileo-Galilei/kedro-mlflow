@@ -1,4 +1,4 @@
-# Getting started
+# Getting started {fas}`rocket`
 
 ```{toctree}
 :caption: Introduction to kedro-mlflow

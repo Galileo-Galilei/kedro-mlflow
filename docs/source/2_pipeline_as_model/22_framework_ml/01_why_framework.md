@@ -112,7 +112,7 @@ As stated previous paragraph, the inference pipeline is not a primary concern wh
 - in the best case, you have trained the model from a git sha which is logged in mlflow. Any potential user can (but it takes time) recreate the exact inference pipeline from your source code, and retrieve all necessary artifacts from mlflow. This is tedious, error prone, and gives a lot of responsibility and work to your end user, but at least it makes your model usable.
 - most likely, you did not train your model from a version control commit. While experimenting /debug, it is very common to modify the code and retrain without committing. The exact code associated to a given model will likely be impossible to find out later.  
 
-> `kedro-mlflow` offers a `PipelineML` (and its helpers `pipeline_ml_factory`) class which binds the `training` and `inference` pipeline (similarly to ``scikit-learn`` ``Pipeline`` object), and a hook which autolog such pipelines when they are run. This enables data scientists to ensure that each training model is logged with its associated inference pipeline, and is ready to use for any end user. This decreases a lot the necessary cognitive complexity to ensure coherence between training and inference.
+> `kedro-mlflow` offers a `PipelineML` (and its helper `pipeline_ml_factory`) class which binds the `training` and `inference` pipeline (similarly to ``scikit-learn`` ``Pipeline`` object), and a hook which autolog such pipelines when they are run. This enables data scientists to ensure that each training model is logged with its associated inference pipeline, and is ready to use for any end user. This decreases a lot the necessary cognitive complexity to ensure coherence between training and inference.
 
 ### Issue 4: Data scientists do not handle business objects
 
@@ -132,7 +132,7 @@ Your model must handle business objects (e.g. a mail, a movie review, a customer
 
 ``kedro-mlflow`` assume that we declare a clear contrat of what the output of the data science project is: it is an an inference pipeline. This defines a clear "definition of done" of the data science project: is it ready to deploy?
 
-The downside of such an approach is that it increases data scientist's responsibilities,because s(he) is responsible for his code.
+The downside of such an approach is that it increases data scientist's responsibilities, because s(he) is responsible for his code.
 
 ``kedro-mlflow`` offers a very convenient way (through the ``pipeline_ml_factory`` function) to make sure that each experiment will result in creating a compliant "output".
 

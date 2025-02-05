@@ -62,7 +62,7 @@ You can configure your project as follows:
     kedro run --pipeline=training
     ```
 
-    **The inference pipeline will _automagically_ be logged as a custom mlflow model"** (a ``KedroPipelineModel``) **at the end of the training pipeline!**.
+    **The inference pipeline will _automagically_ be logged as a custom mlflow model** (a ``KedroPipelineModel``) **at the end of the training pipeline!**.
 
 5. Go to the UI, retrieve the run id of your "inference pipeline" model and use it as you want, e.g. in the `catalog.yml`:
 
@@ -111,7 +111,3 @@ You have also other resources to understand the rationale:
 - an explanation of the [``PipelineML`` class in the python objects section](../07_python_objects/03_Pipelines.md)
 - detailed explanations [on this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16) and [this discussion](https://github.com/Galileo-Galilei/kedro-mlflow/discussions/229).
 - an example of use in a user project [in this repo](https://github.com/laurids-reichardt/kedro-examples/blob/kedro-mlflow-hotfix2/text-classification/src/text_classification/pipelines/pipeline.py).
-
-## Motivation
-
-You can find more about the motivations in <https://kedro-mlflow.readthedocs.io/en/stable/source/06_framework_ml/index.html>.

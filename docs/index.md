@@ -12,7 +12,7 @@ Its main features are **automatic parameters tracking**, **datasets tracking as 
 :link-type: url
 :class-header: bg-light
 
-{fas}`flask;pst-color-primary` Experiment tracking
+{fas}`flask fa-xl;pst-color-primary` Experiment tracking
 ^^^
 
 Track the **parameters**, **metrics**, **artifacts** and **models** of your kedro pipelines for reproducibility.
@@ -23,7 +23,7 @@ Track the **parameters**, **metrics**, **artifacts** and **models** of your kedr
 :link-type: url
 :class-header: bg-light
 
-{fas}`rocket;pst-color-primary` Pipeline as model
+{fas}`rocket fa-xl;pst-color-primary` Pipeline as model
 ^^^
 
 Package any kedro pipeline to a **custom mlflow model** for deployment and serving. The custom model for an inference pipeline can be **registered** in mlflow **automatically** at the end of each training in a *scikit-learn* like way.
@@ -41,12 +41,12 @@ Package any kedro pipeline to a **custom mlflow model** for deployment and servi
 :link-type: url
 :class-header: bg-light
 
-{fas}`book;pst-color-primary` Quickstart
+{fas}`book fa-xl;pst-color-primary` Quickstart
 ^^^
 
 Get started in **1 mn** with experiment tracking!
 +++
-Try out {fas}`arrow-right`
+Try out {fas}`arrow-right fa-xl`
 :::
 
 :::{grid-item-card}
@@ -54,13 +54,13 @@ Try out {fas}`arrow-right`
 :link-type: url
 :class-header: bg-light
 
-{fas}`fa-solid fa-chalkboard-user;pst-color-primary` Advanced tutorial
+{fas}`fa-solid fa-chalkboard-user fa-xl;pst-color-primary` Advanced tutorial
 ^^^
 
 The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as a mlops framework!
 
 +++
-Try on github {fab}`fa-brands fa-github`
+Try on github {fab}`github;fa-xl`
 :::
 
 :::{grid-item-card}
@@ -68,13 +68,13 @@ Try on github {fab}`fa-brands fa-github`
 :link-type: url
 :class-header: bg-light
 
-{fas}`fa-solid fa-video;pst-color-primary` Demonstration in video
+{fas}`fa-solid fa-video fa-xl;pst-color-primary` Demonstration in video
 ^^^
 
 A youtube video by the kedro team to introduce the plugin, with live coding
 
 +++
-See on youtube {fab}`fa-brands fa-youtube`
+See on youtube {fab}`youtube;fa-xl`
 :::
 
 ::::
@@ -86,4 +86,5 @@ hidden: true
 ---
 source/0_getting_started/index
 source/1_experiment_tracking/index
+source/2_pipeline_as_model/index
 ```

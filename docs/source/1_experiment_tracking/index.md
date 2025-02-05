@@ -1,4 +1,4 @@
-# Experiment tracking
+# Experiment tracking {fas}`flask`
 
 ```{toctree}
 :caption: Experiment tracking
@@ -15,7 +15,6 @@
 
 10_experiment_tracking/06_mlflow_ui
 ```
-
 
 ```{toctree}
 :caption: Interactive use

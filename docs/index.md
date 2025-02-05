@@ -84,7 +84,8 @@ See on youtube {fab}`youtube;fa-xl`
 maxdepth: 1
 hidden: true
 ---
-source/0_getting_started/index
-source/1_experiment_tracking/index
-source/2_pipeline_as_model/index
+source/01_introduction/index
+source/02_getting_started/index
+source/03_experiment_tracking/index
+source/04_pipeline_as_model/index
 ```

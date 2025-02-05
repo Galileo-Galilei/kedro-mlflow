@@ -88,4 +88,5 @@ source/01_introduction/index
 source/02_getting_started/index
 source/03_experiment_tracking/index
 source/04_pipeline_as_model/index
+source/05_API/index
 ```

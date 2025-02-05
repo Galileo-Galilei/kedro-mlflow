@@ -1,7 +1,7 @@
 Datasets
 ==================================
 
-Artifact DataSet
+Artifact Dataset
 -----------------
 
 .. automodule:: kedro_mlflow.io.artifacts.mlflow_artifact_dataset
@@ -9,7 +9,7 @@ Artifact DataSet
    :undoc-members:
    :show-inheritance:
 
-Metrics DataSet
+Metrics Dataset
 ----------------
 
 .. automodule:: kedro_mlflow.io.metrics.mlflow_metric_dataset
@@ -28,7 +28,7 @@ Metrics DataSet
    :undoc-members:
    :show-inheritance:
 
-Models DataSet
+Models Dataset
 ---------------
 
 .. automodule:: kedro_mlflow.io.models.mlflow_abstract_model_dataset

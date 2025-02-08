@@ -36,11 +36,11 @@ jobs:
     - name: Check code formatting with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
       run: |
-        uv run ruff format . --check
+        uv run --no-project ruff format . --check
     - name: Check import order and syntax with ruff
       if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11' # linting should occur only once in the loop
       run: |
-        uv run ruff check .
+        uv run --no-project ruff check .
     - name: Test with pytest and generate coverage report
       run: |
         uv run --no-project pytest --cov=./ --cov-report=xml

@@ -29,7 +29,7 @@ jobs:
       run: |
         uv venv
         uv pip install wheel
-        uv run python setup.py sdist bdist_wheel
+        uv run --no-project python setup.py sdist bdist_wheel
     - name: Set dynamically package version as output variable
       # see https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#example-of-setting-an-output-parameter
       id: set_package_version

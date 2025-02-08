@@ -23,8 +23,12 @@ jobs:
       PYTHON_PACKAGE: kedro_mlflow
     steps:
     - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        enable-cache: true
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Validate inputs
@@ -33,8 +37,8 @@ jobs:
     - name: Bump the version number  # bump2version is a maintained fork of original bumpversion
       id: bump_version
       run: |
-        pip install bump-my-version
-        bump-my-version bump ${{ github.event.inputs.version_part }}
+        uv tool install bump-my-version
+        uvx bump-my-version bump ${{ github.event.inputs.version_part }}
         echo "package_version=$(cat $PYTHON_PACKAGE/__init__.py | grep -Po  '\d+\.\d+\.\d+')" >> $GITHUB_OUTPUT
     - name: Update the CHANGELOG according to 'Keep a Changelog' guidelines
       uses: thomaseizinger/keep-a-changelog-new-release@v1

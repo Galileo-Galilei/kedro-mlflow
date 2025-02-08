@@ -4,7 +4,7 @@
 
 ### Changed
 
--   :memo: Change documentation theme to [the pydata sphinx theme](https://pydata-sphinx-theme.readthedocs.io/en/stable/#), and refacotr secion to make them clearer  ([#621](https://github.com/Galileo-Galilei/kedro-mlflow/pull/621))
+-   :memo: Change documentation theme to [the pydata sphinx theme](https://pydata-sphinx-theme.readthedocs.io/en/stable/#), and refactor sections to make them clearer  ([#621](https://github.com/Galileo-Galilei/kedro-mlflow/pull/621))
 
 ## [0.14.0] - 2025-01-28
 

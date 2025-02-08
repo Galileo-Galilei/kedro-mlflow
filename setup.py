@@ -51,6 +51,7 @@ setup(
             "pytest-cov>=2.8.0, <7.0.0",
             "pytest-lazy-fixtures>=1.0.0, <2.0.0",
             "pytest-mock>=3.1.0, <4.0.0",
+            "pytest-xdist>=3.0.0,<4.0.0",  # mess up the test readibility in the console but is much faster for the CI with "-n auto" option
             "ruff>=0.5.0,<0.9.0",  # ensure consistency with pre-commit
             "scikit-learn>=0.23.0, <1.7.0",
             "kedro-datasets[pandas.CSVDataSet]",

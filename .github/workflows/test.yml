@@ -43,7 +43,6 @@ jobs:
         uv run --no-project ruff check .
     - name: Test with pytest and generate coverage report
       run: |
-        uv pip install pytest-xdist
         uv run --no-project pytest --cov=./ --cov-report=xml -n auto
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v1

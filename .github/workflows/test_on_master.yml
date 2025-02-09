@@ -1,0 +1,17 @@
+name: test
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+    lint_and_test:
+        uses: ./.github/workflows/test_reusable_workflow.yml
+        strategy:
+            matrix:
+                python-version: ["3.9", "3.10", "3.11", "3.12"]
+                os: [ubuntu-latest, macos-latest, windows-latest]
+        with:
+            python-version: ${{ matrix.python-version }}
+            os: ${{ matrix.os }}
+        secrets: inherit

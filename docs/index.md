@@ -99,4 +99,5 @@ source/03_experiment_tracking/index
 source/04_pipeline_as_model/index
 source/05_API/index
 Changelog <https://github.com/Galileo-Galilei/kedro-mlflow/releases>
+source/06_migration_guide/index
 ```

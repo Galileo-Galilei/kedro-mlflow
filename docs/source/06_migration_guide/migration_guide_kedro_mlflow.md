@@ -1,18 +1,61 @@
-# Migration guide
+# Migration guide between kedro-mlflow versions
 
 This page explains how to migrate an existing kedro project to a more up to date `kedro-mlflow` versions with breaking changes.
 
+## Migration from 0.13.x to 0.14.x
+
+Upgrade mlflow to ``mlflow>=2.7.0``.
+
+## Migration from 0.12.x to 0.13.x
+
+Upgrade mlflow to ``mlflow>=1.30``.
+
+## Migration from 0.11.x to 0.12.x
+
+1. Upgrade your kedro project to ``kedro>=0.19,<0.20``
+2. Rename the following ``DataSet``s with the ``Dataset`` suffix (**without final capitalized S**) in your ``catalog.yml`` and change names to make them more explicit:
+| Name in ``kedro_mlflow<=0.11``|Name in ``kedro_mlflow>=0.12``       |
+|-------------------------------|-------------------------------------|
+|``MlflowArtifactDataSet``      |``MlflowArtifactDataset``            |
+|``MlflowAbstractModelDataSet`` |``MlflowAbstractModelDataset``       |
+|``MlflowModelRegistryDataSet`` |``MlflowModelRegistryDataset``       |
+|``MlflowMetricDataSet``        |``MlflowMetricDataset``              |
+|``MlflowMetricHistoryDataSet`` |``MlflowMetricHistoryDataset``       |
+|``MlflowModelLoggerDataSet``   |``MlflowModelTrackingDataset``       |
+|``MlflowModelSaverDataSet``    |``MlflowModelLocalFileSystemDataset``|
+|``MlflowMetricsDataSet``       |``MlflowMetricsHistoryDataset``      |
+
+3. Update your ``MlflowArtifactDataset`` catalog entry to rename the ``data_set`` key to ``dataset``
+
+```yaml
+my_dataset:
+    type: MlflowArtifactDataset
+    dataset:
+        type: ...
+```
+
+4. If you use ``KedroPipelineModel`` or ``pipeline_ml_factory``, the default ``copy_mode`` is now  ``assign``because this is the most efficient setup (and usually the desired one) when serving a Kedro Pipeline as a Mlflow model. To get back to the previous ``deepcopy`` mode, change the entry to:
+
+```python
+pipeline_ml_factory(
+    training=training_pipeline,
+    inference=inference_pipeline,
+    kpm_kwargs=dict(copy_mode="deepcopy"),
+)
+```
+
+
 ## Migration from 0.10.x to 0.11.x
 
-1. If you are registering your ``kedro_mlflow`` hooks manually (instead of using automatic registeringfrom plugin, which is the default), change your ``settings.py``
+1. If you are registering your ``kedro_mlflow`` hooks manually (instead of using automatic registering from plugin, which is the default), change your ``settings.py``
 
-from this
+from this:
 
 ```python
 # <your_project>/src/<your_project>/settings.py
 from kedro_mlflow.framework.hooks import MlflowHook
 
-HOOKS = (MlflowPipelineHook(), MlflowNodeHook)
+HOOKS = (MlflowPipelineHook(), MlflowNodeHook())
 ```
 
 to this:
@@ -20,7 +63,7 @@ to this:
 # <your_project>/src/<your_project>/settings.py
 from kedro_mlflow.framework.hooks import MlflowHook
 
-HOOKS = (MlflowHook,)
+HOOKS = (MlflowHook(),)
 ```
 
 2. The `get_mlflow_config` public method has been removed and the mlflow configuration is now automatically stored in the ``mlflow`` attribute of ``KedroContext``. if you need to access the mlflow configuration, you can use:
@@ -41,7 +84,7 @@ with KedroSession.create(
 
 ## Migration from 0.9.x to 0.10.x
 
-You must upgrade your kedro version to ``kedro==0.18.1`` to use ``kedro_mlflow>=0.10``.
+You must upgrade your kedro version to ``kedro>=0.18.1`` to use ``kedro_mlflow>=0.10``.
 
 ## Migration from 0.8.x to 0.9.x
 

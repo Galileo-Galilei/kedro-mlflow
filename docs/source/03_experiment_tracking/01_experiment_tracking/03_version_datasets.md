@@ -10,7 +10,7 @@ Mlflow defines artifacts as "any data a user may want to track during code execu
 Artifacts are a very flexible and convenient way to "bind" any data type to your code execution. Mlflow has a two-step process for such binding:
 
 1. Persist the data locally in the desired file format
-2. Upload the data to the [artifact store](./01_configuration.html)
+2. Upload the data to the [artifact store](https://kedro-mlflow.readthedocs.io/en/latest/source/03_experiment_tracking/01_experiment_tracking/01_configuration.html)
 
 ## How to track data in a kedro project?
 

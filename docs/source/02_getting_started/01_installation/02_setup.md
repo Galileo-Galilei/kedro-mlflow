@@ -1,12 +1,12 @@
 # Initialize your Kedro project
 
-This section assume that [you have installed `kedro-mlflow` in your virtual environment](./01_installation.html).
+This section assume that [you have installed `kedro-mlflow` in your virtual environment](https://kedro-mlflow.readthedocs.io/en/latest/source/02_getting_started/01_installation/01_installation.html).
 
 ## Create a kedro project
 
 This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/get_started/new_project.html).
 
-If you do not have a real-world project, you can use a kedro example and [follow the "Quickstart in 1 mn" example](../02_quickstart/01_example_project.html) to make a demo of this plugin out of the box.
+If you do not have a real-world project, you can use a kedro example and [follow the "Quickstart in 1 mn" example](https://kedro-mlflow.readthedocs.io/en/latest/source/02_getting_started/02_quickstart/01_example_project.html) to make a demo of this plugin out of the box.
 
 ## Activate `kedro-mlflow` in your kedro project
 
@@ -15,7 +15,7 @@ In order to use the ``kedro-mlflow`` plugin, you need to setup its configuration
 ### Setting up the ``kedro-mlflow`` configuration file
 
 
-``kedro-mlflow`` is [configured](../../05_API/01_python_objects/05_Configuration.html) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the ``kedro-mlflow`` CLI](../../05_API/01_python_objects/04_CLI.html), but you can create it manually.
+``kedro-mlflow`` is [configured](https://kedro-mlflow.readthedocs.io/en/latest/source//05_API/01_python_objects/05_Configuration.html) through an ``mlflow.yml`` file. The recommended way to initialize the `mlflow.yml` is by using [the ``kedro-mlflow`` CLI](https://kedro-mlflow.readthedocs.io/en/latest/source/05_API/01_python_objects/04_CLI.html), but you can create it manually.
 
 ```{note}
 Since ``kedro-mlflow>=0.11.2``, the configuration file is optional. However, the plugin will use default ``mlflow`` configuration. Specifically, the runs will be stored in a ``mlruns`` folder at the root fo the kedro project since no ``mlflow_tracking_uri`` is configured.

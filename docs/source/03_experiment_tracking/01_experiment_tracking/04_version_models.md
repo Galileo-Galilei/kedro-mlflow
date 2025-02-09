@@ -21,7 +21,7 @@ my_sklearn_model:
     flavor: mlflow.sklearn
 ```
 
-More informations on available parameters are available in the [dedicated section](../../05_API/01_python_objects/01_Datasets.html#mlflowmodeltrackingdataset).
+More informations on available parameters are available in the [dedicated section](https://kedro-mlflow.readthedocs.io/en/latest/source/05_API/01_python_objects/01_Datasets.html#mlflowmodeltrackingdataset).
 
 You are now able to use ``my_sklearn_model`` in your nodes. Since this model is registered in mlflow, you can also leverage the [mlflow model serving abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-serve) or [predicting on batch abilities](https://www.mlflow.org/docs/latest/cli.html#mlflow-models-predict), as well as the [mlflow models registry](https://www.mlflow.org/docs/latest/model-registry.html) to manage the lifecycle of this model.
 

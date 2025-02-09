@@ -2,7 +2,7 @@
 
 ## Automatic parameters tracking
 
-Parameters tracking is automatic when the ``MlflowHook`` is added to [the hook list of the ``ProjectContext``](../../02_getting_started/01_installation/02_setup.html). The `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](../../05_API/01_python_objects/02_Hooks.html).
+Parameters tracking is automatic when the ``MlflowHook`` is added to [the hook list of the ``ProjectContext``](https://kedro-mlflow.readthedocs.io/en/latest/source/02_getting_started/01_installation/02_setup.html). The `mlflow.yml` configuration file has a parameter called ``flatten_dict_params`` which enables to [log as distinct parameters the (key, value) pairs of a ```Dict`` parameter](https://kedro-mlflow.readthedocs.io/en/latest/source/05_API/01_python_objects/02_Hooks.html).
 
 You **do not need any additional configuration** to benefit from parameters versioning.
 

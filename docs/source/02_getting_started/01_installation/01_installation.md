@@ -46,13 +46,20 @@ There are versions of the plugin compatible up to ``kedro>=0.16.0`` and ``mlflow
 
 ::::{tab-set}
 
-:::{tab-item} Install with pip
+:::{tab-item} Install with pip / uv
 
 You can install ``kedro-mlflow`` plugin from ``PyPi`` with `pip`:
 
 ```console
 pip install --upgrade kedro-mlflow
 ```
+
+If you prefer uv and have it installed, you can use:
+
+```console
+uv pip install --upgrade kedro-mlflow
+```
+
 
 :::
 

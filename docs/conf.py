@@ -16,11 +16,14 @@
 
 
 # -- Project information -----------------------------------------------------
+from datetime import datetime
+
 from kedro_mlflow import __version__ as km_version
 
 project = "kedro-mlflow"
-copyright = "2020, Yolan Honoré-Rougé"
+copyright = f"{datetime.today().year}, Yolan Honoré-Rougé"
 author = "Yolan Honoré-Rougé"
+
 
 # The full version, including alpha/beta/rc tags
 release = km_version

@@ -6,6 +6,10 @@
 
 -   :memo: Change documentation theme to [the pydata sphinx theme](https://pydata-sphinx-theme.readthedocs.io/en/stable/#), and refactor sections to make them clearer  ([#621](https://github.com/Galileo-Galilei/kedro-mlflow/pull/621))
 
+### Fixed
+
+-   :bug: Fix a regression introduced by ``0.13.4`` and enable again to load an artifact from a different ``run_id`` ([#622](https://github.com/Galileo-Galilei/kedro-mlflow/issues/622)).  
+
 ## [0.14.0] - 2025-01-28
 
 ### Added

@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+## [0.14.1] - 2025-02-12
+
 ### Changed
 
 -   :memo: Change documentation theme to [the pydata sphinx theme](https://pydata-sphinx-theme.readthedocs.io/en/stable/#), and refactor sections to make them clearer  ([#621](https://github.com/Galileo-Galilei/kedro-mlflow/pull/621))
 
 ### Fixed
 
--   :bug: Fix a regression introduced by ``0.13.4`` and enable again to load an artifact from a different ``run_id`` ([#622](https://github.com/Galileo-Galilei/kedro-mlflow/issues/622)).  
+-   :bug: Fix a regression introduced by `0.13.4` and enable again to load an artifact from a different `run_id` ([#622](https://github.com/Galileo-Galilei/kedro-mlflow/issues/622)).  
 
 ## [0.14.0] - 2025-01-28
 
@@ -545,7 +547,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.1...HEAD
+
+[0.14.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.0...0.14.1
 
 [0.14.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.13.4...0.14.0
 

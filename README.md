@@ -68,7 +68,7 @@ This package is still in active development. We use [SemVer](https://semver.org/
 
 The user must be aware that we will not reach `1.0.0` milestone before Kedro does (mlflow has already reached `1.0.0`). **That said, the API is considered as stable from 0.8.0 version and user can reliably consider that no consequent breaking change will happen unless necessary for Kedro compatibility (e.g. for minor or major Kedro version).**
 
-If you want to migrate from an older version of `kedro-mlflow` to most recent ones, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/latest/source/02_getting_started/01_installation/03_migration_guide.html).
+If you want to migrate from an older version of `kedro-mlflow` to most recent ones, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/latest/source/06_migration_guide/index.html).
 
 
 # Can I contribute?

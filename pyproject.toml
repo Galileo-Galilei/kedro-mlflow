@@ -191,6 +191,3 @@ filename = "kedro_mlflow/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "README.md"
-
-[[tool.bumpversion.files]]
-filename = "docs/source/02_installation/01_installation.md"

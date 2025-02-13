@@ -42,11 +42,11 @@ Package any kedro pipeline to a **custom mlflow model** for deployment and servi
 
 ## Resources
 
-::::{grid} 1 1 3 3
+::::{grid} 1 1 4 4
 :gutter: 3
 
 :::{grid-item-card}
-:link: source/02_gettnig_started/01_installation/01_installation.html
+:link: source/02_getting_started/01_installation/01_installation.html
 :link-type: url
 :class-header: bg-light
 
@@ -66,7 +66,7 @@ Try out {fas}`arrow-right fa-xl`
 {fas}`fa-solid fa-chalkboard-user fa-xl;pst-color-primary` Advanced tutorial
 ^^^
 
-The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as a mlops framework!
+The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as an MLOps framework!
 
 +++
 Try on github {fab}`github;fa-xl`
@@ -83,9 +83,21 @@ Try on github {fab}`github;fa-xl`
 A youtube video by the kedro team to introduce the plugin, with live coding.
 
 +++
-See on youtube {fab}`youtube;fa-xl`
+Watch on youtube {fab}`youtube;fa-xl`
 :::
 
+:::{grid-item-card}
+:link: https://youtu.be/mIfJR3CdBUE
+:link-type: url
+:class-header: bg-light
+
+{fas}`fa-solid fa-video fa-xl;pst-color-primary` Tackling the ML Reproducibility Curse
+^^^
+
+A community video showcasing the power of the Kedro-MLflow plugin.
++++
+Watch on YouTube {fab}`youtube;fa-xl`
+:::
 ::::
 
 ```{toctree}

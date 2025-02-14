@@ -184,13 +184,10 @@ docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
 [tool.bumpversion]
-current_version = "0.14.0"
+current_version = "0.14.1"
 
 [[tool.bumpversion.files]]
 filename = "kedro_mlflow/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "README.md"
-
-[[tool.bumpversion.files]]
-filename = "docs/source/02_installation/01_installation.md"

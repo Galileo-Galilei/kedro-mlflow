@@ -141,4 +141,8 @@ debug/
 *.xlsx
 *.pptx
 
-docs/source/05_framework_ml/05_example_project_step_by_step.md
+# uv
+
+uv.lock
+
+# End of .gitignore

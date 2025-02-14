@@ -193,3 +193,24 @@ def test_pyfunc_flavor_python_model_save_and_load(
     loaded_model.predict(pd.DataFrame(data=[1], columns=["a"])) == pd.DataFrame(
         data=[2], columns=["a"]
     )
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        None,
+        {"description": "My awsome dataset"},
+        {"string": "bbb", "int": 0},
+    ),
+)
+def test_metrics_history_dataset_with_metadata(metadata):
+    mlflow_model_ds = MlflowModelLocalFileSystemDataset(
+        flavor="mlflow.sklearn",
+        filepath="/my/file/path",
+        metadata=metadata,
+    )
+
+    assert mlflow_model_ds.metadata == metadata
+
+    # Metadata should not show in _describe
+    assert "metadata" not in mlflow_model_ds._describe()

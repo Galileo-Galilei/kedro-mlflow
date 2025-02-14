@@ -14,13 +14,14 @@ class MlflowMetricHistoryDataset(MlflowAbstractMetricDataset):
         run_id: str = None,
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
+        metadata: Dict[str, Any] | None = None,
     ):
         """Initialise MlflowMetricDataset.
         Args:
             run_id (str): The ID of the mlflow run where the metric should be logged
         """
 
-        super().__init__(key, run_id, load_args, save_args)
+        super().__init__(key, run_id, load_args, save_args, metadata)
 
     def _load(self):
         self._validate_run_id()

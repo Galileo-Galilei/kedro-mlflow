@@ -20,6 +20,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
         version: Version = None,
+        metadata: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the Kedro MlflowAbstractModelDataSet.
 
@@ -39,6 +40,8 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
             save_args (Dict[str, Any], optional): Arguments to `log_model`
                 function from specified `flavor`. Defaults to {}.
             version (Version, optional): Specific version to load.
+            metadata: Any arbitrary metadata.
+                This is ignored by Kedro, but may be consumed by users or external plugins.
 
         Raises:
             DatasetError: When passed `flavor` does not exist.
@@ -61,6 +64,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
 
         self._load_args = load_args or {}
         self._save_args = save_args or {}
+        self.metadata = metadata
 
         try:
             self._mlflow_model_module

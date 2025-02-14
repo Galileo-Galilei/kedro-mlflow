@@ -21,6 +21,7 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
         save_args: Dict[str, Any] = None,
         log_args: Dict[str, Any] = None,
         version: Version = None,
+        metadata: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the Kedro MlflowModelDataSet.
 
@@ -40,6 +41,9 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
             save_args (Dict[str, Any], optional): Arguments to `save_model`
                 function from specified `flavor`. Defaults to None.
             version (Version, optional): Kedro version to use. Defaults to None.
+            metadata: Any arbitrary metadata.
+                This is ignored by Kedro, but may be consumed by users or external plugins.
+
         Raises:
             DatasetError: When passed `flavor` does not exist.
         """
@@ -50,6 +54,7 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
             load_args=load_args,
             save_args=save_args,
             version=version,
+            metadata=metadata,
         )
 
     def _load(self) -> Any:

@@ -156,3 +156,23 @@ def test_mlflow_model_registry_load_given_alias(tmp_path, monkeypatch):
     ml_ds = MlflowModelRegistryDataset(model_name="demo_model", alias="champion")
     loaded_model = ml_ds.load()
     assert loaded_model.metadata.run_id == runs[1]
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        None,
+        {"description": "My awsome dataset"},
+        {"string": "bbb", "int": 0},
+    ),
+)
+def test_metrics_history_dataset_with_metadata(tmp_path, metadata):
+    mlflow_model_ds = MlflowModelRegistryDataset(
+        model_name="demo_model",
+        metadata=metadata,
+    )
+
+    assert mlflow_model_ds.metadata == metadata
+
+    # Metadata should not show in _describe
+    assert "metadata" not in mlflow_model_ds._describe()

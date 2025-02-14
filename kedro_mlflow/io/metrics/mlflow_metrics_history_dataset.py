@@ -18,6 +18,7 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         self,
         run_id: str = None,
         prefix: Optional[str] = None,
+        metadata: Dict[str, Any] | None = None,
     ):
         """Initialise MlflowMetricsHistoryDataset.
 
@@ -28,6 +29,7 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         self._prefix = prefix
         self.run_id = run_id
         self._logging_activated = True  # by default, logging is activated!
+        self.metadata = metadata
 
     @property
     def run_id(self):

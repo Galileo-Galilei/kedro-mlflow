@@ -19,6 +19,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         run_id: str = None,
         artifact_path: str = None,
         credentials: Dict[str, Any] = None,
+        metadata: Dict[str, Any] | None = None,
     ):
         dataset_obj, dataset_args = parse_dataset_definition(config=dataset)
 
@@ -27,11 +28,12 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         # instead and since we can't modify the core package,
         # we create a subclass which inherits dynamically from the dataset class
         class MlflowArtifactDatasetChildren(dataset_obj):
-            def __init__(self, run_id, artifact_path):
+            def __init__(self, run_id, artifact_path, metadata):
                 super().__init__(**dataset_args)
                 self.run_id = run_id
                 self.artifact_path = artifact_path
                 self._logging_activated = True
+                self.metadata = metadata
 
             @property
             def _logging_activated(self):
@@ -147,7 +149,9 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         )
 
         mlflow_dataset_instance = MlflowArtifactDatasetChildren(
-            run_id=run_id, artifact_path=artifact_path
+            run_id=run_id,
+            artifact_path=artifact_path,
+            metadata=metadata,
         )
         return mlflow_dataset_instance
 

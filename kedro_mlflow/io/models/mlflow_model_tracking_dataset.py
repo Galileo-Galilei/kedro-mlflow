@@ -19,6 +19,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         pyfunc_workflow: Optional[str] = None,
         load_args: Optional[Dict[str, Any]] = None,
         save_args: Optional[Dict[str, Any]] = None,
+        metadata: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the Kedro MlflowModelDataSet.
 
@@ -40,6 +41,8 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
                 function from specified `flavor`. Defaults to None.
             save_args (Dict[str, Any], optional): Arguments to `log_model`
                 function from specified `flavor`. Defaults to None.
+            metadata: Any arbitrary metadata.
+                This is ignored by Kedro, but may be consumed by users or external plugins.
 
         Raises:
             DatasetError: When passed `flavor` does not exist.
@@ -51,6 +54,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             load_args=load_args,
             save_args=save_args,
             version=None,
+            metadata=metadata,
         )
 
         self._run_id = run_id

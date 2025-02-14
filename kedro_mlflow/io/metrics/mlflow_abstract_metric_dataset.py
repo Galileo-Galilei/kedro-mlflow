@@ -12,6 +12,7 @@ class MlflowAbstractMetricDataset(AbstractDataset):
         run_id: str = None,
         load_args: Dict[str, Any] = None,
         save_args: Dict[str, Any] = None,
+        metadata: Dict[str, Any] | None = None,
     ):
         """Initialise MlflowMetricsHistoryDataset.
 
@@ -24,6 +25,7 @@ class MlflowAbstractMetricDataset(AbstractDataset):
         self._load_args = load_args or {}
         self._save_args = save_args or {}
         self._logging_activated = True  # by default, logging is activated!
+        self.metadata = metadata
 
     @property
     def run_id(self) -> Union[str, None]:

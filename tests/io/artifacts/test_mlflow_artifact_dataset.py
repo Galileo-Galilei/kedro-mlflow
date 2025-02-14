@@ -376,3 +376,23 @@ def test_artifact_dataset_legacy_dataset(tmp_path, mlflow_client, df1):
     remote_path = (Path("artifact_dir") / filepath.name).as_posix()
     assert remote_path in run_artifacts
     assert df1.equals(mlflow_dataset.load())
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        None,
+        {"description": "My awsome dataset"},
+        {"string": "bbb", "int": 0},
+    ),
+)
+def test_artifact_dataset_with_metadata(metadata):
+    mlflow_csv_dataset = MlflowArtifactDataset(
+        dataset=dict(type=CSVDataset, filepath="/my/file/path"),
+        metadata=metadata,
+    )
+
+    assert mlflow_csv_dataset.metadata == metadata
+
+    # Metadata should not show in _describe
+    assert "metadata" not in mlflow_csv_dataset._describe()

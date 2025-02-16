@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: :construction_worker: Ensure `mlflow.yml` is package with the package distribution so that `kedro mlflow init` can find it ([[#635](https://github.com/Galileo-Galilei/kedro-mlflow/issues/635)]).
+
 ## [0.14.1] - 2025-02-12
 
 ### Changed

@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [0.14.2] - 2025-02-16
+
 ### Fixed
 
-- :bug: :construction_worker: Ensure `mlflow.yml` is package with the package distribution so that `kedro mlflow init` can find it ([[#635](https://github.com/Galileo-Galilei/kedro-mlflow/issues/635)]).
+-   :bug: :construction_worker: Ensure `mlflow.yml` is package with the package distribution so that `kedro mlflow init` can find it (\[[#635](https://github.com/Galileo-Galilei/kedro-mlflow/issues/635)]).
 
 ## [0.14.1] - 2025-02-12
 
@@ -551,7 +553,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.2...HEAD
+
+[0.14.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.1...0.14.2
 
 [0.14.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.0...0.14.1
 

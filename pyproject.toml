@@ -2,7 +2,7 @@
 
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ["setuptools>=65.5.1"]  # PEP 518 specifications
+requires = ["setuptools>=65.5.1", "setuptools-scm>=8.0"]  # PEP 518 specifications
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -94,7 +94,7 @@ zip-safe = false
 include = ["kedro_mlflow*"]
 
 [tool.setuptools.package-data]
-kedro_mlflow = ["py.typed"]
+kedro_mlflow = ["py.typed", "*.yml"]
 
 [tool.setuptools.dynamic]
 readme = {file = "README.md", content-type = "text/markdown"}

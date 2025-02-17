@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: All datasets can now take a metadata parameter ([#625](https://github.com/Galileo-Galilei/kedro-mlflow/issues/625), [#633](https://github.com/Galileo-Galilei/kedro-mlflow/pull/633))
+
 ## [0.14.2] - 2025-02-16
 
 ### Fixed

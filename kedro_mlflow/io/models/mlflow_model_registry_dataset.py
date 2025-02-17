@@ -19,6 +19,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         flavor: Optional[str] = "mlflow.pyfunc",
         pyfunc_workflow: Optional[str] = "python_model",
         load_args: Optional[Dict[str, Any]] = None,
+        metadata: Dict[str, Any] | None = None,
     ) -> None:
         """Initialize the Kedro MlflowModelRegistryDataset.
 
@@ -37,6 +38,8 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
             load_args (Dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to None.
+            metadata: Any arbitrary metadata.
+                This is ignored by Kedro, but may be consumed by users or external plugins.
 
         Raises:
             DatasetError: When passed `flavor` does not exist.
@@ -48,6 +51,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             load_args=load_args,
             save_args={},
             version=None,
+            metadata=metadata,
         )
 
         if alias is None and stage_or_version is None:

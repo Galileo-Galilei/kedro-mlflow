@@ -364,3 +364,23 @@ def test_mlflow_model_tracking_logging_deactivation_is_bool():
 
     with pytest.raises(ValueError, match="_logging_activated must be a boolean"):
         mlflow_model_tracking_dataset._logging_activated = "hello"
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        None,
+        {"description": "My awsome dataset"},
+        {"string": "bbb", "int": 0},
+    ),
+)
+def test_metrics_history_dataset_with_metadata(metadata):
+    mlflow_model_ds = MlflowModelTrackingDataset(
+        flavor="mlflow.sklearn",
+        metadata=metadata,
+    )
+
+    assert mlflow_model_ds.metadata == metadata
+
+    # Metadata should not show in _describe
+    assert "metadata" not in mlflow_model_ds._describe()

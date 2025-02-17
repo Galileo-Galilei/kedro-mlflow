@@ -68,3 +68,23 @@ def test_mlflow_metric_history_dataset_logging_deactivation(mlflow_tracking_uri)
     with mlflow.start_run():
         metric_ds.save([0.1])
         assert metric_ds._exists() is False
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    (
+        None,
+        {"description": "My awsome dataset"},
+        {"string": "bbb", "int": 0},
+    ),
+)
+def test_metric_history_dataset_with_metadata(tmp_path, metadata):
+    metric_ds = MlflowMetricHistoryDataset(
+        key="hello",
+        metadata=metadata,
+    )
+
+    assert metric_ds.metadata == metadata
+
+    # Metadata should not show in _describe
+    assert "metadata" not in metric_ds._describe()

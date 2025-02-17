@@ -310,7 +310,7 @@ class MlflowHook:
                 self._logger.info(
                     f"Restarting mlflow run '{mlflow.active_run().info.run_name}' - '{self.run_id}' at node level for multi-threading"
                 )
-            except Exception as err:
+            except Exception as err:  # pragma: no cover
                 if f"Run with UUID {self.run_id} is already active" in str(err):
                     # This means that the run was started before in the same thread, likely at the beginning of another node
                     pass

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.14.3] - 2025-02-17
+
 ### Added
 
 -   :sparkles: All datasets can now take a metadata parameter ([#625](https://github.com/Galileo-Galilei/kedro-mlflow/issues/625), [#633](https://github.com/Galileo-Galilei/kedro-mlflow/pull/633))
@@ -561,7 +563,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.2...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.3...HEAD
+
+[0.14.3]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.2...0.14.3
 
 [0.14.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.1...0.14.2
 

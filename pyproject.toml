@@ -2,7 +2,7 @@
 
 [build-system]
 # Minimum requirements for the build system to execute.
-requires = ["setuptools>=65.5.1"]  # PEP 518 specifications
+requires = ["setuptools>=65.5.1", "setuptools-scm>=8.0"]  # PEP 518 specifications
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -55,7 +55,7 @@ test = [
     "pytest-lazy-fixtures>=1.0.0, <2.0.0", # pytest==8.0.0 breaks pytest-lazy-fixture (without final S) : https://github.com/TvoroG/pytest-lazy-fixture/issues/65
     "pytest-mock>=3.1.0, <4.0.0",
     "pytest-xdist>=3.0.0,<4.0.0",  # mess up the test readibility in the console but is much faster for the CI with "-n auto" option
-    "ruff>=0.5.0,<0.9.0",  # ensure consistency with pre-commit
+    "ruff>=0.5.0,<0.10.0",  # ensure consistency with pre-commit
     "scikit-learn>=0.23.0, <1.7.0",
     "kedro-datasets[pandas.CSVDataSet]",
 ]
@@ -94,7 +94,7 @@ zip-safe = false
 include = ["kedro_mlflow*"]
 
 [tool.setuptools.package-data]
-kedro_mlflow = ["py.typed"]
+kedro_mlflow = ["py.typed", "*.yml"]
 
 [tool.setuptools.dynamic]
 readme = {file = "README.md", content-type = "text/markdown"}
@@ -184,7 +184,7 @@ docstring-code-format = false
 docstring-code-line-length = "dynamic"
 
 [tool.bumpversion]
-current_version = "0.14.1"
+current_version = "0.14.2"
 
 [[tool.bumpversion.files]]
 filename = "kedro_mlflow/__init__.py"

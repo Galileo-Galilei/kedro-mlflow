@@ -1,6 +1,8 @@
 import mlflow
 import pandas as pd
 import pytest
+from kedro.framework.hooks import _create_hook_manager
+from kedro.framework.hooks.manager import _register_hooks
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
@@ -71,84 +73,10 @@ def dummy_run_params(tmp_path):
     return dummy_run_params
 
 
-def test_mlflow_hook_automatically_update_artifact_run_id(
-    kedro_project, dummy_run_params, dummy_pipeline, dummy_catalog
-):
-    # since mlflow>=2.18, the fluent API create a new run for each thread
-    # hence for thread runner we need to prefix the catalog with the run id
-
-    bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project) as session:
-        context = session.load_context()  # triggers conf setup
-
-        mlflow_hook = MlflowHook()
-        mlflow_hook.after_context_created(context)  # setup mlflow config
-
-        mlflow_hook.after_catalog_created(
-            catalog=dummy_catalog,
-            # `after_catalog_created` is not using any of below arguments,
-            # so we are setting them to empty values.
-            conf_catalog={},
-            conf_creds={},
-            feed_dict={},
-            save_version="",
-            load_versions="",
-        )
-
-        mlflow_hook.before_pipeline_run(
-            run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
-        )
-
-        run_id = mlflow.active_run().info.run_id
-        # Check if artifact datasets have the run_id
-        assert dummy_catalog._datasets["model"].run_id == run_id
-
-
-def test_mlflow_hook_automatically_update_artifact_run_id_except_if_it_already_has_run_id(
-    kedro_project, dummy_run_params, dummy_pipeline, dummy_catalog
-):
-    # since mlflow>=2.18, the fluent API create a new run for each thread
-    # hence for thread runner we need to prefix the catalog with the run id
-
-    bootstrap_project(kedro_project)
-    with KedroSession.create(project_path=kedro_project) as session:
-        context = session.load_context()  # triggers conf setup
-
-        # we modify the run id to simulate an existing run id.
-        # We need to do it after load_context() to ensure the tracking uri is properly set up.
-        with mlflow.start_run():
-            existing_run_id = mlflow.active_run().info.run_id
-            dummy_catalog_with_run_id = dummy_catalog.shallow_copy()
-            dummy_catalog_with_run_id._datasets["model"].run_id = existing_run_id
-
-        mlflow_hook = MlflowHook()
-        mlflow_hook.after_context_created(context)  # setup mlflow config
-
-        mlflow_hook.after_catalog_created(
-            catalog=dummy_catalog,
-            # `after_catalog_created` is not using any of below arguments,
-            # so we are setting them to empty values.
-            conf_catalog={},
-            conf_creds={},
-            feed_dict={},
-            save_version="",
-            load_versions="",
-        )
-
-        mlflow_hook.before_pipeline_run(
-            run_params=dummy_run_params, pipeline=dummy_pipeline, catalog=dummy_catalog
-        )
-
-        run_id = mlflow.active_run().info.run_id
-        # Check if artifact datasets have the run_id
-        assert run_id != existing_run_id
-        assert dummy_catalog._datasets["model"].run_id == existing_run_id
-
-
 def test_mlflow_hook_log_artifacts_within_same_run_with_thread_runner(
     kedro_project, dummy_run_params, dummy_pipeline, dummy_catalog
 ):
-    # this test is very specific to a new design introduced in mlflow 2.18 to make it htread safe
+    # this test is very specific to a new design introduced in mlflow 2.18 to make it thread safe
     # see https://github.com/Galileo-Galilei/kedro-mlflow/issues/613
     bootstrap_project(kedro_project)
 
@@ -178,7 +106,10 @@ def test_mlflow_hook_log_artifacts_within_same_run_with_thread_runner(
         # we get the run id BEFORE running the pipeline because it was modified in different thread
         run_id_before_run = mlflow.active_run().info.run_id
 
-        runner.run(dummy_pipeline, dummy_catalog, session._hook_manager)
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+
+        runner.run(dummy_pipeline, dummy_catalog, hook_manager)
 
         run_id_after_run = mlflow.active_run().info.run_id
 

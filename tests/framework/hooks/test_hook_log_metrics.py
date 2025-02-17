@@ -1,6 +1,8 @@
 import mlflow
 import pandas as pd
 import pytest
+from kedro.framework.hooks import _create_hook_manager
+from kedro.framework.hooks.manager import _register_hooks
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
@@ -219,7 +221,10 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
             pipeline=dummy_pipeline,
             catalog=dummy_catalog_with_run_id,
         )
-        runner.run(dummy_pipeline, dummy_catalog_with_run_id, session._hook_manager)
+
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(dummy_pipeline, dummy_catalog_with_run_id, hook_manager)
 
         current_run_id = mlflow.active_run().info.run_id
 

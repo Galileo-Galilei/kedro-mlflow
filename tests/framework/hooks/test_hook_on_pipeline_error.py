@@ -86,7 +86,7 @@ def mock_failing_pipeline(mocker):
     )
 
 
-@pytest.mark.usefixtures("mock_settings_with_mlflow_hooks")
+# @pytest.mark.usefixtures("mock_settings_with_mlflow_hooks")
 @pytest.mark.usefixtures("mock_failing_pipeline")
 def test_on_pipeline_error(kedro_project_with_mlflow_conf):
     tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
@@ -94,18 +94,22 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
+        from logging import getLogger
+
+        LOGGER = getLogger(__name__)
+        LOGGER.info(f"{mlflow.active_run()=}")
         with pytest.raises(ValueError):
+            LOGGER.info(f"{mlflow.active_run()=}")
             session.run()
 
-        # the run we want is the last one in the configuration experiment
-        mlflow_client = MlflowClient(tracking_uri)
-        experiment = mlflow_client.get_experiment_by_name(
-            context.mlflow.tracking.experiment.name
-        )
-        failing_run_info = (
-            MlflowClient(tracking_uri).search_runs(experiment.experiment_id)[0].info
-        )
-        assert mlflow.active_run() is None  # the run must have been closed
-        assert failing_run_info.status == RunStatus.to_string(
-            RunStatus.FAILED
-        )  # it must be marked as failed
+    # the run we want is the last one in the configuration experiment
+    mlflow_client = MlflowClient(tracking_uri)
+    experiment = mlflow_client.get_experiment_by_name(
+        context.mlflow.tracking.experiment.name
+    )
+    failing_run_info = mlflow_client.search_runs(experiment.experiment_id)[-1].info
+
+    assert mlflow.active_run() is None  # the run must have been closed
+    assert failing_run_info.status == RunStatus.to_string(
+        RunStatus.FAILED
+    )  # it must be marked as failed

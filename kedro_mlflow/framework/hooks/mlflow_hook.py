@@ -27,9 +27,6 @@ from kedro_mlflow.framework.hooks.utils import (
     _flatten_dict,
     _generate_kedro_command,
 )
-from kedro_mlflow.io.catalog.add_run_id_to_artifact_datasets import (
-    add_run_id_to_artifact_datasets,
-)
 from kedro_mlflow.io.catalog.switch_catalog_logging import switch_catalog_logging
 from kedro_mlflow.io.metrics import (
     MlflowMetricDataset,
@@ -47,6 +44,7 @@ class MlflowHook:
         self.recursive = True
         self.sep = "."
         self.long_parameters_strategy = "fail"
+        self.run_id = None  # we store the run_id because the hook is stateful and we need to keep track of the active run between the different threads
 
     @property
     def _logger(self) -> Logger:
@@ -242,8 +240,9 @@ class MlflowHook:
             )
 
             if self._already_active_mlflow:
+                self.run_id = mlflow.active_run().info.run_id
                 self._logger.warning(
-                    f"A mlflow run was already active (run_id='{mlflow.active_run().info.run_id}') before the KedroSession was started. This run will be used for logging."
+                    f"A mlflow run was already active (run_id='{self.run_id}') before the KedroSession was started. This run will be used for logging."
                 )
             else:
                 mlflow.start_run(
@@ -252,8 +251,9 @@ class MlflowHook:
                     run_name=run_name,
                     nested=self.mlflow_config.tracking.run.nested,
                 )
+                self.run_id = mlflow.active_run().info.run_id
                 self._logger.info(
-                    f"Mlflow run '{mlflow.active_run().info.run_id}' has started"
+                    f"Mlflow run '{mlflow.active_run().info.run_name}' - '{self.run_id}' has started"
                 )
             # Set tags only for run parameters that have values.
             mlflow.set_tags({k: v for k, v in run_params.items() if v})
@@ -274,12 +274,6 @@ class MlflowHook:
                 ),
             )
 
-            # This function ensures the run_id started at the beginning of the pipeline
-            # is associated to all the datasets. This is necessary because to make mlflow thread safe
-            # each call to the "active run" now creates a new run when started in a new thread. See
-            # https://github.com/Galileo-Galilei/kedro-mlflow/issues/613 and https://github.com/Galileo-Galilei/kedro-mlflow/pull/615
-            add_run_id_to_artifact_datasets(catalog, mlflow.active_run().info.run_id)
-
         else:
             self._logger.info(
                 "kedro-mlflow logging is deactivated for this pipeline in the configuration. This includes DataSets and parameters."
@@ -298,6 +292,30 @@ class MlflowHook:
             inputs: The dictionary of inputs dataset.
             is_async: Whether the node was run in ``async`` mode.
         """
+        if self.run_id is not None:
+            # Reopening the run ensures the run_id started at the beginning of the pipeline
+            # is used for all tracking. This is necessary because to bypass mlflow thread safety
+            # each call to the "active run" now creates a new run when started in a new thread. See
+            # https://github.com/Galileo-Galilei/kedro-mlflow/issues/613
+            # https://github.com/Galileo-Galilei/kedro-mlflow/pull/615
+            # https://github.com/Galileo-Galilei/kedro-mlflow/issues/623
+            # https://github.com/Galileo-Galilei/kedro-mlflow/issues/624
+
+            # If self.run_id is None, this means that the no run was ever started, i.e. that we have deactivated mlflow for this pipeline
+            try:
+                mlflow.start_run(
+                    run_id=self.run_id,
+                    nested=self.mlflow_config.tracking.run.nested,
+                )
+                self._logger.info(
+                    f"Restarting mlflow run '{mlflow.active_run().info.run_name}' - '{self.run_id}' at node level for multi-threading"
+                )
+            except Exception as err:
+                if f"Run with UUID {self.run_id} is already active" in str(err):
+                    # This means that the run was started before in the same thread, likely at the beginning of another node
+                    pass
+                else:
+                    raise err
 
         # only parameters will be logged. Artifacts must be declared manually in the catalog
         if self._is_mlflow_enabled:
@@ -467,8 +485,24 @@ class MlflowHook:
                     f"The run '{mlflow.active_run().info.run_id}' was already opened before launching 'kedro run' so it is not closed. You should close it manually."
                 )
             else:
+                # first, close all runs within the thread
                 while mlflow.active_run():
+                    current_run_id = mlflow.active_run().info.run_id
+                    self._logger.info(
+                        f"The run '{current_run_id}' was closed because of an error in the pipeline."
+                    )
                     mlflow.end_run(RunStatus.to_string(RunStatus.FAILED))
+                    pipeline_run_id_is_closed = current_run_id == self.run_id
+
+                # second, ensure that parent run in another thread is closed
+                if not pipeline_run_id_is_closed:
+                    self.mlflow_config.server._mlflow_client.set_terminated(
+                        self.run_id, RunStatus.to_string(RunStatus.FAILED)
+                    )
+                    self._logger.info(
+                        f"The parent run '{self.run_id}' was closed because of an error in the pipeline."
+                    )
+
         else:  # pragma: no cover
             # the catalog is supposed to be reloaded each time with _get_catalog,
             # hence it should not be modified. this is only a safeguard

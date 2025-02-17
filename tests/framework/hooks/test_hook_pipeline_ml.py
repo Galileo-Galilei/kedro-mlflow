@@ -3,6 +3,8 @@ import sys
 import mlflow
 import pandas as pd
 import pytest
+from kedro.framework.hooks import _create_hook_manager
+from kedro.framework.hooks.manager import _register_hooks
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
@@ -294,8 +296,11 @@ def test_mlflow_hook_save_pipeline_ml(
         mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
+
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
@@ -383,8 +388,10 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
         mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
@@ -438,8 +445,10 @@ def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
         mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
@@ -487,9 +496,9 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
         )
-        runner.run(
-            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
-        )
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_ml_with_parameters, catalog_with_parameters, hook_manager)
 
         current_run_id = mlflow.active_run().info.run_id
 
@@ -562,8 +571,10 @@ def test_mlflow_hook_save_pipeline_ml_with_signature(
         mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
@@ -621,8 +632,10 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
         mlflow_hook.before_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
-        runner.run(pipeline_to_run, dummy_catalog, session._hook_manager)
         run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
@@ -685,10 +698,10 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
             pipeline=pipeline_to_run,
             catalog=dummy_catalog_dataset_factory,
         )
-        runner.run(
-            pipeline_to_run, dummy_catalog_dataset_factory, session._hook_manager
-        )
         run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_to_run, dummy_catalog_dataset_factory, hook_manager)
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params,
             pipeline=pipeline_to_run,
@@ -730,11 +743,10 @@ def test_mlflow_hook_save_and_load_pipeline_ml_with_inference_parameters(
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
         )
-        runner.run(
-            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
-        )
-
         current_run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_ml_with_parameters, catalog_with_parameters, hook_manager)
 
         # This is what we want to test: parameters should be passed by defautl to the signature
         mlflow_hook.after_pipeline_run(
@@ -805,11 +817,10 @@ def test_mlflow_hook_save_and_load_pipeline_ml_specify_runner(
             pipeline=pipeline_ml_with_parameters,
             catalog=catalog_with_parameters,
         )
-        runner.run(
-            pipeline_ml_with_parameters, catalog_with_parameters, session._hook_manager
-        )
-
         current_run_id = mlflow.active_run().info.run_id
+        hook_manager = _create_hook_manager()
+        _register_hooks(hook_manager, (mlflow_hook,))
+        runner.run(pipeline_ml_with_parameters, catalog_with_parameters, hook_manager)
 
         # This is what we want to test: parameters should be passed by defautl to the signature
         mlflow_hook.after_pipeline_run(

@@ -33,7 +33,7 @@ def test_mlflow_yml_rendering(template_mlflowyml):
     expected_config = KedroMlflowConfig.construct(
         project_path="fake/path",
         tracking=dict(
-            disable_tracking=dict(pipelines=[]),
+            disable_tracking=dict(pipelines=[], disable_autologging=False),
             experiment=dict(name="fake_project", restore_if_deleted=True),
             params=dict(
                 dict_params=dict(flatten=False, recursive=True, sep="."),

@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- :sparkles: Add the ``tracking.disable_tracking.disable_autologging`` configuration option in ``mlflow.yml ``to disable autologging by default. This simplify the workflow for Databricks users who have autologging activated by default, which conflicts with the plugin([[#610](https://github.com/Galileo-Galilei/kedro-mlflow/issues/610)]).
+
 ## [0.14.3] - 2025-02-17
 
 ### Added

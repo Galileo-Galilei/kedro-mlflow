@@ -53,16 +53,21 @@ tracking:
   # in a new mlflow run
 
   disable_tracking:
+    disable_autologging: True  # If True, we force autologging to be disabled. This is useful on databricks with autologging by default which conflicts with the plugin. If False, we keep the default behaviour which is disable by default anayway.
     pipelines: []
 
   experiment:
     name: {{ python_package }}
+    create_experiment_kwargs: # will be used only if the experiment does not exist yet and is created.
+      artifact_location: null # enable to specify an artifact location for the experiment different than the global one for the mlflow server
+      tags: null  # a dict of tags for the experiment
     restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
 
   run:
     id: null # if `id` is None, a new run will be created
     name: null # if `name` is None, pipeline name will be used for the run name. You can use "${km.random_name:}" to generate a random name (mlflow's default)
     nested: True  # if `nested` is False, you won't be able to launch sub-runs inside your nodes
+
   params:
     dict_params:
       flatten: False  # if True, parameter which are dictionary will be splitted in multiple parameters when logged in mlflow, one for each key.
@@ -175,11 +180,12 @@ Mlflow enable the user to create "experiments" to organize his work. The differe
 ```yaml
 tracking:
   experiment:
-    name: <your-experiment-name>  # by default, the name of your python package in your kedro project
+    name: {{ python_package }}
+    create_experiment_kwargs: # will be used only if the experiment does not exist yet and is created.
+      artifact_location: null # enable to specify an artifact location for the experiment different than the global one for the mlflow server
+      tags: null  # a dict of tags for the experiment
     restore_if_deleted: True  # if the experiment`name` was previously deleted experiment, should we restore it?
 ```
-
-Note that by default, mlflow crashes if you try to start a run while you have not created the experiment first. `kedro-mlflow` has a `create` key (`True` by default) which forces the creation of the experiment if it does not exist. Set it to `False` to match mlflow default value.
 
 ### Configure the run
 
@@ -191,8 +197,8 @@ The `mlflow.yml` accepts the following keys:
 tracking:
   run:
     id: null # if `id` is None, a new run will be created
-    name: null # if `name` is None, pipeline name will be used for the run name
-    nested: True  # # if `nested` is False, you won't be able to launch sub-runs inside your nodes
+    name: null # if `name` is None, pipeline name will be used for the run name. You can use "${km.random_name:}" to generate a random name (mlflow's default)
+    nested: True  # if `nested` is False, you won't be able to launch sub-runs inside your nodes
 ```
 
 ```{tip}

@@ -1,6 +1,6 @@
 import shutil
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Optional, Union
 
 import mlflow
 from kedro.io import AbstractVersionedDataset
@@ -15,11 +15,11 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
 
     def __new__(
         cls,
-        dataset: Union[str, Dict],
+        dataset: Union[str, dict],
         run_id: str = None,
         artifact_path: str = None,
-        credentials: Dict[str, Any] = None,
-        metadata: Dict[str, Any] | None = None,
+        credentials: dict[str, Any] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ):
         dataset_obj, dataset_args = parse_dataset_definition(config=dataset)
 
@@ -169,7 +169,7 @@ class MlflowArtifactDataset(AbstractVersionedDataset):
         """
         pass
 
-    def _describe(self) -> Dict[str, Any]:  # pragma: no cover
+    def _describe(self) -> dict[str, Any]:  # pragma: no cover
         """
         MlflowArtifactDataset is a factory for DataSet
         and consequently does not implements abtracts methods

@@ -1,5 +1,5 @@
 from copy import deepcopy
-from typing import Any, Dict
+from typing import Any, Optional
 
 from mlflow.tracking import MlflowClient
 
@@ -16,9 +16,9 @@ class MlflowMetricDataset(MlflowAbstractMetricDataset):
         self,
         key: str = None,
         run_id: str = None,
-        load_args: Dict[str, Any] = None,
-        save_args: Dict[str, Any] = None,
-        metadata: Dict[str, Any] | None = None,
+        load_args: dict[str, Any] = None,
+        save_args: dict[str, Any] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ):
         """Initialise MlflowMetricDataset.
         Args:

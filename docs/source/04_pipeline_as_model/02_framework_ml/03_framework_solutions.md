@@ -24,7 +24,7 @@ from kedro_mlflow_tutorial.pipelines.ml_app.pipeline import create_ml_pipeline
 
 class ProjectHooks:
     @hook_impl
-    def register_pipelines(self) -> Dict[str, Pipeline]:
+    def register_pipelines(self) -> [str, Pipeline]:
         ml_pipeline = create_ml_pipeline()
 
         # convert your two pipelines to a PipelinML object

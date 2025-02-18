@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Any, Optional, Union
 
 import mlflow
 from kedro.io import AbstractDataset
@@ -10,9 +10,9 @@ class MlflowAbstractMetricDataset(AbstractDataset):
         self,
         key: str = None,
         run_id: str = None,
-        load_args: Dict[str, Any] = None,
-        save_args: Dict[str, Any] = None,
-        metadata: Dict[str, Any] | None = None,
+        load_args: dict[str, Any] = None,
+        save_args: dict[str, Any] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ):
         """Initialise MlflowMetricsHistoryDataset.
 
@@ -81,11 +81,11 @@ class MlflowAbstractMetricDataset(AbstractDataset):
         flag_exist = self.key in run.data.metrics.keys() if run else False
         return flag_exist
 
-    def _describe(self) -> Dict[str, Any]:
+    def _describe(self) -> dict[str, Any]:
         """Describe MLflow metrics dataset.
 
         Returns:
-            Dict[str, Any]: Dictionary with MLflow metrics dataset description.
+            dict[str, Any]: dictionary with MLflow metrics dataset description.
         """
         return {
             "key": self.key,

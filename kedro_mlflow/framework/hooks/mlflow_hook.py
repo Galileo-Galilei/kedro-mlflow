@@ -3,7 +3,7 @@ import re
 from logging import Logger, getLogger
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, Dict, Union
+from typing import Any, Union
 
 import mlflow
 from kedro.config import MissingConfigException
@@ -145,9 +145,9 @@ class MlflowHook:
     def after_catalog_created(
         self,
         catalog: DataCatalog,
-        conf_catalog: Dict[str, Any],
-        conf_creds: Dict[str, Any],
-        feed_dict: Dict[str, Any],
+        conf_catalog: dict[str, Any],
+        conf_creds: dict[str, Any],
+        feed_dict: dict[str, Any],
         save_version: str,
         load_versions: str,
     ):
@@ -197,7 +197,7 @@ class MlflowHook:
 
     @hook_impl
     def before_pipeline_run(
-        self, run_params: Dict[str, Any], pipeline: Pipeline, catalog: DataCatalog
+        self, run_params: dict[str, Any], pipeline: Pipeline, catalog: DataCatalog
     ) -> None:
         """Hook to be invoked before a pipeline runs.
         Args:
@@ -208,14 +208,14 @@ class MlflowHook:
                     "project_path": str,
                     "env": str,
                     "kedro_version": str,
-                    "tags": Optional[List[str]],
-                    "from_nodes": Optional[List[str]],
-                    "to_nodes": Optional[List[str]],
-                    "node_names": Optional[List[str]],
-                    "from_inputs": Optional[List[str]],
-                    "load_versions": Optional[List[str]],
+                    "tags": Optional[list[str]],
+                    "from_nodes": Optional[list[str]],
+                    "to_nodes": Optional[list[str]],
+                    "node_names": Optional[list[str]],
+                    "from_inputs": Optional[list[str]],
+                    "load_versions": Optional[list[str]],
                     "pipeline_name": str,
-                    "extra_params": Optional[Dict[str, Any]],
+                    "extra_params": Optional[dict[str, Any]],
                 }
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
@@ -282,7 +282,7 @@ class MlflowHook:
 
     @hook_impl
     def before_node_run(
-        self, node: Node, catalog: DataCatalog, inputs: Dict[str, Any], is_async: bool
+        self, node: Node, catalog: DataCatalog, inputs: dict[str, Any], is_async: bool
     ) -> None:
         """Hook to be invoked before a node runs.
         This hook logs all the parameters of the nodes in mlflow.
@@ -342,7 +342,7 @@ class MlflowHook:
             for k, v in params_inputs.items():
                 self._log_param(k, v)
 
-    def _log_param(self, name: str, value: Union[Dict, int, bool, str]) -> None:
+    def _log_param(self, name: str, value: Union[dict, int, bool, str]) -> None:
         str_value = str(value)
         str_value_length = len(str_value)
         if str_value_length <= MAX_PARAM_VAL_LENGTH:
@@ -368,7 +368,7 @@ class MlflowHook:
     @hook_impl
     def after_pipeline_run(
         self,
-        run_params: Dict[str, Any],
+        run_params: dict[str, Any],
         pipeline: Pipeline,
         catalog: DataCatalog,
     ) -> None:
@@ -381,14 +381,14 @@ class MlflowHook:
                     "project_path": str,
                     "env": str,
                     "kedro_version": str,
-                    "tags": Optional[List[str]],
-                    "from_nodes": Optional[List[str]],
-                    "to_nodes": Optional[List[str]],
-                    "node_names": Optional[List[str]],
-                    "from_inputs": Optional[List[str]],
-                    "load_versions": Optional[List[str]],
+                    "tags": Optional[list[str]],
+                    "from_nodes": Optional[list[str]],
+                    "to_nodes": Optional[list[str]],
+                    "node_names": Optional[list[str]],
+                    "from_inputs": Optional[list[str]],
+                    "load_versions": Optional[list[str]],
                     "pipeline_name": str,
-                    "extra_params": Optional[Dict[str, Any]],
+                    "extra_params": Optional[dict[str, Any]],
                 }
             pipeline: The ``Pipeline`` that was run.
             catalog: The ``DataCatalog`` used during the run.
@@ -451,7 +451,7 @@ class MlflowHook:
     def on_pipeline_error(
         self,
         error: Exception,
-        run_params: Dict[str, Any],
+        run_params: dict[str, Any],
         pipeline: Pipeline,
         catalog: DataCatalog,
     ):
@@ -467,14 +467,14 @@ class MlflowHook:
                      "project_path": str,
                      "env": str,
                      "kedro_version": str,
-                     "tags": Optional[List[str]],
-                     "from_nodes": Optional[List[str]],
-                     "to_nodes": Optional[List[str]],
-                     "node_names": Optional[List[str]],
-                     "from_inputs": Optional[List[str]],
-                     "load_versions": Optional[List[str]],
+                     "tags": Optional[list[str]],
+                     "from_nodes": Optional[list[str]],
+                     "to_nodes": Optional[list[str]],
+                     "node_names": Optional[list[str]],
+                     "from_inputs": Optional[list[str]],
+                     "load_versions": Optional[list[str]],
                      "pipeline_name": str,
-                     "extra_params": Optional[Dict[str, Any]]
+                     "extra_params": Optional[dict[str, Any]]
                    }
             pipeline: (Not used) The ``Pipeline`` that will was run.
             catalog: (Not used) The ``DataCatalog`` used during the run.

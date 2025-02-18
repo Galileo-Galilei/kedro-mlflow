@@ -4,7 +4,7 @@ from logging import getLogger
 from pathlib import Path
 from platform import python_version
 from tempfile import TemporaryDirectory
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 import click
 import mlflow
@@ -295,7 +295,7 @@ def modelify(
     flag_infer_input_example: Optional[bool],
     run_id: Optional[str],
     run_name: Optional[str],
-    copy_mode: Optional[Union[str, Dict[str, str]]],
+    copy_mode: Optional[Union[str, dict[str, str]]],
     artifact_path: str,
     code_path: str,
     conda_env: Optional[str],

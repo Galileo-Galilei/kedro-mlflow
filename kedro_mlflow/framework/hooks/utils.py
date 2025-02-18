@@ -1,5 +1,3 @@
-from typing import Dict
-
 from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 
 
@@ -43,7 +41,7 @@ def _generate_kedro_command(
     return kedro_cmd
 
 
-def _flatten_dict(d: Dict, recursive: bool = True, sep: str = ".") -> Dict:
+def _flatten_dict(d: dict, recursive: bool = True, sep: str = ".") -> dict:
     def expand(key, value):
         if isinstance(value, dict):
             new_value = (

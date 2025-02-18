@@ -14,7 +14,7 @@ Example within kedro template:
 from PYTHON_PACKAGE.pipelines import data_science as ds
 
 
-def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
+def create_pipelines(**kwargs) -> dict[str, Pipeline]:
     data_science_pipeline = ds.create_pipeline()
     training_pipeline = pipeline_ml_factory(
         training=data_science_pipeline.only_nodes_with_tags(

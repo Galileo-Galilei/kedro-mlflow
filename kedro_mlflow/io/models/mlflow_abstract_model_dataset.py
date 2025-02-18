@@ -1,7 +1,7 @@
 from importlib import import_module
 from importlib.util import find_spec
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from kedro.io import AbstractVersionedDataset, Version
 from kedro.io.core import DatasetError
@@ -17,10 +17,10 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
         filepath: str,
         flavor: str,
         pyfunc_workflow: Optional[str] = None,
-        load_args: Dict[str, Any] = None,
-        save_args: Dict[str, Any] = None,
+        load_args: dict[str, Any] = None,
+        save_args: dict[str, Any] = None,
         version: Version = None,
-        metadata: Dict[str, Any] | None = None,
+        metadata: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize the Kedro MlflowAbstractModelDataSet.
 
@@ -35,9 +35,9 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
                 Must be Python-importable.
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
-            load_args (Dict[str, Any], optional): Arguments to `load_model`
+            load_args (dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to {}.
-            save_args (Dict[str, Any], optional): Arguments to `log_model`
+            save_args (dict[str, Any], optional): Arguments to `log_model`
                 function from specified `flavor`. Defaults to {}.
             version (Version, optional): Specific version to load.
             metadata: Any arbitrary metadata.
@@ -100,7 +100,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
 
     # TODO: check with Kajetan what was originally intended here
     # @classmethod
-    # def _parse_args(cls, kwargs_dict: Dict[str, Any]) -> Dict[str, Any]:
+    # def _parse_args(cls, kwargs_dict: dict[str, Any]) -> dict[str, Any]:
     #     parsed_kargs = {}
     #     for key, value in kwargs_dict.items():
     #         if key.endswith("_args"):

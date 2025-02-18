@@ -1,14 +1,14 @@
 from functools import partial
 from itertools import chain
-from typing import Any, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Generator, Optional, Tuple, Union
 
 import mlflow
 from kedro.io import AbstractDataset, DatasetError
 from mlflow.tracking import MlflowClient
 
-MetricItem = Union[Dict[str, float], List[Dict[str, float]]]
+MetricItem = Union[dict[str, float], list[dict[str, float]]]
 MetricTuple = Tuple[str, float, int]
-MetricsDict = Dict[str, MetricItem]
+Metricsdict = dict[str, MetricItem]
 
 
 class MlflowMetricsHistoryDataset(AbstractDataset):
@@ -18,7 +18,7 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         self,
         run_id: str = None,
         prefix: Optional[str] = None,
-        metadata: Dict[str, Any] | None = None,
+        metadata: Optional[dict[str, Any]] = None,
     ):
         """Initialise MlflowMetricsHistoryDataset.
 
@@ -66,11 +66,11 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
             raise ValueError(f"_logging_activated must be a boolean, got {type(flag)}")
         self.__logging_activated = flag
 
-    def _load(self) -> MetricsDict:
+    def _load(self) -> Metricsdict:
         """Load MlflowMetricDataSet.
 
         Returns:
-            Dict[str, Union[int, float]]: Dictionary with MLflow metrics dataset.
+            dict[str, Union[int, float]]: dictionary with MLflow metrics dataset.
         """
         client = MlflowClient()
 
@@ -89,11 +89,11 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
 
         return dataset_metrics
 
-    def _save(self, data: MetricsDict) -> None:
+    def _save(self, data: Metricsdict) -> None:
         """Save given MLflow metrics dataset and log it in MLflow as metrics.
 
         Args:
-            data (MetricsDict): MLflow metrics dataset.
+            data (Metricsdict): MLflow metrics dataset.
         """
         client = MlflowClient()
         try:
@@ -128,11 +128,11 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         # )
         return any(self._is_dataset_metric(x) for x in all_metrics_keys)
 
-    def _describe(self) -> Dict[str, Any]:
+    def _describe(self) -> dict[str, Any]:
         """Describe MLflow metrics dataset.
 
         Returns:
-            Dict[str, Any]: Dictionary with MLflow metrics dataset description.
+            dict[str, Any]: dictionary with MLflow metrics dataset description.
         """
         return {
             "run_id": self._run_id,
@@ -149,16 +149,16 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
 
     # @staticmethod
     # def _update_metric(
-    #     metrics: List[mlflow.entities.Metric], dataset: MetricsDict = {}
-    # ) -> MetricsDict:
+    #     metrics: list[mlflow.entities.Metric], dataset: Metricsdict = {}
+    # ) -> Metricsdict:
     #     """Update metric in given dataset.
 
     #     Args:
-    #         metrics (List[mlflow.entities.Metric]): List with MLflow metric objects.
-    #         dataset (MetricsDict): Dictionary contains MLflow metrics dataset.
+    #         metrics (list[mlflow.entities.Metric]): list with MLflow metric objects.
+    #         dataset (Metricsdict): dictionary contains MLflow metrics dataset.
 
     #     Returns:
-    #         MetricsDict: Dictionary with MLflow metrics dataset.
+    #         Metricsdict: dictionary with MLflow metrics dataset.
     #     """
     #     for metric in metrics:
     #         metric_dict = {"step": metric.step, "value": metric.value}
@@ -173,13 +173,13 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
 
     @staticmethod
     def _convert_metric_history_to_list_or_dict(
-        metrics: List[mlflow.entities.Metric],
-    ) -> Dict[str, Dict[str, Union[float, List[float]]]]:
+        metrics: list[mlflow.entities.Metric],
+    ) -> dict[str, dict[str, Union[float, list[float]]]]:
         """Convert Mlflow metrics objects from MlflowClient().get_metric_history(run_id, key)
         to a list [{'step': x, 'value': y}, {'step': ..., 'value': ...}]
 
         Args:
-            metrics (List[mlflow.entities.Metric]): A list of MLflow Metrics retrieved from the run history
+            metrics (list[mlflow.entities.Metric]): A list of MLflow Metrics retrieved from the run history
         """
         metrics_as_list = [
             {"step": metric.step, "value": metric.value} for metric in metrics
@@ -203,7 +203,7 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
             value (MetricItem): Metric value
 
         Returns:
-            List[MetricTuple]: List with metrics as tuples.
+            list[MetricTuple]: list with metrics as tuples.
         """
         if self._prefix:
             key = f"{self._prefix}.{key}"

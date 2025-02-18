@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Iterable, Optional
 
 import pytest
 import toml
@@ -39,13 +39,13 @@ def kedro_project_path(tmp_path):
     return tmp_path / MOCK_PACKAGE_NAME
 
 
-def _write_yaml(filepath: Path, config: Dict):
+def _write_yaml(filepath: Path, config: dict):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     yaml_str = yaml.dump(config)
     filepath.write_text(yaml_str)
 
 
-def _write_toml(filepath: Path, config: Dict):
+def _write_toml(filepath: Path, config: dict):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     toml_str = toml.dumps(config)
     filepath.write_text(toml_str)
@@ -132,9 +132,9 @@ class DummyProjectHooks:
     @hook_impl
     def register_catalog(
         self,
-        catalog: Optional[Dict[str, Dict[str, Any]]],
-        credentials: Dict[str, Dict[str, Any]],
-        load_versions: Dict[str, str],
+        catalog: Optional[dict[str, dict[str, Any]]],
+        credentials: dict[str, dict[str, Any]],
+        load_versions: dict[str, str],
         save_version: str,
     ) -> DataCatalog:
         return DataCatalog.from_config(

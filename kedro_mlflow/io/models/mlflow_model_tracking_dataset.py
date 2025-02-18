@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import mlflow
 from kedro.io.core import DatasetError
@@ -17,9 +17,9 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         run_id: Optional[str] = None,
         artifact_path: Optional[str] = "model",
         pyfunc_workflow: Optional[str] = None,
-        load_args: Optional[Dict[str, Any]] = None,
-        save_args: Optional[Dict[str, Any]] = None,
-        metadata: Dict[str, Any] | None = None,
+        load_args: Optional[dict[str, Any]] = None,
+        save_args: Optional[dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize the Kedro MlflowModelDataSet.
 
@@ -37,9 +37,9 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
                 the model.
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
-            load_args (Dict[str, Any], optional): Arguments to `load_model`
+            load_args (dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to None.
-            save_args (Dict[str, Any], optional): Arguments to `log_model`
+            save_args (dict[str, Any], optional): Arguments to `log_model`
                 function from specified `flavor`. Defaults to None.
             metadata: Any arbitrary metadata.
                 This is ignored by Kedro, but may be consumed by users or external plugins.
@@ -137,7 +137,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
                 model, self._artifact_path, **self._save_args
             )
 
-    def _describe(self) -> Dict[str, Any]:
+    def _describe(self) -> dict[str, Any]:
         return dict(
             flavor=self._flavor,
             run_id=self._run_id,

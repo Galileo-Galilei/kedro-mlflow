@@ -1,5 +1,5 @@
 from logging import Logger, getLogger
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from kedro.io.core import DatasetError
 
@@ -18,8 +18,8 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         alias: Optional[str] = None,
         flavor: Optional[str] = "mlflow.pyfunc",
         pyfunc_workflow: Optional[str] = "python_model",
-        load_args: Optional[Dict[str, Any]] = None,
-        metadata: Dict[str, Any] | None = None,
+        load_args: Optional[dict[str, Any]] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize the Kedro MlflowModelRegistryDataset.
 
@@ -36,7 +36,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
                 Must be Python-importable.
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
-            load_args (Dict[str, Any], optional): Arguments to `load_model`
+            load_args (dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to None.
             metadata: Any arbitrary metadata.
                 This is ignored by Kedro, but may be consumed by users or external plugins.
@@ -103,7 +103,7 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
             "The 'save' method is not implemented for MlflowModelRegistryDataset. You can pass 'registered_model_name' argument in 'MLflowModelTrackingDataset(..., save_args={registered_model_name='my_model'}' to save and register a model in the same step. "
         )
 
-    def _describe(self) -> Dict[str, Any]:
+    def _describe(self) -> dict[str, Any]:
         return dict(
             model_uri=self.model_uri,
             model_name=self.model_name,

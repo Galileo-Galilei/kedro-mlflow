@@ -1,5 +1,5 @@
 from logging import Logger, getLogger
-from typing import Dict, Iterable, Optional, Union
+from typing import Iterable, Optional, Union
 
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
@@ -43,8 +43,8 @@ class PipelineML(Pipeline):
         tags: Optional[Union[str, Iterable[str]]] = None,
         inference: Pipeline,
         input_name: str,
-        kpm_kwargs: Optional[Dict[str, str]] = None,
-        log_model_kwargs: Optional[Dict[str, str]] = None,
+        kpm_kwargs: Optional[dict[str, str]] = None,
+        log_model_kwargs: Optional[dict[str, str]] = None,
     ):
         """Store all necessary information for calling mlflow.log_model in the pipeline.
 

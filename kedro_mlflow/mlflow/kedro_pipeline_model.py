@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from typing import Dict, Optional, Union
+from typing import Optional, Union
 
 from kedro.framework.hooks import _create_hook_manager
 from kedro.io import DataCatalog, MemoryDataset
@@ -20,7 +20,7 @@ class KedroPipelineModel(PythonModel):
         catalog: DataCatalog,
         input_name: str,
         runner: Optional[AbstractRunner] = None,
-        copy_mode: Optional[Union[Dict[str, str], str]] = "assign",
+        copy_mode: Optional[Union[dict[str, str], str]] = "assign",
     ):
         """[summary]
 
@@ -35,7 +35,7 @@ class KedroPipelineModel(PythonModel):
             AbstractRunner to use. Defaults to SequentialRunner if
             None.
 
-            copy_mode (Optional[Union[Dict[str,str], str]]):
+            copy_mode (Optional[Union[dict[str,str], str]]):
             The copy_mode of each DataSet of the catalog
             when reconstructing the DataCatalog in memory.
             The default is "assign".

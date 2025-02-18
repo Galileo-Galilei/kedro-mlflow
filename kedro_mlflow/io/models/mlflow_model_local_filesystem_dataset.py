@@ -1,6 +1,6 @@
 import shutil
 from os.path import exists
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from kedro.io import Version
 
@@ -17,11 +17,11 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
         filepath: str,
         flavor: str,
         pyfunc_workflow: Optional[str] = None,
-        load_args: Dict[str, Any] = None,
-        save_args: Dict[str, Any] = None,
-        log_args: Dict[str, Any] = None,
+        load_args: dict[str, Any] = None,
+        save_args: dict[str, Any] = None,
+        log_args: dict[str, Any] = None,
         version: Version = None,
-        metadata: Dict[str, Any] | None = None,
+        metadata: Optional[dict[str, Any]] = None,
     ) -> None:
         """Initialize the Kedro MlflowModelDataSet.
 
@@ -36,9 +36,9 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
             filepath (str): Path to store the dataset locally.
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
-            load_args (Dict[str, Any], optional): Arguments to `load_model`
+            load_args (dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to None.
-            save_args (Dict[str, Any], optional): Arguments to `save_model`
+            save_args (dict[str, Any], optional): Arguments to `save_model`
                 function from specified `flavor`. Defaults to None.
             version (Version, optional): Kedro version to use. Defaults to None.
             metadata: Any arbitrary metadata.
@@ -90,7 +90,7 @@ class MlflowModelLocalFileSystemDataset(MlflowAbstractModelDataSet):
             # model object and second is the path.
             self._mlflow_model_module.save_model(model, save_path, **self._save_args)
 
-    def _describe(self) -> Dict[str, Any]:
+    def _describe(self) -> dict[str, Any]:
         return dict(
             filepath=self._filepath,
             flavor=self._flavor,

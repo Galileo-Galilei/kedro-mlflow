@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Iterable, Optional
 
 import mlflow
 import pytest
@@ -23,9 +23,9 @@ class DummyProjectHooks:
     @hook_impl
     def register_catalog(
         self,
-        catalog: Optional[Dict[str, Dict[str, Any]]],
-        credentials: Dict[str, Dict[str, Any]],
-        load_versions: Dict[str, str],
+        catalog: Optional[dict[str, dict[str, Any]]],
+        credentials: dict[str, dict[str, Any]],
+        load_versions: dict[str, str],
         save_version: str,
     ) -> DataCatalog:
         return DataCatalog.from_config(

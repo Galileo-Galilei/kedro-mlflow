@@ -172,7 +172,7 @@ my_model_metrics:
 Let assume that you have node which doesn't have any inputs and returns dictionary with metrics to log:
 
 ```python
-def metrics_node() -> Dict[str, Union[float, List[float]]]:
+def metrics_node() -> dict[str, Union[float, list[float]]]:
     return {
         "metric1": {"value": 1.1, "step": 1},
         "metric2": [{"value": 1.1, "step": 1}, {"value": 1.2, "step": 2}],
@@ -181,8 +181,8 @@ def metrics_node() -> Dict[str, Union[float, List[float]]]:
 
 As you can see above, ``kedro_mlflow.io.metrics.MlflowMetricsHistoryDataset`` can take metrics as:
 
-- ``Dict[str, key]``
-- ``List[Dict[str, key]]``
+- ``[str, key]``
+- ``list[[str, key]]``
 
 To store metrics we need to define metrics dataset in Kedro Catalog:
 

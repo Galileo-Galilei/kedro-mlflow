@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Dict
 
 import mlflow
 import pytest
@@ -15,7 +14,7 @@ from mlflow.utils.validation import MAX_PARAM_VAL_LENGTH
 from kedro_mlflow.framework.hooks import MlflowHook
 
 
-def _write_yaml(filepath: Path, config: Dict):
+def _write_yaml(filepath: Path, config: dict):
     filepath.parent.mkdir(parents=True, exist_ok=True)
     yaml_str = yaml.dump(config)
     filepath.write_text(yaml_str)

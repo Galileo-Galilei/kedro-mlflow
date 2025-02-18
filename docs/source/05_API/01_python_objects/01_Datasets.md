@@ -62,8 +62,8 @@ The ``MlflowModelTrackingDataset`` accepts the following arguments:
 - run_id (Optional[str], optional): MLflow run ID to use to load the model from or save the model to. It plays the same role as "filepath" for standard mlflow datasets. Defaults to None.
 - artifact_path (str, optional): the run relative path to the model.
 - pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
-- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
-- save_args (Dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`. Defaults to None.
+- load_args (dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- save_args (dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`. Defaults to None.
 
 You can either only specify the flavor:
 
@@ -122,8 +122,8 @@ The ``MlflowModelLocalFileSystemDataset`` accepts the following arguments:
 - flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
 - filepath (str): Path to store the dataset locally.
 - pyfunc_workflow (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
-- load_args (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
-- save_args (Dict[str, Any], optional): Arguments to `save_model` function from specified `flavor`. Defaults to None.
+- load_args (dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- save_args (dict[str, Any], optional): Arguments to `save_model` function from specified `flavor`. Defaults to None.
 - version (Version, optional): Kedro version to use. Defaults to None.
 
 The use is very similar to ``MlflowModelTrackingDataset``, but you have to specify a local ``filepath`` instead of a `run_id`:
@@ -168,7 +168,7 @@ The ``MlflowModelRegistryDataset`` accepts the following arguments:
 - ``alias`` (str): A valid alias, which is used instead of stage to filter model since mlflow 2.9.0. Will raise an error if both ``stage_or_version`` and ``alias`` are provided.
 - ``flavor`` (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
 - ``pyfunc_workflow`` (str, optional): Either `python_model` or `loader_module`. See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
-- ``load_args`` (Dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
+- ``load_args`` (dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
 
 We assume you have registered a mlflow model first, either [with the ``MlflowClient``](https://mlflow.org/docs/latest/model-registry.html#adding-an-mlflow-model-to-the-model-registry) or [within the mlflow ui](https://mlflow.org/docs/latest/model-registry.html#ui-workflow), e.g. :
 

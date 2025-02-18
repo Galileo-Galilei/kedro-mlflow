@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Optional, Union
 
 from mlflow.tracking import MlflowClient
 
@@ -12,9 +12,9 @@ class MlflowMetricHistoryDataset(MlflowAbstractMetricDataset):
         self,
         key: str = None,
         run_id: str = None,
-        load_args: Dict[str, Any] = None,
-        save_args: Dict[str, Any] = None,
-        metadata: Dict[str, Any] | None = None,
+        load_args: dict[str, Any] = None,
+        save_args: dict[str, Any] = None,
+        metadata: Optional[dict[str, Any]] = None,
     ):
         """Initialise MlflowMetricDataset.
         Args:
@@ -51,7 +51,7 @@ class MlflowMetricHistoryDataset(MlflowAbstractMetricDataset):
 
     def _save(
         self,
-        data: Union[List[int], Dict[int, float], List[Dict[str, Union[float, str]]]],
+        data: Union[list[int], dict[int, float], list[dict[str, Union[float, str]]]],
     ):
         if self._logging_activated:
             self._validate_run_id()

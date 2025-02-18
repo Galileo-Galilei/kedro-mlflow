@@ -23,7 +23,7 @@ You can configure your project as follows:
     from kedro_mlflow_tutorial.pipelines.ml_app.pipeline import create_ml_pipeline
 
 
-    def register_pipelines(self) -> Dict[str, Pipeline]:
+    def register_pipelines(self) -> [str, Pipeline]:
         ml_pipeline = create_ml_pipeline()
         training_pipeline_ml = pipeline_ml_factory(
             training=ml_pipeline.only_nodes_with_tags(

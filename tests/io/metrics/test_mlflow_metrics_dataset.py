@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 import mlflow
 import pytest
@@ -10,7 +10,7 @@ from kedro_mlflow.io.metrics import MlflowMetricsHistoryDataset
 
 
 def assert_are_metrics_logged(
-    data: Dict[str, Union[float, List[float]]],
+    data: dict[str, Union[float, list[float]]],
     client: MlflowClient,
     run_id: str,
     prefix: Optional[str] = None,
@@ -18,7 +18,7 @@ def assert_are_metrics_logged(
     """Helper function which checks if given metrics where logged.
 
     Args:
-        data: (Dict[str, Union[float, List[float]]]): Logged metrics.
+        data: (dict[str, Union[float, list[float]]]): Logged metrics.
         client: (MlflowClient): MLflow client instance.
         run_id: (str): id of run where data was logged.
         prefix: (Optional[str])

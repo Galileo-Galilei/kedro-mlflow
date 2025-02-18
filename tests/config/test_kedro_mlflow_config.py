@@ -19,7 +19,7 @@ def test_kedro_mlflow_config_init():
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=[]),
+            disable_tracking=dict(pipelines=[], disable_autologging=True),
             experiment=dict(name="Default", restore_if_deleted=True),
             run=dict(id=None, name=None, nested=True),
             params=dict(
@@ -270,3 +270,21 @@ def test_from_dict_to_dict_idempotent(kedro_project_with_mlflow_conf):
     # modify config
     reloaded_config = KedroMlflowConfig.parse_obj(original_config_dict)
     assert config == reloaded_config
+
+
+def test_config_disable_autologging(kedro_project_with_mlflow_conf):
+    config = KedroMlflowConfig(
+        tracking=dict(disable_tracking=dict(disable_autologging=True))
+    )
+
+    mlflow.autolog()
+    from mlflow.utils.autologging_utils import autologging_is_disabled
+
+    assert not autologging_is_disabled(integration_name="mlflow")
+
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
+
+    assert autologging_is_disabled(integration_name="mlflow")

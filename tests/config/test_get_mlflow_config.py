@@ -35,7 +35,10 @@ def test_mlflow_config_default(kedro_project):
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
+            disable_tracking=dict(
+                pipelines=["my_disabled_pipeline"],
+                disable_autologging=True,
+            ),
             experiment=dict(name="fake_package", restore_if_deleted=True),
             run=dict(id="123456789", name="my_run", nested=True),
             params=dict(
@@ -74,7 +77,10 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=[]),
+            disable_tracking=dict(
+                pipelines=[],
+                disable_autologging=True,
+            ),
             experiment=dict(name="fake_project", restore_if_deleted=True),
             run=dict(id=None, name=None, nested=True),
             params=dict(
@@ -101,7 +107,10 @@ def test_mlflow_config_with_no_experiment_name(kedro_project):
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=[]),
+            disable_tracking=dict(
+                pipelines=[],
+                disable_autologging=True,
+            ),
             experiment=dict(name="fake_project", restore_if_deleted=True),
             run=dict(id=None, name=None, nested=True),
             params=dict(
@@ -215,7 +224,7 @@ def test_mlflow_config_correctly_set(kedro_project, project_settings):
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=[]),
+            disable_tracking=dict(pipelines=[], disable_autologging=True),
             experiment=dict(name="fake_project", restore_if_deleted=True),
             run=dict(id=None, name=None, nested=True),
             params=dict(
@@ -238,7 +247,10 @@ def test_mlflow_config_interpolated_with_globals_resolver(monkeypatch, fake_proj
             request_header_provider=dict(type=None, pass_context=False, init_kwargs={}),
         ),
         tracking=dict(
-            disable_tracking=dict(pipelines=["my_disabled_pipeline"]),
+            disable_tracking=dict(
+                pipelines=["my_disabled_pipeline"],
+                disable_autologging=True,
+            ),
             experiment=dict(name="fake_package", restore_if_deleted=True),
             run=dict(id="123456789", name="my_run", nested=True),
             params=dict(

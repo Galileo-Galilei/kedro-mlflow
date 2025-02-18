@@ -48,6 +48,7 @@ class MlflowServerOptions(BaseModel):
 class DisableTrackingOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
     pipelines: List[str] = []
+    disable_autologging: bool = True
 
     class Config:
         extra = "forbid"
@@ -157,6 +158,12 @@ class KedroMlflowConfig(BaseModel):
         mlflow.set_registry_uri(self.server.mlflow_registry_uri)
 
         self._set_experiment()
+
+        if self.tracking.disable_tracking.disable_autologging is True:
+            # notice that we dont't pass 'self.tracking.disable_tracking.disable_autologging' directly
+            # because if it's false we just keep the default behaviour of the platform which is often True by default,
+            # except on Databricks
+            mlflow.autolog(disable=True)
 
     def _register_request_header_provider(self, context: KedroContext):
         # this is a specific trick to deal with expiring tokens for authentication, see https://github.com/Galileo-Galilei/kedro-mlflow/issues/357

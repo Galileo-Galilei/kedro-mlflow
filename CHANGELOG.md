@@ -4,7 +4,8 @@
 
 ### Added
 
-- :sparkles: Add the ``tracking.disable_tracking.disable_autologging`` configuration option in ``mlflow.yml ``to disable autologging by default. This simplify the workflow for Databricks users who have autologging activated by default, which conflicts with the plugin([[#610](https://github.com/Galileo-Galilei/kedro-mlflow/issues/610)]).
+- :sparkles: Add the ``tracking.disable_tracking.disable_autologging`` configuration option in ``mlflow.yml `` to disable autologging by default. This simplify the workflow for Databricks users who have autologging activated by default, which conflicts with ``kedro-mlflow`` ([[#610](https://github.com/Galileo-Galilei/kedro-mlflow/issues/610)]).
+- :sparkles: Add ``tracking.experiment.create_experiment_kwargs.artifact_location`` and ``tracking.experiment.create_experiment_kwargs.tags`` configuration options in ``mlflow.yml `` to enable advanced configuration of mlflow experiment created at runtime by ``kedro-mlflow`` ([[#557](https://github.com/Galileo-Galilei/kedro-mlflow/issues/557)]).
 
 ## [0.14.3] - 2025-02-17
 

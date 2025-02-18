@@ -39,7 +39,11 @@ def test_mlflow_config_default(kedro_project):
                 pipelines=["my_disabled_pipeline"],
                 disable_autologging=True,
             ),
-            experiment=dict(name="fake_package", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_package",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id="123456789", name="my_run", nested=True),
             params=dict(
                 dict_params=dict(
@@ -81,7 +85,11 @@ def test_mlflow_config_in_uninitialized_project(kedro_project, package_name):
                 pipelines=[],
                 disable_autologging=True,
             ),
-            experiment=dict(name="fake_project", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_project",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(flatten=False, recursive=True, sep="."),
@@ -111,7 +119,11 @@ def test_mlflow_config_with_no_experiment_name(kedro_project):
                 pipelines=[],
                 disable_autologging=True,
             ),
-            experiment=dict(name="fake_project", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_project",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(flatten=False, recursive=True, sep="."),
@@ -225,7 +237,11 @@ def test_mlflow_config_correctly_set(kedro_project, project_settings):
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[], disable_autologging=True),
-            experiment=dict(name="fake_project", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_project",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(flatten=False, recursive=True, sep="."),
@@ -251,7 +267,11 @@ def test_mlflow_config_interpolated_with_globals_resolver(monkeypatch, fake_proj
                 pipelines=["my_disabled_pipeline"],
                 disable_autologging=True,
             ),
-            experiment=dict(name="fake_package", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_package",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id="123456789", name="my_run", nested=True),
             params=dict(
                 dict_params=dict(
@@ -318,7 +338,11 @@ class CustomRequestHeaderProvider(RequestHeaderProvider):
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[]),
-            experiment=dict(name="Default", restore_if_deleted=True),
+            experiment=dict(
+                name="Default",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(
@@ -377,7 +401,11 @@ class CustomRequestHeaderProviderInitKwargs(RequestHeaderProvider):
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[]),
-            experiment=dict(name="Default", restore_if_deleted=True),
+            experiment=dict(
+                name="Default",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(
@@ -440,7 +468,11 @@ class CustomRequestHeaderProviderInitKwargsKedroContext(RequestHeaderProvider):
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[]),
-            experiment=dict(name="Default", restore_if_deleted=True),
+            experiment=dict(
+                name="Default",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(
@@ -495,7 +527,11 @@ class BadCustomRequestHeaderProvider():
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[]),
-            experiment=dict(name="Default", restore_if_deleted=True),
+            experiment=dict(
+                name="Default",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(

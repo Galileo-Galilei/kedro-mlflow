@@ -34,7 +34,11 @@ def test_mlflow_yml_rendering(template_mlflowyml):
         project_path="fake/path",
         tracking=dict(
             disable_tracking=dict(pipelines=[], disable_autologging=True),
-            experiment=dict(name="fake_project", restore_if_deleted=True),
+            experiment=dict(
+                name="fake_project",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             params=dict(
                 dict_params=dict(flatten=False, recursive=True, sep="."),
                 long_params_strategy="fail",

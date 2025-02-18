@@ -20,7 +20,11 @@ def test_kedro_mlflow_config_init():
         ),
         tracking=dict(
             disable_tracking=dict(pipelines=[], disable_autologging=True),
-            experiment=dict(name="Default", restore_if_deleted=True),
+            experiment=dict(
+                name="Default",
+                create_experiment_kwargs=dict(artifact_location=None, tags=None),
+                restore_if_deleted=True,
+            ),
             run=dict(id=None, name=None, nested=True),
             params=dict(
                 dict_params=dict(
@@ -35,7 +39,7 @@ def test_kedro_mlflow_config_init():
     )
 
 
-def test_kedro_mlflow_config_new_experiment_does_not_exists(
+def test_kedro_mlflow_config_new_experiment_is_created_if_does_not_exists(
     kedro_project_with_mlflow_conf,
 ):
     config = KedroMlflowConfig(
@@ -51,6 +55,37 @@ def test_kedro_mlflow_config_new_experiment_does_not_exists(
     assert "exp1" in [
         exp.name for exp in config.server._mlflow_client.search_experiments()
     ]
+
+
+def test_kedro_mlflow_config_new_experiment_is_created_with_kwargs(
+    kedro_project_with_mlflow_conf,
+):
+    config = KedroMlflowConfig(
+        server=dict(mlflow_tracking_uri="mlruns"),
+        tracking=dict(
+            experiment=dict(
+                name="exp_custom_artifact_location",
+                create_experiment_kwargs=dict(
+                    artifact_location="mlruns_custom", tags={"my_tag": "my_value"}
+                ),
+            )
+        ),
+    )
+
+    bootstrap_project(kedro_project_with_mlflow_conf)
+    with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
+        context = session.load_context()  # setup config
+        config.setup(context)
+
+    experiment = config.server._mlflow_client.get_experiment_by_name(
+        "exp_custom_artifact_location"
+    )
+    assert experiment is not None
+    assert (
+        experiment.artifact_location
+        == (kedro_project_with_mlflow_conf / "mlruns_custom").as_uri()
+    )
+    assert experiment.tags == {"my_tag": "my_value"}
 
 
 def test_kedro_mlflow_config_with_use_env_tracking_uri(

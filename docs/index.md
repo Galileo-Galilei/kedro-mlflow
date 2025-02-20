@@ -66,7 +66,7 @@ Try out {fas}`arrow-right fa-xl`
 {fas}`fa-solid fa-chalkboard-user fa-xl;pst-color-primary` Advanced tutorial
 ^^^
 
-The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as an MLOps framework!
+The ``kedro-mlflow-tutorial`` github repo contains a step-by-step tutorial to learn how to use kedro-mlflow as a MLOps framework!
 
 +++
 Try on github {fab}`github;fa-xl`

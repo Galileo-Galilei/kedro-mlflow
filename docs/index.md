@@ -94,7 +94,7 @@ Watch on youtube {fab}`youtube;fa-xl`
 {fas}`fa-solid fa-video fa-xl;pst-color-primary` Tackling the ML Reproducibility Curse
 ^^^
 
-A community video showcasing the power of the Kedro-MLflow plugin.
+A community video by [Oleg Litvinov](https://github.com/OlegBEZb) showcasing how to use the Kedro-MLflow plugin on an end to end project.
 +++
 Watch on YouTube {fab}`youtube;fa-xl`
 :::

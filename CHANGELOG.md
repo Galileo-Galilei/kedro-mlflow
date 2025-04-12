@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Fix opening new MLFlow's SystemMetricsMonitors in every node [#647](https://github.com/Galileo-Galilei/kedro-mlflow/pull/647) 
+
 ## [0.14.4] - 2025-02-20
 
 ### Added

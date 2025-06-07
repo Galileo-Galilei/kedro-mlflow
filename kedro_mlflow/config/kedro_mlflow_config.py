@@ -1,7 +1,7 @@
 import os
 from logging import getLogger
 from pathlib import Path, PurePath
-from typing import Dict, List, Optional
+from typing import Optional
 from urllib.parse import urlparse
 
 import mlflow
@@ -23,7 +23,7 @@ class RequestHeaderProviderOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
     type: Optional[str] = None
     pass_context: bool = False
-    init_kwargs: Dict[str, str] = {}
+    init_kwargs: dict[str, str] = {}
 
     class Config:
         extra = "forbid"
@@ -47,8 +47,16 @@ class MlflowServerOptions(BaseModel):
 
 class DisableTrackingOptions(BaseModel):
     # mutable default is ok for pydantic : https://stackoverflow.com/questions/63793662/how-to-give-a-pydantic-list-field-a-default-value
-    pipelines: List[str] = []
+    pipelines: list[str] = []
     disable_autologging: bool = True
+
+    class Config:
+        extra = "forbid"
+
+
+class CreateExperimentOptions(BaseModel):
+    artifact_location: Optional[str] = None
+    tags: Optional[dict] = None
 
     class Config:
         extra = "forbid"
@@ -56,6 +64,7 @@ class DisableTrackingOptions(BaseModel):
 
 class ExperimentOptions(BaseModel):
     name: str = "Default"
+    create_experiment_kwargs: CreateExperimentOptions = CreateExperimentOptions()
     restore_if_deleted: StrictBool = True
     _experiment: Experiment = PrivateAttr()
     # do not create _experiment immediately to avoid creating
@@ -75,7 +84,7 @@ class RunOptions(BaseModel):
         extra = "forbid"
 
 
-class DictParamsOptions(BaseModel):
+class dictParamsOptions(BaseModel):
     flatten: StrictBool = False
     recursive: StrictBool = True
     sep: str = "."
@@ -85,7 +94,7 @@ class DictParamsOptions(BaseModel):
 
 
 class MlflowParamsOptions(BaseModel):
-    dict_params: DictParamsOptions = DictParamsOptions()
+    dict_params: dictParamsOptions = dictParamsOptions()
     long_params_strategy: Literal["fail", "truncate", "tag"] = "fail"
 
     class Config:
@@ -157,6 +166,16 @@ class KedroMlflowConfig(BaseModel):
         mlflow.set_tracking_uri(self.server.mlflow_tracking_uri)
         mlflow.set_registry_uri(self.server.mlflow_registry_uri)
 
+        # before we set the experiment, ensure it is a valid uri
+        if (
+            self.tracking.experiment.create_experiment_kwargs.artifact_location
+            is not None
+        ):
+            self.tracking.experiment.create_experiment_kwargs.artifact_location = _validate_uri(
+                project_path=context.project_path,
+                uri=self.tracking.experiment.create_experiment_kwargs.artifact_location,
+            )
+
         self._set_experiment()
 
         if self.tracking.disable_tracking.disable_autologging is True:
@@ -206,23 +225,30 @@ class KedroMlflowConfig(BaseModel):
         Returns:
             mlflow.entities.Experiment -- [description]
         """
-        # we retrieve the experiment manually to check if it exsits
+        # we retrieve the experiment manually to check if it exists
         mlflow_experiment = self.server._mlflow_client.get_experiment_by_name(
             name=self.tracking.experiment.name
         )
         # Deal with two side case when retrieving the experiment
-        if mlflow_experiment is not None:
-            if (
-                self.tracking.experiment.restore_if_deleted
-                and mlflow_experiment.lifecycle_stage == "deleted"
-            ):
-                # the experiment was created, then deleted : we have to restore it manually before setting it as the active one
-                self.server._mlflow_client.restore_experiment(
-                    mlflow_experiment.experiment_id
-                )
+        if mlflow_experiment is None:
+            # we create the experiment if it does not exists
+            self.server._mlflow_client.create_experiment(
+                name=self.tracking.experiment.name,
+                artifact_location=self.tracking.experiment.create_experiment_kwargs.artifact_location,
+                tags=self.tracking.experiment.create_experiment_kwargs.tags,
+            )
+        elif (
+            self.tracking.experiment.restore_if_deleted
+            and mlflow_experiment.lifecycle_stage == "deleted"
+        ):
+            # the experiment was created, then deleted : we have to restore it manually before setting it as the active one
+            self.server._mlflow_client.restore_experiment(
+                mlflow_experiment.experiment_id
+            )
 
         # this creates the experiment if it does not exists
-        # and creates a global variable with the experiment
+        # but it has been done by prvious 'else' to have advanced control at creation
+        # It creates a global variable with the experiment
         # but returns nothing
         mlflow.set_experiment(experiment_name=self.tracking.experiment.name)
 

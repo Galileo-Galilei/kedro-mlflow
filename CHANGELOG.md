@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :memo: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
+
 ## [0.14.4] - 2025-02-20
 
 ### Added
@@ -37,7 +41,7 @@
 
 ### Fixed
 
--   :bug: Fix a regression introduced by `0.13.4` and enable again to load an artifact from a different `run_id` ([#622](https://github.com/Galileo-Galilei/kedro-mlflow/issues/622)).  
+-   :bug: Fix a regression introduced by `0.13.4` and enable again to load an artifact from a different `run_id` ([#622](https://github.com/Galileo-Galilei/kedro-mlflow/issues/622)).
 
 ## [0.14.0] - 2025-01-28
 

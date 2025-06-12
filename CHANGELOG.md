@@ -2,9 +2,16 @@
 
 ## [Unreleased]
 
+
 ### Added
 
 -   :memo: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
+
+
+### Fixed
+
+-   :bug: Fix opening new MLFlow's SystemMetricsMonitors in every node [#647](https://github.com/Galileo-Galilei/kedro-mlflow/pull/647) 
+
 
 ## [0.14.4] - 2025-02-20
 

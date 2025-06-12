@@ -1,3 +1,5 @@
+from typing import Any
+
 import mlflow
 import pytest
 from kedro.framework.session import KedroSession
@@ -28,6 +30,16 @@ def dummy_run_params(tmp_path):
 
 
 @pytest.fixture
+def dummy_data() -> dict[str, Any]:
+    return {
+        "params:param1": 1,
+        "foo": MemoryDataset(),
+        "bar": MemoryDataset(),
+        "parameters": {"param1": 1, "param2": 2},
+    }
+
+
+@pytest.fixture
 def dummy_node():
     def fake_fun(arg1, arg2, arg3):
         return None
@@ -49,15 +61,8 @@ def dummy_pipeline(dummy_node):
 
 
 @pytest.fixture
-def dummy_catalog():
-    catalog = DataCatalog(
-        {
-            "params:param1": 1,
-            "foo": MemoryDataset(),
-            "bar": MemoryDataset(),
-            "parameters": {"param1": 1, "param2": 2},
-        }
-    )
+def dummy_catalog(dummy_data):
+    catalog = DataCatalog(dummy_data)
 
     return catalog
 
@@ -105,12 +110,7 @@ def test_hook_use_active_run_if_exist_and_do_not_close(
             assert mlflow.active_run().info.run_id == mlflow_run_id
 
 
-def test_hook_active_run_exists_with_different_tracking_uri(
-    kedro_project,
-    dummy_run_params,
-    dummy_pipeline,
-    dummy_catalog,
-):
+def test_hook_active_run_exists_with_different_tracking_uri(kedro_project):
     # tracking uri is "mlruns2", not "mlruns"
     mlflow.set_tracking_uri(f"file:///{kedro_project}/mlruns2")
     with mlflow.start_run():
@@ -140,3 +140,51 @@ def test_hook_active_run_exists_with_different_tracking_uri(
                 mlflow.active_run().info.run_id
             )
             assert active_run.data.params == {"a": "1"}
+
+
+def test_hook_reuse_system_metrics_in_nodes(
+    kedro_project,
+    dummy_run_params,
+    dummy_node,
+    dummy_pipeline,
+    dummy_catalog,
+):
+    mlflow.enable_system_metrics_logging()
+    mlflow.set_tracking_uri(f"file:///{kedro_project}/mlruns")
+    with mlflow.start_run():
+        mlflow_run_id = mlflow.active_run().info.run_id
+        system_metrics = mlflow.tracking.fluent.run_id_to_system_metrics_monitor[
+            mlflow_run_id
+        ]
+
+        bootstrap_project(kedro_project)
+        with KedroSession.create(
+            project_path=kedro_project,
+        ) as session:
+            context = session.load_context()
+
+            mlflow_node_hook = MlflowHook()
+            mlflow_node_hook.after_context_created(context)
+            mlflow_node_hook.before_pipeline_run(
+                run_params=dummy_run_params,
+                pipeline=dummy_pipeline,
+                catalog=dummy_catalog,
+            )
+
+            mlflow_node_hook.before_node_run(
+                node=dummy_node,
+                catalog=dummy_catalog,
+                inputs={
+                    k: v
+                    for k, v in dummy_catalog._datasets.items()
+                    if k in dummy_node.inputs
+                },
+                is_async=False,
+            )
+
+            assert (
+                system_metrics
+                == mlflow.tracking.fluent.run_id_to_system_metrics_monitor[
+                    mlflow_run_id
+                ]
+            )

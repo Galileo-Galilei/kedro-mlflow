@@ -48,7 +48,7 @@ jobs:
       run: |
         uv run pytest -x --cov=./ --cov-report=xml -n auto
     - name: Upload coverage report to Codecov
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v4
       if: ${{ inputs.os }} == 'ubuntu-latest' && ${{ inputs.python-version }} == '3.11' # upload should occur only once in the loop
       with:
         token: ${{ secrets.CODECOV_TOKEN }}  # token is not mandatory but make access more stable

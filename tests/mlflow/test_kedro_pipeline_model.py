@@ -362,9 +362,9 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
     with pytest.raises(
         ValueError, match="Provided artifacts do not match catalog entries"
     ):
-        # before mlflow 2.21, this block could be outside the pytest.raies cnotext manager
-        # but for mlflow>=2.21, there is a check (of the example) made at logging time, so
-        # the error is raied at loggign time
+        # before mlflow 2.21, this block could be outside the pytest.raises context manager
+        # but for mlflow>=2.21, there is a check of the example made at logging time, so
+        # the error is raised at logging time instead of loading time
         with mlflow.start_run():
             mlflow.pyfunc.log_model(
                 artifact_path="model",
@@ -395,18 +395,23 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
 
     mlflow_tracking_uri = (tmp_path / "mlruns").as_uri()
     mlflow.set_tracking_uri(mlflow_tracking_uri)
-    with mlflow.start_run():
-        mlflow.pyfunc.log_model(
-            artifact_path="model",
-            python_model=kedro_model,
-            artifacts=None,  # no artifacts provided
-            conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
-        )
-        run_id = mlflow.active_run().info.run_id
 
     with pytest.raises(
         ValueError, match="Provided artifacts do not match catalog entries"
     ):
+        # before mlflow 2.21, this block could be outside the pytest.raises context manager
+        # but for mlflow>=2.21, there is a check of the example made at logging time, so
+        # the error is raised at logging time instead of loading time
+        with mlflow.start_run():
+            mlflow.pyfunc.log_model(
+                artifact_path="model",
+                python_model=kedro_model,
+                artifacts={
+                    "bad_model_name": catalog._datasets["model"]._filepath
+                },  # correct path, but wrong catalog name
+                conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
+            )
+            run_id = mlflow.active_run().info.run_id
         mlflow.pyfunc.load_model(
             model_uri=(Path(r"runs:/") / run_id / "model").as_posix()
         )

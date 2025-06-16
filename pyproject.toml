@@ -71,7 +71,7 @@ doc = [
 ]
 dev = [
     "pre-commit>=2.0.0,<5.0.0",
-    "jupyter>=1.0.0,<2.0.0",
+    "ipykernel",
 ]
 
 all = [ "kedro_mlflow[test,doc,dev]" ]

@@ -194,7 +194,20 @@ class KedroPipelineModel(PythonModel):
 
         updated_catalog = self.initial_catalog.shallow_copy()
         for name, uri in context.artifacts.items():
-            updated_catalog._datasets[name]._filepath = Path(uri)
+            # in mlflow <2.21, we could just do "Path(uri)"
+            # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
+            # this only works from python>=3.13
+            # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
+            path_uri = Path(uri)
+            is_relative_uri = not path_uri.is_absolute()
+            if is_relative_uri & uri.startswith(r"file:///"):
+                self._logger.warning(
+                    f"The URI '{uri}' is considered relative : {str(path_uri)}( due to windows specific bug), retrying conversion"
+                )
+                uri = uri[8:]
+                path_uri = Path(uri)
+
+            updated_catalog._datasets[name]._filepath = path_uri
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input, params=None):

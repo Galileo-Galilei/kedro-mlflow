@@ -198,8 +198,6 @@ class KedroPipelineModel(PythonModel):
             # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
             # this only works from python>=3.13
             # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
-            print(f"{name=}", f"{uri=}")
-
             path_uri = Path(uri)
             is_relative_uri = not path_uri.is_absolute()
             if is_relative_uri & uri.startswith(r"file:///"):
@@ -209,11 +207,8 @@ class KedroPipelineModel(PythonModel):
                 uri = uri[8:]
                 path_uri = Path(uri)
 
-            print("before")
             updated_catalog._datasets[name]._filepath = path_uri
-            print("after")
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
-            print("after save")
 
     def predict(self, context, model_input, params=None):
         # we create an empty hook manager but do NOT register hooks

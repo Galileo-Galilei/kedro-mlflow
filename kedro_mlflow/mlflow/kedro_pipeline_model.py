@@ -198,13 +198,28 @@ class KedroPipelineModel(PythonModel):
             # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
             # this only works from python>=3.13
             # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
-            path_uri = Path(uri)
-            is_relative_uri = not path_uri.is_absolute()
-            if is_relative_uri & uri.startswith(r"file:///"):
+            # the bug loks like:
+            #   >>> uri = "file:///C:/Users/username/Documents/file.txt"
+            #   >>> path_uri=Path("file:/C:/Users/username/Documents/file.txt")
+            #   >>> posix_path=path_uri.as_posix() # file:/C:/Users/username/Documents/file.txt" #
+            # notice "file:/"" pathprefix
+
+            import re
+
+            posix_path = Path(uri).as_posix()
+            if re.match(pattern=r"file:/\w+", string=posix_path):
                 self._logger.warning(
-                    f"The URI '{uri}' is considered relative : {str(path_uri)}( due to windows specific bug), retrying conversion"
+                    f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
-                uri = uri[8:]
+                import os
+
+                # we remove the "file:/" prefix on windows
+                # and "file:" on posix systems (keep the slash prefix)
+                path_uri = (
+                    Path(posix_path[6:]) if os.name == "nt" else Path(posix_path[5:])
+                )
+
+            else:
                 path_uri = Path(uri)
 
             updated_catalog._datasets[name]._filepath = path_uri

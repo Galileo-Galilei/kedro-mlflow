@@ -209,7 +209,7 @@ class KedroPipelineModel(PythonModel):
                 path_uri = Path(uri)
 
             updated_catalog._datasets[name]._filepath = path_uri
-            print(f"{updated_catalog._datasets[name]._filepath=}")
+            print(f"\n\n\n{updated_catalog._datasets[name]._filepath=}\n\n\n")
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input, params=None):

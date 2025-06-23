@@ -46,7 +46,7 @@ jobs:
         uv run ruff check .
     - name: Test with pytest and generate coverage report
       run: |
-        uv run pytest -k test_kedro_pipeline_ml_loading_deepcopiable_catalog  --cov=./ --cov-report=xml
+        uv run pytest -k test_kedro_pipeline_ml_loading_deepcopiable_catalog -s  --cov=./ --cov-report=xml
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v4
       if: ${{ inputs.os }} == 'ubuntu-latest' && ${{ inputs.python-version }} == '3.11' # upload should occur only once in the loop

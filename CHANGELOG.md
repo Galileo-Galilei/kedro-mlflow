@@ -6,6 +6,10 @@
 
 -   :memo: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
 
+### Fixed
+
+-   :bug: Fix ``KedroPipelineModel.load_context`` loading from local files with uri filepath for ``mlflow>=2.21,<3`` [#656](https://github.com/Galileo-Galilei/kedro-mlflow/pull/656)
+
 ## [0.14.4] - 2025-02-20
 
 ### Added

@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from typing import Optional, Union
 
@@ -199,19 +200,16 @@ class KedroPipelineModel(PythonModel):
             # this only works from python>=3.13
             # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
 
-            # path_uri = Path(uri)
-            # is_relative_uri = not path_uri.is_absolute()
-            import os
-
             if (os.name == "nt") & uri.startswith(r"file:///"):
                 self._logger.warning(
-                    f"The URI '{uri}' is considered relative : {uri}( due to windows specific bug), retrying conversion"
+                    f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
                 path_uri = Path(uri[8:])
             else:
                 path_uri = Path(uri)
 
             updated_catalog._datasets[name]._filepath = path_uri
+            print(f"{updated_catalog._datasets[name]._filepath=}")
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input, params=None):

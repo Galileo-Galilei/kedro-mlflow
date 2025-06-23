@@ -198,6 +198,12 @@ class KedroPipelineModel(PythonModel):
             # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
             # this only works from python>=3.13
             # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
+            # the bug loks like:
+            #   >>> uri = "file:///C:/Users/username/Documents/file.txt"
+            #   >>> path_uri=Path("file:/C:/Users/username/Documents/file.txt")
+            #   >>> posix_path=path_uri.as_posix() # file:/C:/Users/username/Documents/file.txt" #
+            # notice "file:/"" pathprefix
+
             import re
 
             posix_path = Path(uri).as_posix()
@@ -206,6 +212,8 @@ class KedroPipelineModel(PythonModel):
                     f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
                 path_uri = Path(posix_path[6:])
+            else:
+                path_uri = Path(uri)
 
             updated_catalog._datasets[name]._filepath = path_uri
             print(f"\n\n\n{updated_catalog._datasets[name]._filepath=}\n\n\n")

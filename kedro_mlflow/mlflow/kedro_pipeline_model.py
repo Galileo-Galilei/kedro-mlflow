@@ -203,12 +203,13 @@ class KedroPipelineModel(PythonModel):
             # is_relative_uri = not path_uri.is_absolute()
             import os
 
-            path_uri = Path(uri)
             if (os.name == "nt") & uri.startswith(r"file:///"):
                 self._logger.warning(
                     f"The URI '{uri}' is considered relative : {uri}( due to windows specific bug), retrying conversion"
                 )
                 path_uri = Path(uri[8:])
+            else:
+                path_uri = Path(uri)
 
             updated_catalog._datasets[name]._filepath = path_uri
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))

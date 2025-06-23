@@ -9,5 +9,5 @@ jobs:
         uses: ./.github/workflows/test_reusable_workflow.yml
         with:
             python-version: "3.11"
-            os: "windows-latest"
+            os: "macos-latest"
         secrets: inherit

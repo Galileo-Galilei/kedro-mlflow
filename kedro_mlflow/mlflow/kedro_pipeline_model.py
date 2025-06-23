@@ -1,5 +1,4 @@
 import logging
-import os
 from pathlib import Path
 from typing import Optional, Union
 
@@ -199,14 +198,14 @@ class KedroPipelineModel(PythonModel):
             # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
             # this only works from python>=3.13
             # TODO REMOVE THIS HACK WHEN PYTHON >= 3.13 IS THE LOWER BOUND
+            import re
 
-            if (os.name == "nt") & uri.startswith(r"file:///"):
+            posix_path = Path(uri).as_posix()
+            if re.match(pattern=r"file:/\w+", string=posix_path):
                 self._logger.warning(
                     f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
-                path_uri = Path(uri[8:])
-            else:
-                path_uri = Path(uri)
+                path_uri = Path(posix_path[6:])
 
             updated_catalog._datasets[name]._filepath = path_uri
             print(f"\n\n\n{updated_catalog._datasets[name]._filepath=}\n\n\n")

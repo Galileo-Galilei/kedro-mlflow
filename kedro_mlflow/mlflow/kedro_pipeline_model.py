@@ -213,6 +213,8 @@ class KedroPipelineModel(PythonModel):
                 )
                 import os
 
+                # we remove the "file:/" prefix on windows
+                # and "file:" on posix systems (keep the slash prefix)
                 path_uri = (
                     Path(posix_path[6:]) if os.name == "nt" else Path(posix_path[5:])
                 )

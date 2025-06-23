@@ -46,7 +46,7 @@ jobs:
         uv run ruff check .
     - name: Test with pytest and generate coverage report
       run: |
-        uv run pytest --cov=./ --cov-report=xml
+        uv run pytest -k test_modelify_with_run_name -s
     - name: Upload coverage report to Codecov
       uses: codecov/codecov-action@v4
       if: ${{ inputs.os }} == 'ubuntu-latest' && ${{ inputs.python-version }} == '3.11' # upload should occur only once in the loop

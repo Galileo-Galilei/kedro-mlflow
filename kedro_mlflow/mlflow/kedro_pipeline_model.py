@@ -203,6 +203,7 @@ class KedroPipelineModel(PythonModel):
             # is_relative_uri = not path_uri.is_absolute()
             import os
 
+            path_uri = Path(uri)
             if (os.name == "nt") & uri.startswith(r"file:///"):
                 self._logger.warning(
                     f"The URI '{uri}' is considered relative : {uri}( due to windows specific bug), retrying conversion"

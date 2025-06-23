@@ -211,7 +211,12 @@ class KedroPipelineModel(PythonModel):
                 self._logger.warning(
                     f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
-                path_uri = Path(posix_path[6:])
+                import os
+
+                path_uri = (
+                    Path(posix_path[6:]) if os.name == "nt" else Path(posix_path[5:])
+                )
+
             else:
                 path_uri = Path(uri)
 

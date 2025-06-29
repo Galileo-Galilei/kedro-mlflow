@@ -169,11 +169,11 @@ class PipelineML(Pipeline):
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
         return self.training.only_nodes(*node_names)
 
-    def only_nodes_with_namespace(
-        self, node_namespace: str
+    def only_nodes_with_namespaces(
+        self, node_namespaces: str
     ) -> "Pipeline":  # pragma: no cover
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
-        return self.training.only_nodes_with_namespace(node_namespace)
+        return self.training.only_nodes_with_namespace(node_namespaces)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "Pipeline":  # pragma: no cover
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
@@ -217,16 +217,16 @@ class PipelineML(Pipeline):
         pipeline = super().tag(*tags)
         return self._turn_pipeline_to_ml(pipeline)
 
-    def filter(
+    def filter(  # noqa: PLR0913
         self,
-        tags: Optional[Iterable[str]] = None,
-        from_nodes: Optional[Iterable[str]] = None,
-        to_nodes: Optional[Iterable[str]] = None,
-        node_names: Optional[Iterable[str]] = None,
-        from_inputs: Optional[Iterable[str]] = None,
-        to_outputs: Optional[Iterable[str]] = None,
-        node_namespace: Optional[str] = None,
-    ) -> "Pipeline":
+        tags: Iterable[str] | None = None,
+        from_nodes: Iterable[str] | None = None,
+        to_nodes: Iterable[str] | None = None,
+        node_names: Iterable[str] | None = None,
+        from_inputs: Iterable[str] | None = None,
+        to_outputs: Iterable[str] | None = None,
+        node_namespaces: Iterable[str] | None = None,
+    ) -> Pipeline:
         # see from_inputs for an explanation of why we don't call super()
         pipeline = self.training.filter(
             tags=tags,
@@ -235,7 +235,7 @@ class PipelineML(Pipeline):
             node_names=node_names,
             from_inputs=from_inputs,
             to_outputs=to_outputs,
-            node_namespace=node_namespace,
+            node_namespaces=node_namespaces,
         )
         return self._turn_pipeline_to_ml(pipeline)
 

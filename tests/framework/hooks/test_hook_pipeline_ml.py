@@ -671,7 +671,7 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
         namespace = "a"
         log_model_kwargs["artifact_path"] = "artifacts"
         dummy_pipeline_with_namespace = pipeline(
-            pipe=dummy_pipeline_dataset_factory, namespace=namespace
+            nodes=dummy_pipeline_dataset_factory, namespace=namespace
         )
         pipeline_to_run = pipeline_ml_factory(
             training=dummy_pipeline_with_namespace.only_nodes_with_tags("training"),

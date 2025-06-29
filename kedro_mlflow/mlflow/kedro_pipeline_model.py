@@ -1,4 +1,5 @@
 import logging
+from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
 
@@ -192,7 +193,7 @@ class KedroPipelineModel(PythonModel):
                 f"\n    - 'inference.inputs() - artifacts' = : {in_inference_but_not_artifacts}"
             )
 
-        updated_catalog = self.initial_catalog.shallow_copy()
+        updated_catalog = deepcopy(self.initial_catalog)
         for name, uri in context.artifacts.items():
             # in mlflow <2.21, we could just do "Path(uri)"
             # but in mlflow >=2.21, we should do "Path.from_uri()" but according to this: https://github.com/python/cpython/issues/107465
@@ -223,7 +224,7 @@ class KedroPipelineModel(PythonModel):
                 path_uri = Path(uri)
 
             updated_catalog[name]._filepath = path_uri
-            self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
+            self.loaded_catalog[name] = updated_catalog.load(name)
 
     def predict(self, context, model_input, params=None):
         # we create an empty hook manager but do NOT register hooks
@@ -258,12 +259,9 @@ class KedroPipelineModel(PythonModel):
             # no need to check if params are in the catalog, because mlflow already checks that the params matching the signature
             param = f"params:{name}"
             self._logger.info(f"Using {param}={value} for the prediction")
-            self.loaded_catalog.save(name=param, data=value)
+            self.loaded_catalog[param] = value
 
-        self.loaded_catalog.save(
-            name=self.input_name,
-            data=model_input,
-        )
+        self.loaded_catalog[self.input_name] = model_input
 
         run_output = runner.run(
             pipeline=self.pipeline,

@@ -224,7 +224,7 @@ class KedroPipelineModel(PythonModel):
                 path_uri = Path(uri)
 
             updated_catalog[name]._filepath = path_uri
-            self.loaded_catalog[name] = updated_catalog.load(name)
+            self.loaded_catalog[name].save(updated_catalog.load(name))
 
     def predict(self, context, model_input, params=None):
         # we create an empty hook manager but do NOT register hooks
@@ -261,7 +261,7 @@ class KedroPipelineModel(PythonModel):
             self._logger.info(f"Using {param}={value} for the prediction")
             self.loaded_catalog[param] = value
 
-        self.loaded_catalog[self.input_name] = model_input
+        self.loaded_catalog[self.input_name].save(model_input)
 
         run_output = runner.run(
             pipeline=self.pipeline,

@@ -59,7 +59,13 @@ def pipeline_with_tag():
                 tags=["preprocessing"],
                 name="preprocess_fun",
             ),
-            node(func=train_fun, inputs="data", outputs="model", tags=["training"]),
+            node(
+                func=train_fun,
+                inputs="data",
+                outputs="model",
+                tags=["training"],
+                name="train_fun",
+            ),
         ]
     )
     return pipeline_with_tag
@@ -350,7 +356,7 @@ def test_pipeline_ml_substraction(
     caplog,
     pipeline_ml_with_intermediary_artifacts,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -377,7 +383,7 @@ def test_pipeline_ml_addition(
     pipeline_ml_with_namespace,
     pipeline_ml_with_tag,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -401,7 +407,7 @@ def test_pipeline_ml_or(
     pipeline_ml_with_namespace,
     pipeline_ml_with_tag,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -425,10 +431,10 @@ def test_pipeline_ml_or(
     [
         (None, None, None, None, None),
         (["training"], None, None, None, None),
-        (None, ["train_fun([data]) -> [model]"], None, None, None),
-        (None, ["preprocess_fun([raw_data]) -> [data]"], None, None, None),
-        (None, None, ["train_fun([data]) -> [model]"], None, None),
-        (None, None, None, ["train_fun([data]) -> [model]"], None),
+        (None, ["train_fun"], None, None, None),
+        (None, ["preprocess_fun"], None, None, None),
+        (None, None, ["train_fun"], None, None),
+        (None, None, None, ["train_fun"], None),
         (None, None, None, None, ["data"]),
     ],
 )

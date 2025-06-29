@@ -10,7 +10,7 @@ from kedro.config import MissingConfigException
 from kedro.framework.context import KedroContext
 from kedro.framework.hooks import hook_impl
 from kedro.framework.startup import _get_project_metadata
-from kedro.io import DataCatalog
+from kedro.io import CatalogProtocol, DataCatalog
 from kedro.pipeline import Pipeline
 from kedro.pipeline.node import Node
 from mlflow.entities import RunStatus
@@ -142,39 +142,39 @@ class MlflowHook:
         self.mlflow_config = mlflow_config  # store for further reuse
 
     @hook_impl
-    def after_catalog_created(
+    def after_catalog_created(  # noqa: PLR0913
         self,
-        catalog: DataCatalog,
+        catalog: CatalogProtocol,
         conf_catalog: dict[str, Any],
         conf_creds: dict[str, Any],
-        feed_dict: dict[str, Any],
+        parameters: dict[str, Any],
         save_version: str,
-        load_versions: str,
-    ):
+        load_versions: dict[str, str],
+    ) -> None:
         # we use this hooks to modif "MlflowmetricsDataset" to ensure consistency
         # of the metric name with the catalog name
-        for name, dataset in catalog._datasets.items():
+        for name, dataset in catalog.items():
             if (
                 isinstance(dataset, MlflowMetricsHistoryDataset)
                 and dataset._prefix is None
             ):
                 if dataset._run_id is not None:
-                    catalog._datasets[name] = MlflowMetricsHistoryDataset(
+                    catalog[name] = MlflowMetricsHistoryDataset(
                         run_id=dataset._run_id, prefix=name
                     )
                 else:
-                    catalog._datasets[name] = MlflowMetricsHistoryDataset(prefix=name)
+                    catalog[name] = MlflowMetricsHistoryDataset(prefix=name)
 
             if isinstance(dataset, MlflowMetricDataset) and dataset.key is None:
                 if dataset._run_id is not None:
-                    catalog._datasets[name] = MlflowMetricDataset(
+                    catalog[name] = MlflowMetricDataset(
                         run_id=dataset._run_id,
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
                     )
                 else:
-                    catalog._datasets[name] = MlflowMetricDataset(
+                    catalog[name] = MlflowMetricDataset(
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
@@ -182,14 +182,14 @@ class MlflowHook:
 
             if isinstance(dataset, MlflowMetricHistoryDataset) and dataset.key is None:
                 if dataset._run_id is not None:
-                    catalog._datasets[name] = MlflowMetricHistoryDataset(
+                    catalog[name] = MlflowMetricHistoryDataset(
                         run_id=dataset._run_id,
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,
                     )
                 else:
-                    catalog._datasets[name] = MlflowMetricHistoryDataset(
+                    catalog[name] = MlflowMetricHistoryDataset(
                         key=name,
                         load_args=dataset._load_args,
                         save_args=dataset._save_args,

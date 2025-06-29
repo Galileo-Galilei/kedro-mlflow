@@ -289,7 +289,7 @@ def test_mlflow_hook_save_pipeline_ml(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -368,7 +368,7 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -428,7 +428,7 @@ def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -487,7 +487,7 @@ def test_mlflow_hook_save_pipeline_ml_with_parameters(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -564,7 +564,7 @@ def test_mlflow_hook_save_pipeline_ml_with_signature(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -625,7 +625,7 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -689,7 +689,7 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -734,7 +734,7 @@ def test_mlflow_hook_save_and_load_pipeline_ml_with_inference_parameters(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -808,7 +808,7 @@ def test_mlflow_hook_save_and_load_pipeline_ml_specify_runner(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )

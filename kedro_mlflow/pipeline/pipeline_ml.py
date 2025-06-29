@@ -173,7 +173,7 @@ class PipelineML(Pipeline):
         self, node_namespaces: str
     ) -> "Pipeline":  # pragma: no cover
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
-        return self.training.only_nodes_with_namespace(node_namespaces)
+        return self.training.only_nodes_with_namespaces(node_namespaces)
 
     def only_nodes_with_inputs(self, *inputs: str) -> "Pipeline":  # pragma: no cover
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)

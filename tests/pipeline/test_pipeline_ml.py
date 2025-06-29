@@ -318,7 +318,7 @@ def test_pipeline_ml_only_nodes_with_outputs(
     )
 
 
-def test_pipeline_ml_only_nodes_with_namespace(
+def test_pipeline_ml_only_nodes_with_namespaces(
     caplog,
     pipeline_ml_with_namespace,
 ):
@@ -328,8 +328,8 @@ def test_pipeline_ml_only_nodes_with_namespace(
 
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
 
-    filtered_pipeline_ml = pipeline_ml_with_namespace.only_nodes_with_namespace(
-        node_namespace="tmp_namespace"
+    filtered_pipeline_ml = pipeline_ml_with_namespace.only_nodes_with_namespaces(
+        node_namespaces=["tmp_namespace"]
     )
 
     # PipelineML class must be preserved when filtering
@@ -488,7 +488,7 @@ def test_pipeline_ml_filtering(
         (None, None, None, ["preprocess_fun([raw_data]) -> [data]"], None),
     ],
 )
-def test_pipeline_ml__filtering_generate_invalid_pipeline_ml(
+def test_pipeline_ml_filtering_generate_invalid_pipeline_ml(
     mocker,
     pipeline_ml_obj,
     tags,

@@ -93,7 +93,7 @@ def test_mlflow_hook_log_artifacts_within_same_run_with_thread_runner(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )

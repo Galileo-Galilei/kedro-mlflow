@@ -155,7 +155,7 @@ def test_mlflow_hook_automatically_prefix_metrics_dataset(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )
@@ -212,7 +212,7 @@ def test_mlflow_hook_metrics_dataset_with_run_id(
             # so we are setting them to empty values.
             conf_catalog={},
             conf_creds={},
-            feed_dict={},
+            parameters={},
             save_version="",
             load_versions="",
         )

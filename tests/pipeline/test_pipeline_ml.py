@@ -57,8 +57,15 @@ def pipeline_with_tag():
                 inputs="raw_data",
                 outputs="data",
                 tags=["preprocessing"],
+                name="preprocess_fun",
             ),
-            node(func=train_fun, inputs="data", outputs="model", tags=["training"]),
+            node(
+                func=train_fun,
+                inputs="data",
+                outputs="model",
+                tags=["training"],
+                name="train_fun",
+            ),
         ]
     )
     return pipeline_with_tag
@@ -85,6 +92,7 @@ def pipeline_ml_with_intermediary_artifacts():
                 inputs="raw_data",
                 outputs="data",
                 tags=["training", "preprocessing"],
+                name="preprocess_fun",
             ),
             node(
                 func=fit_encoder_fun,
@@ -318,7 +326,7 @@ def test_pipeline_ml_only_nodes_with_outputs(
     )
 
 
-def test_pipeline_ml_only_nodes_with_namespace(
+def test_pipeline_ml_only_nodes_with_namespaces(
     caplog,
     pipeline_ml_with_namespace,
 ):
@@ -328,8 +336,8 @@ def test_pipeline_ml_only_nodes_with_namespace(
 
     # remember : the arguments are iterable, so do not pass string directly (e.g ["training"] rather than training)
 
-    filtered_pipeline_ml = pipeline_ml_with_namespace.only_nodes_with_namespace(
-        node_namespace="tmp_namespace"
+    filtered_pipeline_ml = pipeline_ml_with_namespace.only_nodes_with_namespaces(
+        node_namespaces=["tmp_namespace"]
     )
 
     # PipelineML class must be preserved when filtering
@@ -348,7 +356,7 @@ def test_pipeline_ml_substraction(
     caplog,
     pipeline_ml_with_intermediary_artifacts,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -375,7 +383,7 @@ def test_pipeline_ml_addition(
     pipeline_ml_with_namespace,
     pipeline_ml_with_tag,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -399,7 +407,7 @@ def test_pipeline_ml_or(
     pipeline_ml_with_namespace,
     pipeline_ml_with_tag,
 ):
-    """When the pipeline is filtered with only_nodes_with_namespace, we return only the training pipeline. This is for kedro viz compatibility"""
+    """When the pipeline is filtered with only_nodes_with_namespaces, we return only the training pipeline. This is for kedro viz compatibility"""
 
     # pipeline_ml_with_namespace are fixture in conftest
 
@@ -423,10 +431,10 @@ def test_pipeline_ml_or(
     [
         (None, None, None, None, None),
         (["training"], None, None, None, None),
-        (None, ["train_fun([data]) -> [model]"], None, None, None),
-        (None, ["preprocess_fun([raw_data]) -> [data]"], None, None, None),
-        (None, None, ["train_fun([data]) -> [model]"], None, None),
-        (None, None, None, ["train_fun([data]) -> [model]"], None),
+        (None, ["train_fun"], None, None, None),
+        (None, ["preprocess_fun"], None, None, None),
+        (None, None, ["train_fun"], None, None),
+        (None, None, None, ["train_fun"], None),
         (None, None, None, None, ["data"]),
     ],
 )
@@ -484,11 +492,11 @@ def test_pipeline_ml_filtering(
     "tags,from_nodes,to_nodes,node_names,from_inputs",
     [
         (["preprocessing"], None, None, None, None),
-        (None, None, ["preprocess_fun([raw_data]) -> [data]"], None, None),
-        (None, None, None, ["preprocess_fun([raw_data]) -> [data]"], None),
+        (None, None, ["preprocess_fun"], None, None),
+        (None, None, None, ["preprocess_fun"], None),
     ],
 )
-def test_pipeline_ml__filtering_generate_invalid_pipeline_ml(
+def test_pipeline_ml_filtering_generate_invalid_pipeline_ml(
     mocker,
     pipeline_ml_obj,
     tags,

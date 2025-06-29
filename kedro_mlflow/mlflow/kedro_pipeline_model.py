@@ -271,7 +271,7 @@ class KedroPipelineModel(PythonModel):
 
         # unpack the result to avoid messing the json
         # file with the name of the Kedro dataset
-        unpacked_output = run_output[self.output_name]
+        unpacked_output = run_output[self.output_name].load()
 
         return unpacked_output
 

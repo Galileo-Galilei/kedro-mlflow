@@ -8,8 +8,7 @@ from kedro.framework.hooks.manager import _register_hooks
 from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog, MemoryDataset
-from kedro.pipeline import Pipeline, node
-from kedro.pipeline.modular_pipeline import pipeline
+from kedro.pipeline import Pipeline, node, pipeline
 from kedro.runner import SequentialRunner
 from kedro_datasets.pickle import PickleDataset
 from mlflow.models import infer_signature

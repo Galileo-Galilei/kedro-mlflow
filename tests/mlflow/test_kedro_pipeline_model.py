@@ -272,7 +272,7 @@ def dummy_catalog(tmp_path):
 def test_model_packaging_with_copy_mode(
     tmp_path, tmp_folder, pipeline_inference_dummy, dummy_catalog, copy_mode, expected
 ):
-    dummy_catalog._datasets["model"].save(2)  # emulate model fitting
+    dummy_catalog["model"] = 2  # emulate model fitting
 
     kedro_model = KedroPipelineModel(
         pipeline=pipeline_inference_dummy,
@@ -302,7 +302,7 @@ def test_model_packaging_with_copy_mode(
     # second assertion: copy_mode works
     actual_copy_mode = {
         name: ds._copy_mode
-        for name, ds in loaded_model._model_impl.python_model.loaded_catalog._datasets.items()
+        for name, ds in loaded_model._model_impl.python_model.loaded_catalog.items()
     }
 
     assert actual_copy_mode == expected
@@ -340,15 +340,15 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
         }
     )
 
-    catalog._datasets["raw_data"].save(1)  # emulate input on disk
-    catalog._datasets["model"].save(2)  # emulate model fitting
+    catalog["raw_data"] = 1  # emulate input on disk
+    catalog["model"] = 2  # emulate model fitting
 
     # the input is persited
     artifacts = {
         name: Path(dataset._filepath.as_posix())
         .resolve()
         .as_uri()  # weird bug when directly converting PurePosixPath to windows: it is considered as relative
-        for name, dataset in catalog._datasets.items()
+        for name, dataset in catalog.items()
         if not isinstance(dataset, MemoryDataset)
     }
 

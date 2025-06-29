@@ -95,7 +95,7 @@ def dummy_catalog(tmp_path):
             ),
         }
     )
-    dummy_catalog._datasets["model"].save(2)  # emulate model fitting
+    dummy_catalog["model"] = 2  # emulate model fitting
 
     return dummy_catalog
 

@@ -57,6 +57,7 @@ def pipeline_with_tag():
                 inputs="raw_data",
                 outputs="data",
                 tags=["preprocessing"],
+                name="preprocess_fun",
             ),
             node(func=train_fun, inputs="data", outputs="model", tags=["training"]),
         ]
@@ -85,6 +86,7 @@ def pipeline_ml_with_intermediary_artifacts():
                 inputs="raw_data",
                 outputs="data",
                 tags=["training", "preprocessing"],
+                name="preprocess_fun",
             ),
             node(
                 func=fit_encoder_fun,
@@ -484,8 +486,8 @@ def test_pipeline_ml_filtering(
     "tags,from_nodes,to_nodes,node_names,from_inputs",
     [
         (["preprocessing"], None, None, None, None),
-        (None, None, ["preprocess_fun([raw_data]) -> [data]"], None, None),
-        (None, None, None, ["preprocess_fun([raw_data]) -> [data]"], None),
+        (None, None, ["preprocess_fun"], None, None),
+        (None, None, None, ["preprocess_fun"], None),
     ],
 )
 def test_pipeline_ml_filtering_generate_invalid_pipeline_ml(

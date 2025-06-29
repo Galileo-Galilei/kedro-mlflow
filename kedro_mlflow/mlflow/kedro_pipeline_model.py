@@ -110,14 +110,14 @@ class KedroPipelineModel(PythonModel):
         for dataset_name in self.pipeline.inputs():
             if dataset_name == self.input_name:
                 # there is no obligation that this dataset is persisted
-                # and even if it is, we keep only an ampty memory dataset to avoid
+                # and even if it is, we keep only an empty memory dataset to avoid
                 # extra uneccessary dependencies: this dataset will be replaced at
                 # inference time and we do not need to know the original type, see
                 # https://github.com/Galileo-Galilei/kedro-mlflow/issues/273
-                sub_catalog.add(dataset_name=dataset_name, dataset=MemoryDataset())
+                sub_catalog[dataset_name] = MemoryDataset()
             else:
                 try:
-                    dataset = catalog._datasets[dataset_name]
+                    dataset = catalog[dataset_name]
                     if isinstance(
                         dataset, MemoryDataset
                     ) and not dataset_name.startswith("params:"):
@@ -132,7 +132,7 @@ class KedroPipelineModel(PythonModel):
                     self._logger.info(
                         f"The dataset '{dataset_name}' is added to the Pipeline catalog."
                     )
-                    sub_catalog.add(dataset_name=dataset_name, dataset=dataset)
+                    sub_catalog[dataset_name] = dataset
                 except KeyError:
                     raise KedroPipelineModelError(
                         f"The provided catalog must contains '{dataset_name}' dataset "
@@ -145,7 +145,7 @@ class KedroPipelineModel(PythonModel):
         self, parameters_saving_folder: Optional[Path] = None
     ):
         artifacts = {}
-        for name, dataset in self.initial_catalog._datasets.items():
+        for name, dataset in self.initial_catalog.items():
             if name != self.input_name:
                 if name.startswith("params:"):
                     # we need to persist it locally for mlflow access
@@ -222,7 +222,7 @@ class KedroPipelineModel(PythonModel):
             else:
                 path_uri = Path(uri)
 
-            updated_catalog._datasets[name]._filepath = path_uri
+            updated_catalog[name]._filepath = path_uri
             self.loaded_catalog.save(name=name, data=updated_catalog.load(name))
 
     def predict(self, context, model_input, params=None):

@@ -161,10 +161,10 @@ def test_mlflow_hook_automatically_prefix_metrics_dataset(
         )
         # Check if metrics datasets have prefix with its names.
         # for metric
-        assert dummy_catalog._datasets["my_metrics"]._prefix == "my_metrics"
-        assert dummy_catalog._datasets["another_metrics"]._prefix == "foo"
-        assert dummy_catalog._datasets["my_metric"].key == "my_metric"
-        assert dummy_catalog._datasets["another_metric"].key == "foo"
+        assert dummy_catalog["my_metrics"]._prefix == "my_metrics"
+        assert dummy_catalog["another_metrics"]._prefix == "foo"
+        assert dummy_catalog["my_metric"].key == "my_metric"
+        assert dummy_catalog["another_metric"].key == "foo"
 
 
 def test_mlflow_hook_metrics_dataset_with_run_id(

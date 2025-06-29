@@ -519,7 +519,7 @@ def test_catalog_extraction(pipeline, catalog, input_name, result):
         pipeline=pipeline, catalog=catalog, input_name=input_name
     )
     filtered_catalog = kedro_pipeline_model.initial_catalog
-    assert set(filtered_catalog.list()) == result
+    assert set(filtered_catalog.keys()) == result
 
 
 def test_catalog_extraction_missing_inference_input(pipeline_inference_dummy):

@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 import mlflow
 import pandas as pd
 import pytest
-from kedro.io import DataCatalog, MemoryDataset
+from kedro.io import DataCatalog, DatasetNotFoundError, MemoryDataset
 from kedro.pipeline import Pipeline, node
 from kedro_datasets.pickle import PickleDataset
 from pytest_lazy_fixtures import lf
@@ -272,7 +272,7 @@ def dummy_catalog(tmp_path):
 def test_model_packaging_with_copy_mode(
     tmp_path, tmp_folder, pipeline_inference_dummy, dummy_catalog, copy_mode, expected
 ):
-    dummy_catalog["model"] = 2  # emulate model fitting
+    dummy_catalog["model"].save(2)  # emulate model fitting
 
     kedro_model = KedroPipelineModel(
         pipeline=pipeline_inference_dummy,
@@ -300,6 +300,7 @@ def test_model_packaging_with_copy_mode(
     assert loaded_model.predict(1) == 2  # noqa: PLR2004
 
     # second assertion: copy_mode works
+
     actual_copy_mode = {
         name: ds._copy_mode
         for name, ds in loaded_model._model_impl.python_model.loaded_catalog.items()
@@ -340,10 +341,10 @@ def test_model_packaging_too_many_artifacts(tmp_path, pipeline_inference_dummy):
         }
     )
 
-    catalog["raw_data"] = 1  # emulate input on disk
-    catalog["model"] = 2  # emulate model fitting
+    catalog["raw_data"].save(1)  # emulate input on disk
+    catalog["model"].save(2)  # emulate model fitting
 
-    # the input is persited
+    # the input is persisted
     artifacts = {
         name: Path(dataset._filepath.as_posix())
         .resolve()
@@ -389,6 +390,8 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
         }
     )
 
+    catalog["model"].save(2)  # emulate model fitting
+
     kedro_model = KedroPipelineModel(
         pipeline=pipeline_inference_dummy, catalog=catalog, input_name="raw_data"
     )
@@ -407,7 +410,9 @@ def test_model_packaging_missing_artifacts(tmp_path, pipeline_inference_dummy):
                 artifact_path="model",
                 python_model=kedro_model,
                 artifacts={
-                    "bad_model_name": catalog._datasets["model"]._filepath
+                    "bad_model_name": Path(catalog["model"]._filepath.as_posix())
+                    .resolve()
+                    .as_uri()
                 },  # correct path, but wrong catalog name
                 conda_env={"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             )
@@ -526,8 +531,8 @@ def test_catalog_extraction_missing_inference_input(pipeline_inference_dummy):
     catalog = DataCatalog({"raw_data": MemoryDataset(), "data": MemoryDataset()})
     # "model" is missing in the catalog
     with pytest.raises(
-        KedroPipelineModelError,
-        match="since it is the input of the pipeline",
+        DatasetNotFoundError,
+        match="Dataset 'model' not found in the catalog",
     ):
         KedroPipelineModel(
             pipeline=pipeline_inference_dummy,
@@ -589,7 +594,7 @@ def test_kedro_pipeline_model_save_and_load(
         pipeline=pipeline, catalog=catalog, input_name=input_name
     )
     # emulate artifacts persistence
-    for ds in catalog._datasets.values():
+    for ds in catalog.values():
         if hasattr(ds, "_filepath") is not None:
             ds.save(1)
 

@@ -1,4 +1,6 @@
 import logging
+import os
+import re
 from copy import deepcopy
 from pathlib import Path
 from typing import Optional, Union
@@ -205,14 +207,11 @@ class KedroPipelineModel(PythonModel):
             #   >>> posix_path=path_uri.as_posix() # file:/C:/Users/username/Documents/file.txt" #
             # notice "file:/"" pathprefix
 
-            import re
-
             posix_path = Path(uri).as_posix()
             if re.match(pattern=r"file:/\w+", string=posix_path):
                 self._logger.warning(
                     f"The URI '{uri}' is considered relative : {uri}(due to windows specific bug), retrying conversion"
                 )
-                import os
 
                 # we remove the "file:/" prefix on windows
                 # and "file:" on posix systems (keep the slash prefix)
@@ -259,13 +258,16 @@ class KedroPipelineModel(PythonModel):
             # no need to check if params are in the catalog, because mlflow already checks that the params matching the signature
             param = f"params:{name}"
             self._logger.info(f"Using {param}={value} for the prediction")
-            self.loaded_catalog[param] = value
+            self.loaded_catalog[param].save(value)
 
-        self.loaded_catalog[self.input_name].save(model_input)
+        # the catalog will be modified inplace at runtime, e.g. if the outputs "predictions" is not in the catalog it will be added inplace
+        # to avoid duplications, we deepcopy at runtime
+        runtime_catalog = deepcopy(self.loaded_catalog)
+        runtime_catalog[self.input_name].save(model_input)
 
         run_output = runner.run(
             pipeline=self.pipeline,
-            catalog=self.loaded_catalog,
+            catalog=runtime_catalog,
             hook_manager=hook_manager,
         )
 

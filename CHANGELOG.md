@@ -473,7 +473,7 @@
 -   :sparkles: `pipeline_ml_factory` now accepts that `inference` pipeline `inputs` may be in `training` pipeline `inputs` ([#71](https://github.com/Galileo-Galilei/kedro-mlflow/issues/71))
 -   :sparkles: `pipeline_ml_factory` now infer automatically the schema of the input dataset to validate data automatically at inference time. The output schema can be declared manually in `model_signature` argument ([#70](https://github.com/Galileo-Galilei/kedro-mlflow/issues/70))
 -   :sparkles: Add two DataSets for model logging and saving: `MlflowModelTrackingDataset` and `MlflowModelLocalFileSystemDataset` ([#12](https://github.com/Galileo-Galilei/kedro-mlflow/issues/12))
--   :sparkles: `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
+-   :sparkles: `MlflowPipelineHook` and `MlflowNodeHook` are now [auto-registered](https://docs.kedro.org/en/stable/hooks/introduction.html#registering-the-hook-implementation-with-kedro) if you use `kedro>=0.16.4` ([#29](https://github.com/Galileo-Galilei/kedro-mlflow/issues/29))
 
 ### Fixed
 

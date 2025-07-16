@@ -11,7 +11,7 @@ authors = [
     {name = "Yolan Honoré-Rougé"}
 ]
 description = "A kedro-plugin to use mlflow in your kedro projects"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "kedro==1.0.0rc1",
     "mlflow>=2.7.0, <3.0.0",
@@ -33,7 +33,6 @@ keywords = [
 license = {text = "Apache Software License (Apache 2.0)"}
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -138,8 +137,8 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.9
-target-version = "py39"
+# Assume Python 3.10
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
@@ -190,3 +189,6 @@ filename = "kedro_mlflow/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "README.md"
+
+[tool.uv.sources]
+kedro-datasets = { git = "https://github.com/kedro-org/kedro-plugins.git", subdirectory = "kedro-datasets", rev = "main" }

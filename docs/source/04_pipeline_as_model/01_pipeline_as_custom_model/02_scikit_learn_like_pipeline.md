@@ -110,4 +110,3 @@ You have also other resources to understand the rationale:
 
 - an explanation of the [``PipelineML`` class in the python objects section](https://kedro-mlflow.readthedocs.io/en/latest/source/05_API/01_python_objects/03_Pipelines.html)
 - detailed explanations [on this issue](https://github.com/Galileo-Galilei/kedro-mlflow/issues/16) and [this discussion](https://github.com/Galileo-Galilei/kedro-mlflow/discussions/229).
-- an example of use in a user project [in this repo](https://github.com/laurids-reichardt/kedro-examples/blob/kedro-mlflow-hotfix2/text-classification/src/text_classification/pipelines/pipeline.py).

@@ -28,7 +28,7 @@ class KedroClickGroup(click.Group):
         self.commands = {}
 
         # add commands on the fly based on conditions
-        if is_kedro_project(Path.cwd()):
+        if is_kedro_project(find_kedro_project(Path.cwd())):
             self.add_command(init)
             self.add_command(ui)
             self.add_command(modelify)

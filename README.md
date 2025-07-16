@@ -41,7 +41,7 @@ You can install ``kedro-mlflow`` with several tools and from several packaging p
 | ![Conda Forge logo](https://simpleicons.org/icons/condaforge.svg) | Conda Forge  | ``conda install kedro-mlflow --channel conda-forge`` |
 |     ![GitHub logo](https://simpleicons.org/icons/github.svg)      |    GitHub    | ``pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git`` |
 
-I strongly recommend to use a package manager (like ``conda``) to create a virtual environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html).
+I strongly recommend to use a package manager (like ``conda``) to create a virtual environment and to read [``kedro`` installation guide](https://docs.kedro.org/en/stable/get_started/minimal_kedro_project.html#step-1-install-kedro).
 
 # Getting started
 

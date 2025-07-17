@@ -9,6 +9,7 @@ from kedro.framework.session import KedroSession
 from kedro.framework.startup import bootstrap_project
 from kedro.io import DataCatalog
 from kedro.pipeline import Pipeline, node
+from kedro.runner import SequentialRunner, ThreadRunner
 from mlflow.entities import RunStatus
 from mlflow.tracking import MlflowClient
 
@@ -63,18 +64,35 @@ def mock_settings_with_mlflow_hooks(mocker):
 
 @pytest.fixture
 def mock_failing_pipeline(mocker):
-    def failing_node():
-        mlflow.start_run(nested=True)
+    def useless_node():
+        return "nothing"
+
+    def failing_node(x):
         raise ValueError("Let's make this pipeline fail")
 
     def mocked_register_pipelines():
         failing_pipeline = Pipeline(
             [
                 node(
-                    func=failing_node,
+                    func=useless_node,
                     inputs=None,
+                    outputs="fake_output1",
+                ),
+                node(
+                    func=useless_node,
+                    inputs=None,
+                    outputs="fake_output2",
+                ),
+                node(
+                    func=useless_node,
+                    inputs=None,
+                    outputs="fake_output3",
+                ),
+                node(
+                    func=failing_node,
+                    inputs="fake_output3",
                     outputs="fake_output",
-                )
+                ),
             ]
         )
         return {"__default__": failing_pipeline, "pipeline_off": failing_pipeline}
@@ -88,19 +106,18 @@ def mock_failing_pipeline(mocker):
 
 # @pytest.mark.usefixtures("mock_settings_with_mlflow_hooks")
 @pytest.mark.usefixtures("mock_failing_pipeline")
-def test_on_pipeline_error(kedro_project_with_mlflow_conf):
+@pytest.mark.parametrize(
+    "runner",
+    [SequentialRunner(), ThreadRunner()],
+)
+def test_mark_run_as_failed_on_pipeline_error(kedro_project_with_mlflow_conf, runner):
     tracking_uri = (kedro_project_with_mlflow_conf / "mlruns").as_uri()
 
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-        from logging import getLogger
-
-        LOGGER = getLogger(__name__)
-        LOGGER.info(f"{mlflow.active_run()=}")
         with pytest.raises(ValueError):
-            LOGGER.info(f"{mlflow.active_run()=}")
-            session.run()
+            session.run(runner=runner)
 
     # the run we want is the last one in the configuration experiment
     mlflow_client = MlflowClient(tracking_uri)

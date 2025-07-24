@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+
 ### Added
 
 -   :memo: Update thread-safe related logs to DEBUG level to reduce logging ([#650](https://github.com/Galileo-Galilei/kedro-mlflow/pull/650))
@@ -13,6 +14,12 @@
 ### Fixed
 
 -   :bug: Fix ``KedroPipelineModel.load_context`` loading from local files with uri filepath for ``mlflow>=2.21,<3`` [#656](https://github.com/Galileo-Galilei/kedro-mlflow/pull/656)
+
+
+### Fixed
+
+-   :bug: Fix opening new MLFlow's SystemMetricsMonitors in every node [#647](https://github.com/Galileo-Galilei/kedro-mlflow/pull/647) 
+
 
 ## [0.14.4] - 2025-02-20
 

@@ -306,6 +306,7 @@ class MlflowHook:
                 mlflow.start_run(
                     run_id=self.run_id,
                     nested=self.mlflow_config.tracking.run.nested,
+                    log_system_metrics=False,
                 )
                 self._logger.debug(
                     f"Restarting mlflow run '{mlflow.active_run().info.run_name}' - '{self.run_id}' at node level for multi-threading"

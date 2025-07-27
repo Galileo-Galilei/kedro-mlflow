@@ -13,7 +13,7 @@ authors = [
 description = "A kedro-plugin to use mlflow in your kedro projects"
 requires-python = ">=3.9"
 dependencies = [
-    "kedro>=0.19.0, <0.20.0",
+    "kedro>=0.19.0, <1.1.0",
     "kedro_datasets",
     "mlflow>=2.7.0, <3.0.0",
     "pydantic>=1.0.0, <3.0.0"

@@ -3,7 +3,6 @@ from pathlib import Path
 import mlflow
 import pandas as pd
 import pytest
-from kedro import __version__ as kedro_version
 from kedro.io import AbstractDataset
 from kedro_datasets.pandas import CSVDataset
 from kedro_datasets.partitions import PartitionedDataset
@@ -11,8 +10,6 @@ from kedro_datasets.pickle import PickleDataset
 from pytest_lazy_fixtures import lf
 
 from kedro_mlflow.io.artifacts import MlflowArtifactDataset
-
-KEDRO_VERSION = tuple(int(x) for x in kedro_version.split("."))
 
 
 @pytest.fixture
@@ -295,9 +292,6 @@ def test_artifact_dataset_partitioned_dataset_save_and_reload(
         pd.testing.assert_frame_equal(df, reloaded_data[k])
 
 
-@pytest.mark.skipif(
-    KEDRO_VERSION < (0, 19, 7), reason="modern datasets were introduced in kedro 0.19.7"
-)
 def test_artifact_dataset_modern_dataset(tmp_path, mlflow_client, df1):
     class MyOwnDatasetWithoutUnderscoreMethods(AbstractDataset):
         def __init__(self, filepath):

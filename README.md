@@ -41,7 +41,7 @@ You can install ``kedro-mlflow`` with several tools and from several packaging p
 | ![Conda Forge logo](https://simpleicons.org/icons/condaforge.svg) | Conda Forge  | ``conda install kedro-mlflow --channel conda-forge`` |
 |     ![GitHub logo](https://simpleicons.org/icons/github.svg)      |    GitHub    | ``pip install --upgrade git+https://github.com/Galileo-Galilei/kedro-mlflow.git`` |
 
-I strongly recommend to use a package manager (like ``conda``) to create a virtual environment and to read [``kedro`` installation guide](https://kedro.readthedocs.io/en/latest/get_started/install.html).
+I strongly recommend to use a package manager (like ``conda``) to create a virtual environment and to read [``kedro`` installation guide](https://docs.kedro.org/en/stable/get_started/minimal_kedro_project.html#step-1-install-kedro).
 
 # Getting started
 
@@ -64,9 +64,7 @@ The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/maste
 
 # Disclaimer
 
-This package is still in active development. We use [SemVer](https://semver.org/) principles to version our releases. Until we reach `1.0.0` milestone, breaking changes will lead to `<minor>` version number increment, while releases which do not introduce breaking changes in the API will lead to `<patch>` version number increment.
-
-The user must be aware that we will not reach `1.0.0` milestone before Kedro does (mlflow has already reached `1.0.0`). **That said, the API is considered as stable from 0.8.0 version and user can reliably consider that no consequent breaking change will happen unless necessary for Kedro compatibility (e.g. for minor or major Kedro version).**
+This package is still in active development. We use [SemVer](https://semver.org/) principles to version our releases. Since we reached `1.0.0` (compatible with ``kedro==1.X`` and ``mlflow==1.X`` or ``2.X``) on 27th of July 2025, breaking changes will lead to `major` version number increment, while releases which do not introduce breaking changes in the API will lead to `minor` or ``patch`` (for bugs) version number increment.
 
 If you want to migrate from an older version of `kedro-mlflow` to most recent ones, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/latest/source/06_migration_guide/index.html).
 

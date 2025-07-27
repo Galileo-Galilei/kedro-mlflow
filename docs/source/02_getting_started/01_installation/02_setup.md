@@ -4,7 +4,7 @@ This section assume that [you have installed `kedro-mlflow` in your virtual envi
 
 ## Create a kedro project
 
-This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://kedro.readthedocs.io/en/latest/get_started/new_project.html).
+This plugin must be used in an existing kedro project. If you do not have a kedro project yet, you can create it with ``kedro new`` command. [See the kedro docs for a tutorial](https://docs.kedro.org/en/stable/get_started/minimal_kedro_project.html#step-2-create-a-new-kedro-project).
 
 If you do not have a real-world project, you can use a kedro example and [follow the "Quickstart in 1 mn" example](https://kedro-mlflow.readthedocs.io/en/latest/source/02_getting_started/02_quickstart/01_example_project.html) to make a demo of this plugin out of the box.
 
@@ -47,7 +47,7 @@ kedro mlflow init --env=<other-environment>
 
 ### Declaring ``kedro-mlflow`` hooks
 
-``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://kedro.readthedocs.io/en/latest/hooks/introduction.html).
+``kedro_mlflow`` hooks implementations must be registered with Kedro. There are 2 ways of registering [hooks](https://docs.kedro.org/en/stable/hooks/introduction.html).
 
 ```{important}
 You must register the hook provided by ``kedro-mlflow`` (the ``MlflowHook``) to make the plugin work.
@@ -57,13 +57,13 @@ You must register the hook provided by ``kedro-mlflow`` (the ``MlflowHook``) to 
 
 :::{tab-item} `kedro>=0.16.4` - auto-discovery
 
-If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
+If you use `kedro>=0.16.4`, `kedro-mlflow` hooks are auto-registered automatically by default without any action from your side. You can [disable this behaviour](https://docs.kedro.org/en/stable/hooks/introduction.html#disable-auto-registered-plugins-hooks) in your `settings.py` file.
 
 :::
 
 :::{tab-item} `kedro>=0.16.0, <=0.16.3` - register in ``settings.py``
 
-If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://kedro.readthedocs.io/en/latest/hooks/introduction.html#registering-your-hook-implementations-with-kedro):
+If you have turned off plugin automatic registration, you can register its hooks manually by [adding them to ``settings.py``](https://docs.kedro.org/en/stable/hooks/introduction.html#registering-your-hook-implementations-with-kedro):
 
 ```python
 # <your_project>/src/<your_project>/settings.py

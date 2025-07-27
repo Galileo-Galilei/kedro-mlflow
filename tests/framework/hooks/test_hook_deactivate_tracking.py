@@ -143,10 +143,10 @@ class DummyProjectHooks:
 
 
 def _mock_imported_settings_paths(mocker, mock_settings):
+    # see https://github.com/kedro-org/kedro/blob/625f62ca5d9cce328f302fffa2c58b93d29b810e/tests/framework/session/test_session.py#L106
     for path in [
-        "kedro.framework.context.context.settings",
-        "kedro.framework.session.session.settings",
         "kedro.framework.project.settings",
+        "kedro.framework.session.session.settings",
     ]:
         mocker.patch(path, mock_settings)
     return mock_settings

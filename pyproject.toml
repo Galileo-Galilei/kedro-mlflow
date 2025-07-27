@@ -11,12 +11,11 @@ authors = [
     {name = "Yolan Honoré-Rougé"}
 ]
 description = "A kedro-plugin to use mlflow in your kedro projects"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
-    "kedro>=0.19.0, <0.20.0",
-    "kedro_datasets",
+    "kedro>=1.0.0, <2.0.0",
     "mlflow>=2.7.0, <3.0.0",
-    "pydantic>=1.0.0, <3.0.0"
+    "pydantic>=1.0.0, <3.0.0",
 ]
 keywords = [
     "kedro-plugin",
@@ -34,7 +33,6 @@ keywords = [
 license = {text = "Apache Software License (Apache 2.0)"}
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -57,7 +55,7 @@ test = [
     "pytest-xdist>=3.0.0,<4.0.0",  # mess up the test readibility in the console but is much faster for the CI with "-n auto" option
     "ruff>=0.5.0,<1.0.0",  # ensure consistency with pre-commit
     "scikit-learn>=0.23.0, <1.7.0",
-    "kedro-datasets[pandas.CSVDataSet]",
+    "kedro-datasets[pandas.CSVDataSet]>=8.0.0",
 ]
 
 doc = [
@@ -139,8 +137,8 @@ exclude = [
 line-length = 88
 indent-width = 4
 
-# Assume Python 3.9
-target-version = "py39"
+# Assume Python 3.10
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.

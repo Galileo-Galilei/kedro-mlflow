@@ -4,11 +4,11 @@
 
 ### Added
 
--   :memo: Update thread-safe related logs to DEBUG level to reduce logging ([#650](https://github.com/Galileo-Galilei/kedro-mlflow/pull/650))
+-   :memo: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
 
 ### Changed
 
--   :mute: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
+-    :mute: Update thread-safe related logs to DEBUG level to reduce logging ([#650](https://github.com/Galileo-Galilei/kedro-mlflow/pull/650))
 
 ### Fixed
 

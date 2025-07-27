@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: Add support for ``kedro>=1.0.0`` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
+
+### Changed
+
+- :boom: :pushpin: Drop support for ``kedro==0.19.X`` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
+
 ## [0.14.5] - 2025-07-27
 
 ### Added

@@ -2,13 +2,15 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2025-07-27
+
 ### Added
 
--   :sparkles: Add support for ``kedro>=1.0.0`` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
+-   :sparkles: Add support for `kedro>=1.0.0` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
 
 ### Changed
 
-- :boom: :pushpin: Drop support for ``kedro==0.19.X`` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
+-   :boom: :pushpin: Drop support for `kedro==0.19.X` ([#658](https://github.com/Galileo-Galilei/kedro-mlflow/pull/658))
 
 ## [0.14.5] - 2025-07-27
 
@@ -596,7 +598,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.5...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.0...HEAD
+
+[1.0.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.5...1.0.0
 
 [0.14.5]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.4...0.14.5
 

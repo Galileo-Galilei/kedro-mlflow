@@ -2,17 +2,19 @@
 
 ## [Unreleased]
 
+## [0.14.5] - 2025-07-27
+
 ### Added
 
 -   :memo: Document how to make partitioned datasets log only outputs of the current run ([#652](https://github.com/Galileo-Galilei/kedro-mlflow/pull/652))
 
 ### Changed
 
--    :mute: Update thread-safe related logs to DEBUG level to reduce logging ([#650](https://github.com/Galileo-Galilei/kedro-mlflow/pull/650))
+-   :mute: Update thread-safe related logs to DEBUG level to reduce logging ([#650](https://github.com/Galileo-Galilei/kedro-mlflow/pull/650))
 
 ### Fixed
 
--   :bug: Fix ``KedroPipelineModel.load_context`` loading from local files with uri filepath for ``mlflow>=2.21,<3`` [#656](https://github.com/Galileo-Galilei/kedro-mlflow/pull/656)
+-   :bug: Fix `KedroPipelineModel.load_context` loading from local files with uri filepath for `mlflow>=2.21,<3` [#656](https://github.com/Galileo-Galilei/kedro-mlflow/pull/656)
 
 ## [0.14.4] - 2025-02-20
 
@@ -586,7 +588,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.4...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.5...HEAD
+
+[0.14.5]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.4...0.14.5
 
 [0.14.4]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.3...0.14.4
 

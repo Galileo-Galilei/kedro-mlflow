@@ -94,8 +94,12 @@ class MlflowModelRegistryDataset(MlflowAbstractModelDataSet):
         # the model itself does not have information about its registry
         # because the same run can be registered under several different names
         #  in the registry. See https://github.com/Galileo-Galilei/kedro-mlflow/issues/552
-
-        self._logger.info(f"Loading model from run_id='{model.metadata.run_id}'")
+        if (
+            model is not None
+            and hasattr(model, "metadata")
+            and hasattr(model.metadata, "run_id")
+        ):
+            self._logger.info(f"Loading model from run_id='{model.metadata.run_id}'")
         return model
 
     def _save(self, model: Any) -> None:

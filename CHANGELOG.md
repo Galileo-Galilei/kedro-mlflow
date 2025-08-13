@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+- :bug: Fix `run_id` logging error while loading `MlflowModelRegistryDataset` ([#671](https://github.com/Galileo-Galilei/kedro-mlflow/pull/671))
+
 ## [1.0.0] - 2025-07-27
 
 ### Added

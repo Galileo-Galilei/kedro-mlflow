@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2025-08-13
+
 ### Fixed
 
-- :bug: Fix `run_id` logging error while loading `MlflowModelRegistryDataset` ([#671](https://github.com/Galileo-Galilei/kedro-mlflow/pull/671))
+-   :bug: Fix `run_id` logging error while loading `MlflowModelRegistryDataset` ([#671](https://github.com/Galileo-Galilei/kedro-mlflow/pull/671))
 
 ## [1.0.0] - 2025-07-27
 
@@ -602,7 +604,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.1...HEAD
+
+[1.0.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.0...1.0.1
 
 [1.0.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/0.14.5...1.0.0
 

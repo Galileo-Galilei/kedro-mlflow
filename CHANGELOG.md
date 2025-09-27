@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2025-09-27
+
 ### Fixed
 
 -   :bug: Treat "databricks-uc" as a special value for mlflow_registry_uri ([#675](https://github.com/Galileo-Galilei/kedro-mlflow/issues/675))
@@ -608,7 +610,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.2...HEAD
+
+[1.0.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.1...1.0.2
 
 [1.0.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.0...1.0.1
 

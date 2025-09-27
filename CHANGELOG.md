@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Treat "databricks-uc" as a special value for mlflow_registry_uri ([#675](https://github.com/Galileo-Galilei/kedro-mlflow/issues/675))
+
 ## [1.0.1] - 2025-08-13
 
 ### Fixed

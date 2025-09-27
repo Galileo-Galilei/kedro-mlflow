@@ -292,11 +292,12 @@ def test_validate_uri_local_absolute_uri(kedro_project_with_mlflow_conf, tmp_pat
 
 
 def test_kedro_mlflow_config_validate_uri_databricks(kedro_project_with_mlflow_conf):
-    # databricks is a reseved keyword which should not be modified
-    config_uri = _validate_uri(
-        uri="databricks", project_path=kedro_project_with_mlflow_conf
-    )
-    assert config_uri == "databricks"
+    # databricks et databricks-uc sont des mots-clés réservés qui ne doivent pas être modifiés
+    for special_uri in ["databricks", "databricks-uc"]:
+        config_uri = _validate_uri(
+            uri=special_uri, project_path=kedro_project_with_mlflow_conf
+        )
+        assert config_uri == special_uri
 
 
 def test_from_dict_to_dict_idempotent(kedro_project_with_mlflow_conf):

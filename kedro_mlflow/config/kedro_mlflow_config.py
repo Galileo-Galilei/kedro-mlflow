@@ -271,9 +271,10 @@ def _validate_uri(project_path: str, uri: Optional[str]) -> str:
         str -- A valid mlflow_tracking_uri
     """
 
-    if uri == "databricks":
-        # "databricks" is a special reserved keyword for mlflow which should not be converted to a path
+    if uri in ("databricks", "databricks-uc"):
+        # "databricks" and "databricks-uc" are special reserved keywords for mlflow which should not be converted to a path
         # see: https://mlflow.org/docs/latest/tracking.html#where-runs-are-recorded
+        # see: https://docs.databricks.com/en/machine-learning/manage-model-lifecycle.html#configure-mlflow-client-to-access-models-in-unity-catalog
         return uri
 
     # if no tracking uri is provided, we register the runs locally at the root of the project

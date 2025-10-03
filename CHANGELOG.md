@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+-   :sparkles: Add support for `mlflow>=3.0.0` ([#657](https://github.com/Galileo-Galilei/kedro-mlflow/issues/657))
+
 ## [1.0.2] - 2025-09-27
 
 ### Fixed

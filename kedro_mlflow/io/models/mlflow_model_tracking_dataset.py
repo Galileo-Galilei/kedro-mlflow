@@ -118,12 +118,15 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         else:
             # if there is no run_id, log in active run
             # OR open automatically a new run to log
+            if not mlflow.active_run():
+                # in mlflow 3, mlflow.log_model no longer starts automatically a run if there is no active one
+                mlflow.start_run()
             self._save_model_in_run(model)
 
     def _save_model_in_run(self, model):
         if self._flavor == "mlflow.pyfunc":
-            # PyFunc models utilise either `python_model` or `loader_module`
-            # workflow. We we assign the passed `model` object to one of those keys
+            # PyFunc models uses either `python_model` or `loader_module`
+            # workflow. We assign the passed `model` object to one of those keys
             # depending on the chosen `pyfunc_workflow`.
             self._save_args[self._pyfunc_workflow] = model
             if self._logging_activated:

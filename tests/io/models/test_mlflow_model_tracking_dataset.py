@@ -270,7 +270,7 @@ def test_load_without_run_id_nor_active_run(tracking_uri):
         (lf("pipeline_inference")),  # must work for Pipeline
     ],
 )
-def test_pyfunc_flavor_python_model_save_and_load(
+def test_pyfunc_flavor_python_model_save_and_load_tracking_dataset(
     tmp_folder,
     tracking_uri,
     pipeline,

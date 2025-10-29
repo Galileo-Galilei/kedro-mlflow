@@ -8,14 +8,13 @@ from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
 )
 
 
+# TODO: rename as MlflowLoggedModelDataset ? check out implications and relevance
 class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 
     def __init__(
         self,
         flavor: str,
-        run_id: Optional[str] = None,
-        artifact_path: Optional[str] = "model",
         pyfunc_workflow: Optional[str] = None,
         load_args: Optional[dict[str, Any]] = None,
         save_args: Optional[dict[str, Any]] = None,
@@ -26,21 +25,17 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         Parameters are passed from the Data Catalog.
 
         During save, the model is first logged to MLflow.
-        During load, the model is pulled from MLflow run with `run_id`.
+        During load, the model is pulled from MLflow through its model_id.
 
         Args:
             flavor (str): Built-in or custom MLflow model flavor module.
-                Must be Python-importable.
-            run_id (Optional[str], optional): MLflow run ID to use to load
-                the model from or save the model to. Defaults to None.
-            artifact_path (str, optional): the run relative path to
-                the model.
+                Must be Python-importable. ex: "mlflow.sklearn", "mlflow.pyfunc..."
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
             load_args (dict[str, Any], optional): Arguments to `load_model`
                 function from specified `flavor`. Defaults to None.
             save_args (dict[str, Any], optional): Arguments to `log_model`
-                function from specified `flavor`. Defaults to None.
+                function from specified `flavor`. Default to None, it is recommended to specify 'name'.
             metadata: Any arbitrary metadata.
                 This is ignored by Kedro, but may be consumed by users or external plugins.
 
@@ -48,7 +43,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             DatasetError: When passed `flavor` does not exist.
         """
         super().__init__(
-            filepath="",
+            filepath="",  # filepath is the model uri, but this is set dynamically by mlflow
             flavor=flavor,
             pyfunc_workflow=pyfunc_workflow,
             load_args=load_args,
@@ -57,43 +52,39 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             metadata=metadata,
         )
 
-        self._run_id = run_id
-        self._artifact_path = artifact_path
+        self._logger = self.getLogger(__name__)
 
-        # drop the key which MUST be common to save and load and
-        #  thus is instantiated outside save_args
-        self._save_args.pop("artifact_path", None)
-
-    @property
-    def model_uri(self):
-        run_id = None
-        if self._run_id:
-            run_id = self._run_id
-        elif mlflow.active_run() is not None:
-            run_id = mlflow.active_run().info.run_id
-        if run_id is None:
-            raise DatasetError(
-                "To access the model_uri, you must either: "
-                "\n -  specifiy 'run_id' "
-                "\n - have an active run to retrieve data from"
+        if self._save_args.get("name") is None:
+            self._logger.warning(
+                "It is highly recommended to specify 'name' in 'save_args' to log the model. Since you did not specify it, a default name will be used by mlflow when saving the model."
             )
+        # we will dynamically retrieve the model uri to use for loading the model based on the last one which was saved
+        # but if the user specified a model_uri when instantiating the class we should not override it
+        # we keep track of both to choose the right one when loading
+        self._user_defined_model_uri = self._save_args.pop("model_uri", None)
+        self._last_saved_model_uri = None
+        self.model_info = None
 
-        model_uri = f"runs:/{run_id}/{self._artifact_path}"
-
-        return model_uri
-
-    def _load(self) -> Any:
+    def _load(self) -> mlflow.entities.logged_model.LoggedModel:
         """Loads an MLflow model from local path or from MLflow run.
 
         Returns:
-            Any: Deserialized model.
+            LoggedModel: Deserialized model.
         """
 
-        # If `run_id` is specified, pull the model from MLflow.
-        # TODO: enable loading from another mlflow conf (with a client with another tracking uri)
-        # Alternatively, use local path to load the model.
+        if self._user_defined_model_uri is not None:
+            load_model_uri = self._user_defined_model_uri
+        elif self._last_saved_model_uri is not None:
+            load_model_uri = self._last_saved_model_uri
+        else:
+            raise DatasetError(
+                "To load form a given model_uri, you must either: "
+                "\n - specify 'model_uri' in 'load_args' when creating the class instance with one of these formats: https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_pyfunc"
+                "\n - have saved a model before to access the last saved model uri."
+            )
+
         return self._mlflow_model_module.load_model(
-            model_uri=self.model_uri, **self._load_args
+            model_uri=load_model_uri, **self._load_args
         )
 
     def _save(self, model: Any) -> None:
@@ -102,50 +93,42 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         Args:
             model (Any): A model object supported by the given MLflow flavor.
         """
-        if self._run_id:
-            if mlflow.active_run():
-                # it is not possible to log in a run which is not the current opened one
+        if self._logging_activated:
+            if self._user_defined_model_uri:
                 raise DatasetError(
-                    f"'run_id' cannot be specified (run_id='{self._run_id}') "
-                    f"if there is an mlflow active run (active run id='{mlflow.active_run().info.run_id}') "
-                    f"See the rationale in this issue: https://github.com/Galileo-Galilei/kedro-mlflow/issues/549."
+                    "It is impossible to save a model when 'model_uri' is specified."
+                    "Because mlflow does not let you override an existing model."
+                    "You should specify 'model_uri' only for loading an existing model."
                 )
-            else:
-                # if the run id is specified and there is no opened run,
-                # open the right run before logging
-                with mlflow.start_run(run_id=self._run_id):
-                    self._save_model_in_run(model)
-        else:
-            # if there is no run_id, log in active run
-            # OR open automatically a new run to log
-            if not mlflow.active_run():
-                # in mlflow 3, mlflow.log_model no longer starts automatically a run if there is no active one
-                mlflow.start_run()
-            self._save_model_in_run(model)
+            if self._flavor == "mlflow.pyfunc":
+                # PyFunc models uses either `python_model` or `loader_module`
+                # workflow. We assign the passed `model` object to one of those keys
+                # depending on the chosen `pyfunc_workflow`.
+                self._save_args[self._pyfunc_workflow] = model
 
-    def _save_model_in_run(self, model):
-        if self._flavor == "mlflow.pyfunc":
-            # PyFunc models uses either `python_model` or `loader_module`
-            # workflow. We assign the passed `model` object to one of those keys
-            # depending on the chosen `pyfunc_workflow`.
-            self._save_args[self._pyfunc_workflow] = model
-            if self._logging_activated:
-                self._mlflow_model_module.log_model(
-                    self._artifact_path, **self._save_args
+                # we store the Modelinfo object in model_info attribute for later loading
+                self.model_info = self._mlflow_model_module.log_model(**self._save_args)
+            else:
+                # Otherwise we save using the common workflow where first argument is the
+                # model object and second is the path.
+                # e.g., mlflow.sklearn.log_model(sklearn_model, name, ...)
+                self.model_info = self._mlflow_model_module.log_model(
+                    model, **self._save_args
                 )
-        elif self._logging_activated:
-            # Otherwise we save using the common workflow where first argument is the
-            # model object and second is the path.
-            self._mlflow_model_module.log_model(
-                model, self._artifact_path, **self._save_args
-            )
+
+            # keep track of the last saved model uri for later loading
+            self._last_saved_model_uri = self.model_info.model_uri
 
     def _describe(self) -> dict[str, Any]:
         return dict(
             flavor=self._flavor,
-            run_id=self._run_id,
-            artifact_path=self._artifact_path,
             pyfunc_workflow=self._pyfunc_workflow,
             load_args=self._load_args,
             save_args=self._save_args,
+            name=self._save_args.get("name") or self.model_info.name
+            if self.model_info
+            else None,
+            model_uri=self._user_defined_model_uri or self._last_saved_model_uri,
+            model_id=self.model_info._model_uuid if self.model_info else None,
+            run_id=self.model_info._run_id if self.model_info else None,
         )

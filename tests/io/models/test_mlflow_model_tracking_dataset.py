@@ -111,146 +111,137 @@ def kedro_pipeline_model(pipeline_ml_obj, dummy_catalog):
     return kedro_pipeline_model
 
 
-def test_flavor_does_not_exists():
+def test_model_tracking_dataset_flavor_does_not_exists():
     with pytest.raises(DatasetError, match="'mlflow.whoops' module not found"):
         MlflowModelTrackingDataset.from_config(
-            name="whoops",
             config={
                 "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
                 "flavor": "mlflow.whoops",
+                "save_args": {"name": "whoops"},
             },
         )
 
 
-def test_save_sklearn_flavor_with_run_id_and_already_active_run(tracking_uri):
-    """This test checks that saving a mlflow dataset must fail
-    if a run_id is specified but is different from the
-    mlflow.active_run()
-
-    """
-    mlflow.set_tracking_uri(tracking_uri)
-    # close all opened mlflow runs to avoid interference between tests
-    while mlflow.active_run():
-        mlflow.end_run()
-
-    mlflow.start_run()
-    existing_run_id = mlflow.active_run().info.run_id
-    mlflow.end_run()
-
-    artifact_path = "my_linreg"
-    model_config = {
-        "name": "linreg",
-        "config": {
-            "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
-            "run_id": existing_run_id,
-            "artifact_path": artifact_path,
-            "flavor": "mlflow.sklearn",
-        },
-    }
-    mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
-
-    # if a run is active, it is impossible to log in another run
-    with mlflow.start_run():
-        with pytest.raises(
-            DatasetError,
-            match="if there is an mlflow active run",
-        ):
-            mlflow_model_ds.save(linreg_model)
-
-
-@pytest.mark.parametrize("active_run_when_loading", [False, True])
-def test_save_and_load_sklearn_flavor_with_run_id(
-    mlflow_client, linreg_model, active_run_when_loading
+# TODO: change the test to check that load work and save crashes with model_uri
+def test_model_tracking_dataset_ensure_cannot_save_sklearn_flavor_with_model_uri(
+    linreg_model,
 ):
-    with mlflow.start_run():
-        existing_run_id = mlflow.active_run().info.run_id
-
-    artifact_path = "my_linreg"
     model_config = {
-        "name": "linreg",
+        "name": "model_ds",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
-            "run_id": existing_run_id,
-            "artifact_path": artifact_path,
+            "save_args": {"name": "my_linreg"},
+            "load_args": {"model_uri": "models:/my_linreg/1"},
             "flavor": "mlflow.sklearn",
         },
     }
-    mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
-
-    # "_save" opens, log and close the specified run
-    mlflow_model_ds.save(linreg_model)
-
-    mlflow_client.list_artifacts(run_id=existing_run_id)[0]
-    artifact = mlflow_client.list_artifacts(run_id=existing_run_id)[0]
-    assert artifact.path == artifact_path
-
-    if not active_run_when_loading:
-        mlflow.end_run()
 
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
+
+    with pytest.raises(
+        DatasetError,
+        match="It is impossible to save a model when 'model_uri' is specified.",
+    ):
+        mlflow_model_ds.save(linreg_model)
+
+
+def test_model_tracking_dataset_load_sklearn_flavor_with_model_uri_from_correct_uri(
+    linreg_model,
+):
+    # pre save two different model
+    model_info1 = mlflow.sklearn.log_model(linreg_model, "my_linreg1")
+    model_info2 = mlflow.sklearn.log_model(linreg_model, "my_linreg2")
+    model_config = {
+        "name": "model_ds",
+        "config": {
+            "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
+            "save_args": {"name": "my_linreg"},
+            "load_args": {"model_uri": model_info1.model_uri},  # load the first one
+            "flavor": "mlflow.sklearn",
+        },
+    }
+
+    mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
+
     linreg_model_loaded = mlflow_model_ds.load()
+    # the model uri is the one specified in load_args
+    assert mlflow_model_ds._describe()["model_uri"] == model_info1.model_uri
+    assert mlflow_model_ds._describe()["model_uri"] != model_info2.model_uri
+
     assert isinstance(linreg_model_loaded, LinearRegression)
     assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
 
 
-@pytest.mark.parametrize("initial_active_run", [False, True])
-def test_save_and_load_sklearn_flavor_without_run_id(
-    mlflow_client, linreg_model, initial_active_run
+def test_model_tracking_dataset_save_and_load_sklearn_flavor_without_model_uri_load_args(
+    linreg_model,
 ):
-    artifact_path = "my_linreg"
+    # pre save two different model
     model_config = {
-        "name": "linreg",
+        "name": "model_ds",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
-            "run_id": None,
-            "artifact_path": artifact_path,
+            "save_args": {"name": "my_linreg"},
             "flavor": "mlflow.sklearn",
         },
     }
+
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
 
-    # if no initial active run, "_save" triggers the run opening
-    if initial_active_run:
-        mlflow.start_run()
+    # the model uri is stored jsut after saving
+    assert mlflow_model_ds._describe()["model_uri"] is None
     mlflow_model_ds.save(linreg_model)
-    current_run_id = mlflow.active_run().info.run_id
-
-    mlflow_client.list_artifacts(run_id=current_run_id)[0]
-    artifact = mlflow_client.list_artifacts(run_id=current_run_id)[0]
-    assert artifact.path == artifact_path
-
-    # the run_id is still opened
-    mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
-    linreg_model_loaded = mlflow_model_ds.load()
-    assert isinstance(linreg_model_loaded, LinearRegression)
-    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
-
-    # load a second time after closing the active_run
-    mlflow.end_run()
-    model_config2 = model_config.copy()
-    model_config2["config"]["run_id"] = current_run_id
-    mlflow_model_ds2 = MlflowModelTrackingDataset.from_config(**model_config2)
-    linreg_model_loaded2 = mlflow_model_ds2.load()
-
-    assert isinstance(linreg_model_loaded2, LinearRegression)
+    # the model uri is the one specified in load_args
     assert (
-        pytest.approx(linreg_model_loaded2.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
+        mlflow_model_ds._describe()["model_uri"] == mlflow.last_logged_model().model_uri
     )
 
+    # when reloading, we got the same model
+    linreg_model_loaded = mlflow_model_ds.load()
 
+    assert isinstance(linreg_model_loaded, LinearRegression)
+    assert pytest.approx(linreg_model_loaded.predict([[1, 2]])[0], abs=10 ** (-14)) == 5  # noqa: PLR2004
+
+
+def test_model_tracking_dataset_save_twice(linreg_model):
+    # when saving twice, the model uri should be updated to the last one
+
+    model_config = {
+        "name": "model_ds",
+        "config": {
+            "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
+            "save_args": {"name": "my_linreg"},
+            "flavor": "mlflow.sklearn",
+        },
+    }
+
+    mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
+
+    # the model uri is stored just after saving
+    mlflow_model_ds.save(linreg_model)
+    last_logged_model_uri1 = mlflow.last_logged_model().model_uri
+    assert mlflow_model_ds._describe()["model_uri"] == last_logged_model_uri1
+
+    # save a second time
+    mlflow_model_ds.save(linreg_model)
+    last_logged_model_uri2 = mlflow.last_logged_model().model_uri
+    assert last_logged_model_uri1 != last_logged_model_uri2
+    assert mlflow_model_ds._describe()["model_uri"] == last_logged_model_uri2
+
+
+# TODO: change the test to load with or without load_args={model_uri}
 def test_load_without_run_id_nor_active_run(tracking_uri):
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():
         mlflow.end_run()
 
-    artifact_path = "my_linreg"
+    name = "my_linreg"
     model_config = {
         "name": "linreg",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
             "run_id": None,
-            "artifact_path": artifact_path,
+            "save_args": {"name": name},
             "flavor": "mlflow.sklearn",
         },
     }
@@ -289,8 +280,8 @@ def test_pyfunc_flavor_python_model_save_and_load_tracking_dataset(
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
             "flavor": "mlflow.pyfunc",
             "pyfunc_workflow": "python_model",
-            "artifact_path": "test_model",
             "save_args": {
+                "name": "test_model",
                 "artifacts": artifacts,
                 "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
@@ -316,18 +307,15 @@ def test_pyfunc_flavor_python_model_save_and_load_tracking_dataset(
     )
 
 
-# TODO: add a test for "pyfunc_workflow=loader_module"
-
-
 def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
     mlflow.set_tracking_uri(tracking_uri)
     model_config = {
-        "name": "kedro_pipeline_model",
+        "name": "tracking_ds",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
             "flavor": "mlflow.pyfunc",
             "pyfunc_workflow": "wrong_workflow",
-            "artifact_path": "test_model",
+            "save_args": {"name": "kedro_pipeline_model"},
         },
     }
     with pytest.raises(
@@ -337,6 +325,7 @@ def test_pyfunc_flavor_wrong_pyfunc_workflow(tracking_uri):
         MlflowModelTrackingDataset.from_config(**model_config)
 
 
+# TODO: change the test to check if no model has been created
 def test_mlflow_model_tracking_logging_deactivation(mlflow_client, linreg_model):
     mlflow_model_tracking_dataset = MlflowModelTrackingDataset(flavor="mlflow.sklearn")
 
@@ -374,7 +363,7 @@ def test_mlflow_model_tracking_logging_deactivation_is_bool():
         {"string": "bbb", "int": 0},
     ),
 )
-def test_metrics_history_dataset_with_metadata(metadata):
+def test_mlflow_model_tracking_dataset_with_metadata(metadata):
     mlflow_model_ds = MlflowModelTrackingDataset(
         flavor="mlflow.sklearn",
         metadata=metadata,

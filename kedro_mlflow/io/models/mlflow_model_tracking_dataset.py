@@ -52,8 +52,6 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             metadata=metadata,
         )
 
-        self._logger = self.getLogger(__name__)
-
         if self._save_args.get("name") is None:
             self._logger.warning(
                 "It is highly recommended to specify 'name' in 'save_args' to log the model. Since you did not specify it, a default name will be used by mlflow when saving the model."
@@ -61,7 +59,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         # we will dynamically retrieve the model uri to use for loading the model based on the last one which was saved
         # but if the user specified a model_uri when instantiating the class we should not override it
         # we keep track of both to choose the right one when loading
-        self._user_defined_model_uri = self._save_args.pop("model_uri", None)
+        self._user_defined_model_uri = self._load_args.pop("model_uri", None)
         self._last_saved_model_uri = None
         self.model_info = None
 
@@ -112,6 +110,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
                 # Otherwise we save using the common workflow where first argument is the
                 # model object and second is the path.
                 # e.g., mlflow.sklearn.log_model(sklearn_model, name, ...)
+
                 self.model_info = self._mlflow_model_module.log_model(
                     model, **self._save_args
                 )

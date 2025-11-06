@@ -114,10 +114,11 @@ def kedro_pipeline_model(pipeline_ml_obj, dummy_catalog):
 def test_model_tracking_dataset_flavor_does_not_exists():
     with pytest.raises(DatasetError, match="'mlflow.whoops' module not found"):
         MlflowModelTrackingDataset.from_config(
+            name="model_ds",
             config={
                 "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
-                "flavor": "mlflow.whoops",
                 "save_args": {"name": "whoops"},
+                "flavor": "mlflow.whoops",
             },
         )
 
@@ -228,7 +229,7 @@ def test_model_tracking_dataset_save_twice(linreg_model):
 
 
 # TODO: change the test to load with or without load_args={model_uri}
-def test_load_without_run_id_nor_active_run(tracking_uri):
+def test_load_without_model_uri_in_load_args_and_no_save_before(tracking_uri):
     mlflow.set_tracking_uri(tracking_uri)
     # close all opened mlflow runs to avoid interference between tests
     while mlflow.active_run():
@@ -239,7 +240,6 @@ def test_load_without_run_id_nor_active_run(tracking_uri):
         "name": "linreg",
         "config": {
             "type": "kedro_mlflow.io.models.MlflowModelTrackingDataset",
-            "run_id": None,
             "save_args": {"name": name},
             "flavor": "mlflow.sklearn",
         },
@@ -248,7 +248,7 @@ def test_load_without_run_id_nor_active_run(tracking_uri):
 
     with pytest.raises(
         DatasetError,
-        match="To access the model_uri, you must either",
+        match="To load from a given model_uri, you must either",
     ):
         mlflow_model_ds.load()
 

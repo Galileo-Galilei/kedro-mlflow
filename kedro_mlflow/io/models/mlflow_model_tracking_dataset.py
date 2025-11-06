@@ -72,7 +72,7 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             return self._last_saved_model_uri
         else:
             raise DatasetError(
-                "To load form a given model_uri, you must either: "
+                "To load from a given model_uri, you must either: "
                 "\n - specify 'model_uri' in 'load_args' when creating the class instance with one of these formats: https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html#mlflow.pyfunc.load_pyfunc"
                 "\n - have saved a model before to access the last saved model uri."
             )

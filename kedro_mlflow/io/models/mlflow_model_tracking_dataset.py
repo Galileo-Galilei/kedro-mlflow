@@ -63,17 +63,13 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
         self._last_saved_model_uri = None
         self.model_info = None
 
-    def _load(self) -> mlflow.entities.logged_model.LoggedModel:
-        """Loads an MLflow model from local path or from MLflow run.
-
-        Returns:
-            LoggedModel: Deserialized model.
-        """
-
+    # create an attribute model_uri which will store the model uri of the last saved model
+    @property
+    def model_uri(self) -> str | None:
         if self._user_defined_model_uri is not None:
-            load_model_uri = self._user_defined_model_uri
+            return self._user_defined_model_uri
         elif self._last_saved_model_uri is not None:
-            load_model_uri = self._last_saved_model_uri
+            return self._last_saved_model_uri
         else:
             raise DatasetError(
                 "To load form a given model_uri, you must either: "
@@ -81,8 +77,15 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
                 "\n - have saved a model before to access the last saved model uri."
             )
 
+    def _load(self) -> mlflow.entities.logged_model.LoggedModel:
+        """Loads an MLflow model from local path or from MLflow run.
+
+        Returns:
+            LoggedModel: Deserialized model.
+        """
+
         return self._mlflow_model_module.load_model(
-            model_uri=load_model_uri, **self._load_args
+            model_uri=self.model_uri, **self._load_args
         )
 
     def _save(self, model: Any) -> None:

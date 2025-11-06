@@ -175,7 +175,6 @@ def test_model_tracking_dataset_load_sklearn_flavor_with_model_uri_from_correct_
 def test_model_tracking_dataset_save_and_load_sklearn_flavor_without_model_uri_load_args(
     linreg_model,
 ):
-    # pre save two different model
     model_config = {
         "name": "model_ds",
         "config": {
@@ -187,7 +186,7 @@ def test_model_tracking_dataset_save_and_load_sklearn_flavor_without_model_uri_l
 
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
 
-    # the model uri is stored jsut after saving
+    # the model uri is stored just after saving
     assert mlflow_model_ds._describe()["model_uri"] is None
     mlflow_model_ds.save(linreg_model)
     # the model uri is the one specified in load_args
@@ -290,14 +289,12 @@ def test_pyfunc_flavor_python_model_save_and_load_tracking_dataset(
 
     mlflow.set_tracking_uri(tracking_uri)
     mlflow_model_ds = MlflowModelTrackingDataset.from_config(**model_config)
-    mlflow_model_ds.save(kedro_pipeline_model)
-    current_run_id = mlflow.active_run().info.run_id
+    mlflow_model_ds.save(kedro_pipeline_model)  # no run created in mlflow 3
 
-    # close the run, create another dataset and reload
-    # (emulate a new "kedro run" with the launch of the )
-    mlflow.end_run()
     model_config2 = model_config.copy()
-    model_config2["config"]["run_id"] = current_run_id
+    # add load args in model_config2 with a model uri key pointing to the last saved model
+    model_config2["config"]["load_args"] = {"model_uri": mlflow_model_ds.model_uri}
+
     mlflow_model_ds2 = MlflowModelTrackingDataset.from_config(**model_config2)
 
     loaded_model = mlflow_model_ds2.load()

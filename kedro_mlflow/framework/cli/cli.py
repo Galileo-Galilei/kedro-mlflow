@@ -181,20 +181,6 @@ def ui(env: str, port: str, host: str):
 
 
 @mlflow_commands.command()
-def run():
-    """Re-run an old run with mlflow-logged info."""
-
-    # TODO (HARD) : define general assumptions to check whether a run
-    #  is reproductible or not
-
-    # TODO retrieve command
-    # TODO retrieve parameters
-    # TODO perform checks on data
-    # TODO launch run
-    raise NotImplementedError  # pragma: no cover
-
-
-@mlflow_commands.command()
 @click.option(
     "--pipeline",
     "-p",
@@ -227,35 +213,23 @@ def run():
     help="Should the input_example of the input data be inferred for mlflow?",
 )
 @click.option(
-    "--run-id",
-    "-r",
-    required=False,
-    default=None,
-    help="The id of the mlflow run where the model will be logged. If unspecified, the command creates a new run.",
-)
-@click.option(
-    "--run-name",
-    required=False,
-    default="modelify",
-    help="The name of the mlflow run where the model will be logged. Defaults to 'modelify'.",
-)
-@click.option(
     "--copy-mode",
     required=False,
     default="deepcopy",
     help="The copy mode to use when replacing each dataset by a MemoryDataset. Either a string (applied all datasets) or a dict mapping each dataset to a copy_mode.",
 )
 @click.option(
-    "--artifact-path",
-    default="model",
-    required=False,
-    help="The artifact path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model",
-)
-@click.option(
-    "--code-path",
+    "--model-name",
     default=None,
     required=False,
-    help="The code path of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model",
+    help="The model name of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model",
+)
+@click.option(
+    "--code-paths",
+    default=None,
+    multiple=True,
+    required=False,
+    help="The code paths of mlflow.pyfunc.log_model, see https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#mlflow.pyfunc.log_model",
 )
 @click.option(
     "--conda-env",
@@ -293,11 +267,9 @@ def modelify(
     input_name: str,
     flag_infer_signature: Optional[bool],
     flag_infer_input_example: Optional[bool],
-    run_id: Optional[str],
-    run_name: Optional[str],
     copy_mode: Optional[Union[str, dict[str, str]]],
-    artifact_path: str,
-    code_path: str,
+    model_name: str,
+    code_paths: list[str],
     conda_env: Optional[str],
     registered_model_name: str,
     await_registration_for: int,
@@ -347,16 +319,15 @@ def modelify(
                 catalog=catalog,
                 input_name=input_name,
                 copy_mode=copy_mode,
-                # add runner option
             )
 
             artifacts = kedro_pipeline_model.extract_pipeline_artifacts(Path(tmp_dir))
 
             log_model_kwargs = dict(
-                artifact_path=artifact_path,
+                name=model_name or f"model-{pipeline_name}",
                 python_model=kedro_pipeline_model,
                 artifacts=artifacts,
-                code_path=code_path,
+                code_paths=list(code_paths),
                 signature=model_signature,
                 input_example=input_example,
                 registered_model_name=registered_model_name,
@@ -379,10 +350,10 @@ def modelify(
 
             log_model_kwargs["conda_env"] = conda_env
 
-            with mlflow.start_run(run_id=run_id, run_name=run_name):
-                mlflow.pyfunc.log_model(**log_model_kwargs)
-                run_id = mlflow.active_run().info.run_id
-                LOGGER.info(f"Model successfully logged in run '{run_id}'")
+            model_info = mlflow.pyfunc.log_model(**log_model_kwargs)
+            LOGGER.info(
+                f"Model '{model_info.name}' successfully logged with model_id '{model_info.model_id}'"
+            )
 
 
 class KedroMlflowCliError(Exception):

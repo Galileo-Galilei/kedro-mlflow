@@ -48,7 +48,7 @@ dynamic = ["readme", "version"]
 
 [project.optional-dependencies]
 test = [
-    "pytest>=5.4.0, <9.0.0",
+    "pytest>=5.4.0, <10.0.0",
     "pytest-cov>=2.8.0, <7.0.0",
     "pytest-lazy-fixtures>=1.0.0, <2.0.0", # pytest==8.0.0 breaks pytest-lazy-fixture (without final S) : https://github.com/TvoroG/pytest-lazy-fixture/issues/65
     "pytest-mock>=3.1.0, <4.0.0",

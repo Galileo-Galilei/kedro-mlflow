@@ -8,7 +8,6 @@ from kedro_mlflow.io.models.mlflow_abstract_model_dataset import (
 )
 
 
-# TODO: rename as MlflowLoggedModelDataset ? check out implications and relevance
 class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
     """Wrapper for saving, logging and loading for all MLflow model flavor."""
 

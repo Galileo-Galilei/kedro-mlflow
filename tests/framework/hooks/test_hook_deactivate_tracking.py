@@ -2,7 +2,6 @@ from pathlib import Path
 from typing import Any, Iterable, Optional
 
 import pytest
-import toml
 import yaml
 from kedro import __version__ as kedro_version
 from kedro.config import AbstractConfigLoader, OmegaConfigLoader
@@ -45,9 +44,8 @@ def _write_yaml(filepath: Path, config: dict):
     filepath.write_text(yaml_str)
 
 
-def _write_toml(filepath: Path, config: dict):
+def _write_toml(filepath: Path, toml_str: str):
     filepath.parent.mkdir(parents=True, exist_ok=True)
-    toml_str = toml.dumps(config)
     filepath.write_text(toml_str)
 
 
@@ -112,16 +110,14 @@ def config_dir(
     _write_yaml(parameters_yml, {"a": "my_param_a"})
     _write_yaml(mlflow_yml, mlflow_config_wo_tracking)
     _write_yaml(credentials_yml, {})
-    payload = {
-        "tool": {
-            "kedro": {
-                "project_name": MOCK_PACKAGE_NAME,
-                "package_name": MOCK_PACKAGE_NAME,
-                "kedro_init_version": kedro_version,
-            }
-        }
-    }
-    _write_toml(pyproject_toml, payload)
+
+    toml_str = f"""\
+[tool.kedro]
+project_name = "{MOCK_PACKAGE_NAME}"
+package_name = "{MOCK_PACKAGE_NAME}"
+kedro_init_version = "{kedro_version}"
+"""
+    _write_toml(pyproject_toml, toml_str)
 
 
 class DummyProjectHooks:

@@ -268,7 +268,7 @@ def dummy_catalog_dataset_factory(tmp_path):
         (lf("dummy_pipeline_ml")),
     ],
 )
-def test_mlflow_hook_save_pipeline_ml(
+def test_mlflow_hook_save_pipeline_ml_as_model(
     kedro_project_with_mlflow_conf,
     pipeline_to_run,
     dummy_catalog,
@@ -303,33 +303,27 @@ def test_mlflow_hook_save_pipeline_ml(
         mlflow_hook.after_pipeline_run(
             run_params=dummy_run_params, pipeline=pipeline_to_run, catalog=dummy_catalog
         )
+
         # test : parameters should have been logged
         mlflow_client = MlflowClient(context.mlflow.server.mlflow_tracking_uri)
-        run_data = mlflow_client.get_run(run_id).data
+        loaded_run = mlflow_client.get_run(run_id)
 
         # all run_params are recorded as tags
         for k, v in dummy_run_params.items():
             if v:
-                assert run_data.tags[k] == str(v)
+                assert loaded_run.data.tags[k] == str(v)
 
         # params are not recorded because we don't have MlflowHook here
         # and the model should not be logged when it is not a PipelineML
-        nb_artifacts = len(mlflow_client.list_artifacts(run_id))
+        # in mlflow 3, models are no longer artifacts of the run but either inputs or puputs
         if isinstance(pipeline_to_run, PipelineML):
-            assert nb_artifacts == 1
+            assert len(loaded_run.outputs.model_outputs) == 1
         else:
-            assert nb_artifacts == 0
+            assert len(loaded_run.outputs.model_outputs) == 0
 
         if isinstance(pipeline_to_run, PipelineML):
             trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/model")
 
-            # there is a trick: before python 3.8, the dict is not ordered
-            # and the conversion to string sometimes leads to
-            # '[{"name": "a", "type": "long"}]' and sometimes to
-            # '[{"type": "long", "name": "a"}]'
-            # which causes random failures and we had to case each case
-            # This was drop when we support only python >=3.9, but
-            # I let the comment in case the bug bounces back
             assert trained_model.metadata.signature.to_dict() == {
                 "inputs": '[{"type": "long", "name": "a", "required": true}]',
                 "outputs": None,

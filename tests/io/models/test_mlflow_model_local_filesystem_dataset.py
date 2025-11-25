@@ -155,7 +155,7 @@ def test_save_load_local(linreg_path, linreg_model, versioned):
         (lf("pipeline_inference")),  # must work for Pipeline
     ],
 )
-def test_pyfunc_flavor_python_model_save_and_load(
+def test_pyfunc_flavor_python_model_save_and_load_local_fs(
     tmp_path, tmp_folder, pipeline, dummy_catalog
 ):
     kedro_pipeline_model = KedroPipelineModel(

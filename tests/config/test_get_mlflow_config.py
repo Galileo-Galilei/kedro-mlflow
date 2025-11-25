@@ -4,7 +4,6 @@ from pathlib import Path
 
 import mlflow.tracking.request_header.registry as mtrr  # necessary to access the global variable '_request_header_provider_registry' of the namespace
 import pytest
-import toml
 import yaml
 from kedro import __version__ as kedro_version
 from kedro.config import OmegaConfigLoader
@@ -195,19 +194,16 @@ def fake_project(tmp_path, local_logging_config):
     (fake_project_dir / "src").mkdir(parents=True)
 
     pyproject_toml_path = fake_project_dir / "pyproject.toml"
-    payload = {
-        "tool": {
-            "kedro": {
-                "project_name": "fake_project",
-                "package_name": "fake_package",
-                "kedro_init_version": kedro_version,
-                "tools": "['None']",
-                "example_pipeline": "False",
-                "source_dir": "src",
-            }
-        }
-    }
-    toml_str = toml.dumps(payload)
+
+    toml_str = f"""\
+[tool.kedro]
+project_name = "fake_project"
+package_name = "fake_package"
+kedro_init_version = "{kedro_version}"
+tools = "['None']"
+example_pipeline = "False"
+source_dir = "src"
+    """
     pyproject_toml_path.write_text(toml_str, encoding="utf-8")
 
     env_logging = fake_project_dir / "conf" / "base" / "logging.yml"

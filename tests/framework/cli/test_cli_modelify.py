@@ -254,9 +254,6 @@ def test_modelify_logs_in_mlflow_even_inside_subdirectory(
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(
@@ -265,11 +262,10 @@ def test_modelify_logs_in_mlflow_even_inside_subdirectory(
         catch_exceptions=True,
     )
 
-    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
-
     assert result.exit_code == 0
+
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
+
     # parse the log
     stripped_output = re.sub(r"\[.+\]", "", result.output)
     stripped_output = re.sub(
@@ -283,8 +279,10 @@ def test_modelify_logs_in_mlflow_even_inside_subdirectory(
             f"The dataset '{artifact}' is added to the Pipeline catalog"
             in stripped_output
         )
-    assert "Model successfully logged" in stripped_output
-    assert len(runs_list_after_cmd) - len(runs_list_before_cmd) == 1
+    assert (
+        "Model 'model-inference' successfully logged with model_id" in stripped_output
+    )
+    assert model_id is not None  # the model has been logged
 
 
 def test_modelify_informative_error_on_invalid_input_name(monkeypatch, kp_for_modelify):
@@ -317,13 +315,6 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_id_set_before_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
-
     result = cli_runner.invoke(
         cli_modelify,
         [
@@ -331,27 +322,19 @@ def test_modelify_with_artifact_path_arg(monkeypatch, kp_for_modelify):
             "inference",
             "--input-name",
             "my_input_data",
-            "--artifact-path",
+            "--model-name",
             "my_new_model",
         ],
         catch_exceptions=True,
     )
-    runs_id_set_after_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
-
-    new_run_id = runs_id_set_after_cmd - runs_id_set_before_cmd
 
     assert result.exit_code == 0
-    assert "my_new_model" in [
-        file.path
-        for file in context.mlflow.server._mlflow_client.list_artifacts(
-            list(new_run_id)[0]
-        )
-    ]
+
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
+
+    logged_model = context.mlflow.server._mlflow_client.get_logged_model(model_id)
+
+    assert "my_new_model" == logged_model.name
 
 
 def test_modelify_with_infer_signature_arg(
@@ -370,13 +353,6 @@ def test_modelify_with_infer_signature_arg(
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)
 
-    runs_id_set_before_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
-
     result = cli_runner.invoke(
         cli_modelify,
         [
@@ -391,16 +367,9 @@ def test_modelify_with_infer_signature_arg(
 
     assert result.exit_code == 0
 
-    runs_id_set_after_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
 
-    new_run_id = list(runs_id_set_after_cmd - runs_id_set_before_cmd)[0]
-
-    loaded_model = mlflow.pyfunc.load_model(f"runs:/{new_run_id}/model")
+    loaded_model = mlflow.pyfunc.load_model(f"models:/{model_id}")
 
     assert loaded_model.metadata.get_input_schema().to_dict() == [
         {"name": "col_int", "type": "long", "required": True},
@@ -427,13 +396,6 @@ def test_modelify_with_infer_input_example(
         catalog.save("trained_model", 2)
         catalog.save("my_input_data", my_input_data)
 
-    runs_id_set_before_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
-
     cmd = [
         "--pipeline",
         "inference",
@@ -452,16 +414,9 @@ def test_modelify_with_infer_input_example(
 
     assert result.exit_code == 0
 
-    runs_id_set_after_cmd = {
-        run.info.run_id
-        for run in context.mlflow.server._mlflow_client.search_runs(
-            context.mlflow.tracking.experiment._experiment.experiment_id
-        )
-    }
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
 
-    new_run_id = list(runs_id_set_after_cmd - runs_id_set_before_cmd)[0]
-
-    loaded_model = mlflow.pyfunc.load_model(f"runs:/{new_run_id}/model")
+    loaded_model = mlflow.pyfunc.load_model(f"models:/{model_id}")
 
     assert loaded_model.metadata.saved_input_example_info == {
         "artifact_path": "input_example.json",
@@ -481,9 +436,6 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(
@@ -499,25 +451,19 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
         catch_exceptions=True,
     )
 
-    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
-
     assert result.exit_code == 0
 
-    # check if there is a single new run
-    run_as_set = set(runs_list_after_cmd) - set(runs_list_before_cmd)
-    assert len(run_as_set) == 1
-    model_run_id = list(run_as_set)[0].info.run_id
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
 
     # retrieve the requirements from the run
     requirements_filepath = mlflow.pyfunc.get_model_dependencies(
-        f"runs:/{model_run_id}/model", format="pip"
+        f"models:/{model_id}", format="pip"
     )
+    print(f"{requirements_filepath=}")
     assert Path(requirements_filepath).parts[-4:] == (
-        model_run_id,
+        "models",
+        model_id,
         "artifacts",
-        "model",
         "requirements.txt",
     )
 
@@ -534,9 +480,6 @@ def test_modelify_with_default_conda_env(monkeypatch, kp_for_modelify):
         catalog = context.catalog
         catalog.save("trained_model", 2)
 
-    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
     cli_runner = CliRunner()
 
     result = cli_runner.invoke(
@@ -550,26 +493,19 @@ def test_modelify_with_default_conda_env(monkeypatch, kp_for_modelify):
         catch_exceptions=True,
     )
 
-    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
-
     assert result.exit_code == 0
 
-    # check if there is a single new run
-    run_as_set = set(runs_list_after_cmd) - set(runs_list_before_cmd)
-    assert len(run_as_set) == 1
-    model_run_id = list(run_as_set)[0].info.run_id
+    model_id = re.search(r"with model_id[ \n]*'(m-[\w]+)'", result.output).group(1)
 
     # retrieve the requirements from the run
     conda_filepath = mlflow.pyfunc.get_model_dependencies(
-        f"runs:/{model_run_id}/model", format="conda"
+        f"models:/{model_id}", format="conda"
     )
 
     assert Path(conda_filepath).parts[-4:] == (
-        model_run_id,
+        "models",
+        model_id,
         "artifacts",
-        "model",
         "conda.yaml",
     )
 
@@ -626,55 +562,3 @@ def test_modelify_fail_with_multiple_requirements(
         "Only one of `conda_env`, `pip_requirements`, and `extra_pip_requirements` can be specified"
         in str(result.exception)
     )
-
-
-@pytest.mark.parametrize(
-    "arg_run_name,actual_run_name",
-    [
-        (None, "modelify"),
-        ("abcd", "abcd"),
-    ],
-)
-def test_modelify_with_run_name(
-    monkeypatch, kp_for_modelify, arg_run_name, actual_run_name
-):
-    monkeypatch.chdir(kp_for_modelify)
-
-    bootstrap_project(Path().cwd())
-    with KedroSession.create(project_path=Path().cwd()) as session:
-        context = session.load_context()
-        catalog = context.catalog
-        catalog.save("trained_model", 2)
-
-    cli_runner = CliRunner()
-
-    cli_args = [
-        "--pipeline",
-        "inference",
-        "--input-name",
-        "my_input_data",
-    ]
-
-    if arg_run_name is not None:
-        cli_args = cli_args + ["--run-name", arg_run_name]
-
-    runs_list_before_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
-
-    result = cli_runner.invoke(
-        cli_modelify,
-        cli_args,
-        catch_exceptions=True,
-    )
-
-    runs_list_after_cmd = context.mlflow.server._mlflow_client.search_runs(
-        context.mlflow.tracking.experiment._experiment.experiment_id
-    )
-
-    assert result.exit_code == 0
-
-    # check if there is a single new run
-    run_as_set = set(runs_list_after_cmd) - set(runs_list_before_cmd)
-    assert len(run_as_set) == 1
-    assert list(run_as_set)[0].info.run_name == actual_run_name

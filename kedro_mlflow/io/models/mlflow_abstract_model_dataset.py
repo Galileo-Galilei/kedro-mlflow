@@ -60,6 +60,7 @@ class MlflowAbstractModelDataSet(AbstractVersionedDataset):
             raise DatasetError(
                 "PyFunc models require specifying `pyfunc_workflow` "
                 "(set to either `python_model` or `loader_module`)"
+                f" got {pyfunc_workflow=} instead."
             )
 
         self._load_args = load_args or {}

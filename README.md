@@ -31,7 +31,7 @@
 
 # How do I install kedro-mlflow?
 
-**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0`` and ``mlflow>=2.0.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
+**Important: ``kedro-mlflow`` is only compatible with ``kedro>=0.16.0`` and ``mlflow>=1.0.0``. If you have a project created with an older version of ``Kedro``, see this [migration guide](https://github.com/quantumblacklabs/kedro/blob/master/RELEASE.md#migration-guide-from-kedro-015-to-016).**
 
 You can install ``kedro-mlflow`` with several tools and from several packaging platforms:
 
@@ -64,7 +64,7 @@ The [release history](https://github.com/Galileo-Galilei/kedro-mlflow/blob/maste
 
 # Disclaimer
 
-This package is still in active development. We use [SemVer](https://semver.org/) principles to version our releases. Since we reached `2.0.0` (compatible with ``kedro==1.X`` and ``mlflow==1.X`` or ``2.X``) on 27th of July 2025, breaking changes will lead to `major` version number increment, while releases which do not introduce breaking changes in the API will lead to `minor` or ``patch`` (for bugs) version number increment.
+This package is still in active development. We use [SemVer](https://semver.org/) principles to version our releases. Since we reached `1.0.0` (compatible with ``kedro==1.X`` and ``mlflow==1.X`` or ``2.X``) on 27th of July 2025, breaking changes will lead to `major` version number increment, while releases which do not introduce breaking changes in the API will lead to `minor` or ``patch`` (for bugs) version number increment. Current kedro-mlflow `2.0.0` is only compatible with ``mlflow==3.x``
 
 If you want to migrate from an older version of `kedro-mlflow` to most recent ones, see the [migration guide](https://kedro-mlflow.readthedocs.io/en/latest/source/06_migration_guide/index.html).
 

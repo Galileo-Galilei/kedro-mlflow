@@ -58,12 +58,10 @@ csv_dataset.save(data=pd.DataFrame({"a": [1, 2], "b": [3, 4]}))
 
 The ``MlflowModelTrackingDataset`` accepts the following arguments:
 
-- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable.
-- run_id (Optional[str], optional): MLflow run ID to use to load the model from or save the model to. It plays the same role as "filepath" for standard mlflow datasets. Defaults to None.
-- artifact_path (str, optional): the run relative path to the model.
-- pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.See [mlflow workflows](https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows).
-- load_args (dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`. Defaults to None.
-- save_args (dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`. Defaults to None.
+- flavor (str): Built-in or custom MLflow model flavor module. Must be Python-importable (e.g. ``mlflow.sklearn``, ``mlflow.pyfunc`` ...)
+- load_args (dict[str, Any], optional): Arguments to `load_model` function from specified `flavor`, see mlflow documentation (e.g. mlflow.sklearn.load_model) for each flavor. Defaults to None.
+- save_args (dict[str, Any], optional): Arguments to `log_model` function from specified `flavor`, see mlflow documentation. Default to None, it is recommended to specify 'name'.
+- metadata: Any arbitrary metadata. This is ignored by Kedro, but may be consumed by users or external plugins.
 
 You can either only specify the flavor:
 
@@ -71,15 +69,17 @@ You can either only specify the flavor:
 from kedro_mlflow.io.models import MlflowModelTrackingDataset
 from sklearn.linear_model import LinearRegression
 
-mlflow_model_tracking = MlflowModelTrackingDataset(flavor="mlflow.sklearn")
+mlflow_model_tracking = MlflowModelTrackingDataset(
+    flavor="mlflow.sklearn", save_args={"name": "my_model"}
+)
 mlflow_model_tracking.save(LinearRegression())
 ```
 
-Let assume that this first model has been saved once, and you xant to retrieve it (for prediction for instance):
+Let assume that this first model has been saved once, and you want to retrieve it (for prediction for instance), you can [specify the ``model_uri``](https://mlflow.org/docs/latest/api_reference/python_api/mlflow.pyfunc.html?highlight=mlflow%20pyfunc%20load_model#mlflow.pyfunc.load_model):
 
 ```python
 mlflow_model_tracking = MlflowModelTrackingDataset(
-    flavor="mlflow.sklearn", run_id="<the-model-run-id>"
+    flavor="mlflow.sklearn", load_args={"model_uri": "models:/my_model"}
 )
 my_linear_regression = mlflow_model_tracking.load()
 my_linear_regression.predict(
@@ -92,9 +92,8 @@ You can also specify some [logging parameters](https://www.mlflow.org/docs/lates
 ```python
 mlflow_model_tracking = MlflowModelTrackingDataset(
     flavor="mlflow.sklearn",
-    run_id="<the-model-run-id>",
     save_args={
-        "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
+        "conda_env": {"python": "3.11.0", "dependencies": ["kedro==1.0.0"]},
         "input_example": data.iloc[0:5, :],
     },
 )
@@ -107,12 +106,11 @@ As always with kedro, you can use it directly in the `catalog.yml` file:
 my_model:
     type: kedro_mlflow.io.models.MlflowModelTrackingDataset
     flavor: "mlflow.sklearn"
-    run_id: <the-model-run-id>,
     save_args:
         conda_env:
-            python: "3.10.0"
+            python: "3.11.0"
             dependencies:
-                - "kedro==0.18.11"
+                - "kedro==1.0.0"
 ```
 
 ### ``MlflowModelLocalFileSystemDataset``

@@ -33,9 +33,9 @@ class MlflowModelTrackingDataset(MlflowAbstractModelDataSet):
             pyfunc_workflow (str, optional): Either `python_model` or `loader_module`.
                 See https://www.mlflow.org/docs/latest/python_api/mlflow.pyfunc.html#workflows.
             load_args (dict[str, Any], optional): Arguments to `load_model`
-                function from specified `flavor`. Defaults to None.
+                function from specified `flavor`, see mlflow documentation. Defaults to None.
             save_args (dict[str, Any], optional): Arguments to `log_model`
-                function from specified `flavor`. Default to None, it is recommended to specify 'name'.
+                function from specified `flavor`, see mlflow documentation. Default to None, it is recommended to specify 'name'.
             metadata: Any arbitrary metadata.
                 This is ignored by Kedro, but may be consumed by users or external plugins.
 

@@ -6,6 +6,12 @@
 
 -   :sparkles: Add support for `mlflow>=3.0.0` ([#657](https://github.com/Galileo-Galilei/kedro-mlflow/issues/657))
 
+### Changed
+
+-   :boom: :pushpin: Drop support for `mlflow>=2.0.0,<3.0.0` ([#678](https://github.com/Galileo-Galilei/kedro-mlflow/pull/678))
+-   :boom: Drop `run_id` argument of ``MlflowModelTrackingDataset``. In mlflow 3, the model is no longer necessarily tied to a run. It is now possible to specify ``load_args={"model_uri":"models/<name>}`` to load a specific model outside the current run.  ([#678](https://github.com/Galileo-Galilei/kedro-mlflow/pull/678))
+-   :boom: Drop `artifact_path` argument of ``MlflowModelTrackingDataset``. In mlflow 3, this argument is renamed ``name``and can be passed to the dataset with``save_args={"name":"my_model_name"}`` ([#678](https://github.com/Galileo-Galilei/kedro-mlflow/pull/678))
+
 ## [1.0.2] - 2025-09-27
 
 ### Fixed

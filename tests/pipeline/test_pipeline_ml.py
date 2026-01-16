@@ -619,3 +619,35 @@ def test_not_enough_inference_outputs():
             ),
             input_name="data",
         )
+
+
+def test_conflicting_custom_log_model_kwargs(pipeline_ml_with_tag):
+    """Test that providing both 'name' and 'artifact_path' raises an error."""
+    with pytest.raises(KedroMlflowPipelineMLError, match="Please only specify 'name'."):
+        pipeline_ml_factory(
+            training=pipeline_ml_with_tag.training,
+            inference=pipeline_ml_with_tag.inference,
+            input_name=pipeline_ml_with_tag.input_name,
+            log_model_kwargs={
+                "name": "CustomModelName",
+                "artifact_path": "custom_artifact_path",
+            },
+        )
+
+
+def test_back_compatible_custom_log_model_kwargs(caplog, pipeline_ml_with_tag):
+    """
+    Test that user-provided 'artifact_path' value still works and is mapped to 'name'.
+    """
+    custom_log_model_kwargs = {"artifact_path": "custom_artifact_path"}
+    pipeline_ml_with_custom_log_model_kwargs = pipeline_ml_factory(
+        training=pipeline_ml_with_tag.training,
+        inference=pipeline_ml_with_tag.inference,
+        input_name=pipeline_ml_with_tag.input_name,
+        log_model_kwargs=custom_log_model_kwargs.copy(),
+    )
+    assert (
+        pipeline_ml_with_custom_log_model_kwargs.log_model_kwargs["name"]
+        == custom_log_model_kwargs["artifact_path"]
+    )
+    assert "'artifact_path' is deprecated" in caplog.text

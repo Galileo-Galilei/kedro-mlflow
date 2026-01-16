@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Enable `PipelineML` logging with either custom model `name` following MLflow v3 convention, or custom `artifact_path` for back-compatibility with older MLflow versions. ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
+
 ## [2.0.0] - 2025-11-25
 
 ### Added

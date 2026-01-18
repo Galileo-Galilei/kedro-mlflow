@@ -34,7 +34,7 @@ class PipelineML(Pipeline):
     """
 
     KPM_KWARGS_DEFAULT = {}
-    LOG_MODEL_KWARGS_DEFAULT = {"signature": "auto", "artifact_path": "model"}
+    LOG_MODEL_KWARGS_DEFAULT = {"signature": "auto", "name": "model"}
 
     def __init__(
         self,
@@ -85,6 +85,16 @@ class PipelineML(Pipeline):
         self.kpm_kwargs = {**self.KPM_KWARGS_DEFAULT, **kpm_kwargs}
 
         log_model_kwargs = log_model_kwargs or {}
+        if "name" in log_model_kwargs and "artifact_path" in log_model_kwargs:
+            raise KedroMlflowPipelineMLError(
+                "Both 'artifact_path' (deprecated in MLflow v3) and 'name' "
+                "parameters were specified. Please only specify 'name'."
+            )
+        elif "artifact_path" in log_model_kwargs:
+            self._logger.warning(
+                "'artifact_path' is deprecated in MLflow v3. Please use 'name' instead."
+            )
+            log_model_kwargs["name"] = log_model_kwargs.pop("artifact_path")
         self.log_model_kwargs = {**self.LOG_MODEL_KWARGS_DEFAULT, **log_model_kwargs}
         self._check_consistency()
 

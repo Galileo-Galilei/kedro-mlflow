@@ -82,7 +82,7 @@ def dummy_pipeline_ml(dummy_pipeline, env_from_dict):
         training=dummy_pipeline.only_nodes_with_tags("training"),
         inference=dummy_pipeline.only_nodes_with_tags("inference"),
         input_name="raw_data",
-        log_model_kwargs={"conda_env": env_from_dict, "artifact_path": "model"},
+        log_model_kwargs={"conda_env": env_from_dict, "name": "model"},
     )
     return dummy_pipeline_ml
 
@@ -371,7 +371,7 @@ def test_mlflow_hook_save_pipeline_ml_with_copy_mode(
             inference=dummy_pipeline_ml.inference,
             input_name=dummy_pipeline_ml.input_name,
             log_model_kwargs={
-                "artifact_path": dummy_pipeline_ml.log_model_kwargs["artifact_path"],
+                "name": dummy_pipeline_ml.log_model_kwargs["name"],
                 "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
             kpm_kwargs={
@@ -431,7 +431,7 @@ def test_mlflow_hook_save_pipeline_ml_with_default_copy_mode_assign(
             inference=dummy_pipeline_ml.inference,
             input_name=dummy_pipeline_ml.input_name,
             log_model_kwargs={
-                "artifact_path": dummy_pipeline_ml.log_model_kwargs["artifact_path"],
+                "name": dummy_pipeline_ml.log_model_kwargs["name"],
                 "conda_env": {"python": "3.10.0", "dependencies": ["kedro==0.18.11"]},
             },
         )
@@ -578,17 +578,17 @@ def test_mlflow_hook_save_pipeline_ml_with_signature(
 
 
 @pytest.mark.parametrize(
-    "artifact_path,expected_artifact_path",
+    "name,expected_name",
     ([None, "model"], ["my_custom_model", "my_custom_model"]),
 )
-def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
+def test_mlflow_hook_save_pipeline_ml_with_name(
     kedro_project_with_mlflow_conf,
     env_from_dict,
     dummy_pipeline,
     dummy_catalog,
     dummy_run_params,
-    artifact_path,
-    expected_artifact_path,
+    name,
+    expected_name,
 ):
     # config_with_base_mlflow_conf is a conftest fixture
     bootstrap_project(kedro_project_with_mlflow_conf)
@@ -599,9 +599,9 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
         log_model_kwargs = {
             "conda_env": env_from_dict,
         }
-        if artifact_path is not None:
+        if name is not None:
             # we need to test what happens if the key is NOT present
-            log_model_kwargs["artifact_path"] = artifact_path
+            log_model_kwargs["name"] = name
 
         pipeline_to_run = pipeline_ml_factory(
             training=dummy_pipeline.only_nodes_with_tags("training"),
@@ -634,9 +634,7 @@ def test_mlflow_hook_save_pipeline_ml_with_artifact_path(
         )
 
         # test : parameters should have been logged
-        trained_model = mlflow.pyfunc.load_model(
-            f"runs:/{run_id}/{expected_artifact_path}"
-        )
+        trained_model = mlflow.pyfunc.load_model(f"runs:/{run_id}/{expected_name}")
         # the real test is that the model is loaded without error
         assert trained_model is not None
 
@@ -663,7 +661,7 @@ def test_mlflow_hook_save_pipeline_ml_with_dataset_factory(
         }
 
         namespace = "a"
-        log_model_kwargs["artifact_path"] = "artifacts"
+        log_model_kwargs["name"] = "artifacts"
         dummy_pipeline_with_namespace = pipeline(
             nodes=dummy_pipeline_dataset_factory, namespace=namespace
         )

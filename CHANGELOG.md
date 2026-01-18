@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-01-18
+
 ### Fixed
 
 -   :bug: Enable `PipelineML` logging with either custom model `name` following MLflow v3 convention, or custom `artifact_path` for back-compatibility with older MLflow versions. ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
@@ -626,7 +628,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.0...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.1...HEAD
+
+[2.0.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.0...2.0.1
 
 [2.0.0]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/1.0.2...2.0.0
 

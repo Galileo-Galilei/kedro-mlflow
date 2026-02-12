@@ -237,7 +237,7 @@ def test_deactivated_tracking_but_not_for_given_pipeline(mock_session):
             )
         }
 
-        mock_session.run(pipeline_name="pipeline_on")
+        mock_session.run(pipeline_names=["pipeline_on"])
 
         all_experiment_ids_end = [
             exp.experiment_id for exp in mlflow_client.search_experiments()
@@ -267,7 +267,7 @@ def test_deactivated_tracking_for_given_pipeline(mock_session):
             )
         }
 
-        mock_session.run(pipeline_name="pipeline_off")
+        mock_session.run(pipeline_names=["pipeline_off"])
 
         all_experiment_ids_end = [
             exp.experiment_id for exp in mlflow_client.search_experiments()

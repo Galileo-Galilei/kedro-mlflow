@@ -20,6 +20,22 @@ def test_generate_kedro_commands():
     assert _generate_kedro_command(**record_data) == expected
 
 
+def test_generate_kedro_commands_with_pipeline_names_list():
+    """Test that pipeline_names as a list is concatenated with '+'"""
+    record_data = {
+        "tags": ["tag1", "tag2"],
+        "from_nodes": ["node1"],
+        "to_nodes": ["node3"],
+        "node_names": ["node1", "node2", "node1"],
+        "from_inputs": ["data_in"],
+        "load_versions": {"data_inter": "01:23:45"},
+        "pipeline_names": ["pipeline1", "pipeline2", "pipeline3"],
+    }
+
+    expected = "kedro run --from-inputs=data_in --from-nodes=node1 --to-nodes=node3 --node=node1,node2,node1 --pipeline=pipeline1,pipeline2,pipeline3 --tag=tag1,tag2 --load-version=data_inter:01:23:45"
+    assert _generate_kedro_command(**record_data) == expected
+
+
 @pytest.mark.parametrize("default_value", [None, []])
 def test_generate_default_kedro_commands(default_value):
     """This test ensures that the _generate_kedro_comands accepts both

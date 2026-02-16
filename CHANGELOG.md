@@ -2,11 +2,15 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Support for `pipeline_names` argument in CLI added in ``kedro==1.2.0`` ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
+
 ## [2.0.1] - 2026-01-18
 
 ### Fixed
 
--   :bug: Enable `PipelineML` logging with either custom model `name` following MLflow v3 convention, or custom `artifact_path` for back-compatibility with older MLflow versions. ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
+-   :bug: Enable `PipelineML` logging with either custom model `name` following MLflow v3 convention, or custom `artifact_path` for back-compatibility with older MLflow versions. ([#687](https://github.com/Galileo-Galilei/kedro-mlflow/issues/687))
 
 ## [2.0.0] - 2025-11-25
 

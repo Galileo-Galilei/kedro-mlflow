@@ -214,14 +214,28 @@ class MlflowHook:
                     "node_names": Optional[list[str]],
                     "from_inputs": Optional[list[str]],
                     "load_versions": Optional[list[str]],
-                    "pipeline_name": str,
+                    "pipeline_name": str,  # deprecated, use pipeline_names
+                    "pipeline_names": Optional[list[str]],
                     "extra_params": Optional[dict[str, Any]],
                 }
             pipeline: The ``Pipeline`` that will be run.
             catalog: The ``DataCatalog`` to be used during the run.
         """
+        # Handle backward compatibility: pipeline_name (str) or pipeline_names (list[str])
+
+        pipeline_names = (
+            run_params.get("pipeline_name")
+            or run_params.get("pipeline_names")
+            or ["__default__"]
+        )
+        if isinstance(pipeline_names, str):
+            pipeline_names = [pipeline_names]
+
+        # Convert pipeline_names list to string with "+" separator for run name
+        pipeline_name_str = "+".join(pipeline_names)
+
         self._is_mlflow_enabled = _assert_mlflow_enabled(
-            run_params["pipeline_name"], self.mlflow_config
+            pipeline_names, self.mlflow_config
         )
 
         if self._is_mlflow_enabled:
@@ -233,11 +247,7 @@ class MlflowHook:
                 self.mlflow_config.tracking.params.long_params_strategy
             )
 
-            run_name = (
-                self.mlflow_config.tracking.run.name
-                or run_params["pipeline_name"]
-                or "__default__"
-            )
+            run_name = self.mlflow_config.tracking.run.name or pipeline_name_str
 
             if self._already_active_mlflow:
                 self.run_id = mlflow.active_run().info.run_id
@@ -270,7 +280,7 @@ class MlflowHook:
                     to_nodes=run_params["to_nodes"],
                     from_inputs=run_params["from_inputs"],
                     load_versions=run_params["load_versions"],
-                    pipeline_name=run_params["pipeline_name"],
+                    pipeline_names=pipeline_names,
                 ),
             )
 
@@ -387,7 +397,8 @@ class MlflowHook:
                     "node_names": Optional[list[str]],
                     "from_inputs": Optional[list[str]],
                     "load_versions": Optional[list[str]],
-                    "pipeline_name": str,
+                    "pipeline_name": str,  # deprecated, use pipeline_names
+                    "pipeline_names": Optional[list[str]],
                     "extra_params": Optional[dict[str, Any]],
                 }
             pipeline: The ``Pipeline`` that was run.
@@ -473,7 +484,8 @@ class MlflowHook:
                      "node_names": Optional[list[str]],
                      "from_inputs": Optional[list[str]],
                      "load_versions": Optional[list[str]],
-                     "pipeline_name": str,
+                     "pipeline_name": str,  # deprecated, use pipeline_names
+                     "pipeline_names": Optional[list[str]],
                      "extra_params": Optional[dict[str, Any]]
                    }
             pipeline: (Not used) The ``Pipeline`` that will was run.

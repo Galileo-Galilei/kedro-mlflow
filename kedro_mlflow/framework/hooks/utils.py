@@ -2,20 +2,22 @@ from kedro_mlflow.config.kedro_mlflow_config import KedroMlflowConfig
 
 
 def _assert_mlflow_enabled(
-    pipeline_name: str, mlflow_config: KedroMlflowConfig
+    pipeline_names: list[str], mlflow_config: KedroMlflowConfig
 ) -> bool:
     # TODO: we may want to enable to filter on tags
     # but we need to deal with the case when several tags are passed
     # what to do if 1 out of 2 is in the list?
     disabled_pipelines = mlflow_config.tracking.disable_tracking.pipelines
-    if pipeline_name in disabled_pipelines:
+
+    # Check if any pipeline is disabled
+    if all(name in disabled_pipelines for name in pipeline_names):
         return False
 
     return True
 
 
 def _generate_kedro_command(
-    tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_name
+    tags, node_names, from_nodes, to_nodes, from_inputs, load_versions, pipeline_names
 ):
     cmd_list = ["kedro", "run"]
     SEP = "="
@@ -27,8 +29,8 @@ def _generate_kedro_command(
         cmd_list.append("--to-nodes" + SEP + ",".join(to_nodes))
     if node_names:
         cmd_list.append("--node" + SEP + ",".join(node_names))
-    if pipeline_name:
-        cmd_list.append("--pipeline" + SEP + pipeline_name)
+    if pipeline_names:
+        cmd_list.append("--pipeline" + SEP + ",".join(pipeline_names))
     if tags:
         # "tag" is the name of the command, "tags" the value in run_params
         cmd_list.append("--tag" + SEP + ",".join(tags))

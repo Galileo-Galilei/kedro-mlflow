@@ -94,12 +94,7 @@ def test_on_pipeline_error(kedro_project_with_mlflow_conf):
     bootstrap_project(kedro_project_with_mlflow_conf)
     with KedroSession.create(project_path=kedro_project_with_mlflow_conf) as session:
         context = session.load_context()
-        from logging import getLogger
-
-        LOGGER = getLogger(__name__)
-        LOGGER.info(f"{mlflow.active_run()=}")
         with pytest.raises(ValueError):
-            LOGGER.info(f"{mlflow.active_run()=}")
             session.run()
 
     # the run we want is the last one in the configuration experiment

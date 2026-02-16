@@ -6,7 +6,7 @@
 
 ### Fixed
 
--   :bug: Support for `pipeline_names` argument in CLI added in `kedro==1.2.0` ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
+-   :bug: Support for `pipeline_names` argument in CLI added in `kedro==1.2.0` ([#686](https://github.com/Galileo-Galilei/kedro-mlflow/issues/686))
 
 ## [2.0.1] - 2026-01-18
 

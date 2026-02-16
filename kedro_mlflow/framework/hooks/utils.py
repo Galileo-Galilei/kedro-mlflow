@@ -8,8 +8,7 @@ def _assert_mlflow_enabled(
     # but we need to deal with the case when several tags are passed
     # what to do if 1 out of 2 is in the list?
     disabled_pipelines = mlflow_config.tracking.disable_tracking.pipelines
-    
-    
+
     # Check if any pipeline is disabled
     if all(name in disabled_pipelines for name in pipeline_names):
         return False

@@ -2,9 +2,11 @@
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-02-16
+
 ### Fixed
 
--   :bug: Support for `pipeline_names` argument in CLI added in ``kedro==1.2.0`` ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
+-   :bug: Support for `pipeline_names` argument in CLI added in `kedro==1.2.0` ([#683](https://github.com/Galileo-Galilei/kedro-mlflow/issues/683))
 
 ## [2.0.1] - 2026-01-18
 
@@ -632,7 +634,9 @@
 -   :sparkles: Add `MlflowDataSet` for artifacts autologging
 -   :sparkles: Add `PipelineMl` class and its `pipeline_ml` factory for pipeline packaging and service
 
-[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.1...HEAD
+[Unreleased]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.2...HEAD
+
+[2.0.2]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.1...2.0.2
 
 [2.0.1]: https://github.com/Galileo-Galilei/kedro-mlflow/compare/2.0.0...2.0.1
 

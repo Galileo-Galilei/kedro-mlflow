@@ -13,7 +13,7 @@ def test_generate_kedro_commands():
         "node_names": ["node1", "node2", "node1"],
         "from_inputs": ["data_in"],
         "load_versions": {"data_inter": "01:23:45"},
-        "pipeline_name": "fake_pl",
+        "pipeline_names": ["fake_pl"],
     }
 
     expected = "kedro run --from-inputs=data_in --from-nodes=node1 --to-nodes=node3 --node=node1,node2,node1 --pipeline=fake_pl --tag=tag1,tag2 --load-version=data_inter:01:23:45"
@@ -52,7 +52,7 @@ def test_generate_default_kedro_commands(default_value):
         "node_names": default_value,
         "from_inputs": default_value,
         "load_versions": default_value,
-        "pipeline_name": "fake_pl",
+        "pipeline_names": ["fake_pl"],
     }
 
     expected = "kedro run --pipeline=fake_pl"

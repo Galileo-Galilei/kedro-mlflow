@@ -459,7 +459,6 @@ def test_modelify_with_pip_requirements(monkeypatch, kp_for_modelify):
     requirements_filepath = mlflow.pyfunc.get_model_dependencies(
         f"models:/{model_id}", format="pip"
     )
-    print(f"{requirements_filepath=}")
     assert Path(requirements_filepath).parts[-4:] == (
         "models",
         model_id,

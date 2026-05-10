@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Fixed
+
+-   :bug: Add  ``PipelineML.__add__`` and ``PipelineML.__radd__`` to support ``pipeline_ml_factory`` alongside the new feature ability which enables to pass several `pipeline_names` argument in CLI introduced in `kedro==1.2.0` ([#690](https://github.com/Galileo-Galilei/kedro-mlflow/issues/690))
+
 ## [2.0.2] - 2026-02-16
 
 ### Fixed

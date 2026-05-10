@@ -76,7 +76,6 @@ class PipelineML(Pipeline):
         """
 
         super().__init__(nodes, *args, tags=tags)
-
         self.inference = inference
         self.input_name = input_name
         # they will be passed to KedroPipelineModel to enable flexibility
@@ -250,8 +249,34 @@ class PipelineML(Pipeline):
         return self._turn_pipeline_to_ml(pipeline)
 
     def __add__(self, other):  # pragma: no cover
+        # This specifically handles the case where we add with an empty pipeline,
+        # which is done in the KedroSession.run method since kedro 1.2.0 to handle several pipeline names in the same command:
+        # https://github.com/kedro-org/kedro/blob/86304ca0dc6785e8cdad70c988cf83a05fcecb7a/kedro/framework/session/session.py#L348-L351
+        if not other.nodes:
+            return self
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
         return self.training + other
+
+    def __radd__(self, other):  # pragma: no cover
+        # This specifically handles the case where we add with an empty pipeline,
+        # which is done in the KedroSession.run method since kedro 1.2.0 to handle several pipeline names in the same command:
+        # https://github.com/kedro-org/kedro/blob/86304ca0dc6785e8cdad70c988cf83a05fcecb7a/kedro/framework/session/session.py#L348-L351
+        if not other.nodes:
+            return self
+        self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)
+        return other + self.training
+
+    # check equality of two pipleinML
+    def __eq__(self, other):  # pragma: no cover
+        if not isinstance(other, PipelineML):
+            return False
+        return (
+            self.training.nodes == other.training.nodes
+            and self.inference.nodes == other.inference.nodes
+            and self.input_name == other.input_name
+            and self.kpm_kwargs == other.kpm_kwargs
+            and self.log_model_kwargs == other.log_model_kwargs
+        )
 
     def __sub__(self, other):  # pragma: no cover
         self._logger.warning(MSG_WARNING_PIPELINEML_DEMOTED)

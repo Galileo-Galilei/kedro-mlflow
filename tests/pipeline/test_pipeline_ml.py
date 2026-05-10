@@ -426,6 +426,31 @@ def test_pipeline_ml_or(
     )
 
 
+def test_pipeline_ml_addition_with_empty_pipeline(
+    pipeline_ml_with_tag,
+):
+    """Test that adding an empty pipeline to PipelineML works correctly.
+
+    This addresses the specific line in KedroSession.run:
+    https://github.com/kedro-org/kedro/blob/86304ca0dc6785e8cdad70c988cf83a05fcecb7a/kedro/framework/session/session.py#L347-L351
+    where the pipeline passed through the cli is added to an empty pipeline.
+
+    Thanks to monkey-patching Pipeline.__add__ in kedro_mlflow/__init__.py,
+    both directions now work correctly.
+    """
+    empty_pipeline = Pipeline([])
+
+    # Test 1: PipelineML + empty Pipeline → should preserve PipelineML
+    result_right = pipeline_ml_with_tag + empty_pipeline
+    assert isinstance(result_right, PipelineML)
+    assert result_right == pipeline_ml_with_tag
+
+    # Test 2: empty Pipeline + PipelineML → should also preserve PipelineML (via monkey patch)
+    result_left = empty_pipeline + pipeline_ml_with_tag
+    assert isinstance(result_left, PipelineML)
+    assert result_left == pipeline_ml_with_tag
+
+
 @pytest.mark.parametrize(
     "tags,from_nodes,to_nodes,node_names,from_inputs",
     [

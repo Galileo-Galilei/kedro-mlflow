@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+
+- :zap: Add opt-in bounded synchronous metric history batching, with offline
+  benchmarks and regression tests ([#693](https://github.com/Galileo-Galilei/kedro-mlflow/issues/693), contributed by GuilhermeP96).
+
 ## [2.0.3] - 2026-05-10
 
 ### Fixed

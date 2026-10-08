@@ -1,9 +1,11 @@
 from functools import partial
 from itertools import chain
+from time import time
 from typing import Any, Generator, Optional, Tuple, Union
 
 import mlflow
 from kedro.io import AbstractDataset, DatasetError
+from mlflow.entities import Metric
 from mlflow.tracking import MlflowClient
 
 MetricItem = Union[dict[str, float], list[dict[str, float]]]
@@ -19,17 +21,26 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         run_id: str = None,
         prefix: Optional[str] = None,
         metadata: Optional[dict[str, Any]] = None,
+        batch_size: Optional[int] = None,
     ):
         """Initialise MlflowMetricsHistoryDataset.
 
         Args:
             prefix (Optional[str]): Prefix for metrics logged in MLflow.
             run_id (str): ID of MLflow run.
+            batch_size (Optional[int]): Opt-in synchronous metric batching (1-1000).
+                None preserves individual logging. Failed batches are not retried;
+                earlier batches may already be persisted by the tracking store.
         """
         self._prefix = prefix
         self.run_id = run_id
         self._logging_activated = True  # by default, logging is activated!
         self.metadata = metadata
+        if batch_size is not None and (
+            type(batch_size) is not int or not 1 <= batch_size <= 1000
+        ):
+            raise ValueError("batch_size must be an integer between 1 and 1000")
+        self._batch_size = batch_size
 
     @property
     def run_id(self):
@@ -112,6 +123,21 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         )
 
         if self._logging_activated:
+            if self._batch_size is not None:
+                batch = []
+                for k, v, i in chain.from_iterable(metrics):
+                    # Match log_metric's millisecond timestamp at observation time.
+                    batch.append(Metric(k, float(v), int(time() * 1000), i))
+                    if len(batch) == self._batch_size:
+                        if run_id is None:
+                            run_id = mlflow.start_run().info.run_id
+                        client.log_batch(run_id, metrics=batch, synchronous=True)
+                        batch = []
+                if batch:
+                    if run_id is None:
+                        run_id = mlflow.start_run().info.run_id
+                    client.log_batch(run_id, metrics=batch, synchronous=True)
+                return
             for k, v, i in chain.from_iterable(metrics):
                 log_metric(k, v, step=i)
 
@@ -134,10 +160,13 @@ class MlflowMetricsHistoryDataset(AbstractDataset):
         Returns:
             dict[str, Any]: dictionary with MLflow metrics dataset description.
         """
-        return {
+        description = {
             "run_id": self._run_id,
             "prefix": self._prefix,
         }
+        if self._batch_size is not None:
+            description["batch_size"] = self._batch_size
+        return description
 
     def _is_dataset_metric(self, key: str) -> bool:
         """Check if given metric belongs to dataset.
